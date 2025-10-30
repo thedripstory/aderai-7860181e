@@ -351,7 +351,7 @@ export default function AderaiApp() {
     try {
       const currencySymbol = CURRENCIES.find((c) => c.code === userData.currency)?.symbol || "$";
 
-      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev", {
+      const response = await fetch("https://aderai-api.akshat-619.workers.dev", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -437,7 +437,7 @@ export default function AderaiApp() {
 
     try {
       // Fetch all segments via worker proxy
-      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segments", {
+      const response = await fetch("https://aderai-api.akshat-619.workers.dev/analytics/segments", {
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
@@ -497,7 +497,7 @@ export default function AderaiApp() {
         setAnalyticsProgress({ current: i + 1, total: segments.length });
 
         // Fetch segment with profile count via worker proxy
-        const response = await fetch(`https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segments/${segment.id}`, {
+        const response = await fetch(`https://aderai-api.akshat-619.workers.dev/analytics/segments/${segment.id}`, {
           headers: {
             "X-API-Key": userData!.klaviyoApiKey,
           },
@@ -552,7 +552,7 @@ export default function AderaiApp() {
   // Fetch segment growth data (7-day change) via worker proxy
   const fetchSegmentGrowth = async (segmentId: string) => {
     try {
-      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segment-values-reports", {
+      const response = await fetch("https://aderai-api.akshat-619.workers.dev/analytics/segment-values-reports", {
         method: "POST",
         headers: {
           "X-API-Key": userData!.klaviyoApiKey,
