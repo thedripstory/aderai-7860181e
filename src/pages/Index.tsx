@@ -25,7 +25,6 @@ import {
   File,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { supabase } from "@/integrations/supabase/client";
 
 /**
  * ADERAI - COMPLETE APP WITH SEGMENT ANALYTICS
@@ -968,14 +967,20 @@ export default function AderaiApp() {
     try {
       // Step 1: Get the "Placed Order" metric ID via Worker
       console.log("📊 Fetching metrics...");
-      const { data: metricsData, error: metricsError } = await supabase.functions.invoke('performance-metrics', {
-        body: { apiKey: userData.klaviyoApiKey },
+      const metricsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/metrics", {
+        mode: "cors",
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
       });
 
-      if (metricsError) {
-        throw new Error(metricsError.message || 'Failed to fetch metrics');
+      console.log("📊 Metrics response status:", metricsResponse.status);
+
+      if (!metricsResponse.ok) {
+        throw new Error("Failed to fetch metrics");
       }
 
+      const metricsData = await metricsResponse.json();
       console.log("📊 Metrics data:", metricsData);
 
       const placedOrderMetric = metricsData.data.find(
@@ -996,17 +1001,22 @@ export default function AderaiApp() {
       const metricId = placedOrderMetric.id;
       console.log("✅ Found conversion metric:", placedOrderMetric.attributes.name, "ID:", metricId);
 
-      // Step 2: Fetch campaigns list via Cloud proxy
+      // Step 2: Fetch campaigns list via Worker
       console.log("📧 Fetching campaigns list...");
-      const { data: campaignsData, error: campaignsError } = await supabase.functions.invoke('performance-campaigns', {
-        body: { apiKey: userData.klaviyoApiKey },
+      const campaignsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/campaigns", {
+        mode: "cors",
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
       });
 
-      console.log("📧 Campaigns response received");
+      console.log("📧 Campaigns response status:", campaignsResponse.status);
 
-      if (campaignsError) {
-        throw new Error(campaignsError.message || 'Failed to fetch campaigns');
+      if (!campaignsResponse.ok) {
+        throw new Error("Failed to fetch campaigns");
       }
+
+      const campaignsData = await campaignsResponse.json();
       console.log("📧 Found campaigns:", campaignsData.data.length);
       console.log(
         "📧 Campaign names:",
@@ -1025,7 +1035,7 @@ export default function AderaiApp() {
 
             // Use Worker proxy for Reporting API
             const reportResponse = await fetch(
-              "https://aderai-worker.akshat-619.workers.dev/performance/campaign-reports",
+              "https://aderai-api.akshat-619.workers.dev/performance/campaign-reports",
               {
                 method: "POST",
                 mode: "cors",
@@ -1116,13 +1126,18 @@ export default function AderaiApp() {
 
     try {
       // Step 1: Get the "Placed Order" metric ID via Worker
-      const { data: metricsData, error: metricsError } = await supabase.functions.invoke('performance-metrics', {
-        body: { apiKey: userData.klaviyoApiKey },
+      const metricsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/metrics", {
+        mode: "cors",
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
       });
 
-      if (metricsError) {
-        throw new Error(metricsError.message || 'Failed to fetch metrics');
+      if (!metricsResponse.ok) {
+        throw new Error("Failed to fetch metrics");
       }
+
+      const metricsData = await metricsResponse.json();
       const placedOrderMetric = metricsData.data.find(
         (m: any) => m.attributes.name === "Placed Order" || m.attributes.name === "Ordered Product",
       );
@@ -1135,14 +1150,19 @@ export default function AderaiApp() {
 
       const metricId = placedOrderMetric.id;
 
-      // Step 2: Fetch flows list via Cloud proxy
-      const { data: flowsData, error: flowsError } = await supabase.functions.invoke('performance-flows', {
-        body: { apiKey: userData.klaviyoApiKey },
+      // Step 2: Fetch flows list via Worker
+      const flowsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/flows", {
+        mode: "cors",
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
       });
 
-      if (flowsError) {
-        throw new Error(flowsError.message || 'Failed to fetch flows');
+      if (!flowsResponse.ok) {
+        throw new Error("Failed to fetch flows");
       }
+
+      const flowsData = await flowsResponse.json();
 
       // Step 3: For each flow, fetch performance using Reporting API via Worker
       // Get ALL flows and use all-time data
@@ -1150,39 +1170,36 @@ export default function AderaiApp() {
         flowsData.data.map(async (flow: any) => {
           try {
             // Use Worker proxy for Reporting API
-            const reportResponse = await fetch(
-              "https://aderai-worker.akshat-619.workers.dev/performance/flow-reports",
-              {
-                method: "POST",
-                mode: "cors",
-                headers: {
-                  "X-API-Key": userData.klaviyoApiKey,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  data: {
-                    type: "flow-values-report",
-                    attributes: {
-                      statistics: [
-                        "opens_unique",
-                        "clicks_unique",
-                        "open_rate",
-                        "click_rate",
-                        "conversion_uniques",
-                        "conversion_value",
-                        "conversion_rate",
-                        "sends",
-                      ],
-                      timeframe: {
-                        key: "since", // All-time data, not just last 30 days
-                      },
-                      conversion_metric_id: metricId,
-                      filter: `equals(flow_id,"${flow.id}")`,
-                    },
-                  },
-                }),
+            const reportResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/flow-reports", {
+              method: "POST",
+              mode: "cors",
+              headers: {
+                "X-API-Key": userData.klaviyoApiKey,
+                "Content-Type": "application/json",
               },
-            );
+              body: JSON.stringify({
+                data: {
+                  type: "flow-values-report",
+                  attributes: {
+                    statistics: [
+                      "opens_unique",
+                      "clicks_unique",
+                      "open_rate",
+                      "click_rate",
+                      "conversion_uniques",
+                      "conversion_value",
+                      "conversion_rate",
+                      "sends",
+                    ],
+                    timeframe: {
+                      key: "since", // All-time data, not just last 30 days
+                    },
+                    conversion_metric_id: metricId,
+                    filter: `equals(flow_id,"${flow.id}")`,
+                  },
+                },
+              }),
+            });
 
             if (reportResponse.ok) {
               const reportData = await reportResponse.json();
