@@ -952,26 +952,268 @@ export default function AderaiApp() {
     }
   };
 
-  // Generate mock campaign data for a segment
+  // State for campaign/flow data
+  const [campaignData, setCampaignData] = useState<any[]>([]);
+  const [flowData, setFlowData] = useState<any[]>([]);
+  const [loadingCampaignData, setLoadingCampaignData] = useState(false);
+
+  // Fetch real campaign data from Klaviyo using Worker proxy
+  const fetchCampaignData = async (segmentId: string) => {
+    if (!userData?.klaviyoApiKey) return;
+
+    setLoadingCampaignData(true);
+    try {
+      // Step 1: Get the "Placed Order" metric ID via Worker
+      const metricsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/metrics", {
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
+      });
+
+      if (!metricsResponse.ok) {
+        throw new Error("Failed to fetch metrics");
+      }
+
+      const metricsData = await metricsResponse.json();
+      const placedOrderMetric = metricsData.data.find(
+        (m: any) => m.attributes.name === "Placed Order" || m.attributes.name === "Ordered Product",
+      );
+
+      if (!placedOrderMetric) {
+        console.warn("No Placed Order metric found");
+        setCampaignData([]);
+        setLoadingCampaignData(false);
+        return;
+      }
+
+      const metricId = placedOrderMetric.id;
+
+      // Step 2: Fetch campaigns list via Worker
+      const campaignsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/campaigns", {
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
+      });
+
+      if (!campaignsResponse.ok) {
+        throw new Error("Failed to fetch campaigns");
+      }
+
+      const campaignsData = await campaignsResponse.json();
+
+      // Step 3: For each campaign, fetch performance using Reporting API via Worker
+      const campaignMetrics = await Promise.all(
+        campaignsData.data.slice(0, 10).map(async (campaign: any) => {
+          try {
+            // Use Worker proxy for Reporting API
+            const reportResponse = await fetch(
+              "https://aderai-worker.akshat-619.workers.dev/performance/campaign-reports",
+              {
+                method: "POST",
+                headers: {
+                  "X-API-Key": userData.klaviyoApiKey,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  data: {
+                    type: "campaign-values-report",
+                    attributes: {
+                      statistics: [
+                        "opens_unique",
+                        "clicks_unique",
+                        "open_rate",
+                        "click_rate",
+                        "bounce_rate",
+                        "conversion_uniques",
+                        "conversion_value",
+                        "conversion_rate",
+                        "revenue_per_recipient",
+                      ],
+                      timeframe: {
+                        key: "last_30_days",
+                      },
+                      conversion_metric_id: metricId,
+                      filter: `equals(campaign_id,"${campaign.id}")`,
+                    },
+                  },
+                }),
+              },
+            );
+
+            if (reportResponse.ok) {
+              const reportData = await reportResponse.json();
+              const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
+
+              return {
+                name: campaign.attributes?.name || "Untitled Campaign",
+                sent: stats.sends || 0,
+                opened: stats.opens_unique || 0,
+                clicked: stats.clicks_unique || 0,
+                revenue: stats.conversion_value || 0,
+                conversions: stats.conversion_uniques || 0,
+                id: campaign.id,
+              };
+            }
+
+            return null;
+          } catch (err) {
+            console.error("Error fetching campaign metrics:", err);
+            return null;
+          }
+        }),
+      );
+
+      const validCampaigns = campaignMetrics.filter((c) => c !== null && c.sent > 0);
+      setCampaignData(validCampaigns);
+    } catch (error) {
+      console.error("Error fetching campaign data:", error);
+      setCampaignData([]);
+    } finally {
+      setLoadingCampaignData(false);
+    }
+  };
+
+  // Fetch real flow data from Klaviyo using Worker proxy
+  const fetchFlowData = async (segmentId: string) => {
+    if (!userData?.klaviyoApiKey) return;
+
+    try {
+      // Step 1: Get the "Placed Order" metric ID via Worker
+      const metricsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/metrics", {
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
+      });
+
+      if (!metricsResponse.ok) {
+        throw new Error("Failed to fetch metrics");
+      }
+
+      const metricsData = await metricsResponse.json();
+      const placedOrderMetric = metricsData.data.find(
+        (m: any) => m.attributes.name === "Placed Order" || m.attributes.name === "Ordered Product",
+      );
+
+      if (!placedOrderMetric) {
+        console.warn("No Placed Order metric found for flows");
+        setFlowData([]);
+        return;
+      }
+
+      const metricId = placedOrderMetric.id;
+
+      // Step 2: Fetch flows list via Worker
+      const flowsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/flows", {
+        headers: {
+          "X-API-Key": userData.klaviyoApiKey,
+        },
+      });
+
+      if (!flowsResponse.ok) {
+        throw new Error("Failed to fetch flows");
+      }
+
+      const flowsData = await flowsResponse.json();
+
+      // Step 3: For each flow, fetch performance using Reporting API via Worker
+      const flowMetrics = await Promise.all(
+        flowsData.data.slice(0, 10).map(async (flow: any) => {
+          try {
+            // Use Worker proxy for Reporting API
+            const reportResponse = await fetch(
+              "https://aderai-worker.akshat-619.workers.dev/performance/flow-reports",
+              {
+                method: "POST",
+                headers: {
+                  "X-API-Key": userData.klaviyoApiKey,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  data: {
+                    type: "flow-values-report",
+                    attributes: {
+                      statistics: [
+                        "opens_unique",
+                        "clicks_unique",
+                        "open_rate",
+                        "click_rate",
+                        "conversion_uniques",
+                        "conversion_value",
+                        "conversion_rate",
+                      ],
+                      timeframe: {
+                        key: "last_30_days",
+                      },
+                      conversion_metric_id: metricId,
+                      filter: `equals(flow_id,"${flow.id}")`,
+                    },
+                  },
+                }),
+              },
+            );
+
+            if (reportResponse.ok) {
+              const reportData = await reportResponse.json();
+              const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
+
+              return {
+                name: flow.attributes?.name || "Untitled Flow",
+                status: flow.attributes?.status || "draft",
+                trigger_type: flow.attributes?.trigger_type || "Manual",
+                id: flow.id,
+                // Stats from Reporting API
+                sent: stats.sends || 0,
+                opened: stats.opens_unique || 0,
+                clicked: stats.clicks_unique || 0,
+                revenue: stats.conversion_value || 0,
+                conversions: stats.conversion_uniques || 0,
+              };
+            }
+
+            // If reporting API fails, return basic flow info without stats
+            return {
+              name: flow.attributes?.name || "Untitled Flow",
+              status: flow.attributes?.status || "draft",
+              trigger_type: flow.attributes?.trigger_type || "Manual",
+              id: flow.id,
+            };
+          } catch (err) {
+            console.error("Error fetching flow metrics:", err);
+            // Return basic info even if reporting fails
+            return {
+              name: flow.attributes?.name || "Untitled Flow",
+              status: flow.attributes?.status || "draft",
+              trigger_type: flow.attributes?.trigger_type || "Manual",
+              id: flow.id,
+            };
+          }
+        }),
+      );
+
+      setFlowData(flowMetrics);
+    } catch (error) {
+      console.error("Error fetching flow data:", error);
+      setFlowData([]);
+    }
+  };
+
+  // Generate mock campaign data for a segment (FALLBACK)
   const getCampaignData = (segmentId: string) => {
-    const campaigns = [
-      { name: "Holiday Promo 2025", sent: 1250, opened: 425, clicked: 89, revenue: 12450, conversions: 67 },
-      { name: "Welcome Series", sent: 890, opened: 534, clicked: 178, revenue: 8920, conversions: 89 },
-      { name: "Win-Back Campaign", sent: 567, opened: 198, clicked: 45, revenue: 5340, conversions: 34 },
-      { name: "VIP Exclusive Offer", sent: 234, opened: 187, clicked: 98, revenue: 15680, conversions: 56 },
-      { name: "Product Launch", sent: 1456, opened: 654, clicked: 234, revenue: 18900, conversions: 123 },
-    ];
-    return campaigns;
+    if (campaignData.length > 0) {
+      return campaignData;
+    }
+
+    // Return empty if no data
+    return [];
   };
 
   const getFlowData = (segmentId: string) => {
-    const flows = [
-      { name: "Abandoned Cart Recovery", members: 456, revenue: 34500, orders: 234, avgOrderValue: 147.44 },
-      { name: "Post-Purchase Follow-Up", members: 789, revenue: 12340, orders: 456, avgOrderValue: 27.06 },
-      { name: "Browse Abandonment", members: 234, revenue: 8900, orders: 123, avgOrderValue: 72.36 },
-      { name: "Customer Winback", members: 123, revenue: 5670, orders: 67, avgOrderValue: 84.63 },
-    ];
-    return flows;
+    if (flowData.length > 0) {
+      return flowData;
+    }
+
+    // Return empty if no data
+    return [];
   };
 
   // Get filtered and sorted segments for table
@@ -2107,6 +2349,9 @@ export default function AderaiApp() {
                                 onClick={() => {
                                   setSelectedSegmentForCampaign(segment.id);
                                   setShowCampaignModal(true);
+                                  // Fetch real campaign and flow data
+                                  fetchCampaignData(segment.id);
+                                  fetchFlowData(segment.id);
                                 }}
                                 className="px-3 py-1.5 bg-[#2A2A2A] hover:bg-[#EF3F3F] text-white text-xs rounded-lg transition"
                               >
@@ -2479,171 +2724,250 @@ export default function AderaiApp() {
                 </button>
               </div>
 
-              {/* Overview Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                  <div className="text-sm text-gray-400 mb-1">Total Revenue</div>
-                  <div className="text-2xl font-bold text-[#10B981]">
-                    $
-                    {getCampaignData(selectedSegmentForCampaign)
-                      .reduce((sum, c) => sum + c.revenue, 0)
-                      .toLocaleString()}
-                  </div>
+              {/* Loading State */}
+              {loadingCampaignData ? (
+                <div className="text-center py-12">
+                  <Loader className="w-12 h-12 text-[#EF3F3F] animate-spin mx-auto mb-4" />
+                  <p className="text-gray-400">Loading campaign data from Klaviyo...</p>
                 </div>
-                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                  <div className="text-sm text-gray-400 mb-1">Total Conversions</div>
-                  <div className="text-2xl font-bold text-white">
-                    {getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.conversions, 0)}
+              ) : (
+                <>
+                  {/* Overview Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                      <div className="text-sm text-gray-400 mb-1">Total Revenue</div>
+                      <div className="text-2xl font-bold text-[#10B981]">
+                        $
+                        {getCampaignData(selectedSegmentForCampaign)
+                          .reduce((sum, c) => sum + c.revenue, 0)
+                          .toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                      <div className="text-sm text-gray-400 mb-1">Total Conversions</div>
+                      <div className="text-2xl font-bold text-white">
+                        {getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.conversions, 0)}
+                      </div>
+                    </div>
+                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                      <div className="text-sm text-gray-400 mb-1">Avg Open Rate</div>
+                      <div className="text-2xl font-bold text-white">
+                        {(
+                          (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.opened / c.sent, 0) /
+                            getCampaignData(selectedSegmentForCampaign).length) *
+                          100
+                        ).toFixed(1)}
+                        %
+                      </div>
+                    </div>
+                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                      <div className="text-sm text-gray-400 mb-1">Avg Click Rate</div>
+                      <div className="text-2xl font-bold text-white">
+                        {(
+                          (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.clicked / c.sent, 0) /
+                            getCampaignData(selectedSegmentForCampaign).length) *
+                          100
+                        ).toFixed(1)}
+                        %
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                  <div className="text-sm text-gray-400 mb-1">Avg Open Rate</div>
-                  <div className="text-2xl font-bold text-white">
-                    {(
-                      (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.opened / c.sent, 0) /
-                        getCampaignData(selectedSegmentForCampaign).length) *
-                      100
-                    ).toFixed(1)}
-                    %
-                  </div>
-                </div>
-                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                  <div className="text-sm text-gray-400 mb-1">Avg Click Rate</div>
-                  <div className="text-2xl font-bold text-white">
-                    {(
-                      (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.clicked / c.sent, 0) /
-                        getCampaignData(selectedSegmentForCampaign).length) *
-                      100
-                    ).toFixed(1)}
-                    %
-                  </div>
-                </div>
-              </div>
 
-              {/* Campaigns Table */}
-              <div className="mb-8">
-                <h4 className="text-lg font-semibold text-white mb-4">📧 Campaign Performance</h4>
-                <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-[#2A2A2A]">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Campaign</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Sent</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Opened</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Clicked</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Revenue</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Conv.</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">ROI</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#2A2A2A]">
-                      {getCampaignData(selectedSegmentForCampaign).map((campaign, idx) => {
-                        const openRate = ((campaign.opened / campaign.sent) * 100).toFixed(1);
-                        const clickRate = ((campaign.clicked / campaign.sent) * 100).toFixed(1);
-                        const roi = ((campaign.revenue / (campaign.sent * 0.5)) * 100).toFixed(0); // Assume $0.50 cost per send
-
-                        return (
-                          <tr key={idx} className="hover:bg-[#1A1A1A] transition">
-                            <td className="px-4 py-3 text-white font-medium">{campaign.name}</td>
-                            <td className="px-4 py-3 text-right text-gray-300">{campaign.sent.toLocaleString()}</td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="text-white">{campaign.opened.toLocaleString()}</div>
-                              <div className="text-xs text-gray-500">{openRate}%</div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="text-white">{campaign.clicked.toLocaleString()}</div>
-                              <div className="text-xs text-gray-500">{clickRate}%</div>
-                            </td>
-                            <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
-                              ${campaign.revenue.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-3 text-right text-white">{campaign.conversions}</td>
-                            <td className="px-4 py-3 text-right">
-                              <span
-                                className={`px-2 py-1 rounded text-xs font-semibold ${
-                                  parseInt(roi) > 200
-                                    ? "bg-[#10B981]/20 text-[#10B981]"
-                                    : "bg-[#F59E0B]/20 text-[#F59E0B]"
-                                }`}
-                              >
-                                {roi}%
-                              </span>
-                            </td>
+                  {/* Campaigns Table */}
+                  <div className="mb-8">
+                    <h4 className="text-lg font-semibold text-white mb-4">📧 Campaign Performance</h4>
+                    <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-[#2A2A2A]">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
+                              Campaign
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Sent</th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Opened
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Clicked
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Revenue
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Conv.
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">ROI</th>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                        </thead>
+                        <tbody className="divide-y divide-[#2A2A2A]">
+                          {getCampaignData(selectedSegmentForCampaign).length > 0 ? (
+                            getCampaignData(selectedSegmentForCampaign).map((campaign, idx) => {
+                              const openRate = ((campaign.opened / campaign.sent) * 100).toFixed(1);
+                              const clickRate = ((campaign.clicked / campaign.sent) * 100).toFixed(1);
+                              const roi = ((campaign.revenue / (campaign.sent * 0.5)) * 100).toFixed(0); // Assume $0.50 cost per send
 
-              {/* Flows Table */}
-              <div className="mb-6">
-                <h4 className="text-lg font-semibold text-white mb-4">🔄 Klaviyo Flows</h4>
-                <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-[#2A2A2A]">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Flow Name</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Members</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Revenue</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Orders</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                          Avg Order
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#2A2A2A]">
-                      {getFlowData(selectedSegmentForCampaign).map((flow, idx) => (
-                        <tr key={idx} className="hover:bg-[#1A1A1A] transition">
-                          <td className="px-4 py-3 text-white font-medium">{flow.name}</td>
-                          <td className="px-4 py-3 text-right text-gray-300">{flow.members.toLocaleString()}</td>
-                          <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
-                            ${flow.revenue.toLocaleString()}
-                          </td>
-                          <td className="px-4 py-3 text-right text-white">{flow.orders}</td>
-                          <td className="px-4 py-3 text-right text-gray-300">${flow.avgOrderValue.toFixed(2)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                              return (
+                                <tr key={idx} className="hover:bg-[#1A1A1A] transition">
+                                  <td className="px-4 py-3 text-white font-medium">{campaign.name}</td>
+                                  <td className="px-4 py-3 text-right text-gray-300">
+                                    {campaign.sent.toLocaleString()}
+                                  </td>
+                                  <td className="px-4 py-3 text-right">
+                                    <div className="text-white">{campaign.opened.toLocaleString()}</div>
+                                    <div className="text-xs text-gray-500">{openRate}%</div>
+                                  </td>
+                                  <td className="px-4 py-3 text-right">
+                                    <div className="text-white">{campaign.clicked.toLocaleString()}</div>
+                                    <div className="text-xs text-gray-500">{clickRate}%</div>
+                                  </td>
+                                  <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
+                                    ${campaign.revenue.toLocaleString()}
+                                  </td>
+                                  <td className="px-4 py-3 text-right text-white">{campaign.conversions}</td>
+                                  <td className="px-4 py-3 text-right">
+                                    <span
+                                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                                        parseInt(roi) > 200
+                                          ? "bg-[#10B981]/20 text-[#10B981]"
+                                          : "bg-[#F59E0B]/20 text-[#F59E0B]"
+                                      }`}
+                                    >
+                                      {roi}%
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <tr>
+                              <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                                No campaigns found. Create campaigns in Klaviyo to see performance data here.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
 
-              {/* Insights */}
-              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-6">
-                <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                  💡 Automation Suggestions
-                </h4>
-                <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#EF3F3F]">•</span>
-                    <span>Consider creating a VIP-exclusive flow for this high-performing segment</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#EF3F3F]">•</span>
-                    <span>Holiday campaigns show 45% higher engagement - schedule similar campaigns</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#EF3F3F]">•</span>
-                    <span>Cart abandonment flow generates highest ROI - ensure all segment members are enrolled</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#EF3F3F]">•</span>
-                    <span>Test sending campaigns on weekdays for this segment (currently weekend-heavy)</span>
-                  </li>
-                </ul>
-              </div>
+                  {/* Flows Table */}
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-white mb-4">🔄 Klaviyo Flows Performance</h4>
+                    <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-[#2A2A2A]">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
+                              Flow Name
+                            </th>
+                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase">
+                              Status
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
+                              Trigger
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Sent</th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Opened
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Clicked
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Revenue
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                              Conv.
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#2A2A2A]">
+                          {getFlowData(selectedSegmentForCampaign).length > 0 ? (
+                            getFlowData(selectedSegmentForCampaign).map((flow, idx) => {
+                              const hasStats = flow.sent && flow.sent > 0;
+                              const openRate = hasStats ? (((flow.opened || 0) / flow.sent) * 100).toFixed(1) : "-";
+                              const clickRate = hasStats ? (((flow.clicked || 0) / flow.sent) * 100).toFixed(1) : "-";
 
-              {/* Close Button */}
-              <div className="flex justify-end mt-6">
-                <button
-                  onClick={() => setShowCampaignModal(false)}
-                  className="px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition"
-                >
-                  Close
-                </button>
-              </div>
+                              return (
+                                <tr key={idx} className="hover:bg-[#1A1A1A] transition">
+                                  <td className="px-4 py-3 text-white font-medium">{flow.name}</td>
+                                  <td className="px-4 py-3 text-center">
+                                    <span
+                                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                                        flow.status === "live"
+                                          ? "bg-[#10B981]/20 text-[#10B981]"
+                                          : "bg-gray-500/20 text-gray-400"
+                                      }`}
+                                    >
+                                      {flow.status || "Draft"}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 text-gray-300 text-sm">{flow.trigger_type || "Manual"}</td>
+                                  <td className="px-4 py-3 text-right text-gray-300">
+                                    {hasStats ? (flow.sent || 0).toLocaleString() : "-"}
+                                  </td>
+                                  <td className="px-4 py-3 text-right">
+                                    {hasStats ? (
+                                      <>
+                                        <div className="text-white">{(flow.opened || 0).toLocaleString()}</div>
+                                        <div className="text-xs text-gray-500">{openRate}%</div>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-500">-</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-right">
+                                    {hasStats ? (
+                                      <>
+                                        <div className="text-white">{(flow.clicked || 0).toLocaleString()}</div>
+                                        <div className="text-xs text-gray-500">{clickRate}%</div>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-500">-</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
+                                    {hasStats ? `$${(flow.revenue || 0).toLocaleString()}` : "-"}
+                                  </td>
+                                  <td className="px-4 py-3 text-right text-white">
+                                    {hasStats ? flow.conversions || 0 : "-"}
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <tr>
+                              <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                                No flows found. Create flows in Klaviyo to see performance data here.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    {getFlowData(selectedSegmentForCampaign).length > 0 &&
+                      !getFlowData(selectedSegmentForCampaign)[0].sent && (
+                        <div className="mt-3 flex items-start gap-2 text-sm text-gray-400">
+                          <Info className="w-4 h-4 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
+                          <p>
+                            Performance metrics will appear after flows have sent messages. Data shown is from the last
+                            30 days.
+                          </p>
+                        </div>
+                      )}
+                  </div>
+
+                  {/* Close Button */}
+                  <div className="flex justify-end mt-6">
+                    <button
+                      onClick={() => setShowCampaignModal(false)}
+                      className="px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
