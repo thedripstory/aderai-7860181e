@@ -316,7 +316,7 @@ export default function AderaiApp() {
   const [isCreating, setIsCreating] = useState(false);
   const [results, setResults] = useState<{ segmentId: string; status: "success" | "error"; message: string }[]>([]);
   const [currentStep, setCurrentStep] = useState<"setup" | "select" | "creating" | "complete">("setup");
-  const [workerUrl, setWorkerUrl] = useState("https://your-worker.your-subdomain.workers.dev/create-segments");
+  const [workerUrl, setWorkerUrl] = useState("https://aderai-api.akshat-619.workers.dev/create-segments");
 
   const toggleSegment = (segmentId: string) => {
     const newSelected = new Set(selectedSegments);
