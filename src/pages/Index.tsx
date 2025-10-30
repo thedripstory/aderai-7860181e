@@ -996,22 +996,17 @@ export default function AderaiApp() {
       const metricId = placedOrderMetric.id;
       console.log("✅ Found conversion metric:", placedOrderMetric.attributes.name, "ID:", metricId);
 
-      // Step 2: Fetch campaigns list via Worker
+      // Step 2: Fetch campaigns list via Cloud proxy
       console.log("📧 Fetching campaigns list...");
-      const campaignsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/campaigns", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
+      const { data: campaignsData, error: campaignsError } = await supabase.functions.invoke('performance-campaigns', {
+        body: { apiKey: userData.klaviyoApiKey },
       });
 
-      console.log("📧 Campaigns response status:", campaignsResponse.status);
+      console.log("📧 Campaigns response received");
 
-      if (!campaignsResponse.ok) {
-        throw new Error("Failed to fetch campaigns");
+      if (campaignsError) {
+        throw new Error(campaignsError.message || 'Failed to fetch campaigns');
       }
-
-      const campaignsData = await campaignsResponse.json();
       console.log("📧 Found campaigns:", campaignsData.data.length);
       console.log(
         "📧 Campaign names:",
@@ -1140,19 +1135,14 @@ export default function AderaiApp() {
 
       const metricId = placedOrderMetric.id;
 
-      // Step 2: Fetch flows list via Worker
-      const flowsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/flows", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
+      // Step 2: Fetch flows list via Cloud proxy
+      const { data: flowsData, error: flowsError } = await supabase.functions.invoke('performance-flows', {
+        body: { apiKey: userData.klaviyoApiKey },
       });
 
-      if (!flowsResponse.ok) {
-        throw new Error("Failed to fetch flows");
+      if (flowsError) {
+        throw new Error(flowsError.message || 'Failed to fetch flows');
       }
-
-      const flowsData = await flowsResponse.json();
 
       // Step 3: For each flow, fetch performance using Reporting API via Worker
       // Get ALL flows and use all-time data

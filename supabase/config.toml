@@ -2,3 +2,9 @@ project_id = "jnknwjqqzigbiollbzzz"
 
 [functions.performance-metrics]
 verify_jwt = false
+
+[functions.performance-campaigns]
+verify_jwt = false
+
+[functions.performance-flows]
+verify_jwt = false
