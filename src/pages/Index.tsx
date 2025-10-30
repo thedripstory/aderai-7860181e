@@ -791,8 +791,8 @@ export default function AderaiApp() {
 
   // Export functions
   const exportToCSV = () => {
-    const headers = ["Segment Name", "Members", "Change (7d)", "Change %", "Percentage of Total"];
     const summary = getAnalyticsSummary();
+    const headers = ["Segment Name", "Members", "Change (7d)", "Change %", "Percentage of Total"];
     const rows = getFilteredSegments()
       .map((seg) => {
         const stats = segmentStats[seg.id];
@@ -819,9 +819,9 @@ export default function AderaiApp() {
   };
 
   const exportToExcel = () => {
+    const summary = getAnalyticsSummary();
     // Create HTML table
     const headers = ["Segment", "Members", "Change (7d)", "Change %", "% of Total"];
-    const summary = getAnalyticsSummary();
     const rows = getFilteredSegments()
       .map((seg) => {
         const stats = segmentStats[seg.id];
@@ -857,8 +857,8 @@ export default function AderaiApp() {
   };
 
   const exportToPDF = () => {
-    // Create printable HTML
     const summary = getAnalyticsSummary();
+    // Create printable HTML
     const content = `
       <html>
         <head>
@@ -1680,6 +1680,27 @@ export default function AderaiApp() {
               >
                 <Download className="w-5 h-5" />
                 <span className="text-sm font-medium">Export Report</span>
+              </button>
+              <button
+                onClick={() => {
+                  if (userData) {
+                    setEditingSettings({
+                      accountName: userData.accountName || "",
+                      currency: userData.currency || "USD",
+                      aov: userData.aov.toString() || "",
+                      vipThreshold: userData.vipThreshold.toString() || "",
+                      highValueThreshold: userData.highValueThreshold.toString() || "",
+                      newCustomerDays: userData.newCustomerDays.toString() || "",
+                      lapsedDays: userData.lapsedDays.toString() || "",
+                      churnedDays: userData.churnedDays.toString() || "",
+                    });
+                    setShowSettingsModal(true);
+                  }
+                }}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition"
+              >
+                <SettingsIcon className="w-5 h-5" />
+                <span className="text-sm">Settings</span>
               </button>
               <button
                 onClick={() => setView("dashboard")}
