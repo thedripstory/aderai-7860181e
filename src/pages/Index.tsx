@@ -1036,7 +1036,7 @@ export default function AderaiApp() {
 
           // Add delay between requests (500ms) to avoid rate limiting
           if (index > 0) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
           }
 
           // Use Worker proxy for Reporting API
@@ -1164,15 +1164,17 @@ export default function AderaiApp() {
 
       // Step 3: For each flow, fetch performance using Reporting API via Worker
       // Get ALL flows and use all-time data with rate limiting delays
+      // Limit to first 5 to avoid rate limits
+      const flowsToFetch = flowsData.data.slice(0, 5);
       const flowMetrics = [];
-      for (let i = 0; i < flowsData.data.length; i++) {
-        const flow = flowsData.data[i];
+      for (let i = 0; i < flowsToFetch.length; i++) {
+        const flow = flowsToFetch[i];
         try {
-          console.log(`📊 [${i + 1}/${flowsData.data.length}] Fetching flow stats for: ${flow.attributes?.name}`);
+          console.log(`📊 [${i + 1}/${flowsToFetch.length}] Fetching flow stats for: ${flow.attributes?.name}`);
 
-          // Add delay between requests (500ms) to avoid rate limiting
+          // Add delay between requests (2 seconds) to avoid rate limiting
           if (i > 0) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 2000));
           }
 
           // Use Worker proxy for Reporting API
