@@ -445,20 +445,42 @@ export default function AderaiApp() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch segments");
+        const errorText = await response.text();
+        console.error("API Error:", response.status, errorText);
+
+        if (response.status === 401 || response.status === 403) {
+          alert(
+            'API Key Error: Please check that your Klaviyo API key has "Read Segments" permission.\n\nTo fix:\n1. Go to Klaviyo Settings → API Keys\n2. Create a new Private API Key\n3. Enable "Read Segments" scope\n4. Update your API key in Settings',
+          );
+        } else {
+          alert(`Error loading analytics (${response.status}). Please try again or check your API key permissions.`);
+        }
+        return;
       }
 
       const data = await response.json();
       const segments = data.data || [];
+
+      if (segments.length === 0) {
+        alert("No segments found in your Klaviyo account. Create some segments first!");
+        return;
+      }
 
       setAllSegments(segments);
       setAnalyticsProgress({ current: 0, total: segments.length });
 
       // Fetch profile counts for each segment
       await fetchSegmentCounts(segments);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching segments:", error);
-      alert("Error loading analytics. Please check your API key.");
+
+      if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+        alert(
+          "Network Error: Unable to connect to Klaviyo API.\n\nThis could be due to:\n• CORS/network restrictions\n• Internet connection issues\n• Klaviyo API being down\n\nPlease try again or contact support.",
+        );
+      } else {
+        alert("Error loading analytics. Please check your API key and try again.\n\nError: " + error.message);
+      }
     } finally {
       setLoadingAnalytics(false);
     }
@@ -1440,13 +1462,32 @@ export default function AderaiApp() {
             <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-12 text-center">
               <BarChart3 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">No Analytics Data</h3>
-              <p className="text-gray-400 mb-6">Click "Refresh" to load your segment analytics from Klaviyo.</p>
+              <p className="text-gray-400 mb-6">Click "Load Analytics" to fetch your segment data from Klaviyo.</p>
               <button
                 onClick={fetchAllSegments}
-                className="bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 px-6 rounded-lg transition"
+                className="bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 px-6 rounded-lg transition mb-8"
               >
                 Load Analytics
               </button>
+
+              {/* Troubleshooting Tips */}
+              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-6 text-left max-w-2xl mx-auto">
+                <div className="flex items-start gap-2 text-sm">
+                  <Info className="w-5 h-5 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-gray-300 mb-2">💡 Troubleshooting</p>
+                    <ul className="text-gray-400 space-y-1">
+                      <li>
+                        • Make sure your Klaviyo API key has <strong className="text-white">"Read Segments"</strong>{" "}
+                        permission
+                      </li>
+                      <li>• Check that you have segments created in your Klaviyo account</li>
+                      <li>• First load may take 1-2 minutes (Klaviyo rate limits)</li>
+                      <li>• Subsequent loads are instant (1-hour cache)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
