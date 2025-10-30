@@ -1,804 +1,1101 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
+  Info,
   Zap,
-  Target,
-  TrendingUp,
-  ShoppingCart,
-  Mail,
-  User,
-  Filter,
-  CheckCircle2,
+  CheckCircle,
   AlertCircle,
-  Loader2,
-  ExternalLink,
+  LogOut,
+  Settings,
+  TrendingUp,
+  DollarSign,
+  Users,
+  ShoppingCart,
 } from "lucide-react";
 
-// Color scheme matching The Drip Story
+// ==================== TYPES ====================
+interface User {
+  id: string;
+  email: string;
+  accountName: string;
+  klaviyoApiKey: string;
+  metrics: {
+    aov: number;
+    vipThreshold: number;
+    highValueThreshold: number;
+    newCustomerDays: number;
+    lapsedDays: number;
+    churnedDays: number;
+  };
+  createdAt: string;
+}
+
+interface SegmentResult {
+  segmentId: string;
+  status: "success" | "error";
+  message: string;
+  klaviyoId?: string;
+}
+
+// ==================== CONSTANTS ====================
+const WORKER_URL = "https://aderai-api.akshat-619.workers.dev";
+
 const COLORS = {
   primary: "#EF3F3F",
-  background: "#0A0A0A",
+  bg: "#0A0A0A",
   card: "#1A1A1A",
+  border: "#333333",
   text: "#FFFFFF",
-  textMuted: "#9CA3AF",
-  border: "#2A2A2A",
-  success: "#10B981",
-  error: "#EF4444",
+  textGray: "#999999",
 };
 
-// Complete segment library from BFCM Playbook
-const SEGMENT_LIBRARY = {
-  engagement: {
-    title: "📧 Engagement & Activity",
-    icon: Mail,
-    color: COLORS.primary,
-    segments: [
-      {
-        id: "engaged-30",
-        name: "Engaged (Last 30 days)",
-        emoji: "🫡",
-        description: "Opened or clicked in last 30 days",
-      },
-      {
-        id: "engaged-60",
-        name: "Engaged (Last 60 Days)",
-        emoji: "☝🏻",
-        description: "Opened or clicked in last 60 days",
-      },
-      {
-        id: "engaged-90",
-        name: "Engaged (Last 90 Days)",
-        emoji: "🤑",
-        description: "Opened or clicked in last 90 days",
-      },
-      { id: "highly-engaged", name: "Highly Engaged", emoji: "🔝", description: "Opened 5+ emails in last 30 days" },
-      { id: "recent-clickers", name: "Recent Clickers", emoji: "😎", description: "Clicked link in last 14 days" },
-      { id: "engaged-non-buyers", name: "Engaged Non-Buyers", emoji: "📕", description: "Active but never purchased" },
-      {
-        id: "active-site-30",
-        name: "Active on Site (Last 30 Days)",
-        emoji: "👁️‍🗨️",
-        description: "Visited website recently",
-      },
-      {
-        id: "unengaged-90",
-        name: "Unengaged (90+ Days Inactive)",
-        emoji: "👎🏻",
-        description: "No activity for 90+ days",
-      },
-      {
-        id: "unengaged-180",
-        name: "Unengaged (180+ Days Inactive)",
-        emoji: "🙅🏻‍♂️",
-        description: "No activity for 180+ days",
-      },
-    ],
-  },
+// ==================== SEGMENT LIBRARY ====================
+const getSegmentLibrary = (metrics?: User["metrics"]) => {
+  const library = {
+    // TEST
+    "test-email-marketable": {
+      name: "Email Marketable (Test)",
+      description: "Profiles who can receive email marketing",
+      category: "test",
+      icon: "✅",
+    },
 
-  lifecycle: {
-    title: "💰 Customer Lifecycle & Value",
-    icon: TrendingUp,
-    color: "#10B981",
-    segments: [
-      { id: "new-subscribers", name: "New Subscribers", emoji: "🤩", description: "Subscribed in last 7 days" },
-      {
-        id: "recent-first-time",
-        name: "Recent First-Time Customers",
-        emoji: "💰",
-        description: "First purchase in last 30 days",
-      },
-      { id: "repeat-customers", name: "Repeat Customers", emoji: "💸", description: "Purchased 2+ times" },
-      { id: "one-time-customers", name: "One-Time Customers", emoji: "1️⃣", description: "Purchased exactly once" },
-      { id: "active-customers", name: "Active Customers", emoji: "🥰", description: "Purchased in last 90 days" },
-      { id: "lapsed-customers", name: "Lapsed Customers", emoji: "☹️", description: "No purchase in 90-180 days" },
-      { id: "churned-customers", name: "Churned Customers", emoji: "😟", description: "No purchase in 180+ days" },
-      { id: "vip-customers", name: "VIP Customers", emoji: "👑", description: "Top 10% by lifetime value" },
-      { id: "big-spenders", name: "Big Spenders", emoji: "⚡", description: "High average order value" },
-      { id: "bargain-shoppers", name: "Bargain Shoppers", emoji: "💫", description: "Only buy on discount" },
-      { id: "high-churn-risk", name: "High Churn Risk", emoji: "😥", description: "Showing signs of disengagement" },
-      {
-        id: "likely-purchase-soon",
-        name: "Likely to Purchase Soon",
-        emoji: "☺️",
-        description: "High engagement, no recent purchase",
-      },
-      { id: "predicted-vips", name: "Predicted VIPs", emoji: "❤️‍🔥", description: "Showing VIP purchase patterns" },
-      { id: "high-aov", name: "High AOV", emoji: "🪄", description: "Average order value above $X" },
-      { id: "low-aov", name: "Low AOV", emoji: "🪫", description: "Average order value below $X" },
-    ],
-  },
+    // ENGAGEMENT
+    "engaged-30": {
+      name: "Engaged Last 30 Days",
+      description: "Active users in the last month",
+      category: "engagement",
+      icon: "📧",
+    },
+    "engaged-60": {
+      name: "Engaged Last 60 Days",
+      description: "Active users in the last 60 days",
+      category: "engagement",
+      icon: "📧",
+    },
+    "engaged-clickers": {
+      name: "Email Clickers (30 Days)",
+      description: "Users who clicked emails recently",
+      category: "engagement",
+      icon: "👆",
+    },
+    "opened-email-30": {
+      name: "Opened Email (30 Days)",
+      description: "Users who opened emails recently",
+      category: "engagement",
+      icon: "👁️",
+    },
+    "site-visitors-30": {
+      name: "Site Visitors (30 Days)",
+      description: "Recent website visitors",
+      category: "engagement",
+      icon: "🌐",
+    },
 
-  shopping: {
-    title: "🛒 Shopping Behaviour",
-    icon: ShoppingCart,
-    color: "#F59E0B",
-    segments: [
-      { id: "all-customers", name: "All Customers (PUR ≥ 1)", emoji: "🛍️", description: "Anyone who has purchased" },
-      {
-        id: "never-purchased",
-        name: "Never Purchased (Prospects)",
-        emoji: "🥎",
-        description: "Subscribed but no orders",
-      },
-      {
-        id: "recent-purchasers-30",
-        name: "Recent Purchasers (Last 30 Days)",
-        emoji: "🔥",
-        description: "Purchased in last month",
-      },
-      { id: "abandoned-cart", name: "Abandoned Cart", emoji: "🛒", description: "Items in cart, no checkout" },
-      {
-        id: "abandoned-cart-high-value",
-        name: "Abandoned Cart - High Value",
-        emoji: "🔑",
-        description: "Cart value above $X",
-      },
-      {
-        id: "abandoned-checkout",
-        name: "Abandoned Checkout",
-        emoji: "🗃️",
-        description: "Started checkout, didn't complete",
-      },
-      {
-        id: "abandoned-checkout-high-value",
-        name: "Abandoned Checkout - High Value",
-        emoji: "🚛",
-        description: "High-value abandoned checkout",
-      },
-      {
-        id: "browse-abandonment",
-        name: "Browse Abandonment",
-        emoji: "📱",
-        description: "Viewed products, no cart add",
-      },
-      {
-        id: "category-interest",
-        name: "Category Interest",
-        emoji: "🫣",
-        description: "Viewed specific category 3+ times",
-      },
-      {
-        id: "product-specific-interest",
-        name: "Product-Specific Interest",
-        emoji: "📦",
-        description: "Viewed specific product multiple times",
-      },
-      { id: "cross-sell", name: "Cross-Sell", emoji: "🔀", description: "Bought product A, show product B" },
-      { id: "category-buyers", name: "Category Buyers", emoji: "⚽", description: "Purchased from specific category" },
-      {
-        id: "multi-category-shoppers",
-        name: "Multi-Category Shoppers",
-        emoji: "🤹🏻",
-        description: "Bought from 2+ categories",
-      },
-      {
-        id: "frequent-site-visitors",
-        name: "Frequent Site Visitors",
-        emoji: "🖥️",
-        description: "Visits site 5+ times/month",
-      },
-      { id: "coupon-users", name: "Coupon Users", emoji: "🚦", description: "Uses discount codes regularly" },
-      { id: "full-price-buyers", name: "Full-Price Buyers", emoji: "💲", description: "Never uses discounts" },
-      { id: "product-reviewers", name: "Product Reviewers", emoji: "🖊️", description: "Left product reviews" },
-      { id: "non-reviewers", name: "Non-Reviewers", emoji: "💭", description: "Purchased but never reviewed" },
-    ],
-  },
+    // LIFECYCLE
+    "new-customers-30": {
+      name: `New Customers (${metrics?.newCustomerDays || 30} Days)`,
+      description: "First-time purchasers",
+      category: "lifecycle",
+      icon: "🆕",
+    },
+    "repeat-customers": {
+      name: "Repeat Customers",
+      description: "2+ purchases all-time",
+      category: "lifecycle",
+      icon: "🔄",
+    },
+    "vip-customers": {
+      name: `VIP Customers ($${metrics?.vipThreshold || 500}+ LTV)`,
+      description: "Your highest-value customers",
+      category: "lifecycle",
+      icon: "👑",
+    },
+    "lapsed-60": {
+      name: `Lapsed Customers (${metrics?.lapsedDays || 60}+ Days)`,
+      description: "At-risk customers who haven't purchased recently",
+      category: "lifecycle",
+      icon: "⚠️",
+    },
+    "churned-customers": {
+      name: `Churned Customers (${metrics?.churnedDays || 180}+ Days)`,
+      description: "Lost customers needing win-back",
+      category: "lifecycle",
+      icon: "❌",
+    },
+    "high-value-customers": {
+      name: `High-Value Customers ($${metrics?.highValueThreshold || 300}+ LTV)`,
+      description: "Above-average spenders",
+      category: "lifecycle",
+      icon: "💰",
+    },
 
-  demographic: {
-    title: "👤 Profile & Demographics",
-    icon: User,
-    color: "#8B5CF6",
-    segments: [
-      { id: "gender-male", name: "Gender - Male", emoji: "👦🏻", description: "Male identified profiles" },
-      { id: "gender-female", name: "Gender - Female", emoji: "👩🏻", description: "Female identified profiles" },
-      { id: "gender-uncertain", name: "Gender - Uncertain", emoji: "🦸🏻", description: "Gender not specified" },
-      {
-        id: "location-country",
-        name: "Location - by Country/Region",
-        emoji: "🌎",
-        description: "Target specific countries",
-      },
-      {
-        id: "location-radius",
-        name: "Location - Proximity Radius",
-        emoji: "📍",
-        description: "Within X miles of location",
-      },
-      {
-        id: "birthday-upcoming",
-        name: "Birthday Upcoming (This Month)",
-        emoji: "🎂",
-        description: "Birthday in current month",
-      },
-      { id: "age-groups", name: "Age Group Segments", emoji: "😌", description: "Segment by age ranges" },
-      {
-        id: "region-eu-non-eu",
-        name: "Region Segments (EU vs Non-EU)",
-        emoji: "🗺️",
-        description: "EU vs non-EU customers",
-      },
-    ],
-  },
+    // SHOPPING BEHAVIOR
+    "cart-abandoners-24h": {
+      name: "Cart Abandoners (24 Hours)",
+      description: "Started checkout but didn't complete",
+      category: "shopping",
+      icon: "🛒",
+    },
+    "browse-abandoners": {
+      name: "Browse Abandoners (7 Days)",
+      description: "Viewed products but didn't buy",
+      category: "shopping",
+      icon: "👀",
+    },
+    "purchasers-90d": {
+      name: "Purchasers (90 Days)",
+      description: "Recent purchasers",
+      category: "shopping",
+      icon: "✅",
+    },
+    "high-aov-customers": {
+      name: `High AOV Customers ($${Math.round((metrics?.aov || 100) * 1.5)}+)`,
+      description: "Orders above 1.5x your AOV",
+      category: "shopping",
+      icon: "💎",
+    },
 
-  exclusions: {
-    title: "❌ Exclusion Filters",
-    icon: Filter,
-    color: "#EF4444",
-    segments: [
-      { id: "excl-unsubscribed", name: "Unsubscribed Contacts", emoji: "🗑️", description: "Opted out of emails" },
-      { id: "excl-bounced", name: "Bounced Email Addresses", emoji: "🎾", description: "Email addresses that bounced" },
-      { id: "excl-not-opted-in", name: "Not Opted-In Profiles", emoji: "🚥", description: "No explicit consent" },
-      {
-        id: "excl-recent-purchasers",
-        name: "Recent Purchasers",
-        emoji: "🔜",
-        description: "Just bought (exclude from promo)",
-      },
-      { id: "excl-refunded", name: "Refunded Customers", emoji: "🎣", description: "Requested refund recently" },
-      {
-        id: "excl-negative-feedback",
-        name: "Negative Feedback",
-        emoji: "🤕",
-        description: "Left negative reviews/complaints",
-      },
-      { id: "excl-unengaged", name: "Unengaged Subscribers", emoji: "🎯", description: "Never engaged with emails" },
-      { id: "excl-sunset", name: "Sunset Segment", emoji: "🌇", description: "Inactive 365+ days, ready to remove" },
-      { id: "excl-high-churn", name: "High Churn Risk", emoji: "🥴", description: "About to unsubscribe" },
-      {
-        id: "excl-received-5-0-engagement",
-        name: "Received 5, opened or clicked 0",
-        emoji: "📧",
-        description: "Got 5 emails, zero engagement",
-      },
-      {
-        id: "excl-received-3-in-3-days",
-        name: "Received 3 in the last 3 days",
-        emoji: "😨",
-        description: "Already got 3 emails recently",
-      },
-      { id: "excl-marked-spam", name: "Marked Spam", emoji: "⚠️", description: "Marked previous email as spam" },
-    ],
-  },
+    // EXCLUSIONS
+    "excl-unsubscribed": {
+      name: "Unsubscribed Contacts",
+      description: "Use as exclusion in campaigns",
+      category: "exclusions",
+      icon: "🚫",
+    },
+    "excl-recent-purchasers": {
+      name: "Recent Purchasers (Exclude - 7 Days)",
+      description: "Use to exclude recent buyers",
+      category: "exclusions",
+      icon: "🚫",
+    },
+
+    // DEMOGRAPHIC
+    "gmail-users": {
+      name: "Gmail Users",
+      description: "Profiles with @gmail.com",
+      category: "demographic",
+      icon: "📧",
+    },
+  };
+
+  return library;
 };
 
-const QUICK_START_BUNDLES = {
-  bfcm: {
+const SEGMENT_BUNDLES = {
+  "bfcm-essentials": {
     name: "BFCM Essentials",
-    description: "10 critical segments for Black Friday success",
-    segments: [
-      "engaged-30",
-      "vip-customers",
-      "abandoned-cart",
-      "never-purchased",
-      "lapsed-customers",
-      "recent-first-time",
-      "high-aov",
-      "excl-unsubscribed",
-      "excl-bounced",
-      "excl-recent-purchasers",
-    ],
+    description: "Critical segments for Black Friday",
+    segments: ["engaged-30", "cart-abandoners-24h", "vip-customers", "repeat-customers", "purchasers-90d"],
+    icon: "🔥",
   },
-  vip: {
-    name: "VIP & High-Value Pack",
-    description: "8 revenue-focused segments for big spenders",
-    segments: [
-      "vip-customers",
-      "big-spenders",
-      "predicted-vips",
-      "high-aov",
-      "full-price-buyers",
-      "repeat-customers",
-      "multi-category-shoppers",
-      "excl-refunded",
-    ],
+  "vip-revenue": {
+    name: "VIP & Revenue Focus",
+    description: "Your highest-value customers",
+    segments: ["vip-customers", "high-value-customers", "repeat-customers", "high-aov-customers"],
+    icon: "💰",
   },
-  reengagement: {
-    name: "Re-Engagement Bundle",
-    description: "6 segments to win back inactive customers",
-    segments: [
-      "lapsed-customers",
-      "churned-customers",
-      "unengaged-90",
-      "engaged-non-buyers",
-      "high-churn-risk",
-      "abandoned-cart",
-    ],
+  winback: {
+    name: "Win-Back Campaign",
+    description: "Re-engage lapsed customers",
+    segments: ["lapsed-60", "churned-customers", "browse-abandoners"],
+    icon: "🎯",
   },
   complete: {
     name: "Complete Foundation",
-    description: "All 62 segments - the full suite",
+    description: "All segments for comprehensive targeting",
     segments: "all",
+    icon: "🚀",
   },
 };
 
+// ==================== COMPONENTS ====================
+
+// API Permissions Info Modal
+function ApiPermissionsModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+      <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <Info className="text-[#EF3F3F]" size={24} />
+          🔒 What API Access is Needed?
+        </h3>
+
+        <div className="space-y-4 text-sm text-gray-300">
+          <div>
+            <p className="font-semibold text-white mb-2">Required Permissions:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>
+                Segments: <span className="text-[#EF3F3F] font-bold">Read & Write</span>
+              </li>
+              <li>
+                Tags: <span className="text-[#EF3F3F] font-bold">Read & Write</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="border-t border-gray-800 pt-4">
+            <p className="font-semibold text-white mb-2">🛡️ What Aderai Does:</p>
+            <ul className="space-y-1">
+              <li>✅ Creates segments in your Klaviyo account</li>
+              <li>✅ Adds "Aderai" tag to created segments</li>
+              <li>✅ Customizes thresholds based on your metrics</li>
+            </ul>
+          </div>
+
+          <div className="border-t border-gray-800 pt-4">
+            <p className="font-semibold text-white mb-2">❌ What Aderai NEVER Does:</p>
+            <ul className="space-y-1">
+              <li>❌ Access your customer data or profiles</li>
+              <li>❌ Send emails or SMS messages</li>
+              <li>❌ Modify or delete existing segments</li>
+              <li>❌ Store your API key on servers</li>
+              <li>❌ Share your data with third parties</li>
+            </ul>
+          </div>
+
+          <div className="bg-[#0A0A0A] p-3 rounded border border-gray-800">
+            <p className="text-xs text-gray-400">
+              <strong className="text-white">🔐 Privacy Guarantee:</strong> Your API key is encrypted and stored only in
+              your browser's local storage. All requests go directly from your browser to Klaviyo via our secure
+              Cloudflare Worker. We never see or store your key on any server.
+            </p>
+          </div>
+
+          <a
+            href="https://help.klaviyo.com/hc/en-us/articles/115005062267"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#EF3F3F] hover:text-red-400 text-xs underline block"
+          >
+            → Learn more about Klaviyo API Keys
+          </a>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full mt-6 bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded transition-colors"
+        >
+          Got It
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ==================== MAIN APP ====================
 export default function AderaiApp() {
-  const [apiKey, setApiKey] = useState("");
-  const [selectedSegments, setSelectedSegments] = useState<Set<string>>(new Set());
+  const [currentView, setCurrentView] = useState<"auth" | "onboarding" | "dashboard">("auth");
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [user, setUser] = useState<User | null>(null);
+
+  // Auth form states
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Onboarding states
+  const [accountName, setAccountName] = useState("");
+  const [klaviyoApiKey, setKlaviyoApiKey] = useState("");
+  const [aov, setAov] = useState("100");
+  const [vipThreshold, setVipThreshold] = useState("500");
+  const [highValueThreshold, setHighValueThreshold] = useState("300");
+  const [newCustomerDays, setNewCustomerDays] = useState("30");
+  const [lapsedDays, setLapsedDays] = useState("60");
+  const [churnedDays, setChurnedDays] = useState("180");
+
+  // Dashboard states
+  const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
-  const [results, setResults] = useState<{ segmentId: string; status: "success" | "error"; message: string }[]>([]);
-  const [currentStep, setCurrentStep] = useState<"setup" | "select" | "creating" | "complete">("setup");
-  const [workerUrl, setWorkerUrl] = useState("https://aderai-api.akshat-619.workers.dev/create-segments");
+  const [results, setResults] = useState<SegmentResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [showApiInfo, setShowApiInfo] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
+  // Load user from localStorage on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem("aderai_user");
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      setUser(userData);
+      setCurrentView("dashboard");
+    }
+  }, []);
+
+  // Auth functions
+  const handleAuth = () => {
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    if (authMode === "signup") {
+      // Check if user already exists
+      const existingUser = localStorage.getItem(`aderai_user_${email}`);
+      if (existingUser) {
+        alert("Account already exists. Please login.");
+        setAuthMode("login");
+        return;
+      }
+      // New user - go to onboarding
+      setCurrentView("onboarding");
+    } else {
+      // Login
+      const savedUser = localStorage.getItem(`aderai_user_${email}`);
+      if (!savedUser) {
+        alert("Account not found. Please sign up.");
+        return;
+      }
+
+      const userData = JSON.parse(savedUser);
+      // In a real app, verify password here
+      setUser(userData);
+      localStorage.setItem("aderai_user", JSON.stringify(userData));
+      setCurrentView("dashboard");
+    }
+  };
+
+  const handleOnboardingComplete = () => {
+    if (!accountName || !klaviyoApiKey || !email) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    if (!klaviyoApiKey.startsWith("pk_")) {
+      alert('Invalid Klaviyo API key. It should start with "pk_"');
+      return;
+    }
+
+    const newUser: User = {
+      id: Date.now().toString(),
+      email,
+      accountName,
+      klaviyoApiKey,
+      metrics: {
+        aov: parseFloat(aov),
+        vipThreshold: parseFloat(vipThreshold),
+        highValueThreshold: parseFloat(highValueThreshold),
+        newCustomerDays: parseInt(newCustomerDays),
+        lapsedDays: parseInt(lapsedDays),
+        churnedDays: parseInt(churnedDays),
+      },
+      createdAt: new Date().toISOString(),
+    };
+
+    // Save user
+    localStorage.setItem(`aderai_user_${email}`, JSON.stringify(newUser));
+    localStorage.setItem("aderai_user", JSON.stringify(newUser));
+    setUser(newUser);
+    setCurrentView("dashboard");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("aderai_user");
+    setUser(null);
+    setCurrentView("auth");
+    setEmail("");
+    setPassword("");
+    setSelectedSegments([]);
+    setResults([]);
+    setShowResults(false);
+  };
+
+  const handleUpdateSettings = () => {
+    if (!user) return;
+
+    const updatedUser = {
+      ...user,
+      metrics: {
+        aov: parseFloat(aov),
+        vipThreshold: parseFloat(vipThreshold),
+        highValueThreshold: parseFloat(highValueThreshold),
+        newCustomerDays: parseInt(newCustomerDays),
+        lapsedDays: parseInt(lapsedDays),
+        churnedDays: parseInt(churnedDays),
+      },
+    };
+
+    localStorage.setItem(`aderai_user_${user.email}`, JSON.stringify(updatedUser));
+    localStorage.setItem("aderai_user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    setShowSettings(false);
+    alert("Settings updated successfully!");
+  };
+
+  // Segment selection
   const toggleSegment = (segmentId: string) => {
-    const newSelected = new Set(selectedSegments);
-    if (newSelected.has(segmentId)) {
-      newSelected.delete(segmentId);
-    } else {
-      newSelected.add(segmentId);
-    }
-    setSelectedSegments(newSelected);
+    setSelectedSegments((prev) =>
+      prev.includes(segmentId) ? prev.filter((id) => id !== segmentId) : [...prev, segmentId],
+    );
   };
 
-  const selectAll = (categoryKey: string) => {
-    const newSelected = new Set(selectedSegments);
-    SEGMENT_LIBRARY[categoryKey as keyof typeof SEGMENT_LIBRARY].segments.forEach((seg) => {
-      newSelected.add(seg.id);
-    });
-    setSelectedSegments(newSelected);
-  };
-
-  const deselectAll = (categoryKey: string) => {
-    const newSelected = new Set(selectedSegments);
-    SEGMENT_LIBRARY[categoryKey as keyof typeof SEGMENT_LIBRARY].segments.forEach((seg) => {
-      newSelected.delete(seg.id);
-    });
-    setSelectedSegments(newSelected);
-  };
-
-  const loadBundle = (bundleKey: string) => {
-    const bundle = QUICK_START_BUNDLES[bundleKey as keyof typeof QUICK_START_BUNDLES];
+  const selectBundle = (bundleId: string) => {
+    const bundle = SEGMENT_BUNDLES[bundleId];
     if (bundle.segments === "all") {
-      const allSegments = new Set<string>();
-      Object.values(SEGMENT_LIBRARY).forEach((category) => {
-        category.segments.forEach((seg) => allSegments.add(seg.id));
-      });
-      setSelectedSegments(allSegments);
+      setSelectedSegments(Object.keys(getSegmentLibrary(user?.metrics)));
     } else {
-      setSelectedSegments(new Set(bundle.segments));
+      setSelectedSegments(bundle.segments);
     }
   };
 
-  const createSegments = async () => {
-    if (!apiKey || selectedSegments.size === 0) return;
+  // Create segments
+  const handleCreateSegments = async () => {
+    if (!user || selectedSegments.length === 0) return;
 
     setIsCreating(true);
-    setCurrentStep("creating");
     setResults([]);
+    setShowResults(true);
 
     try {
-      const response = await fetch(workerUrl, {
+      const response = await fetch(WORKER_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          apiKey,
-          segments: Array.from(selectedSegments),
+          apiKey: user.klaviyoApiKey,
+          segments: selectedSegments,
+          metrics: user.metrics, // Pass metrics for dynamic segment creation
         }),
       });
 
       const data = await response.json();
-      setResults(data.results || []);
-      setCurrentStep("complete");
+
+      if (data.success) {
+        setResults(data.results);
+      } else {
+        alert("Error creating segments: " + data.error);
+      }
     } catch (error) {
-      console.error("Error creating segments:", error);
-      setResults([
-        { segmentId: "error", status: "error", message: "Failed to connect to API. Check your Worker URL." },
-      ]);
-      setCurrentStep("complete");
+      alert("Failed to create segments. Please try again.");
+      console.error(error);
     } finally {
       setIsCreating(false);
     }
   };
 
-  return (
-    <div style={{ backgroundColor: COLORS.background, minHeight: "100vh", color: COLORS.text }}>
-      {/* Header */}
-      <header style={{ borderBottom: `1px solid ${COLORS.border}`, padding: "1.5rem 2rem" }}>
-        <div
-          style={{
-            maxWidth: "1400px",
-            margin: "0 auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <h1
-              style={{
-                fontSize: "2rem",
-                fontWeight: "bold",
-                margin: 0,
-                display: "flex",
-                alignItems: "center",
-                gap: "0.75rem",
-              }}
-            >
-              <span style={{ color: COLORS.primary }}>ADER</span>
-              <span>AI</span>
-              <Zap style={{ color: COLORS.primary }} size={32} />
+  // ==================== RENDER AUTH VIEW ====================
+  if (currentView === "auth") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-2">
+              <span className="text-[#EF3F3F]">ADER</span>
+              <span className="text-white">AI</span>
+              <Zap className="inline-block ml-2 text-[#EF3F3F]" size={32} />
             </h1>
-            <p style={{ color: COLORS.textMuted, margin: "0.25rem 0 0 0", fontSize: "0.875rem" }}>
-              by <span style={{ color: COLORS.primary, fontWeight: 600 }}>THE DRIP STORY</span>
-            </p>
+            <p className="text-sm text-gray-400">by THE DRIP STORY</p>
+            <p className="text-lg text-white mt-4">Create 62 segments in 60 seconds</p>
           </div>
-          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-            <span style={{ color: COLORS.textMuted, fontSize: "0.875rem" }}>
-              {selectedSegments.size} segments selected
-            </span>
-            <a
-              href="https://thedripstory.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: COLORS.textMuted,
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                textDecoration: "none",
-              }}
+
+          {/* Auth Card */}
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-6">
+            <div className="flex gap-2 mb-6">
+              <button
+                onClick={() => setAuthMode("login")}
+                className={`flex-1 py-2 rounded font-bold transition-colors ${
+                  authMode === "login" ? "bg-[#EF3F3F] text-white" : "bg-transparent text-gray-400 hover:text-white"
+                }`}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setAuthMode("signup")}
+                className={`flex-1 py-2 rounded font-bold transition-colors ${
+                  authMode === "signup" ? "bg-[#EF3F3F] text-white" : "bg-transparent text-gray-400 hover:text-white"
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 block mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400 block mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                />
+              </div>
+
+              <button
+                onClick={handleAuth}
+                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded transition-colors"
+              >
+                {authMode === "login" ? "Login" : "Sign Up"}
+              </button>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-8 text-sm text-gray-500">
+            Built by <span className="text-[#EF3F3F] font-bold">THE DRIP STORY</span>
+            <br />
+            We achieve 80% open rates. That's 3x the industry standard.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==================== RENDER ONBOARDING VIEW ====================
+  if (currentView === "onboarding") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2">
+              <span className="text-[#EF3F3F]">ADER</span>
+              <span className="text-white">AI</span>
+              <Zap className="inline-block ml-2 text-[#EF3F3F]" size={28} />
+            </h1>
+            <p className="text-sm text-gray-400">Let's set up your account</p>
+          </div>
+
+          {/* Onboarding Card */}
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Account Setup</h2>
+
+            <div className="space-y-6">
+              {/* Account Name */}
+              <div>
+                <label className="text-sm text-white font-semibold block mb-2">
+                  Account Name <span className="text-[#EF3F3F]">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="e.g., My Brand, Acme Store"
+                  className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">This is how you'll identify your account in the dashboard</p>
+              </div>
+
+              {/* Klaviyo API Key */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm text-white font-semibold">
+                    Klaviyo Private API Key <span className="text-[#EF3F3F]">*</span>
+                  </label>
+                  <button
+                    onClick={() => setShowApiInfo(true)}
+                    className="text-[#EF3F3F] hover:text-red-400 transition-colors"
+                  >
+                    <Info size={16} />
+                  </button>
+                </div>
+                <input
+                  type="password"
+                  value={klaviyoApiKey}
+                  onChange={(e) => setKlaviyoApiKey(e.target.value)}
+                  placeholder="pk_..."
+                  className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Get your key from{" "}
+                  <a
+                    href="https://www.klaviyo.com/settings/account/api-keys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#EF3F3F] hover:text-red-400"
+                  >
+                    Klaviyo Settings → API Keys
+                  </a>
+                </p>
+              </div>
+
+              {/* Business Metrics */}
+              <div className="border-t border-gray-800 pt-6">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <TrendingUp size={20} className="text-[#EF3F3F]" />
+                  Your Business Metrics
+                </h3>
+                <p className="text-sm text-gray-400 mb-4">
+                  We'll use these to create custom segments tailored to your business
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Average Order Value (AOV)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <input
+                        type="number"
+                        value={aov}
+                        onChange={(e) => setAov(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-8 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">VIP Customer Threshold (LTV)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <input
+                        type="number"
+                        value={vipThreshold}
+                        onChange={(e) => setVipThreshold(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-8 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">High-Value Customer (LTV)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <input
+                        type="number"
+                        value={highValueThreshold}
+                        onChange={(e) => setHighValueThreshold(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-8 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">New Customer Window (Days)</label>
+                    <input
+                      type="number"
+                      value={newCustomerDays}
+                      onChange={(e) => setNewCustomerDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Lapsed Customer (Days)</label>
+                    <input
+                      type="number"
+                      value={lapsedDays}
+                      onChange={(e) => setLapsedDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Churned Customer (Days)</label>
+                    <input
+                      type="number"
+                      value={churnedDays}
+                      onChange={(e) => setChurnedDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleOnboardingComplete}
+                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-4 rounded transition-colors text-lg"
+              >
+                Complete Setup & Create Segments →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {showApiInfo && <ApiPermissionsModal onClose={() => setShowApiInfo(false)} />}
+      </div>
+    );
+  }
+
+  // ==================== RENDER DASHBOARD VIEW ====================
+  const segmentLibrary = getSegmentLibrary(user?.metrics);
+  const categories = {
+    test: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "test"),
+    engagement: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "engagement"),
+    lifecycle: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "lifecycle"),
+    shopping: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "shopping"),
+    exclusions: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "exclusions"),
+    demographic: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "demographic"),
+  };
+
+  const successCount = results.filter((r) => r.status === "success").length;
+  const errorCount = results.filter((r) => r.status === "error").length;
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] text-white">
+      {/* Header */}
+      <header className="border-b border-gray-800 bg-[#1A1A1A]">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">
+              <span className="text-[#EF3F3F]">ADER</span>
+              <span className="text-white">AI</span>
+              <Zap className="inline-block ml-2 text-[#EF3F3F]" size={24} />
+            </h1>
+            <p className="text-sm text-gray-400">by THE DRIP STORY</p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-semibold text-white">{user?.accountName}</p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
+            </div>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 hover:bg-[#0A0A0A] rounded transition-colors"
+              title="Settings"
             >
-              <ExternalLink size={16} />
-            </a>
+              <Settings size={20} className="text-gray-400 hover:text-white" />
+            </button>
+            <button onClick={handleLogout} className="p-2 hover:bg-[#0A0A0A] rounded transition-colors" title="Logout">
+              <LogOut size={20} className="text-gray-400 hover:text-white" />
+            </button>
           </div>
         </div>
       </header>
 
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "2rem" }}>
-        {/* Setup Step */}
-        {currentStep === "setup" && (
-          <div style={{ maxWidth: "600px", margin: "4rem auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <h2 style={{ fontSize: "3rem", fontWeight: "bold", marginBottom: "1rem" }}>
-                CREATE <span style={{ color: COLORS.primary }}>62 SEGMENTS</span> IN SECONDS
-              </h2>
-              <p style={{ color: COLORS.textMuted, fontSize: "1.125rem" }}>
-                Stop wasting time building segments manually. Aderai creates hyper-targeted segments in your Klaviyo
-                account with one click.
-              </p>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <DollarSign size={20} className="text-[#EF3F3F]" />
+              <span className="text-sm text-gray-400">AOV</span>
             </div>
+            <p className="text-2xl font-bold">${user?.metrics.aov}</p>
+          </div>
 
-            <div
-              style={{
-                backgroundColor: COLORS.card,
-                padding: "2rem",
-                borderRadius: "12px",
-                border: `1px solid ${COLORS.border}`,
-              }}
-            >
-              <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 600 }}>
-                Klaviyo Private API Key
-              </label>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="pk_..."
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  backgroundColor: COLORS.background,
-                  border: `1px solid ${COLORS.border}`,
-                  borderRadius: "6px",
-                  color: COLORS.text,
-                  fontSize: "1rem",
-                  marginBottom: "1rem",
-                }}
-              />
-              <p style={{ color: COLORS.textMuted, fontSize: "0.875rem", marginBottom: "1rem" }}>
-                Get your API key from Klaviyo → Settings → API Keys
-              </p>
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Users size={20} className="text-[#EF3F3F]" />
+              <span className="text-sm text-gray-400">VIP Threshold</span>
+            </div>
+            <p className="text-2xl font-bold">${user?.metrics.vipThreshold}</p>
+          </div>
 
-              <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 600 }}>Cloudflare Worker URL</label>
-              <input
-                type="text"
-                value={workerUrl}
-                onChange={(e) => setWorkerUrl(e.target.value)}
-                placeholder="https://your-worker.workers.dev/create-segments"
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  backgroundColor: COLORS.background,
-                  border: `1px solid ${COLORS.border}`,
-                  borderRadius: "6px",
-                  color: COLORS.text,
-                  fontSize: "1rem",
-                  marginBottom: "1.5rem",
-                }}
-              />
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp size={20} className="text-[#EF3F3F]" />
+              <span className="text-sm text-gray-400">High-Value</span>
+            </div>
+            <p className="text-2xl font-bold">${user?.metrics.highValueThreshold}</p>
+          </div>
 
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <ShoppingCart size={20} className="text-[#EF3F3F]" />
+              <span className="text-sm text-gray-400">Selected</span>
+            </div>
+            <p className="text-2xl font-bold">{selectedSegments.length}</p>
+          </div>
+        </div>
+
+        {/* Quick Start Bundles */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4">🚀 Quick Start Bundles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Object.entries(SEGMENT_BUNDLES).map(([id, bundle]) => (
               <button
-                onClick={() => setCurrentStep("select")}
-                disabled={!apiKey}
-                style={{
-                  width: "100%",
-                  padding: "1rem",
-                  backgroundColor: apiKey ? COLORS.primary : COLORS.border,
-                  color: COLORS.text,
-                  border: "none",
-                  borderRadius: "6px",
-                  fontSize: "1.125rem",
-                  fontWeight: "bold",
-                  cursor: apiKey ? "pointer" : "not-allowed",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
+                key={id}
+                onClick={() => selectBundle(id)}
+                className="bg-[#1A1A1A] border border-gray-800 hover:border-[#EF3F3F] rounded-lg p-4 text-left transition-colors"
               >
-                Continue to Segment Selection →
+                <div className="text-3xl mb-2">{bundle.icon}</div>
+                <h3 className="font-bold text-white mb-1">{bundle.name}</h3>
+                <p className="text-sm text-gray-400">{bundle.description}</p>
+                <p className="text-xs text-[#EF3F3F] mt-2">
+                  {bundle.segments === "all"
+                    ? `${Object.keys(segmentLibrary).length} segments`
+                    : `${bundle.segments.length} segments`}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Segment Categories */}
+        <div className="space-y-6">
+          {Object.entries(categories).map(([categoryName, segments]) => {
+            if (segments.length === 0) return null;
+
+            const categoryTitles = {
+              test: "🧪 Test Segment",
+              engagement: "📧 Engagement",
+              lifecycle: "💰 Customer Lifecycle",
+              shopping: "🛒 Shopping Behavior",
+              exclusions: "❌ Exclusions",
+              demographic: "👤 Demographics",
+            };
+
+            return (
+              <div key={categoryName}>
+                <h3 className="text-lg font-bold mb-3">{categoryTitles[categoryName]}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {segments.map(([segmentId, segment]) => (
+                    <button
+                      key={segmentId}
+                      onClick={() => toggleSegment(segmentId)}
+                      className={`bg-[#1A1A1A] border rounded-lg p-4 text-left transition-all ${
+                        selectedSegments.includes(segmentId)
+                          ? "border-[#EF3F3F] bg-[#EF3F3F]/10"
+                          : "border-gray-800 hover:border-gray-700"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-2xl">{segment.icon}</span>
+                        {selectedSegments.includes(segmentId) && <CheckCircle size={20} className="text-[#EF3F3F]" />}
+                      </div>
+                      <h4 className="font-bold text-white mb-1 text-sm">{segment.name}</h4>
+                      <p className="text-xs text-gray-400">{segment.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Create Button */}
+        {selectedSegments.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-[#1A1A1A] border-t border-gray-800 p-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+              <div>
+                <p className="text-white font-bold">{selectedSegments.length} segments selected</p>
+                <p className="text-sm text-gray-400">Ready to create in Klaviyo</p>
+              </div>
+              <button
+                onClick={handleCreateSegments}
+                disabled={isCreating}
+                className="bg-[#EF3F3F] hover:bg-red-600 disabled:bg-gray-700 text-white font-bold px-8 py-4 rounded transition-colors flex items-center gap-2"
+              >
+                {isCreating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Zap size={20} />
+                    CREATE SEGMENTS
+                  </>
+                )}
               </button>
             </div>
-          </div>
-        )}
-
-        {/* Selection Step */}
-        {currentStep === "select" && (
-          <div>
-            <div style={{ marginBottom: "2rem" }}>
-              <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem" }}>
-                Select Your <span style={{ color: COLORS.primary }}>Segments</span>
-              </h2>
-              <p style={{ color: COLORS.textMuted }}>Choose individual segments or use a quick-start bundle</p>
-            </div>
-
-            {/* Quick Start Bundles */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: "1rem",
-                marginBottom: "2rem",
-              }}
-            >
-              {Object.entries(QUICK_START_BUNDLES).map(([key, bundle]) => (
-                <button
-                  key={key}
-                  onClick={() => loadBundle(key)}
-                  style={{
-                    backgroundColor: COLORS.card,
-                    border: `2px solid ${COLORS.border}`,
-                    borderRadius: "8px",
-                    padding: "1.5rem",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    color: COLORS.text,
-                    transition: "all 0.2s",
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.borderColor = COLORS.primary)}
-                  onMouseOut={(e) => (e.currentTarget.style.borderColor = COLORS.border)}
-                >
-                  <div style={{ fontWeight: "bold", fontSize: "1.125rem", marginBottom: "0.5rem" }}>{bundle.name}</div>
-                  <div style={{ color: COLORS.textMuted, fontSize: "0.875rem" }}>{bundle.description}</div>
-                </button>
-              ))}
-            </div>
-
-            {/* Category Segments */}
-            {Object.entries(SEGMENT_LIBRARY).map(([categoryKey, category]) => {
-              const CategoryIcon = category.icon;
-              const categorySelected = category.segments.filter((seg) => selectedSegments.has(seg.id)).length;
-
-              return (
-                <div key={categoryKey} style={{ marginBottom: "2rem" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                      <CategoryIcon size={24} style={{ color: category.color }} />
-                      <h3 style={{ fontSize: "1.5rem", fontWeight: "bold", margin: 0 }}>{category.title}</h3>
-                      <span style={{ color: COLORS.textMuted, fontSize: "0.875rem" }}>
-                        ({categorySelected}/{category.segments.length})
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button
-                        onClick={() => selectAll(categoryKey)}
-                        style={{
-                          padding: "0.5rem 1rem",
-                          backgroundColor: COLORS.background,
-                          border: `1px solid ${COLORS.border}`,
-                          borderRadius: "4px",
-                          color: COLORS.text,
-                          cursor: "pointer",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        Select All
-                      </button>
-                      <button
-                        onClick={() => deselectAll(categoryKey)}
-                        style={{
-                          padding: "0.5rem 1rem",
-                          backgroundColor: COLORS.background,
-                          border: `1px solid ${COLORS.border}`,
-                          borderRadius: "4px",
-                          color: COLORS.text,
-                          cursor: "pointer",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        Deselect All
-                      </button>
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                      gap: "0.75rem",
-                    }}
-                  >
-                    {category.segments.map((segment) => {
-                      const isSelected = selectedSegments.has(segment.id);
-                      return (
-                        <label
-                          key={segment.id}
-                          style={{
-                            display: "flex",
-                            alignItems: "start",
-                            gap: "0.75rem",
-                            padding: "1rem",
-                            backgroundColor: isSelected ? `${COLORS.primary}15` : COLORS.card,
-                            border: `2px solid ${isSelected ? COLORS.primary : COLORS.border}`,
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            transition: "all 0.2s",
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => toggleSegment(segment.id)}
-                            style={{ marginTop: "0.25rem", cursor: "pointer", accentColor: COLORS.primary }}
-                          />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>
-                              {segment.emoji} {segment.name}
-                            </div>
-                            <div style={{ fontSize: "0.8125rem", color: COLORS.textMuted }}>{segment.description}</div>
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Create Button */}
-            <div
-              style={{
-                position: "sticky",
-                bottom: 0,
-                backgroundColor: COLORS.background,
-                borderTop: `1px solid ${COLORS.border}`,
-                padding: "1.5rem 0",
-              }}
-            >
-              <button
-                onClick={createSegments}
-                disabled={selectedSegments.size === 0 || isCreating}
-                style={{
-                  width: "100%",
-                  padding: "1.25rem",
-                  backgroundColor: selectedSegments.size > 0 ? COLORS.primary : COLORS.border,
-                  color: COLORS.text,
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "1.25rem",
-                  fontWeight: "bold",
-                  cursor: selectedSegments.size > 0 ? "pointer" : "not-allowed",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.75rem",
-                }}
-              >
-                {isCreating ? <Loader2 size={24} className="animate-spin" /> : <Zap size={24} />}
-                Create {selectedSegments.size} Segments in Klaviyo
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Creating Step */}
-        {currentStep === "creating" && (
-          <div style={{ maxWidth: "600px", margin: "4rem auto", textAlign: "center" }}>
-            <Loader2
-              size={64}
-              style={{ color: COLORS.primary, animation: "spin 1s linear infinite", margin: "0 auto 2rem" }}
-            />
-            <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem" }}>Creating Segments...</h2>
-            <p style={{ color: COLORS.textMuted }}>
-              This will take a few seconds. We're creating {selectedSegments.size} segments in your Klaviyo account.
-            </p>
-          </div>
-        )}
-
-        {/* Complete Step */}
-        {currentStep === "complete" && (
-          <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-              <CheckCircle2 size={64} style={{ color: COLORS.success, margin: "0 auto 1rem" }} />
-              <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "0.5rem" }}>Segments Created!</h2>
-              <p style={{ color: COLORS.textMuted }}>Check your Klaviyo account to see your new segments</p>
-            </div>
-
-            <div
-              style={{ backgroundColor: COLORS.card, borderRadius: "8px", padding: "1.5rem", marginBottom: "1.5rem" }}
-            >
-              {results.map((result, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1rem",
-                    padding: "0.75rem",
-                    borderBottom: idx < results.length - 1 ? `1px solid ${COLORS.border}` : "none",
-                  }}
-                >
-                  {result.status === "success" ? (
-                    <CheckCircle2 size={20} style={{ color: COLORS.success, flexShrink: 0 }} />
-                  ) : (
-                    <AlertCircle size={20} style={{ color: COLORS.error, flexShrink: 0 }} />
-                  )}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600 }}>{result.segmentId}</div>
-                    <div style={{ fontSize: "0.875rem", color: COLORS.textMuted }}>{result.message}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => {
-                setCurrentStep("setup");
-                setSelectedSegments(new Set());
-                setResults([]);
-              }}
-              style={{
-                width: "100%",
-                padding: "1rem",
-                backgroundColor: COLORS.primary,
-                color: COLORS.text,
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "1.125rem",
-                fontWeight: "bold",
-                cursor: "pointer",
-                textTransform: "uppercase",
-              }}
-            >
-              Create More Segments
-            </button>
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer
-        style={{
-          borderTop: `1px solid ${COLORS.border}`,
-          padding: "2rem",
-          textAlign: "center",
-          color: COLORS.textMuted,
-          fontSize: "0.875rem",
-        }}
-      >
-        <p>
-          Built by{" "}
-          <a href="https://thedripstory.com" style={{ color: COLORS.primary, textDecoration: "none", fontWeight: 600 }}>
-            THE DRIP STORY
-          </a>{" "}
-          - We achieve 80% open rates. That's 3x the industry standard.
-        </p>
-      </footer>
+      {/* Results Modal */}
+      {showResults && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white">
+                {isCreating ? "Creating Segments..." : "Segments Created!"}
+              </h3>
+              {!isCreating && (
+                <button
+                  onClick={() => {
+                    setShowResults(false);
+                    setSelectedSegments([]);
+                  }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {!isCreating && (
+              <div className="flex gap-4 mb-6">
+                <div className="flex-1 bg-green-900/20 border border-green-700 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle size={20} />
+                    <span className="font-bold">{successCount} Successful</span>
+                  </div>
+                </div>
+                {errorCount > 0 && (
+                  <div className="flex-1 bg-red-900/20 border border-red-700 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-red-400">
+                      <AlertCircle size={20} />
+                      <span className="font-bold">{errorCount} Failed</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {results.map((result, index) => (
+                <div
+                  key={index}
+                  className={`border rounded-lg p-4 ${
+                    result.status === "success" ? "bg-green-900/10 border-green-800" : "bg-red-900/10 border-red-800"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    {result.status === "success" ? (
+                      <CheckCircle size={20} className="text-green-400 mt-0.5" />
+                    ) : (
+                      <AlertCircle size={20} className="text-red-400 mt-0.5" />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-semibold text-white">{segmentLibrary[result.segmentId]?.name}</p>
+                      <p className={`text-sm ${result.status === "success" ? "text-green-400" : "text-red-400"}`}>
+                        {result.message}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {!isCreating && (
+              <div className="mt-6 space-y-3">
+                <a
+                  href="https://www.klaviyo.com/lists"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded text-center transition-colors"
+                >
+                  View in Klaviyo →
+                </a>
+                <button
+                  onClick={() => {
+                    setShowResults(false);
+                    setSelectedSegments([]);
+                  }}
+                  className="block w-full bg-[#0A0A0A] hover:bg-black text-white font-bold py-3 rounded text-center transition-colors"
+                >
+                  Create More Segments
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && user && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Settings size={24} className="text-[#EF3F3F]" />
+                Account Settings
+              </h3>
+              <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-white">
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="text-sm text-gray-400 block mb-1">Account Name</label>
+                <input
+                  type="text"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                />
+              </div>
+
+              <div className="border-t border-gray-800 pt-6">
+                <h4 className="text-lg font-bold text-white mb-4">Business Metrics</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">AOV ($)</label>
+                    <input
+                      type="number"
+                      value={aov}
+                      onChange={(e) => setAov(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">VIP Threshold ($)</label>
+                    <input
+                      type="number"
+                      value={vipThreshold}
+                      onChange={(e) => setVipThreshold(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">High-Value ($)</label>
+                    <input
+                      type="number"
+                      value={highValueThreshold}
+                      onChange={(e) => setHighValueThreshold(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">New Customer (Days)</label>
+                    <input
+                      type="number"
+                      value={newCustomerDays}
+                      onChange={(e) => setNewCustomerDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Lapsed (Days)</label>
+                    <input
+                      type="number"
+                      value={lapsedDays}
+                      onChange={(e) => setLapsedDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Churned (Days)</label>
+                    <input
+                      type="number"
+                      value={churnedDays}
+                      onChange={(e) => setChurnedDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleUpdateSettings}
+                  className="flex-1 bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded transition-colors"
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={() => setShowSettings(false)}
+                  className="flex-1 bg-[#0A0A0A] hover:bg-black text-white font-bold py-3 rounded transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showApiInfo && <ApiPermissionsModal onClose={() => setShowApiInfo(false)} />}
     </div>
   );
 }
