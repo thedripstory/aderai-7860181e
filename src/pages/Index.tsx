@@ -25,6 +25,7 @@ import {
   File,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * ADERAI - COMPLETE APP WITH SEGMENT ANALYTICS
@@ -967,20 +968,14 @@ export default function AderaiApp() {
     try {
       // Step 1: Get the "Placed Order" metric ID via Worker
       console.log("📊 Fetching metrics...");
-      const metricsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/metrics", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
+      const { data: metricsData, error: metricsError } = await supabase.functions.invoke('performance-metrics', {
+        body: { apiKey: userData.klaviyoApiKey },
       });
 
-      console.log("📊 Metrics response status:", metricsResponse.status);
-
-      if (!metricsResponse.ok) {
-        throw new Error("Failed to fetch metrics");
+      if (metricsError) {
+        throw new Error(metricsError.message || 'Failed to fetch metrics');
       }
 
-      const metricsData = await metricsResponse.json();
       console.log("📊 Metrics data:", metricsData);
 
       const placedOrderMetric = metricsData.data.find(
@@ -1126,18 +1121,13 @@ export default function AderaiApp() {
 
     try {
       // Step 1: Get the "Placed Order" metric ID via Worker
-      const metricsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/metrics", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
+      const { data: metricsData, error: metricsError } = await supabase.functions.invoke('performance-metrics', {
+        body: { apiKey: userData.klaviyoApiKey },
       });
 
-      if (!metricsResponse.ok) {
-        throw new Error("Failed to fetch metrics");
+      if (metricsError) {
+        throw new Error(metricsError.message || 'Failed to fetch metrics');
       }
-
-      const metricsData = await metricsResponse.json();
       const placedOrderMetric = metricsData.data.find(
         (m: any) => m.attributes.name === "Placed Order" || m.attributes.name === "Ordered Product",
       );
