@@ -11,11 +11,13 @@ import {
   User,
   Lock,
   Mail,
+  Settings as SettingsIcon,
+  TrendingUp,
 } from "lucide-react";
 
 /**
- * ADERAI - COMPLETE APP WITH AUTH
- * Login → Signup → Onboarding → Dashboard
+ * ADERAI - COMPLETE APP WITH FULL ONBOARDING
+ * Login → Signup → Onboarding (ALL fields) → Dashboard
  */
 
 // Types
@@ -31,6 +33,12 @@ interface UserData {
   accountName: string;
   klaviyoApiKey: string;
   currency: string;
+  aov: string;
+  vipThreshold: string;
+  highValueThreshold: string;
+  newCustomerDays: string;
+  lapsedDays: string;
+  churnedDays: string;
 }
 
 // Segment Data
@@ -170,7 +178,7 @@ const CURRENCIES = [
 ];
 
 export default function AderaiApp() {
-  // View state: 'login' | 'signup' | 'onboarding' | 'dashboard' | 'creating' | 'results'
+  // View state
   const [view, setView] = useState<"login" | "signup" | "onboarding" | "dashboard" | "creating" | "results">("login");
 
   // Auth state
@@ -181,6 +189,12 @@ export default function AderaiApp() {
   const [accountName, setAccountName] = useState("");
   const [klaviyoApiKey, setKlaviyoApiKey] = useState("");
   const [currency, setCurrency] = useState("USD");
+  const [aov, setAov] = useState("100");
+  const [vipThreshold, setVipThreshold] = useState("500");
+  const [highValueThreshold, setHighValueThreshold] = useState("300");
+  const [newCustomerDays, setNewCustomerDays] = useState("30");
+  const [lapsedDays, setLapsedDays] = useState("60");
+  const [churnedDays, setChurnedDays] = useState("180");
 
   // User data
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -238,13 +252,12 @@ export default function AderaiApp() {
       return;
     }
 
-    // Go to onboarding
     setView("onboarding");
   };
 
   const handleOnboarding = () => {
     if (!accountName || !klaviyoApiKey) {
-      alert("Please fill in all fields");
+      alert("Please fill in all required fields");
       return;
     }
 
@@ -253,9 +266,14 @@ export default function AderaiApp() {
       accountName,
       klaviyoApiKey,
       currency,
+      aov,
+      vipThreshold,
+      highValueThreshold,
+      newCustomerDays,
+      lapsedDays,
+      churnedDays,
     };
 
-    // Save user
     localStorage.setItem(`aderai_${email}`, JSON.stringify({ ...user, password }));
     localStorage.setItem("aderai_user", JSON.stringify(user));
 
@@ -310,6 +328,14 @@ export default function AderaiApp() {
           apiKey: userData.klaviyoApiKey,
           segments: selectedSegments,
           currencySymbol,
+          metrics: {
+            aov: userData.aov,
+            vipThreshold: userData.vipThreshold,
+            highValueThreshold: userData.highValueThreshold,
+            newCustomerDays: userData.newCustomerDays,
+            lapsedDays: userData.lapsedDays,
+            churnedDays: userData.churnedDays,
+          },
         }),
       });
 
@@ -321,6 +347,8 @@ export default function AderaiApp() {
       setView("dashboard");
     }
   };
+
+  const getCurrencySymbol = () => CURRENCIES.find((c) => c.code === userData?.currency)?.symbol || "$";
 
   // Render login
   if (view === "login") {
@@ -462,7 +490,7 @@ export default function AderaiApp() {
   if (view === "onboarding") {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
-        <div className="w-full max-w-2xl">
+        <div className="w-full max-w-3xl">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <h1 className="text-5xl font-bold">
@@ -472,12 +500,14 @@ export default function AderaiApp() {
               <Zap className="w-10 h-10 text-[#EF3F3F]" />
             </div>
             <p className="text-xl text-gray-400">Let's set up your account</p>
+            <p className="text-sm text-gray-500 mt-2">This helps us create segments tailored to your business</p>
           </div>
 
           <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8">
             <h2 className="text-2xl font-bold text-white mb-6">Account Setup</h2>
 
             <div className="space-y-6">
+              {/* Account Name */}
               <div>
                 <label className="text-white font-bold mb-2 block">Account Name</label>
                 <input
@@ -489,6 +519,7 @@ export default function AderaiApp() {
                 />
               </div>
 
+              {/* API Key */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-white font-bold flex items-center gap-2">
@@ -506,11 +537,10 @@ export default function AderaiApp() {
                   placeholder="pk_..."
                   className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
                 />
-                <p className="text-xs text-gray-500 mt-2">
-                  Your API key is stored locally and never sent to our servers
-                </p>
+                <p className="text-xs text-gray-500 mt-2">Stored locally and never sent to our servers</p>
               </div>
 
+              {/* Currency */}
               <div>
                 <label className="text-white font-bold mb-2 block">Currency</label>
                 <select
@@ -524,10 +554,94 @@ export default function AderaiApp() {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-2">
-                  This will be used in segment names (e.g., "VIP ${CURRENCIES.find((c) => c.code === currency)?.symbol}
-                  500+")
+              </div>
+
+              {/* Business Metrics */}
+              <div className="border-t border-[#2A2A2A] pt-6">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-[#EF3F3F]" />
+                  Your Business Metrics
+                </h3>
+                <p className="text-sm text-gray-400 mb-4">
+                  These help us customize segment thresholds for your business
                 </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Average Order Value (AOV)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === currency)?.symbol}
+                      </span>
+                      <input
+                        type="number"
+                        value={aov}
+                        onChange={(e) => setAov(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">VIP Customer Threshold (LTV)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === currency)?.symbol}
+                      </span>
+                      <input
+                        type="number"
+                        value={vipThreshold}
+                        onChange={(e) => setVipThreshold(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">High-Value Customer (LTV)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === currency)?.symbol}
+                      </span>
+                      <input
+                        type="number"
+                        value={highValueThreshold}
+                        onChange={(e) => setHighValueThreshold(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">New Customer Window (Days)</label>
+                    <input
+                      type="number"
+                      value={newCustomerDays}
+                      onChange={(e) => setNewCustomerDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Lapsed Customer (Days)</label>
+                    <input
+                      type="number"
+                      value={lapsedDays}
+                      onChange={(e) => setLapsedDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-1">Churned Customer (Days)</label>
+                    <input
+                      type="number"
+                      value={churnedDays}
+                      onChange={(e) => setChurnedDays(e.target.value)}
+                      className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+                </div>
               </div>
 
               <button
@@ -540,30 +654,168 @@ export default function AderaiApp() {
           </div>
         </div>
 
-        {/* API Info Modal */}
+        {/* Improved API Info Modal */}
         {showApiInfo && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-50">
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8 max-w-md">
-              <h3 className="text-2xl font-bold text-white mb-4">Where to find your API key</h3>
-              <ol className="text-gray-300 space-y-2 mb-6">
-                <li>1. Go to Klaviyo → Settings → API Keys</li>
-                <li>2. Create a "Private API Key"</li>
-                <li>3. Give it "Full Access" permissions</li>
-                <li>4. Copy the key (starts with "pk_")</li>
-                <li>5. Paste it above</li>
-              </ol>
-              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded p-4 mb-4">
-                <p className="text-sm text-gray-400">
-                  <Shield className="w-4 h-4 inline mr-2 text-[#EF3F3F]" />
-                  Your API key is sent directly to Klaviyo via our secure Cloudflare Worker. We never see or store it.
-                </p>
+          <div
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowApiInfo(false)}
+          >
+            <div
+              className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <Shield className="w-10 h-10 text-[#EF3F3F]" />
+                <div>
+                  <h3 className="text-3xl font-bold text-white">API Key Setup</h3>
+                  <p className="text-gray-400 text-sm">Your data security is our priority</p>
+                </div>
               </div>
+
+              {/* Steps */}
+              <div className="mb-6">
+                <h4 className="text-white font-bold mb-3 text-lg">How to get your API key:</h4>
+                <ol className="space-y-3">
+                  <li className="flex items-start gap-3 text-gray-300">
+                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                      1
+                    </div>
+                    <span>
+                      Go to <span className="text-white font-semibold">Klaviyo → Settings → API Keys</span>
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3 text-gray-300">
+                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                      2
+                    </div>
+                    <span>
+                      Click <span className="text-white font-semibold">"Create Private API Key"</span>
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3 text-gray-300">
+                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                      3
+                    </div>
+                    <span>
+                      Name it: <span className="text-white font-semibold">"Aderai Segments"</span>
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3 text-gray-300">
+                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                      4
+                    </div>
+                    <span>
+                      Give it <span className="text-white font-semibold">"Full Access"</span> permissions
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3 text-gray-300">
+                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                      5
+                    </div>
+                    <span>
+                      Copy the key (starts with <span className="text-white font-semibold">"pk_"</span>)
+                    </span>
+                  </li>
+                </ol>
+              </div>
+
+              {/* Required Permissions */}
+              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 mb-6">
+                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  Required Permissions
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-gray-300">
+                    <div className="w-2 h-2 bg-[#EF3F3F] rounded-full"></div>
+                    <span>
+                      <span className="text-white font-semibold">Read Segments:</span> To detect existing segments
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-300">
+                    <div className="w-2 h-2 bg-[#EF3F3F] rounded-full"></div>
+                    <span>
+                      <span className="text-white font-semibold">Write Segments:</span> To create new segments
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-300">
+                    <div className="w-2 h-2 bg-[#EF3F3F] rounded-full"></div>
+                    <span>
+                      <span className="text-white font-semibold">Read Metrics:</span> To match your store's events
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Security Info */}
+              <div className="bg-gradient-to-br from-[#EF3F3F]/10 to-[#EF3F3F]/5 border border-[#EF3F3F]/30 rounded-lg p-5 mb-6">
+                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-[#EF3F3F]" />
+                  Your Security Guarantee
+                </h4>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>
+                      <span className="text-white font-semibold">Stored locally only:</span> Your API key never touches
+                      our servers
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>
+                      <span className="text-white font-semibold">Direct to Klaviyo:</span> All requests go from your
+                      browser to Klaviyo
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>
+                      <span className="text-white font-semibold">Zero backend:</span> We never see or log your API key
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>
+                      <span className="text-white font-semibold">Cloudflare Worker:</span> Secure, encrypted connection
+                      at all times
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* How It Works */}
+              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 mb-6">
+                <h4 className="text-white font-bold mb-3">How Aderai Works</h4>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <div className="flex items-center gap-2">
+                    <div className="text-[#EF3F3F] font-bold">1.</div>
+                    <span>You select segments in our interface</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-[#EF3F3F] font-bold">2.</div>
+                    <span>Your browser sends request to Cloudflare Worker</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-[#EF3F3F] font-bold">3.</div>
+                    <span>Worker creates segments directly in your Klaviyo</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-[#EF3F3F] font-bold">4.</div>
+                    <span>Results sent back to you in real-time</span>
+                  </div>
+                </div>
+              </div>
+
               <button
                 onClick={() => setShowApiInfo(false)}
                 className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
               >
-                Got It
+                Got It - Let's Go!
               </button>
+
+              <p className="text-center text-xs text-gray-500 mt-4">Questions? Email us at support@thedripstory.com</p>
             </div>
           </div>
         )}
@@ -579,6 +831,7 @@ export default function AderaiApp() {
           <Loader className="w-16 h-16 text-[#EF3F3F] animate-spin mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Creating Your Segments...</h2>
           <p className="text-gray-400">This will take about {Math.ceil(selectedSegments.length * 0.25)} seconds</p>
+          <p className="text-sm text-gray-500 mt-2">Tailored to your business metrics</p>
         </div>
       </div>
     );
@@ -647,12 +900,12 @@ export default function AderaiApp() {
     );
   }
 
-  // Render dashboard (main app)
+  // Render dashboard
   return (
     <div className="min-h-screen bg-[#0A0A0A] p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-12">
+        <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <h1 className="text-4xl font-bold">
@@ -666,6 +919,31 @@ export default function AderaiApp() {
           <button onClick={handleLogout} className="text-gray-400 hover:text-white transition text-sm">
             Logout
           </button>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
+            <div className="text-sm text-gray-400 mb-1">AOV</div>
+            <div className="text-2xl font-bold text-white">
+              {getCurrencySymbol()}
+              {userData?.aov}
+            </div>
+          </div>
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
+            <div className="text-sm text-gray-400 mb-1">VIP Threshold</div>
+            <div className="text-2xl font-bold text-white">
+              {getCurrencySymbol()}
+              {userData?.vipThreshold}
+            </div>
+          </div>
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
+            <div className="text-sm text-gray-400 mb-1">High-Value</div>
+            <div className="text-2xl font-bold text-white">
+              {getCurrencySymbol()}
+              {userData?.highValueThreshold}
+            </div>
+          </div>
         </div>
 
         {/* Quick Start Bundles */}
