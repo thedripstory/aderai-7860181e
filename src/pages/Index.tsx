@@ -413,6 +413,14 @@ export default function AderaiApp() {
               </div>
             </div>
           </div>
+
+          {/* Footer */}
+          <footer className="mt-8 text-center">
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} Aderai by{" "}
+              <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>. All rights reserved.
+            </p>
+          </footer>
         </div>
       </div>
     );
@@ -481,6 +489,14 @@ export default function AderaiApp() {
               </div>
             </div>
           </div>
+
+          {/* Footer */}
+          <footer className="mt-8 text-center">
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} Aderai by{" "}
+              <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>. All rights reserved.
+            </p>
+          </footer>
         </div>
       </div>
     );
@@ -653,6 +669,14 @@ export default function AderaiApp() {
             </div>
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Aderai by <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>
+            . All rights reserved.
+          </p>
+        </footer>
 
         {/* Improved API Info Modal */}
         {showApiInfo && (
@@ -833,6 +857,14 @@ export default function AderaiApp() {
           <p className="text-gray-400">This will take about {Math.ceil(selectedSegments.length * 0.25)} seconds</p>
           <p className="text-sm text-gray-500 mt-2">Tailored to your business metrics</p>
         </div>
+
+        {/* Footer */}
+        <footer className="absolute bottom-6 left-0 right-0 text-center">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Aderai by <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>
+            . All rights reserved.
+          </p>
+        </footer>
       </div>
     );
   }
@@ -895,15 +927,69 @@ export default function AderaiApp() {
           >
             Create More Segments
           </button>
+
+          {/* Footer */}
+          <footer className="mt-8 pt-8 border-t border-[#2A2A2A] text-center">
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} Aderai by{" "}
+              <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>. All rights reserved.
+            </p>
+          </footer>
         </div>
       </div>
     );
   }
 
+  // Settings state
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsAccountName, setSettingsAccountName] = useState("");
+  const [settingsCurrency, setSettingsCurrency] = useState("USD");
+  const [settingsAov, setSettingsAov] = useState("100");
+  const [settingsVipThreshold, setSettingsVipThreshold] = useState("500");
+  const [settingsHighValueThreshold, setSettingsHighValueThreshold] = useState("300");
+  const [settingsNewCustomerDays, setSettingsNewCustomerDays] = useState("30");
+  const [settingsLapsedDays, setSettingsLapsedDays] = useState("60");
+  const [settingsChurnedDays, setSettingsChurnedDays] = useState("180");
+
+  const openSettings = () => {
+    if (userData) {
+      setSettingsAccountName(userData.accountName);
+      setSettingsCurrency(userData.currency);
+      setSettingsAov(userData.aov);
+      setSettingsVipThreshold(userData.vipThreshold);
+      setSettingsHighValueThreshold(userData.highValueThreshold);
+      setSettingsNewCustomerDays(userData.newCustomerDays);
+      setSettingsLapsedDays(userData.lapsedDays);
+      setSettingsChurnedDays(userData.churnedDays);
+      setShowSettings(true);
+    }
+  };
+
+  const saveSettings = () => {
+    if (!userData) return;
+
+    const updatedUser: UserData = {
+      ...userData,
+      accountName: settingsAccountName,
+      currency: settingsCurrency,
+      aov: settingsAov,
+      vipThreshold: settingsVipThreshold,
+      highValueThreshold: settingsHighValueThreshold,
+      newCustomerDays: settingsNewCustomerDays,
+      lapsedDays: settingsLapsedDays,
+      churnedDays: settingsChurnedDays,
+    };
+
+    localStorage.setItem(`aderai_${userData.email}`, JSON.stringify({ ...updatedUser, password }));
+    localStorage.setItem("aderai_user", JSON.stringify(updatedUser));
+    setUserData(updatedUser);
+    setShowSettings(false);
+  };
+
   // Render dashboard
   return (
-    <div className="min-h-screen bg-[#0A0A0A] p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#0A0A0A] p-6 flex flex-col">
+      <div className="max-w-6xl mx-auto flex-1 w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -916,9 +1002,14 @@ export default function AderaiApp() {
             </div>
             <p className="text-gray-400">Welcome back, {userData?.accountName}</p>
           </div>
-          <button onClick={handleLogout} className="text-gray-400 hover:text-white transition text-sm">
-            Logout
-          </button>
+          <div className="flex items-center gap-4">
+            <button onClick={openSettings} className="text-gray-400 hover:text-white transition" title="Settings">
+              <SettingsIcon className="w-5 h-5" />
+            </button>
+            <button onClick={handleLogout} className="text-gray-400 hover:text-white transition text-sm">
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -1041,7 +1132,177 @@ export default function AderaiApp() {
           <Zap className="w-6 h-6" />
           Create {selectedSegments.length} Segments
         </button>
+
+        {/* Settings Modal */}
+        {showSettings && (
+          <div
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowSettings(false)}
+          >
+            <div
+              className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <SettingsIcon className="w-8 h-8 text-[#EF3F3F]" />
+                  <h3 className="text-3xl font-bold text-white">Settings</h3>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Account Name */}
+                <div>
+                  <label className="text-white font-bold mb-2 block">Account Name</label>
+                  <input
+                    type="text"
+                    value={settingsAccountName}
+                    onChange={(e) => setSettingsAccountName(e.target.value)}
+                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                  />
+                </div>
+
+                {/* Currency */}
+                <div>
+                  <label className="text-white font-bold mb-2 block">Currency</label>
+                  <select
+                    value={settingsCurrency}
+                    onChange={(e) => setSettingsCurrency(e.target.value)}
+                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                  >
+                    {CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.symbol} {c.name} ({c.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Business Metrics */}
+                <div className="border-t border-[#2A2A2A] pt-6">
+                  <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-[#EF3F3F]" />
+                    Business Metrics
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-1">Average Order Value (AOV)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                          {CURRENCIES.find((c) => c.code === settingsCurrency)?.symbol}
+                        </span>
+                        <input
+                          type="number"
+                          value={settingsAov}
+                          onChange={(e) => setSettingsAov(e.target.value)}
+                          className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-1">VIP Customer Threshold (LTV)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                          {CURRENCIES.find((c) => c.code === settingsCurrency)?.symbol}
+                        </span>
+                        <input
+                          type="number"
+                          value={settingsVipThreshold}
+                          onChange={(e) => setSettingsVipThreshold(e.target.value)}
+                          className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-1">High-Value Customer (LTV)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                          {CURRENCIES.find((c) => c.code === settingsCurrency)?.symbol}
+                        </span>
+                        <input
+                          type="number"
+                          value={settingsHighValueThreshold}
+                          onChange={(e) => setSettingsHighValueThreshold(e.target.value)}
+                          className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-1">New Customer Window (Days)</label>
+                      <input
+                        type="number"
+                        value={settingsNewCustomerDays}
+                        onChange={(e) => setSettingsNewCustomerDays(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-1">Lapsed Customer (Days)</label>
+                      <input
+                        type="number"
+                        value={settingsLapsedDays}
+                        onChange={(e) => setSettingsLapsedDays(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-gray-400 block mb-1">Churned Customer (Days)</label>
+                      <input
+                        type="number"
+                        value={settingsChurnedDays}
+                        onChange={(e) => setSettingsChurnedDays(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowSettings(false)}
+                    className="flex-1 bg-[#0A0A0A] border border-[#2A2A2A] hover:border-[#EF3F3F] text-white font-bold py-3 rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={saveSettings}
+                    className="flex-1 bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Footer */}
+      <footer className="max-w-6xl mx-auto w-full mt-12 pt-8 border-t border-[#2A2A2A]">
+        <div className="flex items-center justify-between text-sm text-gray-500">
+          <div>
+            © {new Date().getFullYear()} Aderai by <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>
+            . All rights reserved.
+          </div>
+          <div className="flex items-center gap-6">
+            <a href="#" className="hover:text-white transition">
+              Privacy
+            </a>
+            <a href="#" className="hover:text-white transition">
+              Terms
+            </a>
+            <a href="mailto:support@thedripstory.com" className="hover:text-white transition">
+              Support
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
