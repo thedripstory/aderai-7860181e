@@ -18,6 +18,8 @@ interface User {
   email: string;
   accountName: string;
   klaviyoApiKey: string;
+  currency: string;
+  currencySymbol: string;
   metrics: {
     aov: number;
     vipThreshold: number;
@@ -39,6 +41,25 @@ interface SegmentResult {
 // ==================== CONSTANTS ====================
 const WORKER_URL = "https://aderai-api.akshat-619.workers.dev";
 
+const CURRENCIES = [
+  { code: "USD", symbol: "$", name: "US Dollar" },
+  { code: "EUR", symbol: "€", name: "Euro" },
+  { code: "GBP", symbol: "£", name: "British Pound" },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+  { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
+  { code: "INR", symbol: "₹", name: "Indian Rupee" },
+  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
+  { code: "SAR", symbol: "ر.س", name: "Saudi Riyal" },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
+  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+  { code: "CNY", symbol: "¥", name: "Chinese Yuan" },
+  { code: "CHF", symbol: "Fr", name: "Swiss Franc" },
+  { code: "NZD", symbol: "NZ$", name: "New Zealand Dollar" },
+  { code: "ZAR", symbol: "R", name: "South African Rand" },
+  { code: "BRL", symbol: "R$", name: "Brazilian Real" },
+  { code: "MXN", symbol: "MX$", name: "Mexican Peso" },
+];
+
 const COLORS = {
   primary: "#EF3F3F",
   bg: "#0A0A0A",
@@ -49,7 +70,9 @@ const COLORS = {
 };
 
 // ==================== SEGMENT LIBRARY ====================
-const getSegmentLibrary = (metrics?: User["metrics"]) => {
+const getSegmentLibrary = (metrics?: User["metrics"], currencySymbol?: string) => {
+  const sym = currencySymbol || "$";
+
   const library = {
     // TEST
     "test-email-marketable": {
@@ -105,7 +128,7 @@ const getSegmentLibrary = (metrics?: User["metrics"]) => {
       icon: "🔄",
     },
     "vip-customers": {
-      name: `VIP Customers ($${metrics?.vipThreshold || 500}+ LTV)`,
+      name: `VIP Customers (${sym}${metrics?.vipThreshold || 500}+ LTV)`,
       description: "Your highest-value customers",
       category: "lifecycle",
       icon: "👑",
@@ -123,7 +146,7 @@ const getSegmentLibrary = (metrics?: User["metrics"]) => {
       icon: "❌",
     },
     "high-value-customers": {
-      name: `High-Value Customers ($${metrics?.highValueThreshold || 300}+ LTV)`,
+      name: `High-Value Customers (${sym}${metrics?.highValueThreshold || 300}+ LTV)`,
       description: "Above-average spenders",
       category: "lifecycle",
       icon: "💰",
@@ -149,7 +172,7 @@ const getSegmentLibrary = (metrics?: User["metrics"]) => {
       icon: "✅",
     },
     "high-aov-customers": {
-      name: `High AOV Customers ($${Math.round((metrics?.aov || 100) * 1.5)}+)`,
+      name: `High AOV Customers (${sym}${Math.round((metrics?.aov || 100) * 1.5)}+)`,
       description: "Orders above 1.5x your AOV",
       category: "shopping",
       icon: "💎",
@@ -295,6 +318,7 @@ export default function AderaiApp() {
   // Onboarding states
   const [accountName, setAccountName] = useState("");
   const [klaviyoApiKey, setKlaviyoApiKey] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const [aov, setAov] = useState("100");
   const [vipThreshold, setVipThreshold] = useState("500");
   const [highValueThreshold, setHighValueThreshold] = useState("300");
@@ -319,6 +343,20 @@ export default function AderaiApp() {
       setCurrentView("dashboard");
     }
   }, []);
+
+  // Populate settings form when user or showSettings changes
+  useEffect(() => {
+    if (user && showSettings) {
+      setAccountName(user.accountName);
+      setSelectedCurrency(user.currency || "USD");
+      setAov(user.metrics.aov.toString());
+      setVipThreshold(user.metrics.vipThreshold.toString());
+      setHighValueThreshold(user.metrics.highValueThreshold.toString());
+      setNewCustomerDays(user.metrics.newCustomerDays.toString());
+      setLapsedDays(user.metrics.lapsedDays.toString());
+      setChurnedDays(user.metrics.churnedDays.toString());
+    }
+  }, [user, showSettings]);
 
   // Auth functions
   const handleAuth = () => {
@@ -364,11 +402,15 @@ export default function AderaiApp() {
       return;
     }
 
+    const currencyData = CURRENCIES.find((c) => c.code === selectedCurrency);
+
     const newUser: User = {
       id: Date.now().toString(),
       email,
       accountName,
       klaviyoApiKey,
+      currency: selectedCurrency,
+      currencySymbol: currencyData?.symbol || "$",
       metrics: {
         aov: parseFloat(aov),
         vipThreshold: parseFloat(vipThreshold),
@@ -401,8 +443,12 @@ export default function AderaiApp() {
   const handleUpdateSettings = () => {
     if (!user) return;
 
+    const currencyData = CURRENCIES.find((c) => c.code === selectedCurrency);
+
     const updatedUser = {
       ...user,
+      currency: selectedCurrency,
+      currencySymbol: currencyData?.symbol || "$",
       metrics: {
         aov: parseFloat(aov),
         vipThreshold: parseFloat(vipThreshold),
@@ -453,7 +499,8 @@ export default function AderaiApp() {
         body: JSON.stringify({
           apiKey: user.klaviyoApiKey,
           segments: selectedSegments,
-          metrics: user.metrics, // Pass metrics for dynamic segment creation
+          metrics: user.metrics,
+          currencySymbol: user.currencySymbol,
         }),
       });
 
@@ -630,16 +677,37 @@ export default function AderaiApp() {
                   We'll use these to create custom segments tailored to your business
                 </p>
 
+                {/* Currency Selector */}
+                <div className="mb-4">
+                  <label className="text-sm text-white font-semibold block mb-2">
+                    Currency <span className="text-[#EF3F3F]">*</span>
+                  </label>
+                  <select
+                    value={selectedCurrency}
+                    onChange={(e) => setSelectedCurrency(e.target.value)}
+                    className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                  >
+                    {CURRENCIES.map((curr) => (
+                      <option key={curr.code} value={curr.code}>
+                        {curr.symbol} {curr.name} ({curr.code})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Select your business currency for monetary values</p>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm text-gray-400 block mb-1">Average Order Value (AOV)</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === selectedCurrency)?.symbol || "$"}
+                      </span>
                       <input
                         type="number"
                         value={aov}
                         onChange={(e) => setAov(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-8 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -647,12 +715,14 @@ export default function AderaiApp() {
                   <div>
                     <label className="text-sm text-gray-400 block mb-1">VIP Customer Threshold (LTV)</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === selectedCurrency)?.symbol || "$"}
+                      </span>
                       <input
                         type="number"
                         value={vipThreshold}
                         onChange={(e) => setVipThreshold(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-8 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -660,12 +730,14 @@ export default function AderaiApp() {
                   <div>
                     <label className="text-sm text-gray-400 block mb-1">High-Value Customer (LTV)</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === selectedCurrency)?.symbol || "$"}
+                      </span>
                       <input
                         type="number"
                         value={highValueThreshold}
                         onChange={(e) => setHighValueThreshold(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-8 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -718,7 +790,7 @@ export default function AderaiApp() {
   }
 
   // ==================== RENDER DASHBOARD VIEW ====================
-  const segmentLibrary = getSegmentLibrary(user?.metrics);
+  const segmentLibrary = getSegmentLibrary(user?.metrics, user?.currencySymbol);
   const categories = {
     test: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "test"),
     engagement: Object.entries(segmentLibrary).filter(([_, seg]) => seg.category === "engagement"),
@@ -773,7 +845,10 @@ export default function AderaiApp() {
               <DollarSign size={20} className="text-[#EF3F3F]" />
               <span className="text-sm text-gray-400">AOV</span>
             </div>
-            <p className="text-2xl font-bold">${user?.metrics.aov}</p>
+            <p className="text-2xl font-bold">
+              {user?.currencySymbol}
+              {user?.metrics.aov}
+            </p>
           </div>
 
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-4">
@@ -781,7 +856,10 @@ export default function AderaiApp() {
               <Users size={20} className="text-[#EF3F3F]" />
               <span className="text-sm text-gray-400">VIP Threshold</span>
             </div>
-            <p className="text-2xl font-bold">${user?.metrics.vipThreshold}</p>
+            <p className="text-2xl font-bold">
+              {user?.currencySymbol}
+              {user?.metrics.vipThreshold}
+            </p>
           </div>
 
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-4">
@@ -789,7 +867,10 @@ export default function AderaiApp() {
               <TrendingUp size={20} className="text-[#EF3F3F]" />
               <span className="text-sm text-gray-400">High-Value</span>
             </div>
-            <p className="text-2xl font-bold">${user?.metrics.highValueThreshold}</p>
+            <p className="text-2xl font-bold">
+              {user?.currencySymbol}
+              {user?.metrics.highValueThreshold}
+            </p>
           </div>
 
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-lg p-4">
@@ -1011,37 +1092,67 @@ export default function AderaiApp() {
                 />
               </div>
 
+              <div>
+                <label className="text-sm text-gray-400 block mb-1">Currency</label>
+                <select
+                  value={selectedCurrency}
+                  onChange={(e) => setSelectedCurrency(e.target.value)}
+                  className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                >
+                  {CURRENCIES.map((curr) => (
+                    <option key={curr.code} value={curr.code}>
+                      {curr.symbol} {curr.name} ({curr.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="border-t border-gray-800 pt-6">
                 <h4 className="text-lg font-bold text-white mb-4">Business Metrics</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">AOV ($)</label>
-                    <input
-                      type="number"
-                      value={aov}
-                      onChange={(e) => setAov(e.target.value)}
-                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                    />
+                    <label className="text-sm text-gray-400 block mb-1">AOV</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === selectedCurrency)?.symbol || "$"}
+                      </span>
+                      <input
+                        type="number"
+                        value={aov}
+                        onChange={(e) => setAov(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">VIP Threshold ($)</label>
-                    <input
-                      type="number"
-                      value={vipThreshold}
-                      onChange={(e) => setVipThreshold(e.target.value)}
-                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                    />
+                    <label className="text-sm text-gray-400 block mb-1">VIP Threshold</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === selectedCurrency)?.symbol || "$"}
+                      </span>
+                      <input
+                        type="number"
+                        value={vipThreshold}
+                        onChange={(e) => setVipThreshold(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">High-Value ($)</label>
-                    <input
-                      type="number"
-                      value={highValueThreshold}
-                      onChange={(e) => setHighValueThreshold(e.target.value)}
-                      className="w-full bg-[#0A0A0A] border border-gray-800 rounded px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                    />
+                    <label className="text-sm text-gray-400 block mb-1">High-Value</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        {CURRENCIES.find((c) => c.code === selectedCurrency)?.symbol || "$"}
+                      </span>
+                      <input
+                        type="number"
+                        value={highValueThreshold}
+                        onChange={(e) => setHighValueThreshold(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-gray-800 rounded pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
                   </div>
 
                   <div>
