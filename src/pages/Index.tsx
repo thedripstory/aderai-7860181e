@@ -310,6 +310,19 @@ export default function AderaiApp() {
   const [reportDateRange, setReportDateRange] = useState<"7" | "30" | "60" | "90">("30");
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["profileCount", "netChange", "changePercent"]);
 
+  // Settings modal state - NEW
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [editingSettings, setEditingSettings] = useState({
+    accountName: "",
+    currency: "USD",
+    aov: "",
+    vipThreshold: "",
+    highValueThreshold: "",
+    newCustomerDays: "",
+    lapsedDays: "",
+    churnedDays: "",
+  });
+
   // Load user on mount
   useEffect(() => {
     const saved = localStorage.getItem("aderai_user");
@@ -774,7 +787,6 @@ export default function AderaiApp() {
 
   // Export functions
   const exportToCSV = () => {
-    const summary = getAnalyticsSummary();
     const headers = ["Segment Name", "Members", "Change (7d)", "Change %", "Percentage of Total"];
     const rows = getFilteredSegments()
       .map((seg) => {
@@ -802,7 +814,6 @@ export default function AderaiApp() {
   };
 
   const exportToExcel = () => {
-    const summary = getAnalyticsSummary();
     // Create HTML table
     const headers = ["Segment", "Members", "Change (7d)", "Change %", "% of Total"];
     const rows = getFilteredSegments()
@@ -840,7 +851,6 @@ export default function AderaiApp() {
   };
 
   const exportToPDF = () => {
-    const summary = getAnalyticsSummary();
     // Create printable HTML
     const content = `
       <html>
@@ -912,6 +922,26 @@ export default function AderaiApp() {
         printWindow.print();
         printWindow.close();
       }, 250);
+    }
+  };
+
+  // Save settings function
+  const handleSaveSettings = () => {
+    if (userData) {
+      const updatedData: UserData = {
+        ...userData,
+        accountName: editingSettings.accountName,
+        currency: editingSettings.currency,
+        aov: parseInt(editingSettings.aov),
+        vipThreshold: parseInt(editingSettings.vipThreshold),
+        highValueThreshold: parseInt(editingSettings.highValueThreshold),
+        newCustomerDays: parseInt(editingSettings.newCustomerDays),
+        lapsedDays: parseInt(editingSettings.lapsedDays),
+        churnedDays: parseInt(editingSettings.churnedDays),
+      };
+      setUserData(updatedData);
+      localStorage.setItem("userData", JSON.stringify(updatedData));
+      setShowSettingsModal(false);
     }
   };
 
@@ -1463,7 +1493,19 @@ export default function AderaiApp() {
               </button>
 
               <button
-                onClick={() => setShowApiInfo(!showApiInfo)}
+                onClick={() => {
+                  setEditingSettings({
+                    accountName: userData?.accountName || "",
+                    currency: userData?.currency || "USD",
+                    aov: userData?.aov.toString() || "",
+                    vipThreshold: userData?.vipThreshold.toString() || "",
+                    highValueThreshold: userData?.highValueThreshold.toString() || "",
+                    newCustomerDays: userData?.newCustomerDays.toString() || "",
+                    lapsedDays: userData?.lapsedDays.toString() || "",
+                    churnedDays: userData?.churnedDays.toString() || "",
+                  });
+                  setShowSettingsModal(true);
+                }}
                 className="flex items-center gap-2 text-gray-400 hover:text-white transition"
               >
                 <SettingsIcon className="w-5 h-5" />
@@ -1475,37 +1517,6 @@ export default function AderaiApp() {
             </div>
           </div>
         </div>
-
-        {/* Settings Panel */}
-        {showApiInfo && (
-          <div className="bg-[#1A1A1A] border-b border-[#2A2A2A] px-6 py-4">
-            <div className="max-w-7xl mx-auto">
-              <h3 className="text-lg font-semibold text-white mb-4">Account Settings</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-400">Email:</span>
-                  <span className="text-white ml-2">{userData?.email}</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Currency:</span>
-                  <span className="text-white ml-2">{userData?.currency}</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">AOV:</span>
-                  <span className="text-white ml-2">
-                    {userData?.currency} {userData?.aov}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-400">VIP Threshold:</span>
-                  <span className="text-white ml-2">
-                    {userData?.currency} {userData?.vipThreshold}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -2102,6 +2113,290 @@ export default function AderaiApp() {
             </div>
           )}
         </div>
+
+        {/* Settings Modal */}
+        {showSettingsModal && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <SettingsIcon className="w-7 h-7 text-[#EF3F3F]" />
+                  Account Settings
+                </h3>
+                <button
+                  onClick={() => setShowSettingsModal(false)}
+                  className="text-gray-400 hover:text-white transition text-2xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Basic Information */}
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-4">Basic Information</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">Account Name</label>
+                        <button
+                          onMouseEnter={() => setActiveTooltip("accountname")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition relative"
+                        >
+                          <Info className="w-4 h-4" />
+                          {activeTooltip === "accountname" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Your store or business name
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={editingSettings.accountName}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, accountName: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">Currency</label>
+                        <button
+                          onMouseEnter={() => setActiveTooltip("currency-setting")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition relative"
+                        >
+                          <Info className="w-4 h-4" />
+                          {activeTooltip === "currency-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Select your store's primary currency
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                      <select
+                        value={editingSettings.currency}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, currency: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      >
+                        {CURRENCIES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.symbol} {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Value Thresholds */}
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-4">Value Thresholds</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">Average Order Value</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("aov-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "aov-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Typical amount a customer spends per order
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.aov}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, aov: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">VIP Threshold</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("vip-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "vip-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Minimum lifetime value for VIP status (typically 5x AOV)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.vipThreshold}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, vipThreshold: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">High Value Threshold</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("highvalue-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "highvalue-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Minimum lifetime value for high-value customers (typically 3x AOV)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.highValueThreshold}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, highValueThreshold: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Time Thresholds */}
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-4">Time Thresholds (Days)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">New Customer</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("newcustomer-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "newcustomer-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Days since first purchase to be considered "new" (typically 30 days)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.newCustomerDays}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, newCustomerDays: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">Lapsed</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("lapsed-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "lapsed-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Days without purchase to be considered "lapsed" (typically 60 days)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.lapsedDays}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, lapsedDays: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">Churned</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("churned-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "churned-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Days without purchase to be considered "churned" (typically 180 days)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.churnedDays}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, churnedDays: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* API Key Info (Read-only) */}
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-4">API Configuration</h4>
+                  <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Lock className="w-5 h-5 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-400 mb-2">
+                          <span className="font-bold text-white">Klaviyo API Key:</span> Secured & encrypted
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Your API key cannot be viewed or edited for security reasons. To change it, please contact
+                          support or create a new account.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 mt-8">
+                <button
+                  onClick={() => setShowSettingsModal(false)}
+                  className="flex-1 px-6 py-3 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveSettings}
+                  className="flex-1 px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Export Modal */}
         {showExportModal && (
