@@ -237,6 +237,7 @@ export default function AderaiApp() {
   const [results, setResults] = useState<SegmentResult[]>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>("Core BFCM");
   const [showApiInfo, setShowApiInfo] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   // Analytics state - NEW
   const [allSegments, setAllSegments] = useState<any[]>([]);
@@ -864,7 +865,16 @@ export default function AderaiApp() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Klaviyo API Key *</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm text-gray-400">Klaviyo API Key *</label>
+                      <button
+                        onClick={() => setShowApiInfo(true)}
+                        className="text-gray-400 hover:text-[#EF3F3F] transition"
+                        title="Learn about API access"
+                      >
+                        <Info className="w-4 h-4" />
+                      </button>
+                    </div>
                     <input
                       type="password"
                       value={klaviyoApiKey}
@@ -896,7 +906,23 @@ export default function AderaiApp() {
                 <h3 className="text-lg font-semibold text-white mb-4">Value Thresholds</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Average Order Value</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm text-gray-400">Average Order Value</label>
+                      <div className="relative">
+                        <button
+                          onMouseEnter={() => setActiveTooltip("aov")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                        {activeTooltip === "aov" && (
+                          <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                            The typical amount a customer spends per order in your store
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <input
                       type="number"
                       value={aov}
@@ -906,7 +932,23 @@ export default function AderaiApp() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">VIP Threshold</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm text-gray-400">VIP Threshold</label>
+                      <div className="relative">
+                        <button
+                          onMouseEnter={() => setActiveTooltip("vip")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                        {activeTooltip === "vip" && (
+                          <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                            Minimum lifetime value to be considered a VIP customer (typically 5x AOV)
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <input
                       type="number"
                       value={vipThreshold}
@@ -916,7 +958,23 @@ export default function AderaiApp() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">High Value Threshold</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm text-gray-400">High Value Threshold</label>
+                      <div className="relative">
+                        <button
+                          onMouseEnter={() => setActiveTooltip("highvalue")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                        {activeTooltip === "highvalue" && (
+                          <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                            Minimum lifetime value for high-value customers (typically 3x AOV)
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <input
                       type="number"
                       value={highValueThreshold}
@@ -932,7 +990,23 @@ export default function AderaiApp() {
                 <h3 className="text-lg font-semibold text-white mb-4">Time Thresholds (Days)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">New Customer</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm text-gray-400">New Customer</label>
+                      <div className="relative">
+                        <button
+                          onMouseEnter={() => setActiveTooltip("newcustomer")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                        {activeTooltip === "newcustomer" && (
+                          <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                            Number of days since first purchase to be considered "new" (typically 30 days)
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <input
                       type="number"
                       value={newCustomerDays}
@@ -942,7 +1016,23 @@ export default function AderaiApp() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Lapsed</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm text-gray-400">Lapsed</label>
+                      <div className="relative">
+                        <button
+                          onMouseEnter={() => setActiveTooltip("lapsed")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                        {activeTooltip === "lapsed" && (
+                          <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                            Days without purchase to be considered "lapsed" (typically 60 days)
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <input
                       type="number"
                       value={lapsedDays}
@@ -952,7 +1042,23 @@ export default function AderaiApp() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Churned</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm text-gray-400">Churned</label>
+                      <div className="relative">
+                        <button
+                          onMouseEnter={() => setActiveTooltip("churned")}
+                          onMouseLeave={() => setActiveTooltip(null)}
+                          className="text-gray-400 hover:text-[#EF3F3F] transition"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                        {activeTooltip === "churned" && (
+                          <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                            Days without purchase to be considered "churned" (typically 180 days)
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <input
                       type="number"
                       value={churnedDays}
@@ -972,6 +1078,123 @@ export default function AderaiApp() {
             </button>
           </div>
         </div>
+
+        {/* API Info Modal */}
+        {showApiInfo && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-2xl max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <Info className="w-8 h-8 text-[#EF3F3F]" />
+                <Lock className="w-6 h-6 text-[#EF3F3F]" />
+                <h3 className="text-2xl font-bold text-white">What API Access is Needed?</h3>
+              </div>
+
+              {/* Required Permissions */}
+              <div className="mb-6">
+                <h4 className="text-white font-bold mb-3 text-lg">Required Permissions:</h4>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="text-[#EF3F3F] font-bold">•</span>
+                    <span>
+                      Segments: <span className="text-[#EF3F3F] font-bold">Read & Write</span>
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="text-[#EF3F3F] font-bold">•</span>
+                    <span>
+                      Tags: <span className="text-[#EF3F3F] font-bold">Read & Write</span>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* What Aderai Does */}
+              <div className="mb-6">
+                <h4 className="text-white font-bold mb-3 text-lg flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-green-500" />
+                  What Aderai Does:
+                </h4>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Creates segments in your Klaviyo account</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Adds "Aderai" tag to created segments</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Customizes thresholds based on your metrics</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* What Aderai NEVER Does */}
+              <div className="mb-6">
+                <h4 className="text-white font-bold mb-3 text-lg flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-500" />
+                  What Aderai NEVER Does:
+                </h4>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="text-red-500 font-bold text-xl">✗</span>
+                    <span>Access your customer data or profiles</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="text-red-500 font-bold text-xl">✗</span>
+                    <span>Send emails or SMS messages</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="text-red-500 font-bold text-xl">✗</span>
+                    <span>Modify or delete existing segments</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="text-red-500 font-bold text-xl">✗</span>
+                    <span>Store your API key on servers</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="text-red-500 font-bold text-xl">✗</span>
+                    <span>Share your data with third parties</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Privacy Guarantee */}
+              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <Lock className="w-5 h-5 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-300">
+                      <span className="font-bold text-white">🔒 Privacy Guarantee:</span> Your API key is encrypted and
+                      stored only in your browser's local storage. All requests go directly from your browser to Klaviyo
+                      via our secure Cloudflare Worker. We never see or store your key on any server.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Learn More Link */}
+              <a
+                href="https://developers.klaviyo.com/en/docs/retrieve_api_credentials"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-center text-[#EF3F3F] hover:text-red-400 mb-6 text-sm"
+              >
+                → Learn more about Klaviyo API Keys
+              </a>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowApiInfo(false)}
+                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
