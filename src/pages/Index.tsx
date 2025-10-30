@@ -962,50 +962,75 @@ export default function AderaiApp() {
     if (!userData?.klaviyoApiKey) return;
 
     setLoadingCampaignData(true);
+    console.log("🚀 Starting campaign data fetch...");
+
     try {
       // Step 1: Get the "Placed Order" metric ID via Worker
+      console.log("📊 Fetching metrics...");
       const metricsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/metrics", {
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
       });
 
+      console.log("📊 Metrics response status:", metricsResponse.status);
+
       if (!metricsResponse.ok) {
         throw new Error("Failed to fetch metrics");
       }
 
       const metricsData = await metricsResponse.json();
+      console.log("📊 Metrics data:", metricsData);
+
       const placedOrderMetric = metricsData.data.find(
         (m: any) => m.attributes.name === "Placed Order" || m.attributes.name === "Ordered Product",
       );
 
       if (!placedOrderMetric) {
-        console.warn("No Placed Order metric found");
+        console.warn("❌ No Placed Order metric found");
+        console.log(
+          "Available metrics:",
+          metricsData.data.map((m: any) => m.attributes.name),
+        );
         setCampaignData([]);
         setLoadingCampaignData(false);
         return;
       }
 
       const metricId = placedOrderMetric.id;
+      console.log("✅ Found conversion metric:", placedOrderMetric.attributes.name, "ID:", metricId);
 
       // Step 2: Fetch campaigns list via Worker
+      console.log("📧 Fetching campaigns list...");
       const campaignsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/campaigns", {
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
       });
 
+      console.log("📧 Campaigns response status:", campaignsResponse.status);
+
       if (!campaignsResponse.ok) {
         throw new Error("Failed to fetch campaigns");
       }
 
       const campaignsData = await campaignsResponse.json();
+      console.log("📧 Found campaigns:", campaignsData.data.length);
+      console.log(
+        "📧 Campaign names:",
+        campaignsData.data.map((c: any) => c.attributes?.name),
+      );
 
       // Step 3: For each campaign, fetch performance using Reporting API via Worker
       // Get ALL campaigns (remove slice limit) and use all-time data
+      console.log("📈 Fetching campaign performance data...");
       const campaignMetrics = await Promise.all(
-        campaignsData.data.map(async (campaign: any) => {
+        campaignsData.data.map(async (campaign: any, index: number) => {
           try {
+            console.log(
+              `📈 [${index + 1}/${campaignsData.data.length}] Fetching stats for: ${campaign.attributes?.name}`,
+            );
+
             // Use Worker proxy for Reporting API
             const reportResponse = await fetch(
               "https://aderai-worker.akshat-619.workers.dev/performance/campaign-reports",
@@ -1042,13 +1067,18 @@ export default function AderaiApp() {
               },
             );
 
+            console.log(`📈 [${index + 1}] Report response status:`, reportResponse.status);
+
             if (reportResponse.ok) {
               const reportData = await reportResponse.json();
+              console.log(`📈 [${index + 1}] Report data:`, reportData);
+
               const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
+              console.log(`📈 [${index + 1}] Stats:`, stats);
 
               // Only include if campaign was actually sent
               if (stats.sends && stats.sends > 0) {
-                return {
+                const campaignData = {
                   name: campaign.attributes?.name || "Untitled Campaign",
                   sent: stats.sends || 0,
                   opened: stats.opens_unique || 0,
@@ -1057,18 +1087,27 @@ export default function AderaiApp() {
                   conversions: stats.conversion_uniques || 0,
                   id: campaign.id,
                 };
+                console.log(`✅ [${index + 1}] Valid campaign data:`, campaignData);
+                return campaignData;
+              } else {
+                console.log(`⚠️ [${index + 1}] No sends for this campaign`);
               }
+            } else {
+              const errorText = await reportResponse.text();
+              console.error(`❌ [${index + 1}] Report API failed:`, reportResponse.status, errorText);
             }
 
             return null;
           } catch (err) {
-            console.error("Error fetching campaign metrics:", err);
+            console.error(`❌ [${index + 1}] Error fetching campaign metrics:`, err);
             return null;
           }
         }),
       );
 
       const validCampaigns = campaignMetrics.filter((c) => c !== null);
+      console.log("✅ Valid campaigns with data:", validCampaigns.length);
+      console.log("📊 Final campaign data:", validCampaigns);
       setCampaignData(validCampaigns);
     } catch (error) {
       console.error("Error fetching campaign data:", error);
