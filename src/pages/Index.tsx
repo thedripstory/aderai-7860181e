@@ -774,6 +774,7 @@ export default function AderaiApp() {
 
   // Export functions
   const exportToCSV = () => {
+    const summary = getAnalyticsSummary();
     const headers = ["Segment Name", "Members", "Change (7d)", "Change %", "Percentage of Total"];
     const rows = getFilteredSegments()
       .map((seg) => {
@@ -801,6 +802,7 @@ export default function AderaiApp() {
   };
 
   const exportToExcel = () => {
+    const summary = getAnalyticsSummary();
     // Create HTML table
     const headers = ["Segment", "Members", "Change (7d)", "Change %", "% of Total"];
     const rows = getFilteredSegments()
@@ -838,6 +840,7 @@ export default function AderaiApp() {
   };
 
   const exportToPDF = () => {
+    const summary = getAnalyticsSummary();
     // Create printable HTML
     const content = `
       <html>
