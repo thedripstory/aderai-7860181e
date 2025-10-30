@@ -386,18 +386,14 @@ export default function AderaiApp() {
   const isAderaiSegment = (segment: any): boolean => {
     // Check if segment has the "Aderai" tag (primary method)
     if (segment.tagNames && segment.tagNames.includes("Aderai")) {
-      console.log("✅ Segment matched by TAG:", segment.attributes?.name);
       return true;
     }
 
     // Check if name includes "| Aderai" suffix
     if (segment.attributes?.name?.includes("| Aderai")) {
-      console.log("✅ Segment matched by NAME suffix:", segment.attributes?.name);
       return true;
     }
 
-    // NOT checking template names anymore - only tag and name suffix matter
-    console.log("❌ Segment did NOT match:", segment.attributes?.name, "Tags:", segment.tagNames);
     return false;
   };
 
@@ -467,19 +463,12 @@ export default function AderaiApp() {
       const data = await response.json();
       const segments = data.data || [];
 
-      console.log("📊 Raw API Response:", {
-        totalSegments: segments.length,
-        hasIncluded: !!data.included,
-        includedCount: data.included?.length || 0,
-      });
-
       // Extract tags from included data and attach to segments
       const tagsMap = new Map();
       if (data.included) {
         data.included.forEach((item: any) => {
           if (item.type === "tag") {
             tagsMap.set(item.id, item.attributes.name);
-            console.log("🏷️  Found tag:", item.attributes.name);
           }
         });
       }
@@ -488,12 +477,6 @@ export default function AderaiApp() {
       const segmentsWithTags = segments.map((segment: any) => {
         const tagRelationships = segment.relationships?.tags?.data || [];
         const tagNames = tagRelationships.map((tagRef: any) => tagsMap.get(tagRef.id)).filter(Boolean);
-
-        console.log("📦 Segment:", {
-          name: segment.attributes?.name,
-          hasTagRelationships: tagRelationships.length > 0,
-          tagNames: tagNames,
-        });
 
         return {
           ...segment,
