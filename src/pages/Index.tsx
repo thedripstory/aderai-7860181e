@@ -1,11 +1,21 @@
-import React, { useState } from "react";
-import { Shield, Zap, CheckCircle, AlertCircle, Loader, Settings, Info, ChevronDown, ChevronUp } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Shield,
+  Zap,
+  CheckCircle,
+  AlertCircle,
+  Loader,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Lock,
+  Mail,
+} from "lucide-react";
 
 /**
- * ADERAI - COMPLETE REACT APP
- * ALL 70 SEGMENTS FROM BFCM NOTION DOC
- *
- * Ready for Lovable.dev deployment
+ * ADERAI - COMPLETE APP WITH AUTH
+ * Login → Signup → Onboarding → Dashboard
  */
 
 // Types
@@ -16,7 +26,14 @@ interface SegmentResult {
   klaviyoId?: string;
 }
 
-// Segment Data Structure
+interface UserData {
+  email: string;
+  accountName: string;
+  klaviyoApiKey: string;
+  currency: string;
+}
+
+// Segment Data
 const SEGMENTS = {
   "Core BFCM": [
     { id: "vip-customers", name: "👑 VIP Customers", desc: "Top 10% by lifetime value" },
@@ -100,7 +117,6 @@ const SEGMENTS = {
   ],
 };
 
-// Quick Start Bundles
 const BUNDLES = {
   "BFCM Essentials": [
     "vip-customers",
@@ -134,7 +150,6 @@ const BUNDLES = {
   ],
 };
 
-// Currencies
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
   { code: "EUR", symbol: "€", name: "Euro" },
@@ -155,17 +170,108 @@ const CURRENCIES = [
 ];
 
 export default function AderaiApp() {
-  // State
-  const [step, setStep] = useState<"setup" | "creating" | "results">("setup");
-  const [apiKey, setApiKey] = useState("");
-  const [workerUrl, setWorkerUrl] = useState("");
+  // View state: 'login' | 'signup' | 'onboarding' | 'dashboard' | 'creating' | 'results'
+  const [view, setView] = useState<"login" | "signup" | "onboarding" | "dashboard" | "creating" | "results">("login");
+
+  // Auth state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Onboarding state
+  const [accountName, setAccountName] = useState("");
+  const [klaviyoApiKey, setKlaviyoApiKey] = useState("");
   const [currency, setCurrency] = useState("USD");
+
+  // User data
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  // Dashboard state
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [results, setResults] = useState<SegmentResult[]>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>("Core BFCM");
   const [showApiInfo, setShowApiInfo] = useState(false);
 
-  // Functions
+  // Load user on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("aderai_user");
+    if (saved) {
+      const user = JSON.parse(saved);
+      setUserData(user);
+      setView("dashboard");
+    }
+  }, []);
+
+  // Auth functions
+  const handleLogin = () => {
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    const saved = localStorage.getItem(`aderai_${email}`);
+    if (!saved) {
+      alert("Account not found. Please sign up.");
+      return;
+    }
+
+    const user = JSON.parse(saved);
+    if (user.password !== password) {
+      alert("Incorrect password");
+      return;
+    }
+
+    setUserData(user);
+    localStorage.setItem("aderai_user", JSON.stringify(user));
+    setView("dashboard");
+  };
+
+  const handleSignup = () => {
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    const exists = localStorage.getItem(`aderai_${email}`);
+    if (exists) {
+      alert("Account already exists. Please login.");
+      setView("login");
+      return;
+    }
+
+    // Go to onboarding
+    setView("onboarding");
+  };
+
+  const handleOnboarding = () => {
+    if (!accountName || !klaviyoApiKey) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    const user: UserData = {
+      email,
+      accountName,
+      klaviyoApiKey,
+      currency,
+    };
+
+    // Save user
+    localStorage.setItem(`aderai_${email}`, JSON.stringify({ ...user, password }));
+    localStorage.setItem("aderai_user", JSON.stringify(user));
+
+    setUserData(user);
+    setView("dashboard");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("aderai_user");
+    setUserData(null);
+    setEmail("");
+    setPassword("");
+    setView("login");
+  };
+
+  // Segment functions
   const toggleSegment = (id: string) => {
     setSelectedSegments((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
   };
@@ -187,21 +293,21 @@ export default function AderaiApp() {
   };
 
   const createSegments = async () => {
-    if (!apiKey || selectedSegments.length === 0) {
-      alert("Please enter your API key and select segments");
+    if (!userData || selectedSegments.length === 0) {
+      alert("Please select segments");
       return;
     }
 
-    setStep("creating");
+    setView("creating");
 
     try {
-      const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol || "$";
+      const currencySymbol = CURRENCIES.find((c) => c.code === userData.currency)?.symbol || "$";
 
-      const response = await fetch(workerUrl || "https://aderai-api.YOUR-SUBDOMAIN.workers.dev", {
+      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          apiKey,
+          apiKey: userData.klaviyoApiKey,
           segments: selectedSegments,
           currencySymbol,
         }),
@@ -209,17 +315,264 @@ export default function AderaiApp() {
 
       const data = await response.json();
       setResults(data.results || []);
-      setStep("results");
+      setView("results");
     } catch (error) {
       alert("Error creating segments: " + (error as Error).message);
-      setStep("setup");
+      setView("dashboard");
     }
   };
 
-  const getCurrencySymbol = () => CURRENCIES.find((c) => c.code === currency)?.symbol || "$";
+  // Render login
+  if (view === "login") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <h1 className="text-5xl font-bold">
+                <span className="text-[#EF3F3F]">ADER</span>
+                <span className="text-white">AI</span>
+              </h1>
+              <Zap className="w-10 h-10 text-[#EF3F3F]" />
+            </div>
+            <p className="text-gray-400">Create 70 Klaviyo segments in 30 seconds</p>
+          </div>
 
-  // Render
-  if (step === "creating") {
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Login</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-white text-sm mb-2 block">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white text-sm mb-2 block">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleLogin}
+                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
+              >
+                Login
+              </button>
+
+              <div className="text-center text-gray-400 text-sm">
+                Don't have an account?{" "}
+                <button onClick={() => setView("signup")} className="text-[#EF3F3F] hover:text-red-400 font-bold">
+                  Sign Up
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render signup
+  if (view === "signup") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <h1 className="text-5xl font-bold">
+                <span className="text-[#EF3F3F]">ADER</span>
+                <span className="text-white">AI</span>
+              </h1>
+              <Zap className="w-10 h-10 text-[#EF3F3F]" />
+            </div>
+            <p className="text-gray-400">Create your account</p>
+          </div>
+
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Sign Up</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-white text-sm mb-2 block">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white text-sm mb-2 block">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleSignup}
+                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
+              >
+                Continue
+              </button>
+
+              <div className="text-center text-gray-400 text-sm">
+                Already have an account?{" "}
+                <button onClick={() => setView("login")} className="text-[#EF3F3F] hover:text-red-400 font-bold">
+                  Login
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render onboarding
+  if (view === "onboarding") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
+        <div className="w-full max-w-2xl">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <h1 className="text-5xl font-bold">
+                <span className="text-[#EF3F3F]">ADER</span>
+                <span className="text-white">AI</span>
+              </h1>
+              <Zap className="w-10 h-10 text-[#EF3F3F]" />
+            </div>
+            <p className="text-xl text-gray-400">Let's set up your account</p>
+          </div>
+
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Account Setup</h2>
+
+            <div className="space-y-6">
+              <div>
+                <label className="text-white font-bold mb-2 block">Account Name</label>
+                <input
+                  type="text"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="My Store"
+                  className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-white font-bold flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-[#EF3F3F]" />
+                    Klaviyo Private API Key
+                  </label>
+                  <button onClick={() => setShowApiInfo(true)} className="text-gray-400 hover:text-white transition">
+                    <Info className="w-5 h-5" />
+                  </button>
+                </div>
+                <input
+                  type="password"
+                  value={klaviyoApiKey}
+                  onChange={(e) => setKlaviyoApiKey(e.target.value)}
+                  placeholder="pk_..."
+                  className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Your API key is stored locally and never sent to our servers
+                </p>
+              </div>
+
+              <div>
+                <label className="text-white font-bold mb-2 block">Currency</label>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.symbol} {c.name} ({c.code})
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-2">
+                  This will be used in segment names (e.g., "VIP ${CURRENCIES.find((c) => c.code === currency)?.symbol}
+                  500+")
+                </p>
+              </div>
+
+              <button
+                onClick={handleOnboarding}
+                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-4 rounded-lg text-lg transition"
+              >
+                Complete Setup
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* API Info Modal */}
+        {showApiInfo && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-50">
+            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8 max-w-md">
+              <h3 className="text-2xl font-bold text-white mb-4">Where to find your API key</h3>
+              <ol className="text-gray-300 space-y-2 mb-6">
+                <li>1. Go to Klaviyo → Settings → API Keys</li>
+                <li>2. Create a "Private API Key"</li>
+                <li>3. Give it "Full Access" permissions</li>
+                <li>4. Copy the key (starts with "pk_")</li>
+                <li>5. Paste it above</li>
+              </ol>
+              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded p-4 mb-4">
+                <p className="text-sm text-gray-400">
+                  <Shield className="w-4 h-4 inline mr-2 text-[#EF3F3F]" />
+                  Your API key is sent directly to Klaviyo via our secure Cloudflare Worker. We never see or store it.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowApiInfo(false)}
+                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Render creating
+  if (view === "creating") {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
         <div className="text-center">
@@ -231,7 +584,8 @@ export default function AderaiApp() {
     );
   }
 
-  if (step === "results") {
+  // Render results
+  if (view === "results") {
     const successCount = results.filter((r) => r.status === "success").length;
     const skippedCount = results.filter((r) => r.status === "skipped").length;
     const errorCount = results.filter((r) => r.status === "error").length;
@@ -260,7 +614,7 @@ export default function AderaiApp() {
             </div>
           </div>
 
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 max-h-96 overflow-y-auto">
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 max-h-96 overflow-y-auto mb-6">
             {results.map((result, idx) => (
               <div key={idx} className="flex items-start gap-3 py-2 border-b border-[#2A2A2A] last:border-0">
                 {result.status === "success" && <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />}
@@ -280,11 +634,11 @@ export default function AderaiApp() {
 
           <button
             onClick={() => {
-              setStep("setup");
+              setView("dashboard");
               setResults([]);
               setSelectedSegments([]);
             }}
-            className="w-full mt-6 bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-4 rounded-lg transition"
+            className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-4 rounded-lg transition"
           >
             Create More Segments
           </button>
@@ -293,58 +647,25 @@ export default function AderaiApp() {
     );
   }
 
-  // Setup Screen
+  // Render dashboard (main app)
   return (
     <div className="min-h-screen bg-[#0A0A0A] p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <h1 className="text-5xl font-bold">
-              <span className="text-[#EF3F3F]">ADER</span>
-              <span className="text-white">AI</span>
-            </h1>
-            <Zap className="w-10 h-10 text-[#EF3F3F]" />
+        <div className="flex items-center justify-between mb-12">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-4xl font-bold">
+                <span className="text-[#EF3F3F]">ADER</span>
+                <span className="text-white">AI</span>
+              </h1>
+              <Zap className="w-8 h-8 text-[#EF3F3F]" />
+            </div>
+            <p className="text-gray-400">Welcome back, {userData?.accountName}</p>
           </div>
-          <p className="text-xl text-gray-400">Create 70 Klaviyo segments in 30 seconds</p>
-          <p className="text-sm text-gray-500 mt-2">By THE DRIP STORY</p>
-        </div>
-
-        {/* API Key Input */}
-        <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <label className="text-white font-bold flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#EF3F3F]" />
-              Klaviyo Private API Key
-            </label>
-            <button onClick={() => setShowApiInfo(true)} className="text-gray-400 hover:text-white transition">
-              <Info className="w-5 h-5" />
-            </button>
-          </div>
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="pk_..."
-            className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
-          />
-          <p className="text-xs text-gray-500 mt-2">Your API key is processed securely and never stored</p>
-        </div>
-
-        {/* Currency Selector */}
-        <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 mb-6">
-          <label className="text-white font-bold mb-3 block">Currency</label>
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
-          >
-            {CURRENCIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.symbol} {c.name} ({c.code})
-              </option>
-            ))}
-          </select>
+          <button onClick={handleLogout} className="text-gray-400 hover:text-white transition text-sm">
+            Logout
+          </button>
         </div>
 
         {/* Quick Start Bundles */}
@@ -436,40 +757,12 @@ export default function AderaiApp() {
         {/* Create Button */}
         <button
           onClick={createSegments}
-          disabled={!apiKey || selectedSegments.length === 0}
+          disabled={selectedSegments.length === 0}
           className="w-full bg-[#EF3F3F] hover:bg-red-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-bold py-6 rounded-lg text-xl transition flex items-center justify-center gap-3"
         >
           <Zap className="w-6 h-6" />
           Create {selectedSegments.length} Segments
         </button>
-
-        {/* API Info Modal */}
-        {showApiInfo && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-50">
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8 max-w-md">
-              <h3 className="text-2xl font-bold text-white mb-4">Where to find your API key</h3>
-              <ol className="text-gray-300 space-y-2 mb-6">
-                <li>1. Go to Klaviyo → Settings → API Keys</li>
-                <li>2. Create a "Private API Key"</li>
-                <li>3. Give it "Full Access" permissions</li>
-                <li>4. Copy the key (starts with "pk_")</li>
-                <li>5. Paste it above</li>
-              </ol>
-              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded p-4 mb-4">
-                <p className="text-sm text-gray-400">
-                  <Shield className="w-4 h-4 inline mr-2 text-[#EF3F3F]" />
-                  Your API key is sent directly to Klaviyo via our secure Cloudflare Worker. We never see or store it.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowApiInfo(false)}
-                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
-              >
-                Got It
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
