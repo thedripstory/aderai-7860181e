@@ -655,8 +655,10 @@ export default function AderaiApp() {
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-              ADERAI <Zap className="w-8 h-8 text-[#EF3F3F]" />
+            <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
+              <span className="text-[#EF3F3F]">ADER</span>
+              <span className="text-white">AI</span>
+              <Zap className="w-8 h-8 text-[#EF3F3F]" />
             </h1>
             <p className="text-gray-400">AI-Powered Klaviyo Segmentation</p>
           </div>
@@ -718,8 +720,10 @@ export default function AderaiApp() {
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-              ADERAI <Zap className="w-8 h-8 text-[#EF3F3F]" />
+            <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
+              <span className="text-[#EF3F3F]">ADER</span>
+              <span className="text-white">AI</span>
+              <Zap className="w-8 h-8 text-[#EF3F3F]" />
             </h1>
             <p className="text-gray-400">AI-Powered Klaviyo Segmentation</p>
           </div>
@@ -781,8 +785,10 @@ export default function AderaiApp() {
       <div className="min-h-screen bg-[#0A0A0A] py-8 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-              ADERAI <Zap className="w-8 h-8 text-[#EF3F3F]" />
+            <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
+              <span className="text-[#EF3F3F]">ADER</span>
+              <span className="text-white">AI</span>
+              <Zap className="w-8 h-8 text-[#EF3F3F]" />
             </h1>
             <p className="text-gray-400">Complete your account setup</p>
           </div>
@@ -927,8 +933,10 @@ export default function AderaiApp() {
         <div className="bg-[#1A1A1A] border-b border-[#2A2A2A] px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                ADERAI <Zap className="w-6 h-6 text-[#EF3F3F]" />
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <span className="text-[#EF3F3F]">ADER</span>
+                <span className="text-white">AI</span>
+                <Zap className="w-6 h-6 text-[#EF3F3F]" />
               </h1>
               <p className="text-sm text-gray-400">Welcome back, {userData?.accountName}</p>
             </div>
@@ -1106,8 +1114,10 @@ export default function AderaiApp() {
         <div className="bg-[#1A1A1A] border-b border-[#2A2A2A] px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                ADERAI <Zap className="w-6 h-6 text-[#EF3F3F]" />
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <span className="text-[#EF3F3F]">ADER</span>
+                <span className="text-white">AI</span>
+                <Zap className="w-6 h-6 text-[#EF3F3F]" />
               </h1>
               <p className="text-sm text-gray-400">Welcome back, {userData?.accountName}</p>
             </div>
