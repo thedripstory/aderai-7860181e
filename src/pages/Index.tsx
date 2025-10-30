@@ -384,36 +384,21 @@ export default function AderaiApp() {
 
   // Check if a segment is created by Aderai
   const isAderaiSegment = (segment: any): boolean => {
-    // First, check if segment has the "Aderai" tag (most reliable method)
+    // Check if segment has the "Aderai" tag (primary method)
     if (segment.tagNames && segment.tagNames.includes("Aderai")) {
       console.log("✅ Segment matched by TAG:", segment.attributes?.name);
       return true;
     }
 
-    // Backwards compatibility: Check if name includes "| Aderai"
+    // Check if name includes "| Aderai" suffix
     if (segment.attributes?.name?.includes("| Aderai")) {
       console.log("✅ Segment matched by NAME suffix:", segment.attributes?.name);
       return true;
     }
 
-    // Fallback: Name matching (for older segments without tags)
-    const segmentName = segment.attributes?.name || "";
-    const allAderaiSegmentNames = Object.values(SEGMENTS)
-      .flat()
-      .map((s) => s.name);
-    const matched = allAderaiSegmentNames.some((name) => {
-      const cleanName = name.replace(/[^\w\s]/gi, "").trim();
-      const cleanSegmentName = segmentName.replace(/[^\w\s]/gi, "").trim();
-      return cleanSegmentName.includes(cleanName) || cleanName.includes(cleanSegmentName);
-    });
-
-    if (matched) {
-      console.log("✅ Segment matched by TEMPLATE:", segment.attributes?.name);
-    } else {
-      console.log("❌ Segment did NOT match:", segment.attributes?.name, "Tags:", segment.tagNames);
-    }
-
-    return matched;
+    // NOT checking template names anymore - only tag and name suffix matter
+    console.log("❌ Segment did NOT match:", segment.attributes?.name, "Tags:", segment.tagNames);
+    return false;
   };
 
   // Load cached analytics data
