@@ -1002,8 +1002,9 @@ export default function AderaiApp() {
       const campaignsData = await campaignsResponse.json();
 
       // Step 3: For each campaign, fetch performance using Reporting API via Worker
+      // Get ALL campaigns (remove slice limit) and use all-time data
       const campaignMetrics = await Promise.all(
-        campaignsData.data.slice(0, 10).map(async (campaign: any) => {
+        campaignsData.data.map(async (campaign: any) => {
           try {
             // Use Worker proxy for Reporting API
             const reportResponse = await fetch(
@@ -1028,9 +1029,10 @@ export default function AderaiApp() {
                         "conversion_value",
                         "conversion_rate",
                         "revenue_per_recipient",
+                        "sends",
                       ],
                       timeframe: {
-                        key: "last_30_days",
+                        key: "since", // All-time data, not just last 30 days
                       },
                       conversion_metric_id: metricId,
                       filter: `equals(campaign_id,"${campaign.id}")`,
@@ -1044,15 +1046,18 @@ export default function AderaiApp() {
               const reportData = await reportResponse.json();
               const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
 
-              return {
-                name: campaign.attributes?.name || "Untitled Campaign",
-                sent: stats.sends || 0,
-                opened: stats.opens_unique || 0,
-                clicked: stats.clicks_unique || 0,
-                revenue: stats.conversion_value || 0,
-                conversions: stats.conversion_uniques || 0,
-                id: campaign.id,
-              };
+              // Only include if campaign was actually sent
+              if (stats.sends && stats.sends > 0) {
+                return {
+                  name: campaign.attributes?.name || "Untitled Campaign",
+                  sent: stats.sends || 0,
+                  opened: stats.opens_unique || 0,
+                  clicked: stats.clicks_unique || 0,
+                  revenue: stats.conversion_value || 0,
+                  conversions: stats.conversion_uniques || 0,
+                  id: campaign.id,
+                };
+              }
             }
 
             return null;
@@ -1063,7 +1068,7 @@ export default function AderaiApp() {
         }),
       );
 
-      const validCampaigns = campaignMetrics.filter((c) => c !== null && c.sent > 0);
+      const validCampaigns = campaignMetrics.filter((c) => c !== null);
       setCampaignData(validCampaigns);
     } catch (error) {
       console.error("Error fetching campaign data:", error);
@@ -1116,8 +1121,9 @@ export default function AderaiApp() {
       const flowsData = await flowsResponse.json();
 
       // Step 3: For each flow, fetch performance using Reporting API via Worker
+      // Get ALL flows and use all-time data
       const flowMetrics = await Promise.all(
-        flowsData.data.slice(0, 10).map(async (flow: any) => {
+        flowsData.data.map(async (flow: any) => {
           try {
             // Use Worker proxy for Reporting API
             const reportResponse = await fetch(
@@ -1140,9 +1146,10 @@ export default function AderaiApp() {
                         "conversion_uniques",
                         "conversion_value",
                         "conversion_rate",
+                        "sends",
                       ],
                       timeframe: {
-                        key: "last_30_days",
+                        key: "since", // All-time data, not just last 30 days
                       },
                       conversion_metric_id: metricId,
                       filter: `equals(flow_id,"${flow.id}")`,
