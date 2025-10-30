@@ -73,7 +73,7 @@ interface AnalyticsCache {
 
 // Segment Data
 const SEGMENTS = {
-  "Core BFCM": [
+  "Core Essentials": [
     { id: "vip-customers", name: "👑 VIP Customers", desc: "Top 10% by lifetime value" },
     { id: "repeat-customers", name: "⭐ Repeat Customers", desc: "3+ purchases" },
     { id: "one-time-customers", name: "🎯 One-Time Customers", desc: "Exactly 1 purchase" },
@@ -283,7 +283,7 @@ export default function AderaiApp() {
   // Dashboard state
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [results, setResults] = useState<SegmentResult[]>([]);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>("Core BFCM");
+  const [expandedCategory, setExpandedCategory] = useState<string | null>("Core Essentials");
   const [showApiInfo, setShowApiInfo] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
