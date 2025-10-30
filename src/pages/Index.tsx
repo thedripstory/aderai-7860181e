@@ -1743,7 +1743,7 @@ export default function AderaiApp() {
                     <div className="text-sm text-gray-400">Total Segments</div>
                     <Users className="w-5 h-5 text-[#EF3F3F]" />
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">{formatNumber(summary.totalSegments)}</div>
+                  <div className="text-3xl font-bold text-white mb-1">{summary.totalSegments}</div>
                   <div className="text-xs text-gray-500">Active segments</div>
                 </div>
 
@@ -1753,7 +1753,7 @@ export default function AderaiApp() {
                     <div className="text-sm text-gray-400">Total Profiles</div>
                     <TrendingUp className="w-5 h-5 text-[#10B981]" />
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">{formatNumber(summary.totalProfiles)}</div>
+                  <div className="text-3xl font-bold text-white mb-1">{summary.totalProfiles.toLocaleString()}</div>
                   <div className="text-xs text-gray-500">Across all segments</div>
                 </div>
 
@@ -1763,7 +1763,7 @@ export default function AderaiApp() {
                     <div className="text-sm text-gray-400">Added (7d)</div>
                     <ArrowUp className="w-5 h-5 text-[#10B981]" />
                   </div>
-                  <div className="text-3xl font-bold text-[#10B981] mb-1">+{formatNumber(summary.totalAdded)}</div>
+                  <div className="text-3xl font-bold text-[#10B981] mb-1">+{summary.totalAdded.toLocaleString()}</div>
                   <div className="text-xs text-gray-500">Last 7 days</div>
                 </div>
 
@@ -1773,7 +1773,7 @@ export default function AderaiApp() {
                     <div className="text-sm text-gray-400">Removed (7d)</div>
                     <ArrowDown className="w-5 h-5 text-[#EF4444]" />
                   </div>
-                  <div className="text-3xl font-bold text-[#EF4444] mb-1">-{formatNumber(summary.totalRemoved)}</div>
+                  <div className="text-3xl font-bold text-[#EF4444] mb-1">-{summary.totalRemoved.toLocaleString()}</div>
                   <div className="text-xs text-gray-500">Last 7 days</div>
                 </div>
               </div>
