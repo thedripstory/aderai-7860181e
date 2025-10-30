@@ -229,6 +229,65 @@ export default function AderaiApp() {
   const [lapsedDays, setLapsedDays] = useState("60");
   const [churnedDays, setChurnedDays] = useState("180");
 
+  // Auto-detect currency based on IP geolocation
+  useEffect(() => {
+    const detectCurrency = async () => {
+      try {
+        // Use ipapi.co free service (no API key needed)
+        const response = await fetch("https://ipapi.co/json/");
+        const data = await response.json();
+
+        // Map country code to currency
+        const currencyMap: Record<string, string> = {
+          US: "USD",
+          CA: "CAD",
+          GB: "GBP",
+          AU: "AUD",
+          NZ: "NZD",
+          IN: "INR",
+          AE: "AED",
+          SA: "SAR",
+          SG: "SGD",
+          JP: "JPY",
+          CN: "CNY",
+          CH: "CHF",
+          ZA: "ZAR",
+          BR: "BRL",
+          MX: "MXN",
+          // European countries
+          DE: "EUR",
+          FR: "EUR",
+          IT: "EUR",
+          ES: "EUR",
+          NL: "EUR",
+          BE: "EUR",
+          AT: "EUR",
+          PT: "EUR",
+          IE: "EUR",
+          FI: "EUR",
+          GR: "EUR",
+          LU: "EUR",
+          CY: "EUR",
+          MT: "EUR",
+          SI: "EUR",
+          SK: "EUR",
+          EE: "EUR",
+          LV: "EUR",
+          LT: "EUR",
+        };
+
+        const detectedCurrency = currencyMap[data.country_code] || "USD";
+        setCurrency(detectedCurrency);
+        console.log("🌍 Auto-detected currency:", detectedCurrency, "from", data.country);
+      } catch (error) {
+        console.log("Could not detect currency, defaulting to USD");
+        // Silently fail - USD is already the default
+      }
+    };
+
+    detectCurrency();
+  }, []);
+
   // User data
   const [userData, setUserData] = useState<UserData | null>(null);
 
