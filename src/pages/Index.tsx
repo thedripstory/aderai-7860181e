@@ -1026,92 +1026,90 @@ export default function AderaiApp() {
       // Step 3: For each campaign, fetch performance using Reporting API via Worker
       // Get ALL campaigns (remove slice limit) and use all-time data
       console.log("📈 Fetching campaign performance data...");
-      const campaignMetrics = await Promise.all(
-        campaignsData.data.map(async (campaign: any, index: number) => {
-          try {
-            console.log(
-              `📈 [${index + 1}/${campaignsData.data.length}] Fetching stats for: ${campaign.attributes?.name}`,
-            );
+      const campaignMetrics = [];
+      for (let index = 0; index < campaignsData.data.length; index++) {
+        const campaign = campaignsData.data[index];
+        try {
+          console.log(
+            `📈 [${index + 1}/${campaignsData.data.length}] Fetching stats for: ${campaign.attributes?.name}`,
+          );
 
-            // Use Worker proxy for Reporting API
-            const reportResponse = await fetch(
-              "https://aderai-api.akshat-619.workers.dev/performance/campaign-reports",
-              {
-                method: "POST",
-                mode: "cors",
-                headers: {
-                  "X-API-Key": userData.klaviyoApiKey,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  data: {
-                    type: "campaign-values-report",
-                    attributes: {
-                      statistics: [
-                        "opens_unique",
-                        "clicks_unique",
-                        "open_rate",
-                        "click_rate",
-                        "bounce_rate",
-                        "conversion_uniques",
-                        "conversion_value",
-                        "conversion_rate",
-                        "revenue_per_recipient",
-                        "sends",
-                      ],
-                      timeframe: {
-                        key: "since", // All-time data, not just last 30 days
-                      },
-                      conversion_metric_id: metricId,
-                      filter: `equals(campaign_id,"${campaign.id}")`,
-                    },
-                  },
-                }),
-              },
-            );
-
-            console.log(`📈 [${index + 1}] Report response status:`, reportResponse.status);
-
-            if (reportResponse.ok) {
-              const reportData = await reportResponse.json();
-              console.log(`📈 [${index + 1}] Report data:`, reportData);
-
-              const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
-              console.log(`📈 [${index + 1}] Stats:`, stats);
-
-              // Only include if campaign was actually sent
-              if (stats.sends && stats.sends > 0) {
-                const campaignData = {
-                  name: campaign.attributes?.name || "Untitled Campaign",
-                  sent: stats.sends || 0,
-                  opened: stats.opens_unique || 0,
-                  clicked: stats.clicks_unique || 0,
-                  revenue: stats.conversion_value || 0,
-                  conversions: stats.conversion_uniques || 0,
-                  id: campaign.id,
-                };
-                console.log(`✅ [${index + 1}] Valid campaign data:`, campaignData);
-                return campaignData;
-              } else {
-                console.log(`⚠️ [${index + 1}] No sends for this campaign`);
-              }
-            } else {
-              const errorText = await reportResponse.text();
-              console.error(`❌ [${index + 1}] Report API failed:`, reportResponse.status, errorText);
-            }
-
-            return null;
-          } catch (err) {
-            console.error(`❌ [${index + 1}] Error fetching campaign metrics:`, err);
-            return null;
+          // Add delay between requests (500ms) to avoid rate limiting
+          if (index > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
           }
-        }),
-      );
 
-      const validCampaigns = campaignMetrics.filter((c) => c !== null);
-      console.log("✅ Valid campaigns with data:", validCampaigns.length);
-      console.log("📊 Final campaign data:", validCampaigns);
-      setCampaignData(validCampaigns);
+          // Use Worker proxy for Reporting API
+          const reportResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/campaign-reports", {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "X-API-Key": userData.klaviyoApiKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              data: {
+                type: "campaign-values-report",
+                attributes: {
+                  statistics: [
+                    "opens_unique",
+                    "clicks_unique",
+                    "open_rate",
+                    "click_rate",
+                    "bounce_rate",
+                    "conversion_uniques",
+                    "conversion_value",
+                    "conversion_rate",
+                    "revenue_per_recipient",
+                    "sends",
+                  ],
+                  timeframe: {
+                    key: "since", // All-time data, not just last 30 days
+                  },
+                  conversion_metric_id: metricId,
+                  filter: `equals(campaign_id,"${campaign.id}")`,
+                },
+              },
+            }),
+          });
+
+          console.log(`📈 [${index + 1}] Report response status:`, reportResponse.status);
+
+          if (reportResponse.ok) {
+            const reportData = await reportResponse.json();
+            console.log(`📈 [${index + 1}] Report data:`, reportData);
+
+            const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
+            console.log(`📈 [${index + 1}] Stats:`, stats);
+
+            // Only include if campaign was actually sent
+            if (stats.sends && stats.sends > 0) {
+              const campaignData = {
+                name: campaign.attributes?.name || "Untitled Campaign",
+                sent: stats.sends || 0,
+                opened: stats.opens_unique || 0,
+                clicked: stats.clicks_unique || 0,
+                revenue: stats.conversion_value || 0,
+                conversions: stats.conversion_uniques || 0,
+                id: campaign.id,
+              };
+              console.log(`✅ [${index + 1}] Valid campaign data:`, campaignData);
+              campaignMetrics.push(campaignData);
+            } else {
+              console.log(`⚠️ [${index + 1}] No sends for this campaign`);
+            }
+          } else {
+            const errorText = await reportResponse.text();
+            console.error(`❌ [${index + 1}] Report API failed:`, reportResponse.status, errorText);
+          }
+        } catch (err) {
+          console.error(`❌ [${index + 1}] Error fetching campaign metrics:`, err);
+        }
+      }
+
+      console.log("✅ Valid campaigns with data:", campaignMetrics.length);
+      console.log("📊 Final campaign data:", campaignMetrics);
+      setCampaignData(campaignMetrics);
     } catch (error) {
       console.error("Error fetching campaign data:", error);
       setCampaignData([]);
@@ -1165,80 +1163,88 @@ export default function AderaiApp() {
       const flowsData = await flowsResponse.json();
 
       // Step 3: For each flow, fetch performance using Reporting API via Worker
-      // Get ALL flows and use all-time data
-      const flowMetrics = await Promise.all(
-        flowsData.data.map(async (flow: any) => {
-          try {
-            // Use Worker proxy for Reporting API
-            const reportResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/flow-reports", {
-              method: "POST",
-              mode: "cors",
-              headers: {
-                "X-API-Key": userData.klaviyoApiKey,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                data: {
-                  type: "flow-values-report",
-                  attributes: {
-                    statistics: [
-                      "opens_unique",
-                      "clicks_unique",
-                      "open_rate",
-                      "click_rate",
-                      "conversion_uniques",
-                      "conversion_value",
-                      "conversion_rate",
-                      "sends",
-                    ],
-                    timeframe: {
-                      key: "since", // All-time data, not just last 30 days
-                    },
-                    conversion_metric_id: metricId,
-                    filter: `equals(flow_id,"${flow.id}")`,
-                  },
-                },
-              }),
-            });
+      // Get ALL flows and use all-time data with rate limiting delays
+      const flowMetrics = [];
+      for (let i = 0; i < flowsData.data.length; i++) {
+        const flow = flowsData.data[i];
+        try {
+          console.log(`📊 [${i + 1}/${flowsData.data.length}] Fetching flow stats for: ${flow.attributes?.name}`);
 
-            if (reportResponse.ok) {
-              const reportData = await reportResponse.json();
-              const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
-
-              return {
-                name: flow.attributes?.name || "Untitled Flow",
-                status: flow.attributes?.status || "draft",
-                trigger_type: flow.attributes?.trigger_type || "Manual",
-                id: flow.id,
-                // Stats from Reporting API
-                sent: stats.sends || 0,
-                opened: stats.opens_unique || 0,
-                clicked: stats.clicks_unique || 0,
-                revenue: stats.conversion_value || 0,
-                conversions: stats.conversion_uniques || 0,
-              };
-            }
-
-            // If reporting API fails, return basic flow info without stats
-            return {
-              name: flow.attributes?.name || "Untitled Flow",
-              status: flow.attributes?.status || "draft",
-              trigger_type: flow.attributes?.trigger_type || "Manual",
-              id: flow.id,
-            };
-          } catch (err) {
-            console.error("Error fetching flow metrics:", err);
-            // Return basic info even if reporting fails
-            return {
-              name: flow.attributes?.name || "Untitled Flow",
-              status: flow.attributes?.status || "draft",
-              trigger_type: flow.attributes?.trigger_type || "Manual",
-              id: flow.id,
-            };
+          // Add delay between requests (500ms) to avoid rate limiting
+          if (i > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
           }
-        }),
-      );
 
+          // Use Worker proxy for Reporting API
+          const reportResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/flow-reports", {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "X-API-Key": userData.klaviyoApiKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              data: {
+                type: "flow-values-report",
+                attributes: {
+                  statistics: [
+                    "opens_unique",
+                    "clicks_unique",
+                    "open_rate",
+                    "click_rate",
+                    "conversion_uniques",
+                    "conversion_value",
+                    "conversion_rate",
+                    "sends",
+                  ],
+                  timeframe: {
+                    key: "since", // All-time data, not just last 30 days
+                  },
+                  conversion_metric_id: metricId,
+                  filter: `equals(flow_id,"${flow.id}")`,
+                },
+              },
+            }),
+          });
+
+          if (reportResponse.ok) {
+            const reportData = await reportResponse.json();
+            const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
+
+            flowMetrics.push({
+              name: flow.attributes?.name || "Untitled Flow",
+              status: flow.attributes?.status || "draft",
+              trigger_type: flow.attributes?.trigger_type || "Manual",
+              id: flow.id,
+              // Stats from Reporting API
+              sent: stats.sends || 0,
+              opened: stats.opens_unique || 0,
+              clicked: stats.clicks_unique || 0,
+              revenue: stats.conversion_value || 0,
+              conversions: stats.conversion_uniques || 0,
+            });
+          } else {
+            // If reporting API fails, return basic flow info without stats
+            flowMetrics.push({
+              name: flow.attributes?.name || "Untitled Flow",
+              status: flow.attributes?.status || "draft",
+              trigger_type: flow.attributes?.trigger_type || "Manual",
+              id: flow.id,
+            });
+          }
+        } catch (err) {
+          console.error(`❌ [${i + 1}] Error fetching flow metrics:`, err);
+          // Return basic info even if reporting fails
+          flowMetrics.push({
+            name: flow.attributes?.name || "Untitled Flow",
+            status: flow.attributes?.status || "draft",
+            trigger_type: flow.attributes?.trigger_type || "Manual",
+            id: flow.id,
+          });
+        }
+      }
+
+      console.log("✅ Flow data fetched:", flowMetrics.length);
       setFlowData(flowMetrics);
     } catch (error) {
       console.error("Error fetching flow data:", error);
