@@ -19,6 +19,10 @@ import {
   ArrowDown,
   Users,
   Search,
+  Download,
+  FileText,
+  FileSpreadsheet,
+  File,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -299,6 +303,12 @@ export default function AderaiApp() {
   // Chart state - NEW
   const [chartTimeframe, setChartTimeframe] = useState<"30" | "60" | "90">("30");
   const [selectedSegmentsForChart, setSelectedSegmentsForChart] = useState<string[]>([]);
+
+  // Export & Reports state - NEW
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportFormat, setExportFormat] = useState<"csv" | "pdf" | "excel">("csv");
+  const [reportDateRange, setReportDateRange] = useState<"7" | "30" | "60" | "90">("30");
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["profileCount", "netChange", "changePercent"]);
 
   // Load user on mount
   useEffect(() => {
@@ -760,6 +770,146 @@ export default function AderaiApp() {
     }
 
     return data;
+  };
+
+  // Export functions
+  const exportToCSV = () => {
+    const headers = ["Segment Name", "Members", "Change (7d)", "Change %", "Percentage of Total"];
+    const rows = getFilteredSegments()
+      .map((seg) => {
+        const stats = segmentStats[seg.id];
+        if (!stats) return null;
+        const percentage = ((stats.profileCount / (summary.totalProfiles || 1)) * 100).toFixed(1);
+        return [
+          stats.name,
+          stats.profileCount,
+          stats.netChange || 0,
+          (stats.changePercent || 0).toFixed(1) + "%",
+          percentage + "%",
+        ];
+      })
+      .filter(Boolean);
+
+    const csvContent = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `aderai-segments-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToExcel = () => {
+    // Create HTML table
+    const headers = ["Segment", "Members", "Change (7d)", "Change %", "% of Total"];
+    const rows = getFilteredSegments()
+      .map((seg) => {
+        const stats = segmentStats[seg.id];
+        if (!stats) return null;
+        const percentage = ((stats.profileCount / (summary.totalProfiles || 1)) * 100).toFixed(1);
+        return [
+          stats.name,
+          stats.profileCount,
+          stats.netChange || 0,
+          (stats.changePercent || 0).toFixed(1) + "%",
+          percentage + "%",
+        ];
+      })
+      .filter(Boolean);
+
+    let tableHTML = "<table><thead><tr>";
+    headers.forEach((h) => (tableHTML += `<th>${h}</th>`));
+    tableHTML += "</tr></thead><tbody>";
+    rows.forEach((row) => {
+      tableHTML += "<tr>";
+      row.forEach((cell) => (tableHTML += `<td>${cell}</td>`));
+      tableHTML += "</tr>";
+    });
+    tableHTML += "</tbody></table>";
+
+    const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `aderai-segments-${new Date().toISOString().split("T")[0]}.xls`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToPDF = () => {
+    // Create printable HTML
+    const content = `
+      <html>
+        <head>
+          <title>Aderai Segment Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 40px; }
+            h1 { color: #EF3F3F; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #EF3F3F; color: white; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            .summary { margin: 20px 0; padding: 20px; background: #f5f5f5; border-radius: 8px; }
+            .date { color: #666; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <h1>📊 Aderai Segment Analytics Report</h1>
+          <p class="date">Generated: ${new Date().toLocaleString()}</p>
+          
+          <div class="summary">
+            <h3>Summary</h3>
+            <p><strong>Total Segments:</strong> ${summary.totalSegments}</p>
+            <p><strong>Total Profiles:</strong> ${formatNumber(summary.totalProfiles)}</p>
+            <p><strong>Added (7d):</strong> +${formatNumber(summary.totalAdded)}</p>
+            <p><strong>Removed (7d):</strong> -${formatNumber(summary.totalRemoved)}</p>
+          </div>
+
+          <h3>Segment Details</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Segment Name</th>
+                <th>Members</th>
+                <th>Change (7d)</th>
+                <th>Change %</th>
+                <th>% of Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${getFilteredSegments()
+                .map((seg) => {
+                  const stats = segmentStats[seg.id];
+                  if (!stats) return "";
+                  const percentage = ((stats.profileCount / (summary.totalProfiles || 1)) * 100).toFixed(1);
+                  return `
+                  <tr>
+                    <td>${stats.name}</td>
+                    <td>${formatNumber(stats.profileCount)}</td>
+                    <td>${stats.netChange > 0 ? "+" : ""}${formatNumber(stats.netChange || 0)}</td>
+                    <td>${(stats.changePercent || 0).toFixed(1)}%</td>
+                    <td>${percentage}%</td>
+                  </tr>
+                `;
+                })
+                .join("")}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open("", "", "width=800,height=600");
+    if (printWindow) {
+      printWindow.document.write(content);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    }
   };
 
   // Get filtered and sorted segments for table
@@ -1482,6 +1632,13 @@ export default function AderaiApp() {
             </div>
             <div className="flex items-center gap-4">
               <button
+                onClick={() => setShowExportModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white rounded-lg transition"
+              >
+                <Download className="w-5 h-5" />
+                <span className="text-sm font-medium">Export Report</span>
+              </button>
+              <button
                 onClick={() => setView("dashboard")}
                 className="flex items-center gap-2 text-gray-400 hover:text-white transition"
               >
@@ -1724,10 +1881,10 @@ export default function AderaiApp() {
               {/* Top Performing Segments */}
               {topSegments.length > 0 && (
                 <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 mb-8">
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                     🔥 Top Performing Segments
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {topSegments.map((segment, index) => {
                       const stats = segmentStats[segment.id];
                       if (!stats) return null;
@@ -1738,14 +1895,14 @@ export default function AderaiApp() {
                       const changePercent = stats.changePercent || 0;
 
                       return (
-                        <div key={segment.id} className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-2">
+                        <div key={segment.id} className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-5">
+                          <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-gray-500 text-sm">{index + 1}.</span>
-                                <div className="text-white font-semibold">{stats.name}</div>
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="text-gray-500 text-base font-semibold">{index + 1}.</span>
+                                <div className="text-white font-semibold text-lg">{stats.name}</div>
                               </div>
-                              <div className="flex items-center gap-4 text-sm">
+                              <div className="flex items-center gap-4 text-sm ml-7">
                                 <span className="text-gray-400">{formatNumber(stats.profileCount)} members</span>
                                 {change !== 0 && (
                                   <span
@@ -1759,14 +1916,14 @@ export default function AderaiApp() {
                               </div>
                             </div>
                           </div>
-                          <div className="mt-2">
-                            <div className="bg-[#2A2A2A] rounded-full h-2 overflow-hidden">
+                          <div className="mt-3 ml-7">
+                            <div className="bg-[#2A2A2A] rounded-full h-2.5 overflow-hidden">
                               <div
                                 className="bg-[#EF3F3F] h-full transition-all duration-500"
                                 style={{ width: `${Math.min(percentage, 100)}%` }}
                               />
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">{percentage.toFixed(1)}% of total</div>
+                            <div className="text-xs text-gray-500 mt-2">{percentage.toFixed(1)}% of total</div>
                           </div>
                         </div>
                       );
@@ -1942,6 +2099,154 @@ export default function AderaiApp() {
             </div>
           )}
         </div>
+
+        {/* Export Modal */}
+        {showExportModal && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Download className="w-7 h-7 text-[#EF3F3F]" />
+                  Export Report
+                </h3>
+                <button onClick={() => setShowExportModal(false)} className="text-gray-400 hover:text-white transition">
+                  ✕
+                </button>
+              </div>
+
+              {/* Date Range Selection */}
+              <div className="mb-6">
+                <label className="block text-sm text-gray-400 mb-3">Report Date Range</label>
+                <div className="grid grid-cols-4 gap-3">
+                  {(["7", "30", "60", "90"] as const).map((days) => (
+                    <button
+                      key={days}
+                      onClick={() => setReportDateRange(days)}
+                      className={`px-4 py-3 rounded-lg transition ${
+                        reportDateRange === days
+                          ? "bg-[#EF3F3F] text-white"
+                          : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
+                      }`}
+                    >
+                      Last {days}d
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Metrics Selection */}
+              <div className="mb-6">
+                <label className="block text-sm text-gray-400 mb-3">Include Metrics</label>
+                <div className="space-y-2">
+                  {[
+                    { id: "profileCount", label: "Member Count" },
+                    { id: "netChange", label: "Net Change (7d)" },
+                    { id: "changePercent", label: "Change Percentage" },
+                    { id: "percentage", label: "Percentage of Total" },
+                  ].map((metric) => (
+                    <label
+                      key={metric.id}
+                      className="flex items-center gap-3 p-3 bg-[#2A2A2A] hover:bg-[#3A3A3A] rounded-lg cursor-pointer transition"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedMetrics.includes(metric.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedMetrics((prev) => [...prev, metric.id]);
+                          } else {
+                            setSelectedMetrics((prev) => prev.filter((m) => m !== metric.id));
+                          }
+                        }}
+                        className="w-5 h-5 rounded border-[#2A2A2A] bg-[#0A0A0A] text-[#EF3F3F] focus:ring-[#EF3F3F]"
+                      />
+                      <span className="text-white">{metric.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Export Format */}
+              <div className="mb-6">
+                <label className="block text-sm text-gray-400 mb-3">Export Format</label>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => setExportFormat("csv")}
+                    className={`p-4 rounded-lg transition flex flex-col items-center gap-2 ${
+                      exportFormat === "csv"
+                        ? "bg-[#EF3F3F] text-white"
+                        : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
+                    }`}
+                  >
+                    <FileText className="w-8 h-8" />
+                    <span className="text-sm font-medium">CSV</span>
+                  </button>
+                  <button
+                    onClick={() => setExportFormat("excel")}
+                    className={`p-4 rounded-lg transition flex flex-col items-center gap-2 ${
+                      exportFormat === "excel"
+                        ? "bg-[#EF3F3F] text-white"
+                        : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
+                    }`}
+                  >
+                    <FileSpreadsheet className="w-8 h-8" />
+                    <span className="text-sm font-medium">Excel</span>
+                  </button>
+                  <button
+                    onClick={() => setExportFormat("pdf")}
+                    className={`p-4 rounded-lg transition flex flex-col items-center gap-2 ${
+                      exportFormat === "pdf"
+                        ? "bg-[#EF3F3F] text-white"
+                        : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
+                    }`}
+                  >
+                    <File className="w-8 h-8" />
+                    <span className="text-sm font-medium">PDF</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Export Info */}
+              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-gray-300">
+                    <p className="mb-2">Your report will include:</p>
+                    <ul className="list-disc list-inside space-y-1 text-gray-400">
+                      <li>{filteredSegments.length} segments</li>
+                      <li>Summary statistics</li>
+                      <li>Last {reportDateRange} days of data</li>
+                      <li>{selectedMetrics.length} selected metrics</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="flex-1 px-6 py-3 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (exportFormat === "csv") exportToCSV();
+                    else if (exportFormat === "excel") exportToExcel();
+                    else exportToPDF();
+                    setShowExportModal(false);
+                  }}
+                  disabled={selectedMetrics.length === 0}
+                  className="flex-1 px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Download className="w-5 h-5" />
+                  Export {exportFormat.toUpperCase()}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="bg-[#1A1A1A] border-t border-[#2A2A2A] py-6 mt-12">
