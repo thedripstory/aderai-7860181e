@@ -420,7 +420,7 @@ export default function AderaiApp() {
     localStorage.setItem("aderai_analytics_cache", JSON.stringify(cache));
   };
 
-  // Fetch all segments from Klaviyo
+  // Fetch all segments from Klaviyo (via worker proxy)
   const fetchAllSegments = async () => {
     if (!userData) return;
 
@@ -436,11 +436,10 @@ export default function AderaiApp() {
     setAnalyticsProgress({ current: 0, total: 0 });
 
     try {
-      // Fetch all segments
-      const response = await fetch("https://a.klaviyo.com/api/segments", {
+      // Fetch all segments via worker proxy
+      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segments", {
         headers: {
-          Authorization: `Klaviyo-API-Key ${userData.klaviyoApiKey}`,
-          revision: "2024-06-15",
+          "X-API-Key": userData.klaviyoApiKey,
         },
       });
 
@@ -476,7 +475,7 @@ export default function AderaiApp() {
 
       if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
         alert(
-          "Network Error: Unable to connect to Klaviyo API.\n\nThis could be due to:\n• CORS/network restrictions\n• Internet connection issues\n• Klaviyo API being down\n\nPlease try again or contact support.",
+          "Network Error: Unable to connect to the analytics service.\n\nPlease check:\n• Your internet connection\n• That your Worker URL is correct\n• Try again in a moment",
         );
       } else {
         alert("Error loading analytics. Please check your API key and try again.\n\nError: " + error.message);
@@ -486,7 +485,7 @@ export default function AderaiApp() {
     }
   };
 
-  // Fetch profile counts for segments
+  // Fetch profile counts for segments (via worker proxy)
   const fetchSegmentCounts = async (segments: any[]) => {
     const stats: Record<string, SegmentStats> = {};
 
@@ -497,16 +496,12 @@ export default function AderaiApp() {
         // Update progress
         setAnalyticsProgress({ current: i + 1, total: segments.length });
 
-        // Fetch segment with profile count
-        const response = await fetch(
-          `https://a.klaviyo.com/api/segments/${segment.id}?additional-fields[segment]=profile_count`,
-          {
-            headers: {
-              Authorization: `Klaviyo-API-Key ${userData!.klaviyoApiKey}`,
-              revision: "2024-06-15",
-            },
+        // Fetch segment with profile count via worker proxy
+        const response = await fetch(`https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segments/${segment.id}`, {
+          headers: {
+            "X-API-Key": userData!.klaviyoApiKey,
           },
-        );
+        });
 
         if (response.ok) {
           const data = await response.json();
@@ -554,15 +549,14 @@ export default function AderaiApp() {
     saveCachedAnalytics(segments, stats);
   };
 
-  // Fetch segment growth data (7-day change)
+  // Fetch segment growth data (7-day change) via worker proxy
   const fetchSegmentGrowth = async (segmentId: string) => {
     try {
-      const response = await fetch("https://a.klaviyo.com/api/segment-values-reports/", {
+      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segment-values-reports", {
         method: "POST",
         headers: {
-          Authorization: `Klaviyo-API-Key ${userData!.klaviyoApiKey}`,
+          "X-API-Key": userData!.klaviyoApiKey,
           "Content-Type": "application/json",
-          revision: "2024-07-15.pre",
         },
         body: JSON.stringify({
           data: {
