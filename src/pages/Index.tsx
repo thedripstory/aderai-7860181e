@@ -323,6 +323,10 @@ export default function AderaiApp() {
     churnedDays: "",
   });
 
+  // Campaign integration state - NEW
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [selectedSegmentForCampaign, setSelectedSegmentForCampaign] = useState<string | null>(null);
+
   // Load user on mount
   useEffect(() => {
     const saved = localStorage.getItem("aderai_user");
@@ -787,7 +791,6 @@ export default function AderaiApp() {
 
   // Export functions
   const exportToCSV = () => {
-    const summary = getAnalyticsSummary();
     const headers = ["Segment Name", "Members", "Change (7d)", "Change %", "Percentage of Total"];
     const rows = getFilteredSegments()
       .map((seg) => {
@@ -815,7 +818,6 @@ export default function AderaiApp() {
   };
 
   const exportToExcel = () => {
-    const summary = getAnalyticsSummary();
     // Create HTML table
     const headers = ["Segment", "Members", "Change (7d)", "Change %", "% of Total"];
     const rows = getFilteredSegments()
@@ -853,7 +855,6 @@ export default function AderaiApp() {
   };
 
   const exportToPDF = () => {
-    const summary = getAnalyticsSummary();
     // Create printable HTML
     const content = `
       <html>
@@ -935,17 +936,39 @@ export default function AderaiApp() {
         ...userData,
         accountName: editingSettings.accountName,
         currency: editingSettings.currency,
-        aov: editingSettings.aov,
-        vipThreshold: editingSettings.vipThreshold,
-        highValueThreshold: editingSettings.highValueThreshold,
-        newCustomerDays: editingSettings.newCustomerDays,
-        lapsedDays: editingSettings.lapsedDays,
-        churnedDays: editingSettings.churnedDays,
+        aov: parseInt(editingSettings.aov),
+        vipThreshold: parseInt(editingSettings.vipThreshold),
+        highValueThreshold: parseInt(editingSettings.highValueThreshold),
+        newCustomerDays: parseInt(editingSettings.newCustomerDays),
+        lapsedDays: parseInt(editingSettings.lapsedDays),
+        churnedDays: parseInt(editingSettings.churnedDays),
       };
       setUserData(updatedData);
       localStorage.setItem("userData", JSON.stringify(updatedData));
       setShowSettingsModal(false);
     }
+  };
+
+  // Generate mock campaign data for a segment
+  const getCampaignData = (segmentId: string) => {
+    const campaigns = [
+      { name: "Holiday Promo 2025", sent: 1250, opened: 425, clicked: 89, revenue: 12450, conversions: 67 },
+      { name: "Welcome Series", sent: 890, opened: 534, clicked: 178, revenue: 8920, conversions: 89 },
+      { name: "Win-Back Campaign", sent: 567, opened: 198, clicked: 45, revenue: 5340, conversions: 34 },
+      { name: "VIP Exclusive Offer", sent: 234, opened: 187, clicked: 98, revenue: 15680, conversions: 56 },
+      { name: "Product Launch", sent: 1456, opened: 654, clicked: 234, revenue: 18900, conversions: 123 },
+    ];
+    return campaigns;
+  };
+
+  const getFlowData = (segmentId: string) => {
+    const flows = [
+      { name: "Abandoned Cart Recovery", members: 456, revenue: 34500, orders: 234, avgOrderValue: 147.44 },
+      { name: "Post-Purchase Follow-Up", members: 789, revenue: 12340, orders: 456, avgOrderValue: 27.06 },
+      { name: "Browse Abandonment", members: 234, revenue: 8900, orders: 123, avgOrderValue: 72.36 },
+      { name: "Customer Winback", members: 123, revenue: 5670, orders: 67, avgOrderValue: 84.63 },
+    ];
+    return flows;
   };
 
   // Get filtered and sorted segments for table
@@ -2002,6 +2025,9 @@ export default function AderaiApp() {
                         <th className="px-6 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">
                           Trend
                         </th>
+                        <th className="px-6 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Campaigns
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#2A2A2A]">
@@ -2051,6 +2077,17 @@ export default function AderaiApp() {
                               ) : (
                                 <div className="text-xs text-gray-500">➡️ 0%</div>
                               )}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <button
+                                onClick={() => {
+                                  setSelectedSegmentForCampaign(segment.id);
+                                  setShowCampaignModal(true);
+                                }}
+                                className="px-3 py-1.5 bg-[#2A2A2A] hover:bg-[#EF3F3F] text-white text-xs rounded-lg transition"
+                              >
+                                View
+                              </button>
                             </td>
                           </tr>
                         );
@@ -2395,6 +2432,192 @@ export default function AderaiApp() {
                   className="flex-1 px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition"
                 >
                   Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Campaign Performance Modal */}
+        {showCampaignModal && selectedSegmentForCampaign && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <TrendingUp className="w-7 h-7 text-[#EF3F3F]" />
+                  Campaign Performance: {segmentStats[selectedSegmentForCampaign]?.name}
+                </h3>
+                <button
+                  onClick={() => setShowCampaignModal(false)}
+                  className="text-gray-400 hover:text-white transition text-2xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Overview Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                  <div className="text-sm text-gray-400 mb-1">Total Revenue</div>
+                  <div className="text-2xl font-bold text-[#10B981]">
+                    $
+                    {getCampaignData(selectedSegmentForCampaign)
+                      .reduce((sum, c) => sum + c.revenue, 0)
+                      .toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                  <div className="text-sm text-gray-400 mb-1">Total Conversions</div>
+                  <div className="text-2xl font-bold text-white">
+                    {getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.conversions, 0)}
+                  </div>
+                </div>
+                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                  <div className="text-sm text-gray-400 mb-1">Avg Open Rate</div>
+                  <div className="text-2xl font-bold text-white">
+                    {(
+                      (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.opened / c.sent, 0) /
+                        getCampaignData(selectedSegmentForCampaign).length) *
+                      100
+                    ).toFixed(1)}
+                    %
+                  </div>
+                </div>
+                <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                  <div className="text-sm text-gray-400 mb-1">Avg Click Rate</div>
+                  <div className="text-2xl font-bold text-white">
+                    {(
+                      (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.clicked / c.sent, 0) /
+                        getCampaignData(selectedSegmentForCampaign).length) *
+                      100
+                    ).toFixed(1)}
+                    %
+                  </div>
+                </div>
+              </div>
+
+              {/* Campaigns Table */}
+              <div className="mb-8">
+                <h4 className="text-lg font-semibold text-white mb-4">📧 Campaign Performance</h4>
+                <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-[#2A2A2A]">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Campaign</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Sent</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Opened</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Clicked</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Revenue</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Conv.</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">ROI</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#2A2A2A]">
+                      {getCampaignData(selectedSegmentForCampaign).map((campaign, idx) => {
+                        const openRate = ((campaign.opened / campaign.sent) * 100).toFixed(1);
+                        const clickRate = ((campaign.clicked / campaign.sent) * 100).toFixed(1);
+                        const roi = ((campaign.revenue / (campaign.sent * 0.5)) * 100).toFixed(0); // Assume $0.50 cost per send
+
+                        return (
+                          <tr key={idx} className="hover:bg-[#1A1A1A] transition">
+                            <td className="px-4 py-3 text-white font-medium">{campaign.name}</td>
+                            <td className="px-4 py-3 text-right text-gray-300">{campaign.sent.toLocaleString()}</td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="text-white">{campaign.opened.toLocaleString()}</div>
+                              <div className="text-xs text-gray-500">{openRate}%</div>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="text-white">{campaign.clicked.toLocaleString()}</div>
+                              <div className="text-xs text-gray-500">{clickRate}%</div>
+                            </td>
+                            <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
+                              ${campaign.revenue.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-right text-white">{campaign.conversions}</td>
+                            <td className="px-4 py-3 text-right">
+                              <span
+                                className={`px-2 py-1 rounded text-xs font-semibold ${
+                                  parseInt(roi) > 200
+                                    ? "bg-[#10B981]/20 text-[#10B981]"
+                                    : "bg-[#F59E0B]/20 text-[#F59E0B]"
+                                }`}
+                              >
+                                {roi}%
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Flows Table */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold text-white mb-4">🔄 Klaviyo Flows</h4>
+                <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-[#2A2A2A]">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Flow Name</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Members</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Revenue</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Orders</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
+                          Avg Order
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#2A2A2A]">
+                      {getFlowData(selectedSegmentForCampaign).map((flow, idx) => (
+                        <tr key={idx} className="hover:bg-[#1A1A1A] transition">
+                          <td className="px-4 py-3 text-white font-medium">{flow.name}</td>
+                          <td className="px-4 py-3 text-right text-gray-300">{flow.members.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
+                            ${flow.revenue.toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 text-right text-white">{flow.orders}</td>
+                          <td className="px-4 py-3 text-right text-gray-300">${flow.avgOrderValue.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Insights */}
+              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-6">
+                <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                  💡 Automation Suggestions
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#EF3F3F]">•</span>
+                    <span>Consider creating a VIP-exclusive flow for this high-performing segment</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#EF3F3F]">•</span>
+                    <span>Holiday campaigns show 45% higher engagement - schedule similar campaigns</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#EF3F3F]">•</span>
+                    <span>Cart abandonment flow generates highest ROI - ensure all segment members are enrolled</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#EF3F3F]">•</span>
+                    <span>Test sending campaigns on weekdays for this segment (currently weekend-heavy)</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Close Button */}
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={() => setShowCampaignModal(false)}
+                  className="px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition"
+                >
+                  Close
                 </button>
               </div>
             </div>
