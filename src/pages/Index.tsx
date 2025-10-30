@@ -787,6 +787,7 @@ export default function AderaiApp() {
 
   // Export functions
   const exportToCSV = () => {
+    const summary = getAnalyticsSummary();
     const headers = ["Segment Name", "Members", "Change (7d)", "Change %", "Percentage of Total"];
     const rows = getFilteredSegments()
       .map((seg) => {
@@ -814,6 +815,7 @@ export default function AderaiApp() {
   };
 
   const exportToExcel = () => {
+    const summary = getAnalyticsSummary();
     // Create HTML table
     const headers = ["Segment", "Members", "Change (7d)", "Change %", "% of Total"];
     const rows = getFilteredSegments()
@@ -851,6 +853,7 @@ export default function AderaiApp() {
   };
 
   const exportToPDF = () => {
+    const summary = getAnalyticsSummary();
     // Create printable HTML
     const content = `
       <html>
@@ -932,12 +935,12 @@ export default function AderaiApp() {
         ...userData,
         accountName: editingSettings.accountName,
         currency: editingSettings.currency,
-        aov: parseInt(editingSettings.aov),
-        vipThreshold: parseInt(editingSettings.vipThreshold),
-        highValueThreshold: parseInt(editingSettings.highValueThreshold),
-        newCustomerDays: parseInt(editingSettings.newCustomerDays),
-        lapsedDays: parseInt(editingSettings.lapsedDays),
-        churnedDays: parseInt(editingSettings.churnedDays),
+        aov: editingSettings.aov,
+        vipThreshold: editingSettings.vipThreshold,
+        highValueThreshold: editingSettings.highValueThreshold,
+        newCustomerDays: editingSettings.newCustomerDays,
+        lapsedDays: editingSettings.lapsedDays,
+        churnedDays: editingSettings.churnedDays,
       };
       setUserData(updatedData);
       localStorage.setItem("userData", JSON.stringify(updatedData));
