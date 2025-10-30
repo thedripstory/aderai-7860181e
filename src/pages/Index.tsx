@@ -351,7 +351,7 @@ export default function AderaiApp() {
     try {
       const currencySymbol = CURRENCIES.find((c) => c.code === userData.currency)?.symbol || "$";
 
-      const response = await fetch("https://aderai-api.akshat-619.workers.dev", {
+      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -383,7 +383,19 @@ export default function AderaiApp() {
   // Analytics Functions - NEW
 
   // Check if a segment is created by Aderai
-  const isAderaiSegment = (segmentName: string): boolean => {
+  const isAderaiSegment = (segment: any): boolean => {
+    // First, check if segment has the "Aderai" tag (most reliable method)
+    if (segment.tagNames && segment.tagNames.includes("Aderai")) {
+      return true;
+    }
+
+    // Backwards compatibility: Check if name includes "| Aderai"
+    if (segment.attributes?.name?.includes("| Aderai")) {
+      return true;
+    }
+
+    // Fallback: Name matching (for older segments without tags)
+    const segmentName = segment.attributes?.name || "";
     const allAderaiSegmentNames = Object.values(SEGMENTS)
       .flat()
       .map((s) => s.name);
@@ -437,7 +449,7 @@ export default function AderaiApp() {
 
     try {
       // Fetch all segments via worker proxy
-      const response = await fetch("https://aderai-api.akshat-619.workers.dev/analytics/segments", {
+      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segments", {
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
@@ -460,16 +472,37 @@ export default function AderaiApp() {
       const data = await response.json();
       const segments = data.data || [];
 
-      if (segments.length === 0) {
+      // Extract tags from included data and attach to segments
+      const tagsMap = new Map();
+      if (data.included) {
+        data.included.forEach((item: any) => {
+          if (item.type === "tag") {
+            tagsMap.set(item.id, item.attributes.name);
+          }
+        });
+      }
+
+      // Attach tag names to each segment
+      const segmentsWithTags = segments.map((segment: any) => {
+        const tagRelationships = segment.relationships?.tags?.data || [];
+        const tagNames = tagRelationships.map((tagRef: any) => tagsMap.get(tagRef.id)).filter(Boolean);
+
+        return {
+          ...segment,
+          tagNames, // Add tag names array to segment object
+        };
+      });
+
+      if (segmentsWithTags.length === 0) {
         alert("No segments found in your Klaviyo account. Create some segments first!");
         return;
       }
 
-      setAllSegments(segments);
-      setAnalyticsProgress({ current: 0, total: segments.length });
+      setAllSegments(segmentsWithTags);
+      setAnalyticsProgress({ current: 0, total: segmentsWithTags.length });
 
       // Fetch profile counts for each segment
-      await fetchSegmentCounts(segments);
+      await fetchSegmentCounts(segmentsWithTags);
     } catch (error: any) {
       console.error("Error fetching segments:", error);
 
@@ -497,7 +530,7 @@ export default function AderaiApp() {
         setAnalyticsProgress({ current: i + 1, total: segments.length });
 
         // Fetch segment with profile count via worker proxy
-        const response = await fetch(`https://aderai-api.akshat-619.workers.dev/analytics/segments/${segment.id}`, {
+        const response = await fetch(`https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segments/${segment.id}`, {
           headers: {
             "X-API-Key": userData!.klaviyoApiKey,
           },
@@ -552,7 +585,7 @@ export default function AderaiApp() {
   // Fetch segment growth data (7-day change) via worker proxy
   const fetchSegmentGrowth = async (segmentId: string) => {
     try {
-      const response = await fetch("https://aderai-api.akshat-619.workers.dev/analytics/segment-values-reports", {
+      const response = await fetch("https://aderai-api.YOUR-SUBDOMAIN.workers.dev/analytics/segment-values-reports", {
         method: "POST",
         headers: {
           "X-API-Key": userData!.klaviyoApiKey,
@@ -593,7 +626,7 @@ export default function AderaiApp() {
       const stats = segmentStats[seg.id];
       if (!stats) return false;
 
-      if (aderaiSegmentsOnly && !isAderaiSegment(stats.name)) return false;
+      if (aderaiSegmentsOnly && !isAderaiSegment(seg)) return false;
       if (segmentSearch && !stats.name.toLowerCase().includes(segmentSearch.toLowerCase())) return false;
 
       return true;
@@ -625,7 +658,7 @@ export default function AderaiApp() {
       .filter((seg) => {
         const stats = segmentStats[seg.id];
         if (!stats) return false;
-        if (aderaiSegmentsOnly && !isAderaiSegment(stats.name)) return false;
+        if (aderaiSegmentsOnly && !isAderaiSegment(seg)) return false;
         return true;
       })
       .sort((a, b) => {
@@ -647,7 +680,7 @@ export default function AderaiApp() {
       const stats = segmentStats[seg.id];
       if (!stats) return false;
 
-      if (aderaiSegmentsOnly && !isAderaiSegment(stats.name)) return false;
+      if (aderaiSegmentsOnly && !isAderaiSegment(seg)) return false;
       if (segmentSearch && !stats.name.toLowerCase().includes(segmentSearch.toLowerCase())) return false;
 
       return true;
