@@ -968,6 +968,7 @@ export default function AderaiApp() {
       // Step 1: Get the "Placed Order" metric ID via Worker
       console.log("📊 Fetching metrics...");
       const metricsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/metrics", {
+        mode: "cors",
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
@@ -1003,6 +1004,7 @@ export default function AderaiApp() {
       // Step 2: Fetch campaigns list via Worker
       console.log("📧 Fetching campaigns list...");
       const campaignsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/campaigns", {
+        mode: "cors",
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
@@ -1036,6 +1038,7 @@ export default function AderaiApp() {
               "https://aderai-worker.akshat-619.workers.dev/performance/campaign-reports",
               {
                 method: "POST",
+                mode: "cors",
                 headers: {
                   "X-API-Key": userData.klaviyoApiKey,
                   "Content-Type": "application/json",
@@ -1124,6 +1127,7 @@ export default function AderaiApp() {
     try {
       // Step 1: Get the "Placed Order" metric ID via Worker
       const metricsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/metrics", {
+        mode: "cors",
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
@@ -1148,6 +1152,7 @@ export default function AderaiApp() {
 
       // Step 2: Fetch flows list via Worker
       const flowsResponse = await fetch("https://aderai-worker.akshat-619.workers.dev/performance/flows", {
+        mode: "cors",
         headers: {
           "X-API-Key": userData.klaviyoApiKey,
         },
@@ -1169,6 +1174,7 @@ export default function AderaiApp() {
               "https://aderai-worker.akshat-619.workers.dev/performance/flow-reports",
               {
                 method: "POST",
+                mode: "cors",
                 headers: {
                   "X-API-Key": userData.klaviyoApiKey,
                   "Content-Type": "application/json",
