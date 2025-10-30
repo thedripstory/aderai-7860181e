@@ -13,11 +13,24 @@ import {
   Mail,
   Settings as SettingsIcon,
   TrendingUp,
+  BarChart3,
+  RefreshCw,
+  ArrowUp,
+  ArrowDown,
+  Users,
+  Search,
 } from "lucide-react";
 
 /**
- * ADERAI - COMPLETE APP WITH FULL ONBOARDING
- * Login → Signup → Onboarding (ALL fields) → Dashboard
+ * ADERAI - COMPLETE APP WITH SEGMENT ANALYTICS
+ * Login → Signup → Onboarding → Dashboard → Analytics
+ *
+ * NEW IN THIS VERSION:
+ * - Analytics view with real Klaviyo data
+ * - Segment performance tracking
+ * - Growth metrics and trends
+ * - Top performers dashboard
+ * - Complete segment statistics
  */
 
 // Types
@@ -39,6 +52,23 @@ interface UserData {
   newCustomerDays: string;
   lapsedDays: string;
   churnedDays: string;
+}
+
+interface SegmentStats {
+  profileCount: number;
+  name: string;
+  created?: string;
+  updated?: string;
+  membersAdded?: number;
+  membersRemoved?: number;
+  netChange?: number;
+  changePercent?: number;
+}
+
+interface AnalyticsCache {
+  timestamp: number;
+  segments: any[];
+  stats: Record<string, SegmentStats>;
 }
 
 // Segment Data
@@ -112,74 +142,66 @@ const SEGMENTS = {
   Exclusions: [
     { id: "unsubscribed", name: "🚫 Unsubscribed", desc: "Cannot receive marketing" },
     { id: "suppressed", name: "🚫 Suppressed", desc: "On suppression list" },
-    { id: "bounced", name: "🚫 Email Bounced", desc: "Email bounced" },
-    { id: "marked-spam", name: "🚫 Marked as Spam", desc: "Marked email as spam" },
-    { id: "never-engaged-exclusion", name: "🚫 Never Engaged", desc: "Zero activity (exclusion)" },
-    { id: "do-not-email", name: "🚫 Do Not Email", desc: "Manually marked" },
-    { id: "recent-purchasers-7-exclusion", name: "🚫 Recent Purchasers (7D)", desc: "Bought in last 7 days" },
-    { id: "used-bfcm-code", name: "🚫 Used BFCM Code", desc: "Already used promo" },
-    { id: "checkout-abandoners-1-day", name: "🚫 Checkout (1D)", desc: "Too recent to email" },
-    { id: "sms-only", name: "🚫 SMS Only", desc: "Prefers SMS" },
-    { id: "outside-shipping-zone", name: "🚫 Outside Shipping", desc: "Can't ship to location" },
-    { id: "refund-requesters", name: "🚫 Refund Requesters", desc: "Requested refund recently" },
+    { id: "non-marketable", name: "📵 Non-Marketable", desc: "Suppressed or unsubscribed" },
+    { id: "bounced-emails", name: "⚠️ Bounced Emails", desc: "Email bounced recently" },
+  ],
+  "Testing & Controls": [
+    { id: "test-segment-a", name: "🧪 Test Segment A", desc: "For A/B testing" },
+    { id: "test-segment-b", name: "🧪 Test Segment B", desc: "For A/B testing" },
+    { id: "holdout-control", name: "🎲 Holdout/Control", desc: "Excluded from campaigns" },
+    { id: "vip-test-group", name: "👑 VIP Test Group", desc: "VIPs for testing" },
   ],
 };
 
 const BUNDLES = {
-  "BFCM Essentials": [
+  "BFCM Core 6": [
     "vip-customers",
     "repeat-customers",
     "one-time-customers",
+    "engaged-non-buyers",
     "cart-abandoners",
     "lapsed-customers",
-    "engaged-non-buyers",
-    "recent-clickers",
-    "high-value-cart",
-    "coupon-users",
-    "recent-first-time",
   ],
-  "VIP & High-Value": [
+  "Complete 20": [
     "vip-customers",
-    "big-spenders",
-    "high-lifetime-value",
-    "predicted-vips",
-    "high-aov",
-    "full-price-buyers",
-    "multi-category-shoppers",
-    "product-reviewers",
-  ],
-  "Re-Engagement": [
+    "repeat-customers",
+    "one-time-customers",
+    "engaged-non-buyers",
+    "cart-abandoners",
     "lapsed-customers",
-    "churned-customers",
+    "highly-engaged",
+    "recent-clickers",
+    "active-on-site",
     "unengaged-90",
+    "high-value-cart",
+    "recent-first-time",
+    "coupon-users",
+    "full-price-buyers",
+    "big-spenders",
+    "bargain-shoppers",
     "high-churn-risk",
+    "predicted-vips",
+    "churned-customers",
     "win-back-target",
-    "at-risk-vips",
   ],
+  "All 70": Object.values(SEGMENTS)
+    .flat()
+    .map((s) => s.id),
 };
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
   { code: "EUR", symbol: "€", name: "Euro" },
   { code: "GBP", symbol: "£", name: "British Pound" },
+  { code: "CAD", symbol: "CA$", name: "Canadian Dollar" },
   { code: "AUD", symbol: "A$", name: "Australian Dollar" },
-  { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
-  { code: "INR", symbol: "₹", name: "Indian Rupee" },
-  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
-  { code: "SAR", symbol: "﷼", name: "Saudi Riyal" },
-  { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
-  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
-  { code: "CNY", symbol: "¥", name: "Chinese Yuan" },
-  { code: "CHF", symbol: "CHF", name: "Swiss Franc" },
-  { code: "NZD", symbol: "NZ$", name: "New Zealand Dollar" },
-  { code: "ZAR", symbol: "R", name: "South African Rand" },
-  { code: "BRL", symbol: "R$", name: "Brazilian Real" },
-  { code: "MXN", symbol: "MX$", name: "Mexican Peso" },
 ];
 
 export default function AderaiApp() {
-  // View state
-  const [view, setView] = useState<"login" | "signup" | "onboarding" | "dashboard" | "creating" | "results">("login");
+  // View state - ADDED 'analytics'
+  const [view, setView] = useState<
+    "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics"
+  >("login");
 
   // Auth state
   const [email, setEmail] = useState("");
@@ -204,6 +226,14 @@ export default function AderaiApp() {
   const [results, setResults] = useState<SegmentResult[]>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>("Core BFCM");
   const [showApiInfo, setShowApiInfo] = useState(false);
+
+  // Analytics state - NEW
+  const [allSegments, setAllSegments] = useState<any[]>([]);
+  const [segmentStats, setSegmentStats] = useState<Record<string, SegmentStats>>({});
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [analyticsProgress, setAnalyticsProgress] = useState({ current: 0, total: 0 });
+  const [aderaiSegmentsOnly, setAderaiSegmentsOnly] = useState(true);
+  const [segmentSearch, setSegmentSearch] = useState("");
 
   // Load user on mount
   useEffect(() => {
@@ -327,14 +357,15 @@ export default function AderaiApp() {
         body: JSON.stringify({
           apiKey: userData.klaviyoApiKey,
           segments: selectedSegments,
-          currencySymbol,
-          metrics: {
-            aov: userData.aov,
-            vipThreshold: userData.vipThreshold,
-            highValueThreshold: userData.highValueThreshold,
-            newCustomerDays: userData.newCustomerDays,
-            lapsedDays: userData.lapsedDays,
-            churnedDays: userData.churnedDays,
+          settings: {
+            currency: userData.currency,
+            currencySymbol,
+            aov: parseFloat(userData.aov),
+            vipThreshold: parseFloat(userData.vipThreshold),
+            highValueThreshold: parseFloat(userData.highValueThreshold),
+            newCustomerDays: parseInt(userData.newCustomerDays),
+            lapsedDays: parseInt(userData.lapsedDays),
+            churnedDays: parseInt(userData.churnedDays),
           },
         }),
       });
@@ -343,966 +374,1165 @@ export default function AderaiApp() {
       setResults(data.results || []);
       setView("results");
     } catch (error) {
-      alert("Error creating segments: " + (error as Error).message);
+      console.error("Error creating segments:", error);
+      alert("Error creating segments. Please try again.");
       setView("dashboard");
     }
   };
 
-  const getCurrencySymbol = () => CURRENCIES.find((c) => c.code === userData?.currency)?.symbol || "$";
+  // Analytics Functions - NEW
 
-  // Render login
+  // Check if a segment is created by Aderai
+  const isAderaiSegment = (segmentName: string): boolean => {
+    const allAderaiSegmentNames = Object.values(SEGMENTS)
+      .flat()
+      .map((s) => s.name);
+    return allAderaiSegmentNames.some((name) => {
+      const cleanName = name.replace(/[^\w\s]/gi, "").trim();
+      const cleanSegmentName = segmentName.replace(/[^\w\s]/gi, "").trim();
+      return cleanSegmentName.includes(cleanName) || cleanName.includes(cleanSegmentName);
+    });
+  };
+
+  // Load cached analytics data
+  const loadCachedAnalytics = (): AnalyticsCache | null => {
+    const cached = localStorage.getItem("aderai_analytics_cache");
+    if (!cached) return null;
+
+    const data: AnalyticsCache = JSON.parse(cached);
+    const oneHour = 60 * 60 * 1000;
+
+    if (Date.now() - data.timestamp > oneHour) {
+      localStorage.removeItem("aderai_analytics_cache");
+      return null;
+    }
+
+    return data;
+  };
+
+  // Save analytics data to cache
+  const saveCachedAnalytics = (segments: any[], stats: Record<string, SegmentStats>) => {
+    const cache: AnalyticsCache = {
+      timestamp: Date.now(),
+      segments,
+      stats,
+    };
+    localStorage.setItem("aderai_analytics_cache", JSON.stringify(cache));
+  };
+
+  // Fetch all segments from Klaviyo
+  const fetchAllSegments = async () => {
+    if (!userData) return;
+
+    // Try to load from cache first
+    const cached = loadCachedAnalytics();
+    if (cached) {
+      setAllSegments(cached.segments);
+      setSegmentStats(cached.stats);
+      return;
+    }
+
+    setLoadingAnalytics(true);
+    setAnalyticsProgress({ current: 0, total: 0 });
+
+    try {
+      // Fetch all segments
+      const response = await fetch("https://a.klaviyo.com/api/segments", {
+        headers: {
+          Authorization: `Klaviyo-API-Key ${userData.klaviyoApiKey}`,
+          revision: "2024-06-15",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch segments");
+      }
+
+      const data = await response.json();
+      const segments = data.data || [];
+
+      setAllSegments(segments);
+      setAnalyticsProgress({ current: 0, total: segments.length });
+
+      // Fetch profile counts for each segment
+      await fetchSegmentCounts(segments);
+    } catch (error) {
+      console.error("Error fetching segments:", error);
+      alert("Error loading analytics. Please check your API key.");
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  };
+
+  // Fetch profile counts for segments
+  const fetchSegmentCounts = async (segments: any[]) => {
+    const stats: Record<string, SegmentStats> = {};
+
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+
+      try {
+        // Update progress
+        setAnalyticsProgress({ current: i + 1, total: segments.length });
+
+        // Fetch segment with profile count
+        const response = await fetch(
+          `https://a.klaviyo.com/api/segments/${segment.id}?additional-fields[segment]=profile_count`,
+          {
+            headers: {
+              Authorization: `Klaviyo-API-Key ${userData!.klaviyoApiKey}`,
+              revision: "2024-06-15",
+            },
+          },
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const profileCount = data.data?.attributes?.profile_count || 0;
+
+          stats[segment.id] = {
+            profileCount,
+            name: data.data?.attributes?.name || segment.attributes?.name,
+            created: data.data?.attributes?.created,
+            updated: data.data?.attributes?.updated,
+          };
+
+          // Try to fetch growth data (7-day change)
+          try {
+            const growthData = await fetchSegmentGrowth(segment.id);
+            if (growthData) {
+              stats[segment.id].membersAdded = growthData.members_added || 0;
+              stats[segment.id].membersRemoved = growthData.members_removed || 0;
+              stats[segment.id].netChange = growthData.net_members_changed || 0;
+
+              // Calculate percentage change
+              const oldCount = profileCount - (growthData.net_members_changed || 0);
+              if (oldCount > 0) {
+                stats[segment.id].changePercent = ((growthData.net_members_changed || 0) / oldCount) * 100;
+              }
+            }
+          } catch (growthError) {
+            // Growth data is optional, continue without it
+            console.log(`Couldn't fetch growth for ${segment.id}:`, growthError);
+          }
+        }
+
+        // Rate limit: 1 request per second
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error(`Error fetching count for ${segment.id}:`, error);
+        stats[segment.id] = {
+          profileCount: 0,
+          name: segment.attributes?.name || "Unknown Segment",
+        };
+      }
+    }
+
+    setSegmentStats(stats);
+    saveCachedAnalytics(segments, stats);
+  };
+
+  // Fetch segment growth data (7-day change)
+  const fetchSegmentGrowth = async (segmentId: string) => {
+    try {
+      const response = await fetch("https://a.klaviyo.com/api/segment-values-reports/", {
+        method: "POST",
+        headers: {
+          Authorization: `Klaviyo-API-Key ${userData!.klaviyoApiKey}`,
+          "Content-Type": "application/json",
+          revision: "2024-07-15.pre",
+        },
+        body: JSON.stringify({
+          data: {
+            type: "segment-values-report",
+            attributes: {
+              statistics: ["total_members", "members_added", "members_removed", "net_members_changed"],
+              timeframe: { key: "last_7_days" },
+              filter: `equals(segment_id,"${segmentId}")`,
+            },
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.data?.attributes?.results?.[0]?.statistics || null;
+      }
+      return null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  // Load analytics when view changes to analytics
+  useEffect(() => {
+    if (view === "analytics" && userData && allSegments.length === 0) {
+      fetchAllSegments();
+    }
+  }, [view]);
+
+  // Calculate analytics summary
+  const getAnalyticsSummary = () => {
+    const filteredSegments = allSegments.filter((seg) => {
+      const stats = segmentStats[seg.id];
+      if (!stats) return false;
+
+      if (aderaiSegmentsOnly && !isAderaiSegment(stats.name)) return false;
+      if (segmentSearch && !stats.name.toLowerCase().includes(segmentSearch.toLowerCase())) return false;
+
+      return true;
+    });
+
+    const totalProfiles = filteredSegments.reduce((sum, seg) => {
+      return sum + (segmentStats[seg.id]?.profileCount || 0);
+    }, 0);
+
+    const totalAdded = filteredSegments.reduce((sum, seg) => {
+      return sum + (segmentStats[seg.id]?.membersAdded || 0);
+    }, 0);
+
+    const totalRemoved = filteredSegments.reduce((sum, seg) => {
+      return sum + (segmentStats[seg.id]?.membersRemoved || 0);
+    }, 0);
+
+    return {
+      totalSegments: filteredSegments.length,
+      totalProfiles,
+      totalAdded,
+      totalRemoved,
+    };
+  };
+
+  // Get top performing segments
+  const getTopSegments = (limit = 5) => {
+    return allSegments
+      .filter((seg) => {
+        const stats = segmentStats[seg.id];
+        if (!stats) return false;
+        if (aderaiSegmentsOnly && !isAderaiSegment(stats.name)) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        const aCount = segmentStats[a.id]?.profileCount || 0;
+        const bCount = segmentStats[b.id]?.profileCount || 0;
+        return bCount - aCount;
+      })
+      .slice(0, limit);
+  };
+
+  // Format number with commas
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString();
+  };
+
+  // Get filtered and sorted segments for table
+  const getFilteredSegments = () => {
+    let filtered = allSegments.filter((seg) => {
+      const stats = segmentStats[seg.id];
+      if (!stats) return false;
+
+      if (aderaiSegmentsOnly && !isAderaiSegment(stats.name)) return false;
+      if (segmentSearch && !stats.name.toLowerCase().includes(segmentSearch.toLowerCase())) return false;
+
+      return true;
+    });
+
+    // Sort by profile count descending
+    filtered.sort((a, b) => {
+      const aCount = segmentStats[a.id]?.profileCount || 0;
+      const bCount = segmentStats[b.id]?.profileCount || 0;
+      return bCount - aCount;
+    });
+
+    return filtered;
+  };
+
+  // ===== RENDER VIEWS =====
+
+  // Login View
   if (view === "login") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <h1 className="text-5xl font-bold">
-                <span className="text-[#EF3F3F]">ADER</span>
-                <span className="text-white">AI</span>
-              </h1>
-              <Zap className="w-10 h-10 text-[#EF3F3F]" />
-            </div>
-            <p className="text-gray-400">Create 70 Klaviyo segments in 30 seconds</p>
+            <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+              ADERAI <Zap className="w-8 h-8 text-[#EF3F3F]" />
+            </h1>
+            <p className="text-gray-400">AI-Powered Klaviyo Segmentation</p>
           </div>
 
           <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8">
             <h2 className="text-2xl font-bold text-white mb-6">Login</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-6">
               <div>
-                <label className="text-white text-sm mb-2 block">Email</label>
+                <label className="block text-sm text-gray-400 mb-2">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
                     placeholder="your@email.com"
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white text-sm mb-2 block">Password</label>
+                <label className="block text-sm text-gray-400 mb-2">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
                     placeholder="••••••••"
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
                   />
                 </div>
               </div>
+            </div>
 
-              <button
-                onClick={handleLogin}
-                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
-              >
-                Login
+            <button
+              onClick={handleLogin}
+              className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 rounded-lg transition mb-4"
+            >
+              Login
+            </button>
+
+            <div className="text-center">
+              <button onClick={() => setView("signup")} className="text-sm text-gray-400 hover:text-white transition">
+                Don't have an account? <span className="text-[#EF3F3F]">Sign up</span>
               </button>
-
-              <div className="text-center text-gray-400 text-sm">
-                Don't have an account?{" "}
-                <button onClick={() => setView("signup")} className="text-[#EF3F3F] hover:text-red-400 font-bold">
-                  Sign Up
-                </button>
-              </div>
             </div>
           </div>
-
-          {/* Footer */}
-          <footer className="mt-8 text-center">
-            <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} Aderai by{" "}
-              <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>. All rights reserved.
-            </p>
-          </footer>
         </div>
       </div>
     );
   }
 
-  // Render signup
+  // Signup View
   if (view === "signup") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <h1 className="text-5xl font-bold">
-                <span className="text-[#EF3F3F]">ADER</span>
-                <span className="text-white">AI</span>
-              </h1>
-              <Zap className="w-10 h-10 text-[#EF3F3F]" />
-            </div>
-            <p className="text-gray-400">Create your account</p>
+            <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+              ADERAI <Zap className="w-8 h-8 text-[#EF3F3F]" />
+            </h1>
+            <p className="text-gray-400">AI-Powered Klaviyo Segmentation</p>
           </div>
 
           <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8">
             <h2 className="text-2xl font-bold text-white mb-6">Sign Up</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-6">
               <div>
-                <label className="text-white text-sm mb-2 block">Email</label>
+                <label className="block text-sm text-gray-400 mb-2">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
                     placeholder="your@email.com"
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white text-sm mb-2 block">Password</label>
+                <label className="block text-sm text-gray-400 mb-2">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
                     placeholder="••••••••"
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
                   />
                 </div>
               </div>
+            </div>
 
-              <button
-                onClick={handleSignup}
-                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
-              >
-                Continue
+            <button
+              onClick={handleSignup}
+              className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 rounded-lg transition mb-4"
+            >
+              Continue to Setup
+            </button>
+
+            <div className="text-center">
+              <button onClick={() => setView("login")} className="text-sm text-gray-400 hover:text-white transition">
+                Already have an account? <span className="text-[#EF3F3F]">Login</span>
               </button>
-
-              <div className="text-center text-gray-400 text-sm">
-                Already have an account?{" "}
-                <button onClick={() => setView("login")} className="text-[#EF3F3F] hover:text-red-400 font-bold">
-                  Login
-                </button>
-              </div>
             </div>
           </div>
-
-          {/* Footer */}
-          <footer className="mt-8 text-center">
-            <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} Aderai by{" "}
-              <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>. All rights reserved.
-            </p>
-          </footer>
         </div>
       </div>
     );
   }
 
-  // Render onboarding
+  // Onboarding View
   if (view === "onboarding") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
-        <div className="w-full max-w-3xl">
+      <div className="min-h-screen bg-[#0A0A0A] py-8 px-4">
+        <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <h1 className="text-5xl font-bold">
-                <span className="text-[#EF3F3F]">ADER</span>
-                <span className="text-white">AI</span>
-              </h1>
-              <Zap className="w-10 h-10 text-[#EF3F3F]" />
-            </div>
-            <p className="text-xl text-gray-400">Let's set up your account</p>
-            <p className="text-sm text-gray-500 mt-2">This helps us create segments tailored to your business</p>
+            <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+              ADERAI <Zap className="w-8 h-8 text-[#EF3F3F]" />
+            </h1>
+            <p className="text-gray-400">Complete your account setup</p>
           </div>
 
           <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-8">
-            <h2 className="text-2xl font-bold text-white mb-6">Account Setup</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">Account Configuration</h2>
 
             <div className="space-y-6">
-              {/* Account Name */}
+              {/* Basic Info */}
               <div>
-                <label className="text-white font-bold mb-2 block">Account Name</label>
-                <input
-                  type="text"
-                  value={accountName}
-                  onChange={(e) => setAccountName(e.target.value)}
-                  placeholder="My Store"
-                  className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
-                />
-              </div>
+                <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Account Name *</label>
+                    <input
+                      type="text"
+                      value={accountName}
+                      onChange={(e) => setAccountName(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      placeholder="My Store"
+                    />
+                  </div>
 
-              {/* API Key */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-white font-bold flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-[#EF3F3F]" />
-                    Klaviyo Private API Key
-                  </label>
-                  <button onClick={() => setShowApiInfo(true)} className="text-gray-400 hover:text-white transition">
-                    <Info className="w-5 h-5" />
-                  </button>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Klaviyo API Key *</label>
+                    <input
+                      type="password"
+                      value={klaviyoApiKey}
+                      onChange={(e) => setKlaviyoApiKey(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      placeholder="pk_..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Currency</label>
+                    <select
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                    >
+                      {CURRENCIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.symbol} {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <input
-                  type="password"
-                  value={klaviyoApiKey}
-                  onChange={(e) => setKlaviyoApiKey(e.target.value)}
-                  placeholder="pk_..."
-                  className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
-                />
-                <p className="text-xs text-gray-500 mt-2">Stored locally and never sent to our servers</p>
               </div>
 
-              {/* Currency */}
+              {/* Value Thresholds */}
               <div>
-                <label className="text-white font-bold mb-2 block">Currency</label>
-                <select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
-                >
-                  {CURRENCIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.symbol} {c.name} ({c.code})
-                    </option>
-                  ))}
-                </select>
+                <h3 className="text-lg font-semibold text-white mb-4">Value Thresholds</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Average Order Value</label>
+                    <input
+                      type="number"
+                      value={aov}
+                      onChange={(e) => setAov(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">VIP Threshold</label>
+                    <input
+                      type="number"
+                      value={vipThreshold}
+                      onChange={(e) => setVipThreshold(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">High Value Threshold</label>
+                    <input
+                      type="number"
+                      value={highValueThreshold}
+                      onChange={(e) => setHighValueThreshold(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Business Metrics */}
-              <div className="border-t border-[#2A2A2A] pt-6">
-                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#EF3F3F]" />
-                  Your Business Metrics
-                </h3>
-                <p className="text-sm text-gray-400 mb-4">
-                  These help us customize segment thresholds for your business
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Time Thresholds */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-4">Time Thresholds (Days)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">Average Order Value (AOV)</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                        {CURRENCIES.find((c) => c.code === currency)?.symbol}
-                      </span>
-                      <input
-                        type="number"
-                        value={aov}
-                        onChange={(e) => setAov(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-gray-400 block mb-1">VIP Customer Threshold (LTV)</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                        {CURRENCIES.find((c) => c.code === currency)?.symbol}
-                      </span>
-                      <input
-                        type="number"
-                        value={vipThreshold}
-                        onChange={(e) => setVipThreshold(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-gray-400 block mb-1">High-Value Customer (LTV)</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                        {CURRENCIES.find((c) => c.code === currency)?.symbol}
-                      </span>
-                      <input
-                        type="number"
-                        value={highValueThreshold}
-                        onChange={(e) => setHighValueThreshold(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-gray-400 block mb-1">New Customer Window (Days)</label>
+                    <label className="block text-sm text-gray-400 mb-2">New Customer</label>
                     <input
                       type="number"
                       value={newCustomerDays}
                       onChange={(e) => setNewCustomerDays(e.target.value)}
-                      className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">Lapsed Customer (Days)</label>
+                    <label className="block text-sm text-gray-400 mb-2">Lapsed</label>
                     <input
                       type="number"
                       value={lapsedDays}
                       onChange={(e) => setLapsedDays(e.target.value)}
-                      className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">Churned Customer (Days)</label>
+                    <label className="block text-sm text-gray-400 mb-2">Churned</label>
                     <input
                       type="number"
                       value={churnedDays}
                       onChange={(e) => setChurnedDays(e.target.value)}
-                      className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
+                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
                     />
                   </div>
                 </div>
               </div>
+            </div>
+
+            <button
+              onClick={handleOnboarding}
+              className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 rounded-lg transition mt-8"
+            >
+              Complete Setup
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Dashboard View
+  if (view === "dashboard") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A]">
+        {/* Header */}
+        <div className="bg-[#1A1A1A] border-b border-[#2A2A2A] px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+                ADERAI <Zap className="w-6 h-6 text-[#EF3F3F]" />
+              </h1>
+              <p className="text-sm text-gray-400">Welcome back, {userData?.accountName}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              {/* Analytics Button - NEW */}
+              <button
+                onClick={() => setView("analytics")}
+                className="flex items-center gap-2 px-4 py-2 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white rounded-lg transition"
+              >
+                <BarChart3 className="w-5 h-5" />
+                <span className="text-sm font-medium">Analytics</span>
+              </button>
 
               <button
-                onClick={handleOnboarding}
-                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-4 rounded-lg text-lg transition"
+                onClick={() => setShowApiInfo(!showApiInfo)}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition"
               >
-                Complete Setup
+                <SettingsIcon className="w-5 h-5" />
+                <span className="text-sm">Settings</span>
+              </button>
+              <button onClick={handleLogout} className="text-sm text-gray-400 hover:text-white transition">
+                Logout
               </button>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} Aderai by <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>
-            . All rights reserved.
-          </p>
-        </footer>
-
-        {/* Improved API Info Modal */}
+        {/* Settings Panel */}
         {showApiInfo && (
-          <div
-            className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50"
-            onClick={() => setShowApiInfo(false)}
-          >
-            <div
-              className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-2xl max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <Shield className="w-10 h-10 text-[#EF3F3F]" />
+          <div className="bg-[#1A1A1A] border-b border-[#2A2A2A] px-6 py-4">
+            <div className="max-w-7xl mx-auto">
+              <h3 className="text-lg font-semibold text-white mb-4">Account Settings</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <h3 className="text-3xl font-bold text-white">API Key Setup</h3>
-                  <p className="text-gray-400 text-sm">Your data security is our priority</p>
+                  <span className="text-gray-400">Email:</span>
+                  <span className="text-white ml-2">{userData?.email}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400">Currency:</span>
+                  <span className="text-white ml-2">{userData?.currency}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400">AOV:</span>
+                  <span className="text-white ml-2">
+                    {userData?.currency} {userData?.aov}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400">VIP Threshold:</span>
+                  <span className="text-white ml-2">
+                    {userData?.currency} {userData?.vipThreshold}
+                  </span>
                 </div>
               </div>
-
-              {/* Steps */}
-              <div className="mb-6">
-                <h4 className="text-white font-bold mb-3 text-lg">How to get your API key:</h4>
-                <ol className="space-y-3">
-                  <li className="flex items-start gap-3 text-gray-300">
-                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      1
-                    </div>
-                    <span>
-                      Go to <span className="text-white font-semibold">Klaviyo → Settings → API Keys</span>
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3 text-gray-300">
-                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      2
-                    </div>
-                    <span>
-                      Click <span className="text-white font-semibold">"Create Private API Key"</span>
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3 text-gray-300">
-                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      3
-                    </div>
-                    <span>
-                      Name it: <span className="text-white font-semibold">"Aderai Segments"</span>
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3 text-gray-300">
-                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      4
-                    </div>
-                    <span>
-                      Give it <span className="text-white font-semibold">"Full Access"</span> permissions
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3 text-gray-300">
-                    <div className="bg-[#EF3F3F] text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      5
-                    </div>
-                    <span>
-                      Copy the key (starts with <span className="text-white font-semibold">"pk_"</span>)
-                    </span>
-                  </li>
-                </ol>
-              </div>
-
-              {/* Required Permissions */}
-              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 mb-6">
-                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  Required Permissions
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <div className="w-2 h-2 bg-[#EF3F3F] rounded-full"></div>
-                    <span>
-                      <span className="text-white font-semibold">Read Segments:</span> To detect existing segments
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <div className="w-2 h-2 bg-[#EF3F3F] rounded-full"></div>
-                    <span>
-                      <span className="text-white font-semibold">Write Segments:</span> To create new segments
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <div className="w-2 h-2 bg-[#EF3F3F] rounded-full"></div>
-                    <span>
-                      <span className="text-white font-semibold">Read Metrics:</span> To match your store's events
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Security Info */}
-              <div className="bg-gradient-to-br from-[#EF3F3F]/10 to-[#EF3F3F]/5 border border-[#EF3F3F]/30 rounded-lg p-5 mb-6">
-                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-[#EF3F3F]" />
-                  Your Security Guarantee
-                </h4>
-                <div className="space-y-2 text-sm text-gray-300">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>
-                      <span className="text-white font-semibold">Stored locally only:</span> Your API key never touches
-                      our servers
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>
-                      <span className="text-white font-semibold">Direct to Klaviyo:</span> All requests go from your
-                      browser to Klaviyo
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>
-                      <span className="text-white font-semibold">Zero backend:</span> We never see or log your API key
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>
-                      <span className="text-white font-semibold">Cloudflare Worker:</span> Secure, encrypted connection
-                      at all times
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* How It Works */}
-              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 mb-6">
-                <h4 className="text-white font-bold mb-3">How Aderai Works</h4>
-                <div className="space-y-2 text-sm text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <div className="text-[#EF3F3F] font-bold">1.</div>
-                    <span>You select segments in our interface</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-[#EF3F3F] font-bold">2.</div>
-                    <span>Your browser sends request to Cloudflare Worker</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-[#EF3F3F] font-bold">3.</div>
-                    <span>Worker creates segments directly in your Klaviyo</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-[#EF3F3F] font-bold">4.</div>
-                    <span>Results sent back to you in real-time</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowApiInfo(false)}
-                className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
-              >
-                Got It - Let's Go!
-              </button>
-
-              <p className="text-center text-xs text-gray-500 mt-4">Questions? Email us at support@thedripstory.com</p>
             </div>
           </div>
         )}
-      </div>
-    );
-  }
 
-  // Render creating
-  if (view === "creating") {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
-        <div className="text-center">
-          <Loader className="w-16 h-16 text-[#EF3F3F] animate-spin mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Creating Your Segments...</h2>
-          <p className="text-gray-400">This will take about {Math.ceil(selectedSegments.length * 0.25)} seconds</p>
-          <p className="text-sm text-gray-500 mt-2">Tailored to your business metrics</p>
-        </div>
-
-        {/* Footer */}
-        <footer className="absolute bottom-6 left-0 right-0 text-center">
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} Aderai by <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>
-            . All rights reserved.
-          </p>
-        </footer>
-      </div>
-    );
-  }
-
-  // Render results
-  if (view === "results") {
-    const successCount = results.filter((r) => r.status === "success").length;
-    const skippedCount = results.filter((r) => r.status === "skipped").length;
-    const errorCount = results.filter((r) => r.status === "error").length;
-
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-white mb-2">Segments Created!</h1>
-            <p className="text-gray-400">Check your Klaviyo account to see your new segments</p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 text-center">
-              <div className="text-4xl font-bold text-green-500 mb-2">{successCount}</div>
-              <div className="text-gray-400">Created</div>
-            </div>
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 text-center">
-              <div className="text-4xl font-bold text-yellow-500 mb-2">{skippedCount}</div>
-              <div className="text-gray-400">Skipped</div>
-            </div>
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 text-center">
-              <div className="text-4xl font-bold text-red-500 mb-2">{errorCount}</div>
-              <div className="text-gray-400">Failed</div>
-            </div>
-          </div>
-
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 max-h-96 overflow-y-auto mb-6">
-            {results.map((result, idx) => (
-              <div key={idx} className="flex items-start gap-3 py-2 border-b border-[#2A2A2A] last:border-0">
-                {result.status === "success" && <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />}
-                {result.status === "skipped" && <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5" />}
-                {result.status === "error" && <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />}
-                <div className="flex-1">
-                  <div className="text-white font-medium">{result.message}</div>
-                  {result.status === "skipped" && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      This metric isn't available in your Klaviyo account
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => {
-              setView("dashboard");
-              setResults([]);
-              setSelectedSegments([]);
-            }}
-            className="w-full bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-4 rounded-lg transition"
-          >
-            Create More Segments
-          </button>
-
-          {/* Footer */}
-          <footer className="mt-8 pt-8 border-t border-[#2A2A2A] text-center">
-            <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} Aderai by{" "}
-              <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>. All rights reserved.
-            </p>
-          </footer>
-        </div>
-      </div>
-    );
-  }
-
-  // Settings state
-  const [showSettings, setShowSettings] = useState(false);
-  const [settingsAccountName, setSettingsAccountName] = useState("");
-  const [settingsCurrency, setSettingsCurrency] = useState("USD");
-  const [settingsAov, setSettingsAov] = useState("100");
-  const [settingsVipThreshold, setSettingsVipThreshold] = useState("500");
-  const [settingsHighValueThreshold, setSettingsHighValueThreshold] = useState("300");
-  const [settingsNewCustomerDays, setSettingsNewCustomerDays] = useState("30");
-  const [settingsLapsedDays, setSettingsLapsedDays] = useState("60");
-  const [settingsChurnedDays, setSettingsChurnedDays] = useState("180");
-
-  const openSettings = () => {
-    if (userData) {
-      setSettingsAccountName(userData.accountName);
-      setSettingsCurrency(userData.currency);
-      setSettingsAov(userData.aov);
-      setSettingsVipThreshold(userData.vipThreshold);
-      setSettingsHighValueThreshold(userData.highValueThreshold);
-      setSettingsNewCustomerDays(userData.newCustomerDays);
-      setSettingsLapsedDays(userData.lapsedDays);
-      setSettingsChurnedDays(userData.churnedDays);
-      setShowSettings(true);
-    }
-  };
-
-  const saveSettings = () => {
-    if (!userData) return;
-
-    const updatedUser: UserData = {
-      ...userData,
-      accountName: settingsAccountName,
-      currency: settingsCurrency,
-      aov: settingsAov,
-      vipThreshold: settingsVipThreshold,
-      highValueThreshold: settingsHighValueThreshold,
-      newCustomerDays: settingsNewCustomerDays,
-      lapsedDays: settingsLapsedDays,
-      churnedDays: settingsChurnedDays,
-    };
-
-    localStorage.setItem(`aderai_${userData.email}`, JSON.stringify({ ...updatedUser, password }));
-    localStorage.setItem("aderai_user", JSON.stringify(updatedUser));
-    setUserData(updatedUser);
-    setShowSettings(false);
-  };
-
-  // Render dashboard
-  return (
-    <div className="min-h-screen bg-[#0A0A0A] p-6 flex flex-col">
-      <div className="max-w-6xl mx-auto flex-1 w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <h1 className="text-4xl font-bold">
-                <span className="text-[#EF3F3F]">ADER</span>
-                <span className="text-white">AI</span>
-              </h1>
-              <Zap className="w-8 h-8 text-[#EF3F3F]" />
-            </div>
-            <p className="text-gray-400">Welcome back, {userData?.accountName}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={openSettings} className="text-gray-400 hover:text-white transition" title="Settings">
-              <SettingsIcon className="w-5 h-5" />
-            </button>
-            <button onClick={handleLogout} className="text-gray-400 hover:text-white transition text-sm">
-              Logout
-            </button>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
-            <div className="text-sm text-gray-400 mb-1">AOV</div>
-            <div className="text-2xl font-bold text-white">
-              {getCurrencySymbol()}
-              {userData?.aov}
-            </div>
-          </div>
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
-            <div className="text-sm text-gray-400 mb-1">VIP Threshold</div>
-            <div className="text-2xl font-bold text-white">
-              {getCurrencySymbol()}
-              {userData?.vipThreshold}
-            </div>
-          </div>
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
-            <div className="text-sm text-gray-400 mb-1">High-Value</div>
-            <div className="text-2xl font-bold text-white">
-              {getCurrencySymbol()}
-              {userData?.highValueThreshold}
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Start Bundles */}
-        <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 mb-6">
-          <h3 className="text-white font-bold mb-4">Quick Start Bundles</h3>
-          <div className="grid grid-cols-3 gap-4">
-            {Object.keys(BUNDLES).map((bundle) => (
-              <button
-                key={bundle}
-                onClick={() => selectBundle(bundle)}
-                className="bg-[#0A0A0A] border border-[#2A2A2A] hover:border-[#EF3F3F] rounded-lg p-4 transition text-left"
-              >
-                <div className="text-white font-bold mb-1">{bundle}</div>
-                <div className="text-sm text-gray-400">{BUNDLES[bundle as keyof typeof BUNDLES].length} segments</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Segment Selection */}
-        <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 mb-6">
-          <h3 className="text-white font-bold mb-4">Select Segments ({selectedSegments.length} selected)</h3>
-
-          {Object.entries(SEGMENTS).map(([category, segments]) => {
-            const allSelected = segments.every((s) => selectedSegments.includes(s.id));
-            const someSelected = segments.some((s) => selectedSegments.includes(s.id));
-
-            return (
-              <div key={category} className="mb-4">
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {/* Quick Select Bundles */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-white mb-4">Quick Select Bundles</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {Object.entries(BUNDLES).map(([name, segments]) => (
                 <button
-                  onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
-                  className="w-full flex items-center justify-between bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 hover:border-[#EF3F3F] transition"
+                  key={name}
+                  onClick={() => selectBundle(name)}
+                  className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-4 hover:border-[#EF3F3F] transition text-left"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="text-white font-bold">{category}</div>
-                    <div className="text-sm text-gray-400">({segments.length} segments)</div>
-                    {someSelected && (
-                      <div className="text-xs bg-[#EF3F3F] text-white px-2 py-1 rounded">
-                        {segments.filter((s) => selectedSegments.includes(s.id)).length} selected
-                      </div>
-                    )}
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-white">{name}</h3>
+                    <Zap className="w-5 h-5 text-[#EF3F3F]" />
                   </div>
-                  {expandedCategory === category ? (
-                    <ChevronUp className="text-gray-400" />
-                  ) : (
-                    <ChevronDown className="text-gray-400" />
-                  )}
+                  <p className="text-sm text-gray-400">{segments.length} segments</p>
                 </button>
+              ))}
+            </div>
+          </div>
 
-                {expandedCategory === category && (
-                  <div className="mt-2 p-4 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg">
-                    <button
-                      onClick={() => selectAllInCategory(category)}
-                      className="text-sm text-[#EF3F3F] hover:text-red-400 mb-3 transition"
-                    >
-                      {allSelected ? "Deselect All" : "Select All"}
-                    </button>
+          {/* Segment Categories */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">Select Segments</h2>
+              <div className="text-sm text-gray-400">{selectedSegments.length} selected</div>
+            </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-4">
+              {Object.entries(SEGMENTS).map(([category, segments]) => (
+                <div key={category} className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
+                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-[#2A2A2A] transition"
+                  >
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-lg font-semibold text-white">{category}</h3>
+                      <span className="text-sm text-gray-500">({segments.length})</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          selectAllInCategory(category);
+                        }}
+                        className="text-sm text-[#EF3F3F] hover:underline"
+                      >
+                        {segments.every((s) => selectedSegments.includes(s.id)) ? "Deselect All" : "Select All"}
+                      </button>
+                      {expandedCategory === category ? (
+                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                      )}
+                    </div>
+                  </button>
+
+                  {expandedCategory === category && (
+                    <div className="px-6 py-4 border-t border-[#2A2A2A] space-y-2">
                       {segments.map((segment) => (
                         <label
                           key={segment.id}
-                          className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition ${
-                            selectedSegments.includes(segment.id)
-                              ? "bg-[#EF3F3F]/10 border border-[#EF3F3F]"
-                              : "bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#EF3F3F]/50"
-                          }`}
+                          className="flex items-center gap-3 p-3 hover:bg-[#2A2A2A] rounded-lg cursor-pointer transition"
                         >
                           <input
                             type="checkbox"
                             checked={selectedSegments.includes(segment.id)}
                             onChange={() => toggleSegment(segment.id)}
-                            className="mt-1"
+                            className="w-5 h-5 rounded border-[#2A2A2A] bg-[#0A0A0A] text-[#EF3F3F] focus:ring-[#EF3F3F]"
                           />
                           <div className="flex-1">
-                            <div className="text-white font-medium text-sm">{segment.name}</div>
-                            <div className="text-xs text-gray-400 mt-1">{segment.desc}</div>
+                            <div className="text-white font-medium">{segment.name}</div>
+                            <div className="text-sm text-gray-400">{segment.desc}</div>
                           </div>
                         </label>
                       ))}
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Create Button */}
+          <div className="flex justify-center">
+            <button
+              onClick={createSegments}
+              disabled={selectedSegments.length === 0}
+              className="bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold py-4 px-12 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <Zap className="w-5 h-5" />
+              Create {selectedSegments.length} Segments
+            </button>
+          </div>
         </div>
 
-        {/* Create Button */}
-        <button
-          onClick={createSegments}
-          disabled={selectedSegments.length === 0}
-          className="w-full bg-[#EF3F3F] hover:bg-red-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-bold py-6 rounded-lg text-xl transition flex items-center justify-center gap-3"
-        >
-          <Zap className="w-6 h-6" />
-          Create {selectedSegments.length} Segments
-        </button>
+        {/* Footer */}
+        <div className="bg-[#1A1A1A] border-t border-[#2A2A2A] py-6 mt-12">
+          <div className="max-w-7xl mx-auto px-6 text-center text-sm text-gray-500">
+            © 2025 Aderai by THE DRIP STORY. All rights reserved.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-        {/* Settings Modal */}
-        {showSettings && (
-          <div
-            className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50"
-            onClick={() => setShowSettings(false)}
-          >
-            <div
-              className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <SettingsIcon className="w-8 h-8 text-[#EF3F3F]" />
-                  <h3 className="text-3xl font-bold text-white">Settings</h3>
-                </div>
+  // Analytics View - NEW!
+  if (view === "analytics") {
+    const summary = getAnalyticsSummary();
+    const topSegments = getTopSegments(5);
+    const filteredSegments = getFilteredSegments();
+
+    return (
+      <div className="min-h-screen bg-[#0A0A0A]">
+        {/* Header */}
+        <div className="bg-[#1A1A1A] border-b border-[#2A2A2A] px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+                ADERAI <Zap className="w-6 h-6 text-[#EF3F3F]" />
+              </h1>
+              <p className="text-sm text-gray-400">Welcome back, {userData?.accountName}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setView("dashboard")}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition"
+              >
+                <span className="text-sm">Dashboard</span>
+              </button>
+              <button
+                onClick={() => setView("analytics")}
+                className="flex items-center gap-2 px-4 py-2 bg-[#EF3F3F] text-white rounded-lg"
+              >
+                <BarChart3 className="w-5 h-5" />
+                <span className="text-sm font-medium">Analytics</span>
+              </button>
+              <button onClick={handleLogout} className="text-sm text-gray-400 hover:text-white transition">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {/* Page Header */}
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                  <BarChart3 className="w-7 h-7 text-[#EF3F3F]" />
+                  Segment Analytics Dashboard
+                </h2>
+                <p className="text-gray-400">Real-time insights from your Klaviyo account</p>
               </div>
-
-              <div className="space-y-6">
-                {/* Account Name */}
-                <div>
-                  <label className="text-white font-bold mb-2 block">Account Name</label>
-                  <input
-                    type="text"
-                    value={settingsAccountName}
-                    onChange={(e) => setSettingsAccountName(e.target.value)}
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
-                  />
-                </div>
-
-                {/* Currency */}
-                <div>
-                  <label className="text-white font-bold mb-2 block">Currency</label>
-                  <select
-                    value={settingsCurrency}
-                    onChange={(e) => setSettingsCurrency(e.target.value)}
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:border-[#EF3F3F] focus:outline-none"
-                  >
-                    {CURRENCIES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.symbol} {c.name} ({c.code})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Business Metrics */}
-                <div className="border-t border-[#2A2A2A] pt-6">
-                  <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-[#EF3F3F]" />
-                    Business Metrics
-                  </h4>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm text-gray-400 block mb-1">Average Order Value (AOV)</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                          {CURRENCIES.find((c) => c.code === settingsCurrency)?.symbol}
-                        </span>
-                        <input
-                          type="number"
-                          value={settingsAov}
-                          onChange={(e) => setSettingsAov(e.target.value)}
-                          className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-gray-400 block mb-1">VIP Customer Threshold (LTV)</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                          {CURRENCIES.find((c) => c.code === settingsCurrency)?.symbol}
-                        </span>
-                        <input
-                          type="number"
-                          value={settingsVipThreshold}
-                          onChange={(e) => setSettingsVipThreshold(e.target.value)}
-                          className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-gray-400 block mb-1">High-Value Customer (LTV)</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                          {CURRENCIES.find((c) => c.code === settingsCurrency)?.symbol}
-                        </span>
-                        <input
-                          type="number"
-                          value={settingsHighValueThreshold}
-                          onChange={(e) => setSettingsHighValueThreshold(e.target.value)}
-                          className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-gray-400 block mb-1">New Customer Window (Days)</label>
-                      <input
-                        type="number"
-                        value={settingsNewCustomerDays}
-                        onChange={(e) => setSettingsNewCustomerDays(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-gray-400 block mb-1">Lapsed Customer (Days)</label>
-                      <input
-                        type="number"
-                        value={settingsLapsedDays}
-                        onChange={(e) => setSettingsLapsedDays(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-gray-400 block mb-1">Churned Customer (Days)</label>
-                      <input
-                        type="number"
-                        value={settingsChurnedDays}
-                        onChange={(e) => setSettingsChurnedDays(e.target.value)}
-                        className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-2 text-white focus:border-[#EF3F3F] focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => setShowSettings(false)}
-                    className="flex-1 bg-[#0A0A0A] border border-[#2A2A2A] hover:border-[#EF3F3F] text-white font-bold py-3 rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={saveSettings}
-                    className="flex-1 bg-[#EF3F3F] hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
-                  >
-                    Save Changes
-                  </button>
-                </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("aderai_analytics_cache");
+                    fetchAllSegments();
+                  }}
+                  disabled={loadingAnalytics}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white rounded-lg transition disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-5 h-5 ${loadingAnalytics ? "animate-spin" : ""}`} />
+                  <span className="text-sm">Refresh</span>
+                </button>
+                <button
+                  onClick={() => setView("dashboard")}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white rounded-lg transition"
+                >
+                  <span className="text-sm">← Back</span>
+                </button>
               </div>
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Footer */}
-      <footer className="max-w-6xl mx-auto w-full mt-12 pt-8 border-t border-[#2A2A2A]">
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <div>
-            © {new Date().getFullYear()} Aderai by <span className="text-[#EF3F3F] font-semibold">THE DRIP STORY</span>
-            . All rights reserved.
-          </div>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-white transition">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-white transition">
-              Terms
-            </a>
-            <a href="mailto:support@thedripstory.com" className="hover:text-white transition">
-              Support
-            </a>
+          {/* Loading State */}
+          {loadingAnalytics && (
+            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-12 mb-8">
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  <Loader className="w-12 h-12 text-[#EF3F3F] animate-spin" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Loading Segment Analytics...</h3>
+                {analyticsProgress.total > 0 && (
+                  <>
+                    <p className="text-gray-400 mb-4">
+                      Loading segment {analyticsProgress.current} of {analyticsProgress.total}...
+                    </p>
+                    <div className="max-w-md mx-auto bg-[#0A0A0A] rounded-full h-3 overflow-hidden">
+                      <div
+                        className="bg-[#EF3F3F] h-full transition-all duration-300"
+                        style={{ width: `${(analyticsProgress.current / analyticsProgress.total) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500 mt-4">This may take a minute due to Klaviyo's rate limits...</p>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Analytics Dashboard - Only show when not loading */}
+          {!loadingAnalytics && allSegments.length > 0 && (
+            <>
+              {/* Summary Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                {/* Total Segments */}
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm text-gray-400">Total Segments</div>
+                    <Users className="w-5 h-5 text-[#EF3F3F]" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">{formatNumber(summary.totalSegments)}</div>
+                  <div className="text-xs text-gray-500">Active segments</div>
+                </div>
+
+                {/* Total Profiles */}
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm text-gray-400">Total Profiles</div>
+                    <TrendingUp className="w-5 h-5 text-[#10B981]" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">{formatNumber(summary.totalProfiles)}</div>
+                  <div className="text-xs text-gray-500">Across all segments</div>
+                </div>
+
+                {/* Added (7d) */}
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm text-gray-400">Added (7d)</div>
+                    <ArrowUp className="w-5 h-5 text-[#10B981]" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#10B981] mb-1">+{formatNumber(summary.totalAdded)}</div>
+                  <div className="text-xs text-gray-500">Last 7 days</div>
+                </div>
+
+                {/* Removed (7d) */}
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm text-gray-400">Removed (7d)</div>
+                    <ArrowDown className="w-5 h-5 text-[#EF4444]" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#EF4444] mb-1">-{formatNumber(summary.totalRemoved)}</div>
+                  <div className="text-xs text-gray-500">Last 7 days</div>
+                </div>
+              </div>
+
+              {/* Top Performing Segments */}
+              {topSegments.length > 0 && (
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-6 mb-8">
+                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    🔥 Top Performing Segments
+                  </h3>
+                  <div className="space-y-4">
+                    {topSegments.map((segment, index) => {
+                      const stats = segmentStats[segment.id];
+                      if (!stats) return null;
+
+                      const totalProfiles = summary.totalProfiles || 1;
+                      const percentage = (stats.profileCount / totalProfiles) * 100;
+                      const change = stats.netChange || 0;
+                      const changePercent = stats.changePercent || 0;
+
+                      return (
+                        <div key={segment.id} className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-gray-500 text-sm">{index + 1}.</span>
+                                <div className="text-white font-semibold">{stats.name}</div>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm">
+                                <span className="text-gray-400">{formatNumber(stats.profileCount)} members</span>
+                                {change !== 0 && (
+                                  <span
+                                    className={`flex items-center gap-1 ${change > 0 ? "text-[#10B981]" : "text-[#EF4444]"}`}
+                                  >
+                                    {change > 0 ? "📈" : "📉"} {change > 0 ? "+" : ""}
+                                    {formatNumber(change)} ({changePercent > 0 ? "+" : ""}
+                                    {changePercent.toFixed(1)}%)
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="mt-2">
+                            <div className="bg-[#2A2A2A] rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-[#EF3F3F] h-full transition-all duration-500"
+                                style={{ width: `${Math.min(percentage, 100)}%` }}
+                              />
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">{percentage.toFixed(1)}% of total</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* All Segments Table */}
+              <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg overflow-hidden">
+                <div className="p-6 border-b border-[#2A2A2A]">
+                  <h3 className="text-xl font-bold text-white mb-4">📋 All Segments</h3>
+
+                  {/* Filters */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={aderaiSegmentsOnly}
+                        onChange={(e) => setAderaiSegmentsOnly(e.target.checked)}
+                        className="w-4 h-4 rounded border-[#2A2A2A] bg-[#0A0A0A] text-[#EF3F3F] focus:ring-[#EF3F3F]"
+                      />
+                      Show Aderai segments only
+                    </label>
+
+                    <div className="flex-1 relative max-w-md">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                      <input
+                        type="text"
+                        value={segmentSearch}
+                        onChange={(e) => setSegmentSearch(e.target.value)}
+                        placeholder="Search segments..."
+                        className="w-full pl-10 pr-4 py-2 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {filteredSegments.length > 0 && (
+                    <div className="text-sm text-gray-400">
+                      Showing {filteredSegments.length} of {allSegments.length} segments
+                    </div>
+                  )}
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-[#0A0A0A]">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Segment Name
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Members
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Change (7d)
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Trend
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#2A2A2A]">
+                      {filteredSegments.map((segment) => {
+                        const stats = segmentStats[segment.id];
+                        if (!stats) return null;
+
+                        const change = stats.netChange || 0;
+                        const changePercent = stats.changePercent || 0;
+
+                        return (
+                          <tr key={segment.id} className="hover:bg-[#0A0A0A] transition">
+                            <td className="px-6 py-4">
+                              <div className="text-white font-medium">{stats.name}</div>
+                              {stats.created && (
+                                <div className="text-xs text-gray-500">
+                                  Created {new Date(stats.created).toLocaleDateString()}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="text-xl font-bold text-white">{formatNumber(stats.profileCount)}</div>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              {change !== 0 ? (
+                                <div
+                                  className={`text-sm font-medium ${change > 0 ? "text-[#10B981]" : "text-[#EF4444]"}`}
+                                >
+                                  {change > 0 ? "+" : ""}
+                                  {formatNumber(change)}
+                                </div>
+                              ) : (
+                                <div className="text-sm text-gray-500">—</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              {change !== 0 ? (
+                                <div
+                                  className={`flex items-center justify-end gap-1 text-xs font-medium ${change > 0 ? "text-[#10B981]" : "text-[#EF4444]"}`}
+                                >
+                                  {change > 0 ? "📈" : "📉"}
+                                  <span>
+                                    {change > 0 ? "+" : ""}
+                                    {changePercent.toFixed(1)}%
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="text-xs text-gray-500">➡️ 0%</div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {filteredSegments.length === 0 && (
+                  <div className="p-12 text-center">
+                    <p className="text-gray-400">No segments found matching your filters.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Cache Info */}
+              <div className="mt-6 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-4">
+                <div className="flex items-start gap-2 text-sm text-gray-400">
+                  <Info className="w-5 h-5 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-gray-300 mb-1">💡 Analytics Caching</p>
+                    <p>
+                      Results are cached for 1 hour to respect Klaviyo's rate limits and improve load times. Click
+                      "Refresh" to fetch the latest data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Empty State */}
+          {!loadingAnalytics && allSegments.length === 0 && (
+            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-12 text-center">
+              <BarChart3 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">No Analytics Data</h3>
+              <p className="text-gray-400 mb-6">Click "Refresh" to load your segment analytics from Klaviyo.</p>
+              <button
+                onClick={fetchAllSegments}
+                className="bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 px-6 rounded-lg transition"
+              >
+                Load Analytics
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="bg-[#1A1A1A] border-t border-[#2A2A2A] py-6 mt-12">
+          <div className="max-w-7xl mx-auto px-6 text-center text-sm text-gray-500">
+            © 2025 Aderai by THE DRIP STORY. All rights reserved.
           </div>
         </div>
-      </footer>
-    </div>
-  );
+      </div>
+    );
+  }
+
+  // Creating View
+  if (view === "creating") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="text-center">
+          <Loader className="w-16 h-16 text-[#EF3F3F] mx-auto mb-4 animate-spin" />
+          <h2 className="text-2xl font-bold text-white mb-2">Creating Your Segments...</h2>
+          <p className="text-gray-400">This may take a minute</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Results View
+  if (view === "results") {
+    const successCount = results.filter((r) => r.status === "success").length;
+    const errorCount = results.filter((r) => r.status === "error").length;
+
+    return (
+      <div className="min-h-screen bg-[#0A0A0A]">
+        <div className="max-w-4xl mx-auto px-6 py-12">
+          <div className="text-center mb-8">
+            <div
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+                errorCount === 0 ? "bg-green-500/20" : "bg-yellow-500/20"
+              }`}
+            >
+              {errorCount === 0 ? (
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              ) : (
+                <AlertCircle className="w-8 h-8 text-yellow-500" />
+              )}
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-2">
+              {errorCount === 0 ? "All Segments Created!" : "Creation Complete"}
+            </h2>
+            <p className="text-gray-400">
+              {successCount} successful, {errorCount} failed
+            </p>
+          </div>
+
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg divide-y divide-[#2A2A2A] mb-8">
+            {results.map((result, index) => (
+              <div key={index} className="p-4 flex items-center gap-4">
+                {result.status === "success" ? (
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                ) : result.status === "error" ? (
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                ) : (
+                  <Info className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                )}
+                <div className="flex-1">
+                  <div className="text-white font-medium">{result.segmentId}</div>
+                  <div className="text-sm text-gray-400">{result.message}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => {
+                setView("dashboard");
+                setSelectedSegments([]);
+                setResults([]);
+              }}
+              className="bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 px-8 rounded-lg transition"
+            >
+              Back to Dashboard
+            </button>
+            <button
+              onClick={() => setView("analytics")}
+              className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white font-semibold py-3 px-8 rounded-lg transition flex items-center gap-2"
+            >
+              <BarChart3 className="w-5 h-5" />
+              View Analytics
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }
