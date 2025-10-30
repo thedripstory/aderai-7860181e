@@ -154,7 +154,7 @@ const SEGMENTS = {
 };
 
 const BUNDLES = {
-  "BFCM Core 6": [
+  "Starter Kit": [
     "vip-customers",
     "repeat-customers",
     "one-time-customers",
@@ -162,29 +162,18 @@ const BUNDLES = {
     "cart-abandoners",
     "lapsed-customers",
   ],
-  "Complete 20": [
+  "Revenue Maximizer": [
     "vip-customers",
-    "repeat-customers",
-    "one-time-customers",
-    "engaged-non-buyers",
-    "cart-abandoners",
-    "lapsed-customers",
-    "highly-engaged",
-    "recent-clickers",
-    "active-on-site",
-    "unengaged-90",
-    "high-value-cart",
-    "recent-first-time",
-    "coupon-users",
-    "full-price-buyers",
+    "high-value-customers",
     "big-spenders",
-    "bargain-shoppers",
-    "high-churn-risk",
+    "high-aov-customers",
+    "repeat-customers",
     "predicted-vips",
-    "churned-customers",
     "win-back-target",
+    "cart-abandoners",
+    "high-value-cart",
   ],
-  "All 64": Object.values(SEGMENTS)
+  "Complete Library": Object.values(SEGMENTS)
     .flat()
     .map((s) => s.id),
 };
