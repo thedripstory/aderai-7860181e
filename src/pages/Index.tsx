@@ -23,6 +23,9 @@ import {
   FileText,
   FileSpreadsheet,
   File,
+  Activity,
+  Lightbulb,
+  X,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -202,6 +205,252 @@ const CURRENCIES = [
   { code: "MXN", symbol: "MX$", name: "Mexican Peso" },
 ];
 
+// Health Score Modal Component (to replace campaign performance modal)
+
+interface HealthScoreModalProps {
+  segment: any;
+  stats: SegmentStats;
+  onClose: () => void;
+}
+
+const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) => {
+  // Calculate Health Score (0-100)
+  const calculateHealthScore = () => {
+    let score = 50; // Base score
+
+    // Growth factor (0-30 points)
+    const growthRate = stats.changePercent || 0;
+    if (growthRate > 20) score += 30;
+    else if (growthRate > 10) score += 20;
+    else if (growthRate > 5) score += 10;
+    else if (growthRate > 0) score += 5;
+    else if (growthRate < -10) score -= 20;
+    else if (growthRate < -5) score -= 10;
+
+    // Size factor (0-20 points)
+    const memberCount = stats.profileCount || 0;
+    if (memberCount > 10000) score += 20;
+    else if (memberCount > 5000) score += 15;
+    else if (memberCount > 1000) score += 10;
+    else if (memberCount > 100) score += 5;
+    else if (memberCount < 10) score -= 10;
+
+    // Activity factor (0-20 points)
+    const recentActivity = (stats.membersAdded || 0) + (stats.membersRemoved || 0);
+    if (recentActivity > 100) score += 20;
+    else if (recentActivity > 50) score += 15;
+    else if (recentActivity > 20) score += 10;
+    else if (recentActivity > 5) score += 5;
+
+    // Stability factor (0-10 points)
+    const churnRate = memberCount > 0 ? ((stats.membersRemoved || 0) / memberCount) * 100 : 0;
+    if (churnRate < 2) score += 10;
+    else if (churnRate < 5) score += 5;
+    else if (churnRate > 20) score -= 15;
+    else if (churnRate > 10) score -= 10;
+
+    return Math.max(0, Math.min(100, score));
+  };
+
+  const healthScore = calculateHealthScore();
+
+  // Determine status
+  const getHealthStatus = (score: number) => {
+    if (score >= 80) return { label: "Excellent", color: "text-green-500", bg: "bg-green-500/10", emoji: "🟢" };
+    if (score >= 60) return { label: "Good", color: "text-blue-500", bg: "bg-blue-500/10", emoji: "🔵" };
+    if (score >= 40) return { label: "Fair", color: "text-yellow-500", bg: "bg-yellow-500/10", emoji: "🟡" };
+    return { label: "Needs Attention", color: "text-red-500", bg: "bg-red-500/10", emoji: "🔴" };
+  };
+
+  const status = getHealthStatus(healthScore);
+
+  // Generate recommendations
+  const getRecommendations = () => {
+    const recommendations = [];
+    const growthRate = stats.changePercent || 0;
+    const memberCount = stats.profileCount || 0;
+    const churnRate = memberCount > 0 ? ((stats.membersRemoved || 0) / memberCount) * 100 : 0;
+
+    if (growthRate < 0) {
+      recommendations.push({
+        type: "warning",
+        title: "Declining Membership",
+        message: `Segment shrinking by ${Math.abs(growthRate).toFixed(1)}%. Consider a re-engagement campaign.`,
+      });
+    }
+
+    if (churnRate > 10) {
+      recommendations.push({
+        type: "alert",
+        title: "High Churn Rate",
+        message: `${churnRate.toFixed(1)}% churn rate detected. Review your flows targeting this segment.`,
+      });
+    }
+
+    if (growthRate > 20) {
+      recommendations.push({
+        type: "success",
+        title: "Strong Growth",
+        message: `Segment growing ${growthRate.toFixed(1)}%. Great time to send a campaign!`,
+      });
+    }
+
+    if (memberCount < 100) {
+      recommendations.push({
+        type: "info",
+        title: "Small Segment",
+        message: "Consider broadening segment criteria to reach more customers.",
+      });
+    }
+
+    if ((stats.membersAdded || 0) === 0 && (stats.membersRemoved || 0) === 0) {
+      recommendations.push({
+        type: "warning",
+        title: "No Recent Activity",
+        message: "This segment has been inactive for 7 days. Check segment definition.",
+      });
+    }
+
+    if (recommendations.length === 0) {
+      recommendations.push({
+        type: "success",
+        title: "Healthy Segment",
+        message: "Segment is performing well. Keep monitoring growth trends.",
+      });
+    }
+
+    return recommendations;
+  };
+
+  const recommendations = getRecommendations();
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-[#1a1a1a] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-red-500/20">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-800 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Activity className="w-6 h-6 text-red-500" />
+            <div>
+              <h2 className="text-xl font-bold text-white">Segment Health Score</h2>
+              <p className="text-sm text-gray-400">{stats.name}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Health Score Display */}
+        <div className="p-6">
+          <div className="bg-gray-900 rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-4xl">{status.emoji}</span>
+                  <span className={`text-2xl font-bold ${status.color}`}>{status.label}</span>
+                </div>
+                <p className="text-gray-400">Overall segment health</p>
+              </div>
+              <div className="text-right">
+                <div className="text-5xl font-bold text-white">{healthScore}</div>
+                <div className="text-sm text-gray-400">out of 100</div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+              <div
+                className={`h-full transition-all duration-500 ${
+                  healthScore >= 80
+                    ? "bg-green-500"
+                    : healthScore >= 60
+                      ? "bg-blue-500"
+                      : healthScore >= 40
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                }`}
+                style={{ width: `${healthScore}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Key Metrics Grid */}
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="bg-gray-900 rounded-lg p-4">
+              <div className="text-gray-400 text-sm mb-1">Members</div>
+              <div className="text-2xl font-bold text-white">{stats.profileCount.toLocaleString()}</div>
+            </div>
+            <div className="bg-gray-900 rounded-lg p-4">
+              <div className="text-gray-400 text-sm mb-1">7-Day Growth</div>
+              <div className={`text-2xl font-bold ${stats.changePercent >= 0 ? "text-green-500" : "text-red-500"}`}>
+                {stats.changePercent >= 0 ? "+" : ""}
+                {stats.changePercent.toFixed(1)}%
+              </div>
+            </div>
+            <div className="bg-gray-900 rounded-lg p-4">
+              <div className="text-gray-400 text-sm mb-1">Added (7d)</div>
+              <div className="text-2xl font-bold text-green-500">+{stats.membersAdded || 0}</div>
+            </div>
+            <div className="bg-gray-900 rounded-lg p-4">
+              <div className="text-gray-400 text-sm mb-1">Removed (7d)</div>
+              <div className="text-2xl font-bold text-red-500">-{stats.membersRemoved || 0}</div>
+            </div>
+          </div>
+
+          {/* Recommendations */}
+          <div>
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-yellow-500" />
+              Recommendations
+            </h3>
+            <div className="space-y-3">
+              {recommendations.map((rec, idx) => (
+                <div
+                  key={idx}
+                  className={`p-4 rounded-lg border ${
+                    rec.type === "success"
+                      ? "bg-green-500/10 border-green-500/20"
+                      : rec.type === "warning"
+                        ? "bg-yellow-500/10 border-yellow-500/20"
+                        : rec.type === "alert"
+                          ? "bg-red-500/10 border-red-500/20"
+                          : "bg-blue-500/10 border-blue-500/20"
+                  }`}
+                >
+                  <div
+                    className={`font-semibold mb-1 ${
+                      rec.type === "success"
+                        ? "text-green-500"
+                        : rec.type === "warning"
+                          ? "text-yellow-500"
+                          : rec.type === "alert"
+                            ? "text-red-500"
+                            : "text-blue-500"
+                    }`}
+                  >
+                    {rec.title}
+                  </div>
+                  <div className="text-gray-300 text-sm">{rec.message}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-800 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 export default function AderaiApp() {
   // View state - ADDED 'analytics'
   const [view, setView] = useState<
@@ -324,8 +573,6 @@ export default function AderaiApp() {
   });
 
   // Campaign integration state - NEW
-  const [showCampaignModal, setShowCampaignModal] = useState(false);
-  const [selectedSegmentForCampaign, setSelectedSegmentForCampaign] = useState<string | null>(null);
 
   // Load user on mount
   useEffect(() => {
@@ -953,325 +1200,11 @@ export default function AderaiApp() {
   };
 
   // State for campaign/flow data
-  const [campaignData, setCampaignData] = useState<any[]>([]);
-  const [flowData, setFlowData] = useState<any[]>([]);
-  const [loadingCampaignData, setLoadingCampaignData] = useState(false);
 
   // Fetch real campaign data from Klaviyo using Worker proxy
-  const fetchCampaignData = async (segmentId: string) => {
-    if (!userData?.klaviyoApiKey) return;
-
-    setLoadingCampaignData(true);
-    console.log("🚀 Starting campaign data fetch...");
-
-    try {
-      // Step 1: Get the "Placed Order" metric ID via Worker
-      console.log("📊 Fetching metrics...");
-      const metricsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/metrics", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
-      });
-
-      console.log("📊 Metrics response status:", metricsResponse.status);
-
-      if (!metricsResponse.ok) {
-        throw new Error("Failed to fetch metrics");
-      }
-
-      const metricsData = await metricsResponse.json();
-      console.log("📊 Metrics data:", metricsData);
-
-      const placedOrderMetric = metricsData.data.find(
-        (m: any) => m.attributes.name === "Placed Order" || m.attributes.name === "Ordered Product",
-      );
-
-      if (!placedOrderMetric) {
-        console.warn("❌ No Placed Order metric found");
-        console.log(
-          "Available metrics:",
-          metricsData.data.map((m: any) => m.attributes.name),
-        );
-        setCampaignData([]);
-        setLoadingCampaignData(false);
-        return;
-      }
-
-      const metricId = placedOrderMetric.id;
-      console.log("✅ Found conversion metric:", placedOrderMetric.attributes.name, "ID:", metricId);
-
-      // Step 2: Fetch campaigns list via Worker
-      console.log("📧 Fetching campaigns list...");
-      const campaignsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/campaigns", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
-      });
-
-      console.log("📧 Campaigns response status:", campaignsResponse.status);
-
-      if (!campaignsResponse.ok) {
-        throw new Error("Failed to fetch campaigns");
-      }
-
-      const campaignsData = await campaignsResponse.json();
-      console.log("📧 Found campaigns:", campaignsData.data.length);
-      console.log(
-        "📧 Campaign names:",
-        campaignsData.data.map((c: any) => c.attributes?.name),
-      );
-
-      // Step 3: For each campaign, fetch performance using Reporting API via Worker
-      // Get ALL campaigns (remove slice limit) and use all-time data
-      console.log("📈 Fetching campaign performance data...");
-      const campaignMetrics = [];
-      for (let index = 0; index < campaignsData.data.length; index++) {
-        const campaign = campaignsData.data[index];
-        try {
-          console.log(
-            `📈 [${index + 1}/${campaignsData.data.length}] Fetching stats for: ${campaign.attributes?.name}`,
-          );
-
-          // Add delay between requests (500ms) to avoid rate limiting
-          if (index > 0) {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
-
-          // Use Worker proxy for Reporting API
-          const reportResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/campaign-reports", {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              "X-API-Key": userData.klaviyoApiKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              data: {
-                type: "campaign-values-report",
-                attributes: {
-                  statistics: [
-                    "opens_unique",
-                    "clicks_unique",
-                    "open_rate",
-                    "click_rate",
-                    "bounce_rate",
-                    "conversion_uniques",
-                    "conversion_value",
-                    "conversion_rate",
-                    "revenue_per_recipient",
-                    "sends",
-                  ],
-                  timeframe: {
-                    key: "since", // All-time data, not just last 30 days
-                  },
-                  conversion_metric_id: metricId,
-                  filter: `equals(campaign_id,"${campaign.id}")`,
-                },
-              },
-            }),
-          });
-
-          console.log(`📈 [${index + 1}] Report response status:`, reportResponse.status);
-
-          if (reportResponse.ok) {
-            const reportData = await reportResponse.json();
-            console.log(`📈 [${index + 1}] Report data:`, reportData);
-
-            const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
-            console.log(`📈 [${index + 1}] Stats:`, stats);
-
-            // Only include if campaign was actually sent
-            if (stats.sends && stats.sends > 0) {
-              const campaignData = {
-                name: campaign.attributes?.name || "Untitled Campaign",
-                sent: stats.sends || 0,
-                opened: stats.opens_unique || 0,
-                clicked: stats.clicks_unique || 0,
-                revenue: stats.conversion_value || 0,
-                conversions: stats.conversion_uniques || 0,
-                id: campaign.id,
-              };
-              console.log(`✅ [${index + 1}] Valid campaign data:`, campaignData);
-              campaignMetrics.push(campaignData);
-            } else {
-              console.log(`⚠️ [${index + 1}] No sends for this campaign`);
-            }
-          } else {
-            const errorText = await reportResponse.text();
-            console.error(`❌ [${index + 1}] Report API failed:`, reportResponse.status, errorText);
-          }
-        } catch (err) {
-          console.error(`❌ [${index + 1}] Error fetching campaign metrics:`, err);
-        }
-      }
-
-      console.log("✅ Valid campaigns with data:", campaignMetrics.length);
-      console.log("📊 Final campaign data:", campaignMetrics);
-      setCampaignData(campaignMetrics);
-    } catch (error) {
-      console.error("Error fetching campaign data:", error);
-      setCampaignData([]);
-    } finally {
-      setLoadingCampaignData(false);
-    }
-  };
-
-  // Fetch real flow data from Klaviyo using Worker proxy
-  const fetchFlowData = async (segmentId: string) => {
-    if (!userData?.klaviyoApiKey) return;
-
-    try {
-      // Step 1: Get the "Placed Order" metric ID via Worker
-      const metricsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/metrics", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
-      });
-
-      if (!metricsResponse.ok) {
-        throw new Error("Failed to fetch metrics");
-      }
-
-      const metricsData = await metricsResponse.json();
-      const placedOrderMetric = metricsData.data.find(
-        (m: any) => m.attributes.name === "Placed Order" || m.attributes.name === "Ordered Product",
-      );
-
-      if (!placedOrderMetric) {
-        console.warn("No Placed Order metric found for flows");
-        setFlowData([]);
-        return;
-      }
-
-      const metricId = placedOrderMetric.id;
-
-      // Step 2: Fetch flows list via Worker
-      const flowsResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/flows", {
-        mode: "cors",
-        headers: {
-          "X-API-Key": userData.klaviyoApiKey,
-        },
-      });
-
-      if (!flowsResponse.ok) {
-        throw new Error("Failed to fetch flows");
-      }
-
-      const flowsData = await flowsResponse.json();
-
-      // Step 3: For each flow, fetch performance using Reporting API via Worker
-      // Get ALL flows and use all-time data with rate limiting delays
-      // Limit to first 5 to avoid rate limits
-      const flowsToFetch = flowsData.data.slice(0, 5);
-      const flowMetrics = [];
-      for (let i = 0; i < flowsToFetch.length; i++) {
-        const flow = flowsToFetch[i];
-        try {
-          console.log(`📊 [${i + 1}/${flowsToFetch.length}] Fetching flow stats for: ${flow.attributes?.name}`);
-
-          // Add delay between requests (2 seconds) to avoid rate limiting
-          if (i > 0) {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-          }
-
-          // Use Worker proxy for Reporting API
-          const reportResponse = await fetch("https://aderai-api.akshat-619.workers.dev/performance/flow-reports", {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              "X-API-Key": userData.klaviyoApiKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              data: {
-                type: "flow-values-report",
-                attributes: {
-                  statistics: [
-                    "opens_unique",
-                    "clicks_unique",
-                    "open_rate",
-                    "click_rate",
-                    "conversion_uniques",
-                    "conversion_value",
-                    "conversion_rate",
-                    "sends",
-                  ],
-                  timeframe: {
-                    key: "since", // All-time data, not just last 30 days
-                  },
-                  conversion_metric_id: metricId,
-                  filter: `equals(flow_id,"${flow.id}")`,
-                },
-              },
-            }),
-          });
-
-          if (reportResponse.ok) {
-            const reportData = await reportResponse.json();
-            const stats = reportData.data?.attributes?.results?.[0]?.attributes || {};
-
-            flowMetrics.push({
-              name: flow.attributes?.name || "Untitled Flow",
-              status: flow.attributes?.status || "draft",
-              trigger_type: flow.attributes?.trigger_type || "Manual",
-              id: flow.id,
-              // Stats from Reporting API
-              sent: stats.sends || 0,
-              opened: stats.opens_unique || 0,
-              clicked: stats.clicks_unique || 0,
-              revenue: stats.conversion_value || 0,
-              conversions: stats.conversion_uniques || 0,
-            });
-          } else {
-            // If reporting API fails, return basic flow info without stats
-            flowMetrics.push({
-              name: flow.attributes?.name || "Untitled Flow",
-              status: flow.attributes?.status || "draft",
-              trigger_type: flow.attributes?.trigger_type || "Manual",
-              id: flow.id,
-            });
-          }
-        } catch (err) {
-          console.error(`❌ [${i + 1}] Error fetching flow metrics:`, err);
-          // Return basic info even if reporting fails
-          flowMetrics.push({
-            name: flow.attributes?.name || "Untitled Flow",
-            status: flow.attributes?.status || "draft",
-            trigger_type: flow.attributes?.trigger_type || "Manual",
-            id: flow.id,
-          });
-        }
-      }
-
-      console.log("✅ Flow data fetched:", flowMetrics.length);
-      setFlowData(flowMetrics);
-    } catch (error) {
-      console.error("Error fetching flow data:", error);
-      setFlowData([]);
-    }
-  };
-
-  // Generate mock campaign data for a segment (FALLBACK)
-  const getCampaignData = (segmentId: string) => {
-    if (campaignData.length > 0) {
-      return campaignData;
-    }
-
-    // Return empty if no data
-    return [];
-  };
-
-  const getFlowData = (segmentId: string) => {
-    if (flowData.length > 0) {
-      return flowData;
-    }
-
-    // Return empty if no data
-    return [];
-  };
+  // Health Score Modal
+  const [showHealthScore, setShowHealthScore] = useState(false);
+  const [selectedSegmentForHealth, setSelectedSegmentForHealth] = useState<any>(null);
 
   // Get filtered and sorted segments for table
   const getFilteredSegments = () => {
@@ -2404,11 +2337,8 @@ export default function AderaiApp() {
                             <td className="px-6 py-4 text-center">
                               <button
                                 onClick={() => {
-                                  setSelectedSegmentForCampaign(segment.id);
-                                  setShowCampaignModal(true);
-                                  // Fetch real campaign and flow data
-                                  fetchCampaignData(segment.id);
-                                  fetchFlowData(segment.id);
+                                  setSelectedSegmentForHealth(segment);
+                                  setShowHealthScore(true);
                                 }}
                                 className="px-3 py-1.5 bg-[#2A2A2A] hover:bg-[#EF3F3F] text-white text-xs rounded-lg transition"
                               >
@@ -2764,417 +2694,13 @@ export default function AderaiApp() {
           </div>
         )}
 
-        {/* Campaign Performance Modal */}
-        {showCampaignModal && selectedSegmentForCampaign && (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                  <TrendingUp className="w-7 h-7 text-[#EF3F3F]" />
-                  Campaign Performance: {segmentStats[selectedSegmentForCampaign]?.name}
-                </h3>
-                <button
-                  onClick={() => setShowCampaignModal(false)}
-                  className="text-gray-400 hover:text-white transition text-2xl"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Loading State */}
-              {loadingCampaignData ? (
-                <div className="text-center py-12">
-                  <Loader className="w-12 h-12 text-[#EF3F3F] animate-spin mx-auto mb-4" />
-                  <p className="text-gray-400">Loading campaign data from Klaviyo...</p>
-                </div>
-              ) : (
-                <>
-                  {/* Overview Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                      <div className="text-sm text-gray-400 mb-1">Total Revenue</div>
-                      <div className="text-2xl font-bold text-[#10B981]">
-                        $
-                        {getCampaignData(selectedSegmentForCampaign)
-                          .reduce((sum, c) => sum + c.revenue, 0)
-                          .toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                      <div className="text-sm text-gray-400 mb-1">Total Conversions</div>
-                      <div className="text-2xl font-bold text-white">
-                        {getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.conversions, 0)}
-                      </div>
-                    </div>
-                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                      <div className="text-sm text-gray-400 mb-1">Avg Open Rate</div>
-                      <div className="text-2xl font-bold text-white">
-                        {(
-                          (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.opened / c.sent, 0) /
-                            getCampaignData(selectedSegmentForCampaign).length) *
-                          100
-                        ).toFixed(1)}
-                        %
-                      </div>
-                    </div>
-                    <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4">
-                      <div className="text-sm text-gray-400 mb-1">Avg Click Rate</div>
-                      <div className="text-2xl font-bold text-white">
-                        {(
-                          (getCampaignData(selectedSegmentForCampaign).reduce((sum, c) => sum + c.clicked / c.sent, 0) /
-                            getCampaignData(selectedSegmentForCampaign).length) *
-                          100
-                        ).toFixed(1)}
-                        %
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Campaigns Table */}
-                  <div className="mb-8">
-                    <h4 className="text-lg font-semibold text-white mb-4">📧 Campaign Performance</h4>
-                    <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
-                      <table className="w-full">
-                        <thead className="bg-[#2A2A2A]">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                              Campaign
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Sent</th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Opened
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Clicked
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Revenue
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Conv.
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">ROI</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#2A2A2A]">
-                          {getCampaignData(selectedSegmentForCampaign).length > 0 ? (
-                            getCampaignData(selectedSegmentForCampaign).map((campaign, idx) => {
-                              const openRate = ((campaign.opened / campaign.sent) * 100).toFixed(1);
-                              const clickRate = ((campaign.clicked / campaign.sent) * 100).toFixed(1);
-                              const roi = ((campaign.revenue / (campaign.sent * 0.5)) * 100).toFixed(0); // Assume $0.50 cost per send
-
-                              return (
-                                <tr key={idx} className="hover:bg-[#1A1A1A] transition">
-                                  <td className="px-4 py-3 text-white font-medium">{campaign.name}</td>
-                                  <td className="px-4 py-3 text-right text-gray-300">
-                                    {campaign.sent.toLocaleString()}
-                                  </td>
-                                  <td className="px-4 py-3 text-right">
-                                    <div className="text-white">{campaign.opened.toLocaleString()}</div>
-                                    <div className="text-xs text-gray-500">{openRate}%</div>
-                                  </td>
-                                  <td className="px-4 py-3 text-right">
-                                    <div className="text-white">{campaign.clicked.toLocaleString()}</div>
-                                    <div className="text-xs text-gray-500">{clickRate}%</div>
-                                  </td>
-                                  <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
-                                    ${campaign.revenue.toLocaleString()}
-                                  </td>
-                                  <td className="px-4 py-3 text-right text-white">{campaign.conversions}</td>
-                                  <td className="px-4 py-3 text-right">
-                                    <span
-                                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                                        parseInt(roi) > 200
-                                          ? "bg-[#10B981]/20 text-[#10B981]"
-                                          : "bg-[#F59E0B]/20 text-[#F59E0B]"
-                                      }`}
-                                    >
-                                      {roi}%
-                                    </span>
-                                  </td>
-                                </tr>
-                              );
-                            })
-                          ) : (
-                            <tr>
-                              <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                                No campaigns found. Create campaigns in Klaviyo to see performance data here.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {/* Flows Table */}
-                  <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-white mb-4">🔄 Klaviyo Flows Performance</h4>
-                    <div className="bg-[#0A0A0A] rounded-lg overflow-hidden">
-                      <table className="w-full">
-                        <thead className="bg-[#2A2A2A]">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                              Flow Name
-                            </th>
-                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase">
-                              Status
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                              Trigger
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Sent</th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Opened
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Clicked
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Revenue
-                            </th>
-                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">
-                              Conv.
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#2A2A2A]">
-                          {getFlowData(selectedSegmentForCampaign).length > 0 ? (
-                            getFlowData(selectedSegmentForCampaign).map((flow, idx) => {
-                              const hasStats = flow.sent && flow.sent > 0;
-                              const openRate = hasStats ? (((flow.opened || 0) / flow.sent) * 100).toFixed(1) : "-";
-                              const clickRate = hasStats ? (((flow.clicked || 0) / flow.sent) * 100).toFixed(1) : "-";
-
-                              return (
-                                <tr key={idx} className="hover:bg-[#1A1A1A] transition">
-                                  <td className="px-4 py-3 text-white font-medium">{flow.name}</td>
-                                  <td className="px-4 py-3 text-center">
-                                    <span
-                                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                                        flow.status === "live"
-                                          ? "bg-[#10B981]/20 text-[#10B981]"
-                                          : "bg-gray-500/20 text-gray-400"
-                                      }`}
-                                    >
-                                      {flow.status || "Draft"}
-                                    </span>
-                                  </td>
-                                  <td className="px-4 py-3 text-gray-300 text-sm">{flow.trigger_type || "Manual"}</td>
-                                  <td className="px-4 py-3 text-right text-gray-300">
-                                    {hasStats ? (flow.sent || 0).toLocaleString() : "-"}
-                                  </td>
-                                  <td className="px-4 py-3 text-right">
-                                    {hasStats ? (
-                                      <>
-                                        <div className="text-white">{(flow.opened || 0).toLocaleString()}</div>
-                                        <div className="text-xs text-gray-500">{openRate}%</div>
-                                      </>
-                                    ) : (
-                                      <span className="text-gray-500">-</span>
-                                    )}
-                                  </td>
-                                  <td className="px-4 py-3 text-right">
-                                    {hasStats ? (
-                                      <>
-                                        <div className="text-white">{(flow.clicked || 0).toLocaleString()}</div>
-                                        <div className="text-xs text-gray-500">{clickRate}%</div>
-                                      </>
-                                    ) : (
-                                      <span className="text-gray-500">-</span>
-                                    )}
-                                  </td>
-                                  <td className="px-4 py-3 text-right text-[#10B981] font-semibold">
-                                    {hasStats ? `$${(flow.revenue || 0).toLocaleString()}` : "-"}
-                                  </td>
-                                  <td className="px-4 py-3 text-right text-white">
-                                    {hasStats ? flow.conversions || 0 : "-"}
-                                  </td>
-                                </tr>
-                              );
-                            })
-                          ) : (
-                            <tr>
-                              <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                                No flows found. Create flows in Klaviyo to see performance data here.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                    {getFlowData(selectedSegmentForCampaign).length > 0 &&
-                      !getFlowData(selectedSegmentForCampaign)[0].sent && (
-                        <div className="mt-3 flex items-start gap-2 text-sm text-gray-400">
-                          <Info className="w-4 h-4 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
-                          <p>
-                            Performance metrics will appear after flows have sent messages. Data shown is from the last
-                            30 days.
-                          </p>
-                        </div>
-                      )}
-                  </div>
-
-                  {/* Close Button */}
-                  <div className="flex justify-end mt-6">
-                    <button
-                      onClick={() => setShowCampaignModal(false)}
-                      className="px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Export Modal */}
-        {showExportModal && (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Download className="w-7 h-7 text-[#EF3F3F]" />
-                  Export Report
-                </h3>
-                <button onClick={() => setShowExportModal(false)} className="text-gray-400 hover:text-white transition">
-                  ✕
-                </button>
-              </div>
-
-              {/* Date Range Selection */}
-              <div className="mb-6">
-                <label className="block text-sm text-gray-400 mb-3">Report Date Range</label>
-                <div className="grid grid-cols-4 gap-3">
-                  {(["7", "30", "60", "90"] as const).map((days) => (
-                    <button
-                      key={days}
-                      onClick={() => setReportDateRange(days)}
-                      className={`px-4 py-3 rounded-lg transition ${
-                        reportDateRange === days
-                          ? "bg-[#EF3F3F] text-white"
-                          : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
-                      }`}
-                    >
-                      Last {days}d
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Metrics Selection */}
-              <div className="mb-6">
-                <label className="block text-sm text-gray-400 mb-3">Include Metrics</label>
-                <div className="space-y-2">
-                  {[
-                    { id: "profileCount", label: "Member Count" },
-                    { id: "netChange", label: "Net Change (7d)" },
-                    { id: "changePercent", label: "Change Percentage" },
-                    { id: "percentage", label: "Percentage of Total" },
-                  ].map((metric) => (
-                    <label
-                      key={metric.id}
-                      className="flex items-center gap-3 p-3 bg-[#2A2A2A] hover:bg-[#3A3A3A] rounded-lg cursor-pointer transition"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedMetrics.includes(metric.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedMetrics((prev) => [...prev, metric.id]);
-                          } else {
-                            setSelectedMetrics((prev) => prev.filter((m) => m !== metric.id));
-                          }
-                        }}
-                        className="w-5 h-5 rounded border-[#2A2A2A] bg-[#0A0A0A] text-[#EF3F3F] focus:ring-[#EF3F3F]"
-                      />
-                      <span className="text-white">{metric.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Export Format */}
-              <div className="mb-6">
-                <label className="block text-sm text-gray-400 mb-3">Export Format</label>
-                <div className="grid grid-cols-3 gap-3">
-                  <button
-                    onClick={() => setExportFormat("csv")}
-                    className={`p-4 rounded-lg transition flex flex-col items-center gap-2 ${
-                      exportFormat === "csv"
-                        ? "bg-[#EF3F3F] text-white"
-                        : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
-                    }`}
-                  >
-                    <FileText className="w-8 h-8" />
-                    <span className="text-sm font-medium">CSV</span>
-                  </button>
-                  <button
-                    onClick={() => setExportFormat("excel")}
-                    className={`p-4 rounded-lg transition flex flex-col items-center gap-2 ${
-                      exportFormat === "excel"
-                        ? "bg-[#EF3F3F] text-white"
-                        : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
-                    }`}
-                  >
-                    <FileSpreadsheet className="w-8 h-8" />
-                    <span className="text-sm font-medium">Excel</span>
-                  </button>
-                  <button
-                    onClick={() => setExportFormat("pdf")}
-                    className={`p-4 rounded-lg transition flex flex-col items-center gap-2 ${
-                      exportFormat === "pdf"
-                        ? "bg-[#EF3F3F] text-white"
-                        : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
-                    }`}
-                  >
-                    <File className="w-8 h-8" />
-                    <span className="text-sm font-medium">PDF</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Export Info */}
-              <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg p-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-[#EF3F3F] flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-gray-300">
-                    <p className="mb-2">Your report will include:</p>
-                    <ul className="list-disc list-inside space-y-1 text-gray-400">
-                      <li>{filteredSegments.length} segments</li>
-                      <li>Summary statistics</li>
-                      <li>Last {reportDateRange} days of data</li>
-                      <li>{selectedMetrics.length} selected metrics</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowExportModal(false)}
-                  className="flex-1 px-6 py-3 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white rounded-lg transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    if (exportFormat === "csv") exportToCSV();
-                    else if (exportFormat === "excel") exportToExcel();
-                    else exportToPDF();
-                    setShowExportModal(false);
-                  }}
-                  disabled={selectedMetrics.length === 0}
-                  className="flex-1 px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  <Download className="w-5 h-5" />
-                  Export {exportFormat.toUpperCase()}
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* Health Score Modal */}
+        {showHealthScore && selectedSegmentForHealth && (
+          <HealthScoreModal
+            segment={selectedSegmentForHealth}
+            stats={segmentStats[selectedSegmentForHealth.id]}
+            onClose={() => setShowHealthScore(false)}
+          />
         )}
 
         {/* Footer */}
