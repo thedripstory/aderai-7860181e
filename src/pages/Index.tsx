@@ -383,9 +383,11 @@ const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) =>
             </div>
             <div className="bg-gray-900 rounded-lg p-4">
               <div className="text-gray-400 text-sm mb-1">7-Day Growth</div>
-              <div className={`text-2xl font-bold ${stats.changePercent >= 0 ? "text-green-500" : "text-red-500"}`}>
-                {stats.changePercent >= 0 ? "+" : ""}
-                {stats.changePercent.toFixed(1)}%
+              <div
+                className={`text-2xl font-bold ${(stats.changePercent ?? 0) >= 0 ? "text-green-500" : "text-red-500"}`}
+              >
+                {(stats.changePercent ?? 0) >= 0 ? "+" : ""}
+                {(stats.changePercent ?? 0).toFixed(1)}%
               </div>
             </div>
             <div className="bg-gray-900 rounded-lg p-4">
@@ -875,6 +877,10 @@ export default function AderaiApp() {
             name: data.data?.attributes?.name || segment.attributes?.name,
             created: data.data?.attributes?.created,
             updated: data.data?.attributes?.updated,
+            membersAdded: 0,
+            membersRemoved: 0,
+            netChange: 0,
+            changePercent: 0,
           };
 
           // Try to fetch growth data (7-day change)
@@ -904,6 +910,10 @@ export default function AderaiApp() {
         stats[segment.id] = {
           profileCount: 0,
           name: segment.attributes?.name || "Unknown Segment",
+          membersAdded: 0,
+          membersRemoved: 0,
+          netChange: 0,
+          changePercent: 0,
         };
       }
     }
@@ -2695,7 +2705,7 @@ export default function AderaiApp() {
         )}
 
         {/* Health Score Modal */}
-        {showHealthScore && selectedSegmentForHealth && (
+        {showHealthScore && selectedSegmentForHealth && segmentStats[selectedSegmentForHealth.id] && (
           <HealthScoreModal
             segment={selectedSegmentForHealth}
             stats={segmentStats[selectedSegmentForHealth.id]}
