@@ -26,6 +26,12 @@ import {
   Activity,
   Lightbulb,
   X,
+  Building2,
+  Sparkles,
+  Plus,
+  Gift,
+  LogOut,
+  Copy,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -454,14 +460,19 @@ const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) =>
   );
 };
 export default function AderaiApp() {
-  // View state - ADDED 'analytics'
+  // View state - Extended with all views
   const [view, setView] = useState<
-    "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics"
+    "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "auth" | "ai-suggester" | "affiliate" | "settings"
   >("login");
 
   // Auth state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [authView, setAuthView] = useState<"choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login">("choice");
+  const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [error, setError] = useState("");
 
   // Onboarding state
   const [accountName, setAccountName] = useState("");
@@ -473,6 +484,14 @@ export default function AderaiApp() {
   const [newCustomerDays, setNewCustomerDays] = useState("30");
   const [lapsedDays, setLapsedDays] = useState("60");
   const [churnedDays, setChurnedDays] = useState("180");
+  const [onboardingStep, setOnboardingStep] = useState(1);
+  const [apiKey, setApiKey] = useState("");
+  const [apiKeyValid, setApiKeyValid] = useState(false);
+  const [newClientName, setNewClientName] = useState("");
+  const [newClientApiKey, setNewClientApiKey] = useState("");
+  const [activeKeyIndex, setActiveKeyIndex] = useState(0);
+  const [klaviyoKeys, setKlaviyoKeys] = useState<any[]>([]);
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
 
   // Auto-detect currency based on IP geolocation
   useEffect(() => {
@@ -550,6 +569,9 @@ export default function AderaiApp() {
   const [analyticsProgress, setAnalyticsProgress] = useState({ current: 0, total: 0 });
   const [aderaiSegmentsOnly, setAderaiSegmentsOnly] = useState(true);
   const [segmentSearch, setSegmentSearch] = useState("");
+  const [selectedSegmentForHealth, setSelectedSegmentForHealth] = useState<any>(null);
+  const [showHealthScore, setShowHealthScore] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(["Core Essentials"]);
 
   // Chart state - NEW
   const [chartTimeframe, setChartTimeframe] = useState<"30" | "60" | "90">("30");
@@ -575,6 +597,16 @@ export default function AderaiApp() {
   });
 
   // Campaign integration state - NEW
+  
+  // AI Suggester state
+  const [aiStep, setAiStep] = useState(1);
+  const [aiGoal, setAiGoal] = useState("");
+  const [aiIndustry, setAiIndustry] = useState("");
+  const [aiChallenge, setAiChallenge] = useState("");
+  const [aiFrequency, setAiFrequency] = useState("");
+  const [aiSpecific, setAiSpecific] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
 
   // Load user on mount
   useEffect(() => {
@@ -1209,12 +1241,100 @@ export default function AderaiApp() {
     }
   };
 
+  // Additional helper functions
+  const validateApiKey = async () => {
+    setLoading(true);
+    try {
+      // Simulate API key validation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setApiKeyValid(true);
+      return true;
+    } catch {
+      setApiKeyValid(false);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBrandSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      // Simulate signup
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setView("onboarding");
+    } catch (err) {
+      setError("Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAgencySignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      // Simulate signup
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setView("onboarding");
+    } catch (err) {
+      setError("Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveOnboarding = () => {
+    handleOnboarding();
+  };
+
+  const handleCreateSegments = () => {
+    createSegments();
+  };
+
+  const handleAddClient = async () => {
+    if (!newClientName || !newClientApiKey) {
+      alert("Please fill in all fields");
+      return;
+    }
+    // Simulate adding client
+    setShowAddClientModal(false);
+    setNewClientName("");
+    setNewClientApiKey("");
+  };
+
+  const handleAISuggest = async () => {
+    setAiLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setAiSuggestions([
+        { id: "ai-1", name: "High-Value Browsers", desc: "Frequent visitors who haven't purchased" },
+        { id: "ai-2", name: "Weekend Shoppers", desc: "Customers who buy on weekends" },
+      ]);
+      setAiStep(6);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleCreateAISegment = (suggestion: any) => {
+    alert(`Creating segment: ${suggestion.name}`);
+    setView("dashboard");
+  };
+
+  const copyAffiliateLink = () => {
+    const link = `https://aderai.com/ref/${userData?.email || 'user'}`;
+    navigator.clipboard.writeText(link);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
   // State for campaign/flow data
 
   // Fetch real campaign data from Klaviyo using Worker proxy
-  // Health Score Modal
-  const [showHealthScore, setShowHealthScore] = useState(false);
-  const [selectedSegmentForHealth, setSelectedSegmentForHealth] = useState<any>(null);
 
   // Get filtered and sorted segments for table
   const getFilteredSegments = () => {
@@ -1393,7 +1513,7 @@ export default function AderaiApp() {
                 </div>
 
                 <button
-                  onClick={authView === 'brand-signup' ? handleBrandSignup : () => handleLogin('brand')}
+                  onClick={authView === 'brand-signup' ? handleBrandSignup : () => handleLogin()}
                   disabled={loading}
                   className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
                 >
@@ -1472,7 +1592,7 @@ export default function AderaiApp() {
                 </div>
 
                 <button
-                  onClick={authView === 'agency-signup' ? handleAgencySignup : () => handleLogin('agency')}
+                  onClick={authView === 'agency-signup' ? handleAgencySignup : () => handleLogin()}
                   disabled={loading}
                   className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
                 >
