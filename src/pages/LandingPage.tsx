@@ -8,6 +8,7 @@ import { AnimatedSegmentVisual } from "@/components/AnimatedSegmentVisual";
 import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
+import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -101,7 +102,9 @@ export default function LandingPage() {
               <MousePointerClick className="w-8 h-8 text-accent mb-4" />
               <div className="text-sm text-accent font-semibold mb-2">With Aderai</div>
               <div className="text-4xl font-bold mb-3 relative inline-block">
-                <CircleDoodle delay="1.5s">30 seconds</CircleDoodle>
+                <CircleDoodle delay="1.5s">
+                  <AnimatedTimeCounter />
+                </CircleDoodle>
               </div>
               <div className="text-sm text-muted-foreground">
                 Select segments, customize to your metrics, deploy. All segments auto-created.
