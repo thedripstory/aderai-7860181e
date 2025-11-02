@@ -78,9 +78,9 @@ export default function LandingPage() {
 
           {/* Main Hero Content */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-primary/10 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/20 mb-8 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">AI-powered segmentation engine</span>
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-500/20 to-orange-600/20 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-orange-500/40 mb-8 animate-fade-in shadow-lg shadow-orange-500/10">
+              <CheckCircle2 className="w-5 h-5 text-orange-500 fill-orange-500/20" />
+              <span className="text-base font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wide">Official Klaviyo Partner</span>
             </div>
             
             <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
