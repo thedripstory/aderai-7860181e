@@ -459,21 +459,25 @@ const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) =>
     </div>
   );
 };
-interface KlaviyoAIProps {
-  initialView?: "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "auth" | "ai-suggester" | "affiliate" | "settings";
-  initialAuthView?: "choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login";
-}
-
-export default function AderaiApp({ initialView = "login", initialAuthView = "choice" }: KlaviyoAIProps = {}) {
+export default function AderaiApp() {
   // View state - Extended with all views
   const [view, setView] = useState<
-    "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "auth" | "ai-suggester" | "affiliate" | "settings"
-  >(initialView);
+    "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "ai-suggester" | "affiliate" | "settings"
+  >("dashboard");
 
-  // Auth state
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [authView, setAuthView] = useState<"choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login">(initialAuthView);
+  // Check auth on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("aderai_user");
+    if (!saved) {
+      // Not authenticated, redirect to login
+      window.location.href = "/login";
+    } else {
+      const user = JSON.parse(saved);
+      setUserData(user);
+    }
+  }, []);
+
+  // App state (removed auth states - handled by separate Auth component)
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -613,55 +617,9 @@ export default function AderaiApp({ initialView = "login", initialAuthView = "ch
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
 
-  // Load user on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("aderai_user");
-    if (saved) {
-      const user = JSON.parse(saved);
-      setUserData(user);
-      setView("dashboard");
-    }
-  }, []);
+  // Load user on mount removed - handled in initial useEffect
 
-  // Auth functions
-  const handleLogin = () => {
-    if (!email || !password) {
-      alert("Please fill in all fields");
-      return;
-    }
-
-    const saved = localStorage.getItem(`aderai_${email}`);
-    if (!saved) {
-      alert("Account not found. Please sign up.");
-      return;
-    }
-
-    const user = JSON.parse(saved);
-    if (user.password !== password) {
-      alert("Incorrect password");
-      return;
-    }
-
-    setUserData(user);
-    localStorage.setItem("aderai_user", JSON.stringify(user));
-    setView("dashboard");
-  };
-
-  const handleSignup = () => {
-    if (!email || !password) {
-      alert("Please fill in all fields");
-      return;
-    }
-
-    const exists = localStorage.getItem(`aderai_${email}`);
-    if (exists) {
-      alert("Account already exists. Please login.");
-      setView("login");
-      return;
-    }
-
-    setView("onboarding");
-  };
+  // Auth functions removed - now handled by separate Auth page component
 
   const handleOnboarding = () => {
     if (!accountName || !klaviyoApiKey) {
@@ -669,8 +627,12 @@ export default function AderaiApp({ initialView = "login", initialAuthView = "ch
       return;
     }
 
+    const saved = localStorage.getItem("aderai_user");
+    if (!saved) return;
+    
+    const existingUser = JSON.parse(saved);
     const user: UserData = {
-      email,
+      email: existingUser.email,
       accountName,
       klaviyoApiKey,
       currency,
@@ -682,19 +644,9 @@ export default function AderaiApp({ initialView = "login", initialAuthView = "ch
       churnedDays,
     };
 
-    localStorage.setItem(`aderai_${email}`, JSON.stringify({ ...user, password }));
     localStorage.setItem("aderai_user", JSON.stringify(user));
-
     setUserData(user);
     setView("dashboard");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("aderai_user");
-    setUserData(null);
-    setEmail("");
-    setPassword("");
-    setView("login");
   };
 
   // Segment functions
@@ -1262,38 +1214,10 @@ export default function AderaiApp({ initialView = "login", initialAuthView = "ch
     }
   };
 
-  const handleBrandSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      // Simulate signup
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setView("onboarding");
-    } catch (err) {
-      setError("Signup failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAgencySignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      // Simulate signup
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setView("onboarding");
-    } catch (err) {
-      setError("Signup failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSaveOnboarding = () => {
-    handleOnboarding();
+  const handleLogout = () => {
+    localStorage.removeItem("aderai_user");
+    setUserData(null);
+    window.location.href = "/login";
   };
 
   const handleCreateSegments = () => {
@@ -1364,261 +1288,6 @@ export default function AderaiApp({ initialView = "login", initialAuthView = "ch
   };
 
   // ===== RENDER VIEWS =====
-
-
-  // ===== VIEWS WITH NEW FEATURES (AI, Agency, Affiliate) =====
-  if (view === 'auth') {
-    if (authView === 'choice') {
-      return (
-        <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
-          <div className="max-w-4xl w-full">
-            <div className="text-center mb-12">
-              <h1 className="text-5xl font-black mb-4">
-                <span className="text-[#EF3F3F]">ADER</span>
-                <span className="text-white">AI</span>
-              </h1>
-              <p className="text-gray-400 text-lg">Choose your account type</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Brand Card */}
-              <div className="bg-[#1A1A1A] border-2 border-[#EF3F3F] rounded-xl p-8 hover:border-[#DC2626] transition cursor-pointer"
-                   onClick={() => setAuthView('brand-signup')}>
-                <div className="w-16 h-16 bg-[#EF3F3F]/10 rounded-lg flex items-center justify-center mb-6 mx-auto">
-                  <Building2 className="w-8 h-8 text-[#EF3F3F]" />
-                </div>
-                <h2 className="text-2xl font-bold text-center mb-4">For Brands</h2>
-                <p className="text-gray-400 text-center mb-6">
-                  Single Klaviyo account. One-time payment of $49. Lifetime access to all features.
-                </p>
-                <ul className="space-y-2 mb-6">
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    70 pre-built segments
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    AI segment suggester
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    Real-time analytics
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    API key locked for security
-                  </li>
-                </ul>
-                <button className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white py-3 rounded-lg font-bold transition">
-                  Continue as Brand
-                </button>
-              </div>
-
-              {/* Agency Card */}
-              <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8 hover:border-[#EF3F3F] transition cursor-pointer"
-                   onClick={() => setAuthView('agency-signup')}>
-                <div className="w-16 h-16 bg-[#2A2A2A] rounded-lg flex items-center justify-center mb-6 mx-auto">
-                  <Users className="w-8 h-8 text-gray-400" />
-                </div>
-                <h2 className="text-2xl font-bold text-center mb-4">For Agencies</h2>
-                <p className="text-gray-400 text-center mb-6">
-                  Manage 2-10 client accounts. Starting at $89/month. Special agency dashboard.
-                </p>
-                <ul className="space-y-2 mb-6">
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    All brand features
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    Multi-client management
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    Bulk operations
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    Volume pricing discounts
-                  </li>
-                </ul>
-                <button className="w-full bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white py-3 rounded-lg font-bold transition">
-                  Continue as Agency
-                </button>
-              </div>
-            </div>
-
-            <div className="text-center mt-8">
-              <p className="text-gray-500 text-sm">
-                Already have an account?{" "}
-                <button className="text-[#EF3F3F] hover:underline" onClick={() => setAuthView('brand-login')}>
-                  Sign In
-                </button>
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Brand Signup/Login
-    if (authView === 'brand-signup' || authView === 'brand-login') {
-      return (
-        <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
-          <div className="w-full max-w-md">
-            <button onClick={() => setAuthView('choice')} className="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-              ← Back
-            </button>
-            
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8">
-              <h2 className="text-3xl font-black text-center mb-6">
-                {authView === 'brand-signup' ? 'Create Brand Account' : 'Brand Login'}
-              </h2>
-
-              {error && (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4">
-                  <p className="text-red-500 text-sm">{error}</p>
-                </div>
-              )}
-
-              <div className="space-y-4">
-                {authView === 'brand-signup' && (
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-2">Brand Name</label>
-                    <input
-                      type="text"
-                      value={accountName}
-                      onChange={(e) => setAccountName(e.target.value)}
-                      placeholder="My E-commerce Store"
-                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@brand.com"
-                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
-                  />
-                </div>
-
-                <button
-                  onClick={authView === 'brand-signup' ? handleBrandSignup : () => handleLogin()}
-                  disabled={loading}
-                  className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
-                >
-                  {loading ? 'Please wait...' : authView === 'brand-signup' ? 'Create Account' : 'Sign In'}
-                </button>
-              </div>
-
-              <div className="mt-6 text-center">
-                <button 
-                  onClick={() => setAuthView(authView === 'brand-signup' ? 'brand-login' : 'brand-signup')}
-                  className="text-sm text-gray-400 hover:text-white"
-                >
-                  {authView === 'brand-signup' ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Agency Signup/Login (similar structure)
-    if (authView === 'agency-signup' || authView === 'agency-login') {
-      return (
-        <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
-          <div className="w-full max-w-md">
-            <button onClick={() => setAuthView('choice')} className="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-              ← Back
-            </button>
-            
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8">
-              <h2 className="text-3xl font-black text-center mb-6">
-                {authView === 'agency-signup' ? 'Create Agency Account' : 'Agency Login'}
-              </h2>
-
-              {error && (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4">
-                  <p className="text-red-500 text-sm">{error}</p>
-                </div>
-              )}
-
-              <div className="space-y-4">
-                {authView === 'agency-signup' && (
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-2">Agency Name</label>
-                    <input
-                      type="text"
-                      value={accountName}
-                      onChange={(e) => setAccountName(e.target.value)}
-                      placeholder="My Digital Agency"
-                      className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@agency.com"
-                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
-                  />
-                </div>
-
-                <button
-                  onClick={authView === 'agency-signup' ? handleAgencySignup : () => handleLogin()}
-                  disabled={loading}
-                  className="w-full bg-[#EF3F3F] hover:bg-[#DC2626] text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
-                >
-                  {loading ? 'Please wait...' : authView === 'agency-signup' ? 'Create Account' : 'Sign In'}
-                </button>
-              </div>
-
-              <div className="mt-6 text-center">
-                <button 
-                  onClick={() => setAuthView(authView === 'agency-signup' ? 'agency-login' : 'agency-signup')}
-                  className="text-sm text-gray-400 hover:text-white"
-                >
-                  {authView === 'agency-signup' ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-  }
 
   // ONBOARDING VIEW (condensed from original - Step 1-3 in single flow)
   if (view === 'onboarding') {
@@ -1751,7 +1420,7 @@ export default function AderaiApp({ initialView = "login", initialAuthView = "ch
                 </div>
               </div>
               <button
-                onClick={handleSaveOnboarding}
+                onClick={handleOnboarding}
                 disabled={loading}
                 className="w-full mt-4 bg-[#EF3F3F] hover:bg-[#DC2626] text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
               >
