@@ -230,10 +230,10 @@ export default function LandingPage() {
             <TrustLogos />
           </div>
         </div>
+        
+        {/* Torn Paper Effect */}
+        <TornPaperDivider className="text-background" />
       </section>
-
-      {/* Torn Paper Divider */}
-      <TornPaperDivider className="text-muted" />
 
       {/* Automation Section */}
       <section className="py-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative overflow-hidden">
