@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, MessageSquare } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -11,11 +11,19 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { EnquiryModal } from "@/components/EnquiryModal";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
+import dashboardRevenue from "@/assets/dashboard-revenue.png";
+import dashboardMetrics from "@/assets/dashboard-metrics.png";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+      setScrollY(window.scrollY);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -79,8 +87,53 @@ export default function LandingPage() {
             </div>
           </div>
 
+          {/* Floating Dashboard Screenshots */}
+          <div 
+            ref={heroRef}
+            className="absolute inset-0 pointer-events-none overflow-hidden"
+            style={{ height: '100%' }}
+          >
+            {/* Left Dashboard - Revenue Chart */}
+            <div 
+              className="absolute left-0 top-1/4 -translate-x-1/4 w-80 lg:w-96 opacity-0 animate-fade-in hidden lg:block"
+              style={{
+                transform: `translateX(calc(-25% + ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(-8deg)`,
+                animationDelay: "600ms",
+                animationFillMode: "forwards",
+                transition: "transform 0.1s ease-out"
+              }}
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
+                <img 
+                  src={dashboardRevenue} 
+                  alt="Revenue Analytics Dashboard"
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+
+            {/* Right Dashboard - Metrics */}
+            <div 
+              className="absolute right-0 top-1/3 translate-x-1/4 w-80 lg:w-96 opacity-0 animate-fade-in hidden lg:block"
+              style={{
+                transform: `translateX(calc(25% - ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(8deg)`,
+                animationDelay: "800ms",
+                animationFillMode: "forwards",
+                transition: "transform 0.1s ease-out"
+              }}
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
+                <img 
+                  src={dashboardMetrics} 
+                  alt="User Metrics Dashboard"
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Main Hero Content */}
-          <div className="text-center mb-16">
+          <div className="relative text-center mb-16 z-10">
             <div className="inline-flex items-center gap-2 bg-gradient-to-br from-orange-400 via-yellow-500 to-orange-600 backdrop-blur-sm px-5 py-2.5 rounded-full border border-orange-300/30 mb-8 animate-fade-in shadow-lg shadow-orange-500/20 hover:scale-110 hover:rotate-2 hover:shadow-2xl hover:shadow-orange-400/40 transition-all duration-300 cursor-pointer relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <CheckCircle2 className="w-4 h-4 text-white relative z-10" />
