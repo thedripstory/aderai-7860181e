@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Quote } from "lucide-react";
+import { Quote, Star } from "lucide-react";
 
 const testimonials = [
   {
@@ -46,26 +46,33 @@ export function RevolvingTestimonials() {
 
   return (
     <div className="mt-8 relative">
-      <div className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 rounded-2xl p-8 border border-primary/20 backdrop-blur-sm overflow-hidden relative">
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-10 border border-border overflow-hidden relative">
         {/* Quote icon */}
-        <div className="absolute top-6 left-6 opacity-10">
-          <Quote className="w-12 h-12 text-primary" />
+        <div className="absolute top-6 left-6 opacity-5">
+          <Quote className="w-10 h-10 text-foreground" />
         </div>
         
         {/* Testimonial content */}
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <div className={`transition-all duration-300 ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
-            <p className="text-xl md:text-2xl font-bold text-foreground mb-4 leading-relaxed">
+            {/* 5 Star Rating */}
+            <div className="flex justify-center gap-1 mb-4">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 fill-foreground text-foreground" />
+              ))}
+            </div>
+            
+            <p className="text-lg md:text-xl font-medium text-foreground/90 mb-4 leading-relaxed">
               "{testimonials[currentIndex].quote}"
             </p>
-            <p className="text-sm font-semibold text-primary uppercase tracking-wider">
-              — {testimonials[currentIndex].author}
+            <p className="text-sm font-medium text-muted-foreground tracking-wide">
+              {testimonials[currentIndex].author}
             </p>
           </div>
         </div>
 
         {/* Progress indicators */}
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center gap-2 mt-8">
           {testimonials.map((_, index) => (
             <button
               key={index}
@@ -76,28 +83,20 @@ export function RevolvingTestimonials() {
                   setIsAnimating(false);
                 }, 300);
               }}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              className={`h-1 rounded-full transition-all duration-300 ${
                 index === currentIndex 
-                  ? 'w-8 bg-primary' 
-                  : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  ? 'w-8 bg-foreground/60' 
+                  : 'w-1 bg-muted-foreground/20 hover:bg-muted-foreground/40'
               }`}
               aria-label={`Go to testimonial ${index + 1}`}
             />
           ))}
         </div>
-
-        {/* Animated gradient line */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-30">
-          <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-white to-transparent animate-[slide-in-right_3s_ease-in-out_infinite]" />
-        </div>
       </div>
 
       {/* Supporting text */}
-      <div className="mt-4 text-center text-sm text-muted-foreground">
-        <span className="inline-flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          Trusted by industry leaders and top publications
-        </span>
+      <div className="mt-4 text-center text-xs text-muted-foreground">
+        Trusted by industry leaders and top publications
       </div>
     </div>
   );
