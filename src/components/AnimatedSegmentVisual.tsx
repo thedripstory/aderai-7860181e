@@ -61,7 +61,7 @@ export const AnimatedSegmentVisual = () => {
           {/* Content */}
           <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
             {/* Left: Step Info */}
-            <div className="flex flex-col justify-center space-y-8">
+            <div className="flex flex-col justify-center space-y-6">
               {/* Step number */}
               <div className="opacity-0 animate-fade-in">
                 <span className="text-7xl font-bold text-primary/20">
@@ -91,48 +91,14 @@ export const AnimatedSegmentVisual = () => {
               </p>
             </div>
 
-            {/* Right: Minimal Visualization */}
-            <div className="flex items-center justify-center opacity-0 animate-fade-in" style={{
-            animationDelay: "200ms",
-            animationFillMode: "forwards"
-          }}>
-              <div className="relative w-full aspect-square max-w-[300px] mx-auto">
-                {/* Central icon display */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-48 h-48">
-                    {/* Outer ring with dots on orbit */}
-                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/20 animate-pulse" style={{
-                    animationDuration: "3s"
-                  }} />
-                    
-                    {/* Progress dots - positioned on the outer ring */}
-                    {STEPS.map((step, i) => {
-                    const angle = i * 90 - 90; // 0°, 90°, 180°, 270° starting from top
-                    const radius = 96; // Half of 192px (48*4 = 192px total width)
-                    const x = Math.cos(angle * Math.PI / 180) * radius;
-                    const y = Math.sin(angle * Math.PI / 180) * radius;
-                    const isActive = i === activeIndex;
-                    const isPast = i < activeIndex;
-                    return <div key={i} className="absolute transition-all duration-700" style={{
-                      left: '50%',
-                      top: '50%',
-                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
-                    }}>
-                          <div className={`w-3 h-3 rounded-full transition-all duration-500 ${isActive ? "bg-primary scale-150 shadow-lg shadow-primary/50" : isPast ? "bg-primary/50" : "bg-border"}`} />
-                        </div>;
-                  })}
-                    
-                    {/* Middle ring */}
-                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/10" />
-                    
-                    {/* Center icon */}
-                    <div className="absolute inset-0 w-48 h-48 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                        <activeStep.icon className="w-10 h-10 text-primary" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            {/* Right: Fixed Placeholder Image */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border shadow-lg">
+                <img 
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" 
+                  alt="Dashboard visualization placeholder"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
