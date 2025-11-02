@@ -241,7 +241,7 @@ export default function LandingPage() {
               </div>
               
               <div>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">L</h2>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">Literal 1 click segmentation.</h2>
                 
                 <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">With official API integration, Aderai deploys high-impact audience segments directly into your Klaviyo account, instantly.</p>
               </div>
