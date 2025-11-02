@@ -93,7 +93,7 @@ export default function LandingPage() {
             </h1>
             
             <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium">
-              <AnimatedUnderline delay="1s">70 segments</AnimatedUnderline> in 30 seconds. What takes <AnimatedUnderline delay="1.2s">10+ hours</AnimatedUnderline> manually, done <strong className="text-foreground">instantly</strong> with Aderai.
+              70 segments in 30 seconds- what takes 10+ hours manually, Aderai does <CircleDoodle delay="1s"><strong className="text-foreground">instantly.</strong></CircleDoodle>
             </p>
             
             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">Deploy expert-grade customer segmentation without the agency price tag.</p>
