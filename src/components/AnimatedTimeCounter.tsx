@@ -19,7 +19,7 @@ export const AnimatedTimeCounter = () => {
     const targetTime = 30; // 30 seconds
     const duration = 2500; // Animation duration in ms
     const startTime = Date.now();
-    const startValue = timeInSeconds;
+    const startValue = 36000; // Always start from 10 hours
 
     // Easing function for deceleration
     const easeOutExpo = (t: number): number => {
@@ -42,7 +42,7 @@ export const AnimatedTimeCounter = () => {
     };
 
     requestAnimationFrame(animate);
-  }, [isAnimating, timeInSeconds]);
+  }, [isAnimating]);
 
   const formatTime = (seconds: number): string => {
     if (seconds >= 3600) {
