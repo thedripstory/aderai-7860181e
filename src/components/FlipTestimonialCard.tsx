@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Quote, TrendingUp } from 'lucide-react';
 
 interface FlipTestimonialCardProps {
@@ -24,10 +24,24 @@ export const FlipTestimonialCard = ({
   delay = "0s"
 }: FlipTestimonialCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  
+  // Auto-flip randomly to hint at back content
+  useEffect(() => {
+    const randomDelay = Math.random() * 10000 + 5000; // Random between 5-15 seconds
+    
+    const autoFlipInterval = setInterval(() => {
+      setIsFlipped(true);
+      setTimeout(() => {
+        setIsFlipped(false);
+      }, 3000); // Show back for 3 seconds
+    }, randomDelay + 15000); // Then repeat every 15+ seconds
+    
+    return () => clearInterval(autoFlipInterval);
+  }, []);
 
   return (
     <div 
-      className="group perspective-1000 h-[400px] cursor-pointer animate-fade-in"
+      className="group perspective-1000 h-[480px] cursor-pointer animate-fade-in"
       style={{ animationDelay: delay }}
       onClick={() => setIsFlipped(!isFlipped)}
     >
@@ -50,7 +64,7 @@ export const FlipTestimonialCard = ({
 
             <div className="flex-1 mb-6">
               <h3 className="text-2xl font-bold mb-4">{name}'s Breakthrough</h3>
-              <p className="text-muted-foreground leading-relaxed line-clamp-5">
+              <p className="text-muted-foreground leading-relaxed text-sm">
                 {story}
               </p>
             </div>
