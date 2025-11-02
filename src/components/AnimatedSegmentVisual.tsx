@@ -96,29 +96,19 @@ export const AnimatedSegmentVisual = () => {
             animationDelay: "200ms",
             animationFillMode: "forwards"
           }}>
-              <div className="relative w-full aspect-square max-w-md">
+              <div className="relative w-full aspect-square max-w-[300px] mx-auto">
                 {/* Central icon display */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative">
-                    {/* Outer ring */}
+                  <div className="relative w-48 h-48">
+                    {/* Outer ring with dots on orbit */}
                     <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/20 animate-pulse" style={{
                     animationDuration: "3s"
                   }} />
                     
-                    {/* Middle ring */}
-                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/10" />
-                    
-                    {/* Center icon */}
-                    <div className="absolute inset-0 w-48 h-48 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                        <activeStep.icon className="w-10 h-10 text-primary" />
-                      </div>
-                    </div>
-
-                    {/* Progress dots */}
+                    {/* Progress dots - positioned on the outer ring */}
                     {STEPS.map((step, i) => {
-                    const angle = i * 90 - 90;
-                    const radius = 96;
+                    const angle = i * 90 - 90; // 0°, 90°, 180°, 270° starting from top
+                    const radius = 96; // Half of 192px (48*4 = 192px total width)
                     const x = Math.cos(angle * Math.PI / 180) * radius;
                     const y = Math.sin(angle * Math.PI / 180) * radius;
                     const isActive = i === activeIndex;
@@ -131,6 +121,16 @@ export const AnimatedSegmentVisual = () => {
                           <div className={`w-3 h-3 rounded-full transition-all duration-500 ${isActive ? "bg-primary scale-150 shadow-lg shadow-primary/50" : isPast ? "bg-primary/50" : "bg-border"}`} />
                         </div>;
                   })}
+                    
+                    {/* Middle ring */}
+                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/10" />
+                    
+                    {/* Center icon */}
+                    <div className="absolute inset-0 w-48 h-48 flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                        <activeStep.icon className="w-10 h-10 text-primary" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
