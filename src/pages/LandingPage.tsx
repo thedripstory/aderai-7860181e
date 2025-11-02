@@ -278,12 +278,10 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex justify-center">
-                <button className="group px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2">
-                  Unlock Forever
-                  <ArrowDoodle direction="right" className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
+              <button className="group px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2">
+                Get Started for Free
+                <ArrowDoodle direction="right" className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
             </div>
 
             {/* Right Workflow Visual */}
