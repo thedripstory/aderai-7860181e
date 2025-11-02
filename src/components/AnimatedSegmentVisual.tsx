@@ -58,23 +58,24 @@ export const AnimatedSegmentVisual = () => {
 
   return (
     <div className="relative w-full max-w-6xl mx-auto my-16">
-      {/* Minimal ambient glow */}
-      <div className="absolute inset-0 bg-primary/3 rounded-3xl blur-3xl" />
+      {/* Enhanced ambient glow */}
+      <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-3xl" />
+      <div className="absolute inset-0 bg-accent/5 rounded-3xl blur-2xl animate-pulse" style={{ animationDuration: "4s" }} />
       
       <div className="relative">
         {/* Section header */}
         <div className="text-center mb-12 space-y-3">
-          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+          <p className="text-sm font-semibold text-primary/80 uppercase tracking-wider">
             Deploy in 4 Steps
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold">
-            Segmentation in <span className="text-primary">30 seconds</span>
+            Segmentation in <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">30 seconds</span>
           </h2>
         </div>
 
         {/* Main Step Display */}
         <div 
-          className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-border/50 overflow-hidden"
+          className="relative bg-gradient-to-br from-background/60 to-primary/5 backdrop-blur-sm rounded-3xl border border-primary/30 overflow-hidden shadow-[0_0_50px_-12px_hsl(var(--primary)/0.3)]"
           onMouseEnter={() => setIsAutoPlaying(false)}
           onMouseLeave={() => setIsAutoPlaying(true)}
         >
@@ -91,8 +92,8 @@ export const AnimatedSegmentVisual = () => {
 
               {/* Title with icon */}
               <div className="space-y-4 opacity-0 animate-fade-in" style={{ animationDelay: "100ms", animationFillMode: "forwards" }}>
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20">
-                  <activeStep.icon className="w-7 h-7 text-primary" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 shadow-[0_0_20px_-5px_hsl(var(--primary)/0.5)]">
+                  <activeStep.icon className="w-7 h-7 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]" />
                 </div>
                 <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
                   {activeStep.title}
@@ -112,16 +113,16 @@ export const AnimatedSegmentVisual = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
                     {/* Outer ring */}
-                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/20 animate-pulse" 
+                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/30 animate-pulse shadow-[0_0_30px_-5px_hsl(var(--primary)/0.4)]" 
                          style={{ animationDuration: "3s" }} />
                     
                     {/* Middle ring */}
-                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/10" />
+                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-accent/20 shadow-[0_0_20px_-5px_hsl(var(--accent)/0.3)]" />
                     
                     {/* Center icon */}
                     <div className="absolute inset-0 w-48 h-48 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                        <activeStep.icon className="w-10 h-10 text-primary" />
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center shadow-[0_0_30px_-5px_hsl(var(--primary)/0.6)]">
+                        <activeStep.icon className="w-10 h-10 text-primary drop-shadow-[0_0_10px_hsl(var(--primary)/0.6)]" />
                       </div>
                     </div>
 
@@ -206,15 +207,15 @@ export const AnimatedSegmentVisual = () => {
           </div>
           
           <div className="relative opacity-0 animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "forwards" }}>
-            <div className="w-12 h-12 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary animate-pulse" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary flex items-center justify-center shadow-[0_0_30px_-5px_hsl(var(--primary)/0.6)]">
+              <Zap className="w-6 h-6 text-primary animate-pulse drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
             </div>
-            <div className="absolute -inset-2 rounded-full border-2 border-primary/20 animate-ping" style={{ animationDuration: "2s" }} />
+            <div className="absolute -inset-2 rounded-full border-2 border-primary/30 animate-ping" style={{ animationDuration: "2s" }} />
           </div>
           
           <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{ animationDelay: "800ms", animationFillMode: "forwards" }}>
             <div className="text-left">
-              <div className="text-3xl font-bold text-primary">30 seconds</div>
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">30 seconds</div>
               <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">With Aderai</div>
             </div>
           </div>
