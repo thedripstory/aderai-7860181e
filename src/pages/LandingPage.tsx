@@ -11,6 +11,7 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { EnquiryModal } from "@/components/EnquiryModal";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
+import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
@@ -609,5 +610,6 @@ export default function LandingPage() {
       </footer>
 
       <EnquiryModal open={enquiryModalOpen} onOpenChange={setEnquiryModalOpen} />
+      <TimeBasedPopup onGetStarted={handleGetStarted} />
     </div>;
 }
