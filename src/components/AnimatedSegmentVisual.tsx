@@ -54,7 +54,7 @@ export const AnimatedSegmentVisual = () => {
             Deploy in 4 Steps
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold">
-            Segmentation in <span className="text-primary">30 seconds</span>
+            Powered by <span className="text-primary">Klaviyo.</span>
           </h2>
         </div>
 
