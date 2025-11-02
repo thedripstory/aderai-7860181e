@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { MousePointerClick, Sparkles, CheckCircle2, Zap } from "lucide-react";
-
 interface Step {
   id: string;
   number: string;
@@ -8,77 +7,59 @@ interface Step {
   title: string;
   description: string;
 }
-
-const STEPS: Step[] = [
-  {
-    id: "1",
-    number: "01",
-    icon: MousePointerClick,
-    title: "Connect Klaviyo",
-    description: "One-click authentication. No API keys, no technical setup required."
-  },
-  {
-    id: "2",
-    number: "02",
-    icon: Sparkles,
-    title: "Select Segments",
-    description: "Choose from 70+ pre-built segments or let AI create custom ones for your brand."
-  },
-  {
-    id: "3",
-    number: "03",
-    icon: Zap,
-    title: "Deploy Instantly",
-    description: "All segments auto-created in Klaviyo in 30 seconds. No manual work."
-  },
-  {
-    id: "4",
-    number: "04",
-    icon: CheckCircle2,
-    title: "Start Targeting",
-    description: "Segments sync in real-time. Begin creating personalized campaigns immediately."
-  },
-];
-
+const STEPS: Step[] = [{
+  id: "1",
+  number: "01",
+  icon: MousePointerClick,
+  title: "Connect Klaviyo",
+  description: "One-click authentication. No API keys, no technical setup required."
+}, {
+  id: "2",
+  number: "02",
+  icon: Sparkles,
+  title: "Select Segments",
+  description: "Choose from 70+ pre-built segments or let AI create custom ones for your brand."
+}, {
+  id: "3",
+  number: "03",
+  icon: Zap,
+  title: "Deploy Instantly",
+  description: "All segments auto-created in Klaviyo in 30 seconds. No manual work."
+}, {
+  id: "4",
+  number: "04",
+  icon: CheckCircle2,
+  title: "Start Targeting",
+  description: "Segments sync in real-time. Begin creating personalized campaigns immediately."
+}];
 export const AnimatedSegmentVisual = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
   useEffect(() => {
     if (!isAutoPlaying) return;
-    
     const interval = setInterval(() => {
-      setActiveIndex((current) => (current + 1) % STEPS.length);
+      setActiveIndex(current => (current + 1) % STEPS.length);
     }, 4000);
-
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
-
   const activeStep = STEPS[activeIndex];
-
-  return (
-    <div className="relative w-full max-w-6xl mx-auto my-16">
-      {/* Enhanced ambient glow */}
-      <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-3xl" />
-      <div className="absolute inset-0 bg-accent/5 rounded-3xl blur-2xl animate-pulse" style={{ animationDuration: "4s" }} />
+  return <div className="relative w-full max-w-6xl mx-auto my-16">
+      {/* Minimal ambient glow */}
+      <div className="absolute inset-0 bg-primary/3 rounded-3xl blur-3xl" />
       
       <div className="relative">
         {/* Section header */}
         <div className="text-center mb-12 space-y-3">
-          <p className="text-sm font-semibold text-primary/80 uppercase tracking-wider">
+          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
             Deploy in 4 Steps
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold">
-            Segmentation in <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">30 seconds</span>
+            Segmentation in <span className="text-primary">30 seconds</span>
           </h2>
         </div>
 
         {/* Main Step Display */}
-        <div 
-          className="relative bg-gradient-to-br from-background/60 to-primary/5 backdrop-blur-sm rounded-3xl border border-primary/30 overflow-hidden shadow-[0_0_50px_-12px_hsl(var(--primary)/0.3)]"
-          onMouseEnter={() => setIsAutoPlaying(false)}
-          onMouseLeave={() => setIsAutoPlaying(true)}
-        >
+        <div className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-border/50 overflow-hidden" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
           {/* Content */}
           <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
             {/* Left: Step Info */}
@@ -91,9 +72,12 @@ export const AnimatedSegmentVisual = () => {
               </div>
 
               {/* Title with icon */}
-              <div className="space-y-4 opacity-0 animate-fade-in" style={{ animationDelay: "100ms", animationFillMode: "forwards" }}>
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 shadow-[0_0_20px_-5px_hsl(var(--primary)/0.5)]">
-                  <activeStep.icon className="w-7 h-7 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]" />
+              <div className="space-y-4 opacity-0 animate-fade-in" style={{
+              animationDelay: "100ms",
+              animationFillMode: "forwards"
+            }}>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20">
+                  <activeStep.icon className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
                   {activeStep.title}
@@ -101,60 +85,54 @@ export const AnimatedSegmentVisual = () => {
               </div>
 
               {/* Description */}
-              <p className="text-lg text-muted-foreground leading-relaxed opacity-0 animate-fade-in" style={{ animationDelay: "200ms", animationFillMode: "forwards" }}>
+              <p className="text-lg text-muted-foreground leading-relaxed opacity-0 animate-fade-in" style={{
+              animationDelay: "200ms",
+              animationFillMode: "forwards"
+            }}>
                 {activeStep.description}
               </p>
             </div>
 
             {/* Right: Minimal Visualization */}
-            <div className="flex items-center justify-center opacity-0 animate-fade-in" style={{ animationDelay: "200ms", animationFillMode: "forwards" }}>
+            <div className="flex items-center justify-center opacity-0 animate-fade-in" style={{
+            animationDelay: "200ms",
+            animationFillMode: "forwards"
+          }}>
               <div className="relative w-full aspect-square max-w-md">
                 {/* Central icon display */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
                     {/* Outer ring */}
-                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/30 animate-pulse shadow-[0_0_30px_-5px_hsl(var(--primary)/0.4)]" 
-                         style={{ animationDuration: "3s" }} />
+                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/20 animate-pulse" style={{
+                    animationDuration: "3s"
+                  }} />
                     
                     {/* Middle ring */}
-                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-accent/20 shadow-[0_0_20px_-5px_hsl(var(--accent)/0.3)]" />
+                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/10" />
                     
                     {/* Center icon */}
                     <div className="absolute inset-0 w-48 h-48 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center shadow-[0_0_30px_-5px_hsl(var(--primary)/0.6)]">
-                        <activeStep.icon className="w-10 h-10 text-primary drop-shadow-[0_0_10px_hsl(var(--primary)/0.6)]" />
+                      <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                        <activeStep.icon className="w-10 h-10 text-primary" />
                       </div>
                     </div>
 
                     {/* Progress dots */}
                     {STEPS.map((step, i) => {
-                      const angle = (i * 90) - 90;
-                      const radius = 96;
-                      const x = Math.cos((angle * Math.PI) / 180) * radius;
-                      const y = Math.sin((angle * Math.PI) / 180) * radius;
-                      const isActive = i === activeIndex;
-                      const isPast = i < activeIndex;
-                      
-                      return (
-                        <div
-                          key={i}
-                          className="absolute transition-all duration-700"
-                          style={{
-                            left: '50%',
-                            top: '50%',
-                            transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
-                          }}
-                        >
-                          <div className={`w-3 h-3 rounded-full transition-all duration-500 ${
-                            isActive 
-                              ? "bg-primary scale-150 shadow-lg shadow-primary/50" 
-                              : isPast
-                              ? "bg-primary/50"
-                              : "bg-border"
-                          }`} />
-                        </div>
-                      );
-                    })}
+                    const angle = i * 90 - 90;
+                    const radius = 96;
+                    const x = Math.cos(angle * Math.PI / 180) * radius;
+                    const y = Math.sin(angle * Math.PI / 180) * radius;
+                    const isActive = i === activeIndex;
+                    const isPast = i < activeIndex;
+                    return <div key={i} className="absolute transition-all duration-700" style={{
+                      left: '50%',
+                      top: '50%',
+                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                    }}>
+                          <div className={`w-3 h-3 rounded-full transition-all duration-500 ${isActive ? "bg-primary scale-150 shadow-lg shadow-primary/50" : isPast ? "bg-primary/50" : "bg-border"}`} />
+                        </div>;
+                  })}
                   </div>
                 </div>
               </div>
@@ -164,63 +142,61 @@ export const AnimatedSegmentVisual = () => {
           {/* Bottom: Step Navigation */}
           <div className="relative px-8 lg:px-16 pb-8">
             <div className="flex items-center justify-center gap-8">
-              {STEPS.map((step, index) => (
-                <button
-                  key={step.id}
-                  onClick={() => {
-                    setActiveIndex(index);
-                    setIsAutoPlaying(false);
-                  }}
-                  className="group relative flex flex-col items-center gap-2 min-w-[60px]"
-                  aria-label={`View step ${step.number}`}
-                >
+              {STEPS.map((step, index) => <button key={step.id} onClick={() => {
+              setActiveIndex(index);
+              setIsAutoPlaying(false);
+            }} className="group relative flex flex-col items-center gap-2 min-w-[60px]" aria-label={`View step ${step.number}`}>
                   {/* Progress bar for active item */}
-                  {index === activeIndex && (
-                    <div className="absolute -top-3 left-0 right-0 h-0.5 bg-border rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary animate-[slide-in-right_4s_linear]"
-                      />
-                    </div>
-                  )}
+                  {index === activeIndex && <div className="absolute -top-3 left-0 right-0 h-0.5 bg-border rounded-full overflow-hidden">
+                      <div className="h-full bg-primary animate-[slide-in-right_4s_linear]" />
+                    </div>}
                   
                   {/* Step number */}
-                  <span className={`text-xs font-bold transition-all duration-300 ${
-                    index === activeIndex 
-                      ? "text-primary scale-110" 
-                      : "text-muted-foreground/50 group-hover:text-muted-foreground"
-                  }`}>
+                  <span className={`text-xs font-bold transition-all duration-300 ${index === activeIndex ? "text-primary scale-110" : "text-muted-foreground/50 group-hover:text-muted-foreground"}`}>
                     {step.number}
                   </span>
-                </button>
-              ))}
+                </button>)}
             </div>
           </div>
         </div>
 
         {/* Bottom animated comparison */}
         <div className="mt-12 flex items-center justify-center gap-8">
-          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{ animationDelay: "400ms", animationFillMode: "forwards" }}>
+          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{
+          animationDelay: "400ms",
+          animationFillMode: "forwards"
+        }}>
             <div className="text-right">
               <div className="text-3xl font-bold text-muted-foreground/30 line-through">10+ hours</div>
               <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Manual setup</div>
             </div>
           </div>
           
-          <div className="relative opacity-0 animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "forwards" }}>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary flex items-center justify-center shadow-[0_0_30px_-5px_hsl(var(--primary)/0.6)]">
-              <Zap className="w-6 h-6 text-primary animate-pulse drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
+          <div className="relative opacity-0 animate-fade-in" style={{
+          animationDelay: "600ms",
+          animationFillMode: "forwards"
+        }}>
+            <div className="w-12 h-12 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
+              <Zap className="w-6 h-6 text-primary animate-pulse" />
             </div>
-            <div className="absolute -inset-2 rounded-full border-2 border-primary/30 animate-ping" style={{ animationDuration: "2s" }} />
+            <div className="absolute -inset-2 rounded-full border-2 border-primary/20 animate-ping" style={{
+            animationDuration: "2s"
+          }} />
           </div>
           
-          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{ animationDelay: "800ms", animationFillMode: "forwards" }}>
+          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{
+          animationDelay: "800ms",
+          animationFillMode: "forwards"
+        }}>
             <div className="text-left">
-              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">30 seconds</div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">With Aderai</div>
+              <div className="text-3xl font-bold text-primary">30 seconds</div>
+              <div className="text-xs text-muted-foreground mt-1 flex items-center gap-0.5">
+                
+                <span className="font-playfair font-bold">aderai<span className="text-accent">.</span></span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
