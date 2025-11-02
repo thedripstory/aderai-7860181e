@@ -59,14 +59,14 @@ export const AnimatedSegmentVisual = () => {
         </div>
 
         {/* Main Step Display */}
-        <div className="relative bg-white/80 dark:bg-white/10 backdrop-blur-sm rounded-3xl border border-primary/40 overflow-hidden shadow-[0_0_60px_-10px_hsl(var(--primary)/0.5)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
+        <div className="relative bg-gradient-to-br from-white/90 to-primary/10 dark:bg-gradient-to-br dark:from-white/10 dark:to-primary/20 backdrop-blur-sm rounded-3xl border border-primary/40 overflow-hidden shadow-[0_0_60px_-10px_hsl(var(--primary)/0.5)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
           {/* Content */}
           <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
             {/* Left: Step Info */}
             <div className="flex flex-col justify-center space-y-8">
               {/* Step number */}
               <div className="opacity-0 animate-fade-in">
-                <span className="text-7xl font-bold text-primary/20">
+                <span className="text-7xl font-bold text-primary/30">
                   {activeStep.number}
                 </span>
               </div>
