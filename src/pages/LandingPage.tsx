@@ -477,7 +477,7 @@ export default function LandingPage() {
               Success Stories that <span className="italic text-primary">Inspire</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Discover how businesses and creators achieve results
+              Discover how brands and agencies achieve results.
             </p>
           </div>
 
