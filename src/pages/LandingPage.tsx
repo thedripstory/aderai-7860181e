@@ -10,7 +10,7 @@ import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { EnquiryModal } from "@/components/EnquiryModal";
-import { AnimatedStatsBar } from "@/components/AnimatedStatsBar";
+import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
@@ -199,8 +199,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Animated Stats Bar */}
-            <AnimatedStatsBar />
+            {/* Revolving Testimonials */}
+            <RevolvingTestimonials />
           </div>
 
           {/* Visual Demo */}
