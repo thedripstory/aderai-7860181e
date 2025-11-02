@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, MessageSquare } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -17,7 +17,6 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  const heroRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -87,102 +86,54 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Floating Dashboard Screenshots */}
-          <div 
-            ref={heroRef}
-            className="absolute inset-0 pointer-events-none overflow-hidden"
-            style={{ height: '100%' }}
-          >
-            {/* Left Dashboard - Revenue Chart */}
-            <div 
-              className="absolute left-0 top-1/4 -translate-x-1/4 w-80 lg:w-96 opacity-0 animate-fade-in hidden lg:block"
-              style={{
-                transform: `translateX(calc(-25% + ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(-8deg)`,
-                animationDelay: "600ms",
-                animationFillMode: "forwards",
-                transition: "transform 0.1s ease-out"
-              }}
-            >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
-                <img 
-                  src={dashboardRevenue} 
-                  alt="Revenue Analytics Dashboard"
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
-
-            {/* Right Dashboard - Metrics */}
-            <div 
-              className="absolute right-0 top-1/3 translate-x-1/4 w-80 lg:w-96 opacity-0 animate-fade-in hidden lg:block"
-              style={{
-                transform: `translateX(calc(25% - ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(8deg)`,
-                animationDelay: "800ms",
-                animationFillMode: "forwards",
-                transition: "transform 0.1s ease-out"
-              }}
-            >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
-                <img 
-                  src={dashboardMetrics} 
-                  alt="User Metrics Dashboard"
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Main Hero Content */}
           <div className="relative text-center mb-16 z-10">
-            {/* Floating Dashboard Screenshots - Left Side */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 hidden xl:block pointer-events-none">
-              {/* Stacked card effect - back cards */}
+            {/* Floating Dashboard Screenshots - Left Side (Deck of Cards) */}
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden xl:block pointer-events-none" style={{ left: '-200px' }}>
+              {/* Back card 1 - furthest */}
               <div 
-                className="absolute w-72 opacity-0 animate-fade-in"
+                className="absolute w-64 opacity-0 animate-fade-in"
                 style={{
-                  transform: `translateX(calc(-120% + ${scrollY * 0.08}px)) translateY(calc(${scrollY * 0.12}px - 30px)) rotate(-12deg)`,
-                  animationDelay: "400ms",
+                  transform: `translateX(calc(-50px + ${scrollY * 0.05}px)) translateY(calc(${scrollY * 0.1}px - 80px)) rotate(-18deg)`,
+                  animationDelay: "300ms",
                   animationFillMode: "forwards",
                   transition: "transform 0.1s ease-out",
                   zIndex: 1
                 }}
               >
-                <div className="rounded-xl overflow-hidden shadow-xl border-2 border-white/10 backdrop-blur-sm opacity-60">
-                  <img src={dashboardMetrics} alt="Dashboard" className="w-full h-auto" />
+                <div className="rounded-xl overflow-hidden shadow-lg border-2 border-white/10 backdrop-blur-sm opacity-40">
+                  <img src={dashboardRevenue} alt="Dashboard" className="w-full h-auto" />
                 </div>
               </div>
               
-              {/* Front card */}
+              {/* Back card 2 */}
               <div 
-                className="relative w-80 opacity-0 animate-fade-in"
+                className="absolute w-68 opacity-0 animate-fade-in"
                 style={{
-                  transform: `translateX(calc(-100% + ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(-8deg)`,
-                  animationDelay: "600ms",
+                  transform: `translateX(calc(0px + ${scrollY * 0.07}px)) translateY(calc(${scrollY * 0.11}px + 60px)) rotate(-14deg)`,
+                  animationDelay: "400ms",
                   animationFillMode: "forwards",
                   transition: "transform 0.1s ease-out",
                   zIndex: 2
                 }}
               >
-                <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
-                  <img src={dashboardRevenue} alt="Revenue Analytics" className="w-full h-auto" />
+                <div className="rounded-xl overflow-hidden shadow-xl border-2 border-white/10 backdrop-blur-sm opacity-50">
+                  <img src={dashboardMetrics} alt="Dashboard" className="w-full h-auto" />
                 </div>
               </div>
-            </div>
-
-            {/* Floating Dashboard Screenshots - Right Side */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 hidden xl:block pointer-events-none">
-              {/* Stacked card effect - back cards */}
+              
+              {/* Middle card */}
               <div 
                 className="absolute w-72 opacity-0 animate-fade-in"
                 style={{
-                  transform: `translateX(calc(120% - ${scrollY * 0.08}px)) translateY(calc(${scrollY * 0.12}px + 30px)) rotate(12deg)`,
+                  transform: `translateX(calc(30px + ${scrollY * 0.08}px)) translateY(calc(${scrollY * 0.12}px - 20px)) rotate(-10deg)`,
                   animationDelay: "500ms",
                   animationFillMode: "forwards",
                   transition: "transform 0.1s ease-out",
-                  zIndex: 1
+                  zIndex: 3
                 }}
               >
-                <div className="rounded-xl overflow-hidden shadow-xl border-2 border-white/10 backdrop-blur-sm opacity-60">
+                <div className="rounded-xl overflow-hidden shadow-xl border-3 border-white/15 backdrop-blur-sm opacity-70">
                   <img src={dashboardRevenue} alt="Dashboard" className="w-full h-auto" />
                 </div>
               </div>
@@ -191,15 +142,82 @@ export default function LandingPage() {
               <div 
                 className="relative w-80 opacity-0 animate-fade-in"
                 style={{
-                  transform: `translateX(calc(100% - ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(8deg)`,
-                  animationDelay: "700ms",
+                  transform: `translateX(calc(60px + ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(-6deg)`,
+                  animationDelay: "600ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 4
+                }}
+              >
+                <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
+                  <img src={dashboardMetrics} alt="Analytics Dashboard" className="w-full h-auto" />
+                </div>
+              </div>
+            </div>
+
+            {/* Floating Dashboard Screenshots - Right Side (Deck of Cards) */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden xl:block pointer-events-none" style={{ right: '-200px' }}>
+              {/* Back card 1 - furthest */}
+              <div 
+                className="absolute w-64 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(50px - ${scrollY * 0.05}px)) translateY(calc(${scrollY * 0.1}px + 70px)) rotate(18deg)`,
+                  animationDelay: "350ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 1
+                }}
+              >
+                <div className="rounded-xl overflow-hidden shadow-lg border-2 border-white/10 backdrop-blur-sm opacity-40">
+                  <img src={dashboardMetrics} alt="Dashboard" className="w-full h-auto" />
+                </div>
+              </div>
+              
+              {/* Back card 2 */}
+              <div 
+                className="absolute w-68 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(0px - ${scrollY * 0.07}px)) translateY(calc(${scrollY * 0.11}px - 50px)) rotate(14deg)`,
+                  animationDelay: "450ms",
                   animationFillMode: "forwards",
                   transition: "transform 0.1s ease-out",
                   zIndex: 2
                 }}
               >
+                <div className="rounded-xl overflow-hidden shadow-xl border-2 border-white/10 backdrop-blur-sm opacity-50">
+                  <img src={dashboardRevenue} alt="Dashboard" className="w-full h-auto" />
+                </div>
+              </div>
+              
+              {/* Middle card */}
+              <div 
+                className="absolute w-72 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(-30px - ${scrollY * 0.08}px)) translateY(calc(${scrollY * 0.12}px + 30px)) rotate(10deg)`,
+                  animationDelay: "550ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 3
+                }}
+              >
+                <div className="rounded-xl overflow-hidden shadow-xl border-3 border-white/15 backdrop-blur-sm opacity-70">
+                  <img src={dashboardMetrics} alt="Dashboard" className="w-full h-auto" />
+                </div>
+              </div>
+              
+              {/* Front card */}
+              <div 
+                className="relative w-80 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(-60px - ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(6deg)`,
+                  animationDelay: "650ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 4
+                }}
+              >
                 <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
-                  <img src={dashboardMetrics} alt="User Metrics" className="w-full h-auto" />
+                  <img src={dashboardRevenue} alt="Revenue Dashboard" className="w-full h-auto" />
                 </div>
               </div>
             </div>
