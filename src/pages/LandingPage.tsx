@@ -57,76 +57,139 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-40 pb-32 px-6 relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-accent/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+      <section className="pt-32 pb-20 px-6 relative overflow-hidden min-h-screen flex items-center">
+        {/* Dynamic Background */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-accent/5 via-background to-primary/5"></div>
+          <div className="absolute top-1/4 -left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl"></div>
         </div>
         
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="mb-8 flex justify-center animate-fade-in">
-            <PoweredByBadge />
+        <div className="max-w-7xl mx-auto w-full">
+          {/* Top Badge */}
+          <div className="mb-12 flex justify-center animate-fade-in">
+            <div className="relative">
+              <PoweredByBadge />
+              <div className="absolute -top-2 -right-2 w-3 h-3 bg-accent rounded-full animate-ping"></div>
+            </div>
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-bold mb-10 tracking-tight leading-[1.1] animate-fade-in" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
-            Segment like a<br />
-            <span className="inline-block mt-2">
-              <CircleDoodle delay="1s">
-                <span className="text-accent">$50M brand</span>
-              </CircleDoodle>
-            </span>
-          </h1>
-          
-          <p className="text-2xl md:text-3xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}>
-            <AnimatedUnderline delay="1.3s">70 segments</AnimatedUnderline> in 30 seconds. What takes <AnimatedUnderline delay="1.5s">10+ hours</AnimatedUnderline> manually, done <strong className="text-foreground">instantly</strong> with Aderai.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-24 animate-fade-in" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
-            <button
-              onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-10 py-5 rounded-full text-lg font-semibold hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 flex items-center gap-3"
-            >
-              Get started for $49
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <button className="bg-transparent border-2 border-foreground text-foreground px-10 py-5 rounded-full text-lg font-semibold hover:bg-foreground hover:text-background transition-all duration-300">
-              See how it works
-            </button>
+          {/* Main Hero Content */}
+          <div className="text-center mb-16">
+            <h1 className="text-7xl md:text-9xl font-black mb-8 tracking-tighter leading-[0.9] animate-fade-in" style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}>
+              <span className="block mb-4">Segment like a</span>
+              <span className="relative inline-block">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent to-primary animate-fade-in" style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}>
+                  $50M brand
+                </span>
+                <CircleDoodle delay="1.2s">
+                  <span className="invisible">$50M brand</span>
+                </CircleDoodle>
+              </span>
+            </h1>
+            
+            {/* Stats Row */}
+            <div className="flex items-center justify-center gap-8 mb-10 flex-wrap animate-fade-in" style={{ animationDelay: "0.5s", animationFillMode: "forwards" }}>
+              <div className="flex items-center gap-3 bg-card/50 backdrop-blur-sm px-6 py-3 rounded-full border border-border">
+                <Zap className="w-5 h-5 text-accent" />
+                <span className="font-bold text-lg">
+                  <AnimatedUnderline delay="1.4s">70 segments</AnimatedUnderline>
+                </span>
+              </div>
+              <div className="flex items-center gap-3 bg-card/50 backdrop-blur-sm px-6 py-3 rounded-full border border-border">
+                <Clock className="w-5 h-5 text-accent" />
+                <span className="font-bold text-lg">
+                  <AnimatedUnderline delay="1.6s">30 seconds</AnimatedUnderline>
+                </span>
+              </div>
+              <div className="flex items-center gap-3 bg-card/50 backdrop-blur-sm px-6 py-3 rounded-full border border-border">
+                <MousePointerClick className="w-5 h-5 text-accent" />
+                <span className="font-bold text-lg">One-click deploy</span>
+              </div>
+            </div>
+            
+            <p className="text-2xl md:text-3xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed font-medium animate-fade-in" style={{ animationDelay: "0.7s", animationFillMode: "forwards" }}>
+              What takes <strong className="text-foreground">10+ hours</strong> manually, done <strong className="text-accent">instantly</strong> with enterprise-level precision
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20 animate-fade-in" style={{ animationDelay: "0.9s", animationFillMode: "forwards" }}>
+              <button
+                onClick={handleGetStarted}
+                className="group bg-accent text-accent-foreground px-12 py-6 rounded-full text-xl font-bold hover:bg-accent/90 transition-all duration-300 shadow-2xl hover:shadow-accent/50 hover:scale-110 flex items-center gap-3 relative overflow-hidden"
+              >
+                <span className="relative z-10">Get started for $49</span>
+                <ArrowRight className="w-6 h-6 relative z-10 group-hover:translate-x-1 transition-transform" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+              </button>
+              <button className="bg-transparent border-3 border-foreground text-foreground px-12 py-6 rounded-full text-xl font-bold hover:bg-foreground hover:text-background transition-all duration-300 shadow-lg">
+                Watch demo
+              </button>
+            </div>
           </div>
 
-          {/* Time comparison */}
-          <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto mb-32 relative animate-fade-in" style={{ animationDelay: "0.8s", animationFillMode: "forwards" }}>
-            <div className="bg-muted rounded-2xl p-10 text-left border-2 border-border hover:border-muted-foreground/20 transition-all duration-300 hover:shadow-lg">
-              <Clock className="w-10 h-10 text-muted-foreground mb-6" />
-              <div className="text-sm text-muted-foreground font-semibold mb-3 uppercase tracking-wide">Manual segmentation</div>
-              <div className="text-5xl font-bold mb-4">10+ hours</div>
-              <div className="text-base text-muted-foreground leading-relaxed">
-                Building 70 segments manually in Klaviyo, debugging Boolean logic, testing each one.
+          {/* Before/After Comparison - Redesigned */}
+          <div className="max-w-6xl mx-auto mb-20 animate-fade-in" style={{ animationDelay: "1.1s", animationFillMode: "forwards" }}>
+            <div className="relative">
+              {/* Connecting Line */}
+              <div className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-1 bg-gradient-to-r from-muted-foreground/50 to-accent z-0">
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-accent rounded-full"></div>
               </div>
-            </div>
-            <div className="bg-card rounded-2xl p-10 text-left border-2 border-accent shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -mr-16 -mt-16"></div>
-              <MousePointerClick className="w-10 h-10 text-accent mb-6 relative z-10" />
-              <div className="text-sm text-accent font-bold mb-3 uppercase tracking-wide relative z-10">With Aderai</div>
-              <div className="text-5xl font-bold mb-4 relative z-10 inline-block">
-                <CircleDoodle delay="1.8s">30 seconds</CircleDoodle>
+              
+              <div className="grid lg:grid-cols-2 gap-12 lg:gap-8">
+                {/* Before Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-muted to-muted-foreground/20 rounded-3xl blur opacity-25 group-hover:opacity-40 transition"></div>
+                  <div className="relative bg-card rounded-3xl p-10 border-2 border-border">
+                    <div className="absolute -top-6 left-8 bg-muted-foreground text-background px-6 py-2 rounded-full text-sm font-bold uppercase">
+                      Old way
+                    </div>
+                    <Clock className="w-14 h-14 text-muted-foreground/50 mb-6 mt-4" />
+                    <div className="text-7xl font-black mb-4 text-muted-foreground">10+</div>
+                    <div className="text-2xl font-bold mb-4">hours wasted</div>
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      Manually building Boolean logic, testing conditions, debugging errors across 70 segments
+                    </p>
+                    <div className="mt-6 pt-6 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
+                      <span className="w-2 h-2 bg-destructive rounded-full"></span>
+                      Frustrating & time-consuming
+                    </div>
+                  </div>
+                </div>
+
+                {/* After Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accent/50 rounded-3xl blur opacity-50 group-hover:opacity-75 transition"></div>
+                  <div className="relative bg-card rounded-3xl p-10 border-2 border-accent shadow-2xl shadow-accent/20">
+                    <div className="absolute -top-6 left-8 bg-accent text-accent-foreground px-6 py-2 rounded-full text-sm font-bold uppercase flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      New way
+                    </div>
+                    <MousePointerClick className="w-14 h-14 text-accent mb-6 mt-4" />
+                    <div className="text-7xl font-black mb-4 text-accent relative inline-block">
+                      <CircleDoodle delay="2s">30s</CircleDoodle>
+                    </div>
+                    <div className="text-2xl font-bold mb-4">One-click magic</div>
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      Select, customize, deploy. All 70 segments auto-created with perfect logic and tested accuracy
+                    </p>
+                    <div className="mt-6 pt-6 border-t border-accent/20 flex items-center gap-2 text-sm text-accent font-semibold">
+                      <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
+                      Instant & effortless
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-base text-muted-foreground leading-relaxed relative z-10">
-                Select segments, customize to your metrics, deploy. All segments auto-created.
-              </div>
-            </div>
-            <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-              <ArrowDoodle direction="right" />
             </div>
           </div>
 
           {/* Visual Demo */}
-          <div className="mb-24">
+          <div className="mb-16 animate-fade-in" style={{ animationDelay: "1.3s", animationFillMode: "forwards" }}>
             <AnimatedSegmentVisual />
           </div>
           
-          <div className="pt-8">
+          {/* Trust Logos */}
+          <div className="pt-12 animate-fade-in" style={{ animationDelay: "1.5s", animationFillMode: "forwards" }}>
             <TrustLogos />
           </div>
         </div>
