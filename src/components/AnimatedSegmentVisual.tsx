@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MousePointerClick, Sparkles, CheckCircle2, Zap, ChevronRight } from "lucide-react";
+import { MousePointerClick, Sparkles, CheckCircle2, Zap, ChevronRight, ChevronLeft } from "lucide-react";
 interface Step {
   id: string;
   number: string;
@@ -59,9 +59,22 @@ export const AnimatedSegmentVisual = () => {
         {/* Main Step Display */}
         <div className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-border/50 overflow-hidden shadow-[0_20px_60px_-15px_hsl(var(--primary)/0.9)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
           {/* Content */}
-          <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
-            {/* Left: Step Info */}
-            <div className="flex flex-col justify-center space-y-6">
+          <div className="relative flex items-center gap-4 p-8 lg:p-16">
+            {/* Left Arrow */}
+            <button
+              onClick={() => {
+                setActiveIndex((current) => (current - 1 + STEPS.length) % STEPS.length);
+                setIsAutoPlaying(false);
+              }}
+              className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full border border-border/50 bg-background/50 hover:bg-background hover:border-border transition-all duration-200 shrink-0"
+              aria-label="Previous step"
+            >
+              <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+            </button>
+
+            <div className="grid lg:grid-cols-2 gap-12 flex-1">
+              {/* Left: Step Info */}
+              <div className="flex flex-col justify-center space-y-6">
               {/* Step number */}
               <div className="opacity-0 animate-fade-in">
                 <span className="text-7xl font-bold text-primary/20">
@@ -101,6 +114,19 @@ export const AnimatedSegmentVisual = () => {
                 />
               </div>
             </div>
+            </div>
+
+            {/* Right Arrow */}
+            <button
+              onClick={() => {
+                setActiveIndex((current) => (current + 1) % STEPS.length);
+                setIsAutoPlaying(false);
+              }}
+              className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full border border-border/50 bg-background/50 hover:bg-background hover:border-border transition-all duration-200 shrink-0"
+              aria-label="Next step"
+            >
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
           </div>
 
           {/* Bottom: Step Navigation */}
