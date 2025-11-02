@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Play } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, MessageSquare } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
@@ -9,8 +9,10 @@ import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
+import { EnquiryModal } from "@/components/EnquiryModal";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
+  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -105,9 +107,12 @@ export default function LandingPage() {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               </button>
-              <button className="group bg-card hover:bg-muted border-2 border-border text-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-lg flex items-center gap-3">
-                <Play className="w-5 h-5" />
-                <span>Watch 60s demo</span>
+              <button 
+                onClick={() => setEnquiryModalOpen(true)}
+                className="group bg-card hover:bg-muted border-2 border-border text-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-lg flex items-center gap-3"
+              >
+                <MessageSquare className="w-5 h-5" />
+                <span>Custom Enquiry</span>
               </button>
             </div>
 
@@ -599,5 +604,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <EnquiryModal open={enquiryModalOpen} onOpenChange={setEnquiryModalOpen} />
     </div>;
 }
