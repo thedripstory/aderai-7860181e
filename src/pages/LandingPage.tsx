@@ -83,13 +83,11 @@ export default function LandingPage() {
               <span className="text-sm font-medium text-primary">AI-powered segmentation engine</span>
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-bold mb-8 tracking-tight leading-none">
+            <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-none">
               Segment like a<br />
-              <CircleDoodle delay="0.8s">
-                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_linear_infinite]">
-                  $50M brand.
-                </span>
-              </CircleDoodle>
+              <span className="text-primary">
+                $50M brand.
+              </span>
             </h1>
             
             <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium">
