@@ -5,31 +5,38 @@ interface CircleDoodleProps {
 
 export const CircleDoodle = ({ children, delay = "0s" }: CircleDoodleProps) => {
   return (
-    <span className="relative inline-block px-6 py-2">
+    <span className="relative inline-block px-8 py-3">
       {children}
       <svg
         className="absolute opacity-0 animate-fade-in pointer-events-none"
         style={{ 
           animationDelay: delay, 
           animationFillMode: "forwards",
-          left: "-12%",
-          top: "-20%",
-          width: "124%",
-          height: "140%"
+          left: "-18%",
+          top: "-30%",
+          width: "136%",
+          height: "160%",
+          filter: "url(#grunge)"
         }}
-        viewBox="0 0 120 60"
+        viewBox="0 0 140 80"
         preserveAspectRatio="none"
       >
+        <defs>
+          <filter id="grunge">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
         <ellipse
-          cx="60"
-          cy="30"
-          rx="56"
-          ry="27"
+          cx="70"
+          cy="40"
+          rx="64"
+          ry="34"
           stroke="hsl(var(--accent))"
-          strokeWidth="2.5"
+          strokeWidth="3"
           fill="none"
           strokeLinecap="round"
-          transform="rotate(-3 60 30)"
+          transform="rotate(-8 70 40)"
         />
       </svg>
     </span>
