@@ -61,7 +61,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm">
             <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
               <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map(i => <div key={i} className="w-6 h-6 rounded-full bg-primary border-2 border-background" />)}
+                {[1, 2, 3, 4].map(i => <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background" />)}
               </div>
               <span className="text-muted-foreground">200+ brands using Aderai</span>
             </div>
@@ -131,7 +131,7 @@ export default function LandingPage() {
           <div className="relative max-w-5xl mx-auto mb-24">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Before Card */}
-              <div className="group bg-muted rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
+              <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/5 rounded-full blur-2xl" />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-6">
@@ -156,7 +156,7 @@ export default function LandingPage() {
               </div>
 
               {/* After Card */}
-              <div className="group bg-primary/5 rounded-3xl p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl">
+              <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-2xl animate-pulse" />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-6">
