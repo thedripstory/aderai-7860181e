@@ -6,8 +6,8 @@ export const EmailHero = () => {
     <section className="px-4 py-12 sm:py-16 text-center bg-background">
       <div className="max-w-2xl mx-auto">
         <div className="inline-block mb-4 px-4 py-1.5 rounded-md bg-accent/10 border border-accent/20">
-          <span className="text-sm font-playfair font-semibold tracking-wide text-accent">
-            aderai for Klaviyo
+          <span className="text-sm font-semibold text-accent">
+            ADERAI for Klaviyo
           </span>
         </div>
         
