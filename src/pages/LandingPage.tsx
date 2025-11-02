@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle, ArrowRight, Zap, Clock, MousePointerClick } from "lucide-react";
 import { TornPaperDivider } from "@/components/TornPaperDivider";
+import { PoweredByBadge } from "@/components/PoweredByBadge";
+import { TrustLogos } from "@/components/TrustLogos";
+import { TestimonialCard } from "@/components/TestimonialCard";
+import { AnimatedSegmentVisual } from "@/components/AnimatedSegmentVisual";
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -41,7 +45,7 @@ export default function LandingPage() {
             </a>
             <button
               onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-5 py-2 rounded-md text-sm font-semibold hover:bg-primary/90 transition"
+              className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary/90 transition"
             >
               Sign up
             </button>
@@ -52,6 +56,10 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
+          <div className="mb-6 flex justify-center">
+            <PoweredByBadge />
+          </div>
+          
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
             Segment like a<br />
             <span className="text-accent">$50M brand.</span>
@@ -64,12 +72,12 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <button
               onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-8 py-4 rounded-md text-base font-semibold hover:bg-primary/90 transition shadow-sm flex items-center gap-2"
+              className="bg-primary text-primary-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-primary/90 transition shadow-lg flex items-center gap-2"
             >
               Get started for $49
               <ArrowRight className="w-5 h-5" />
             </button>
-            <button className="bg-transparent border-2 border-foreground text-foreground px-8 py-4 rounded-md text-base font-semibold hover:bg-foreground hover:text-background transition">
+            <button className="bg-transparent border-2 border-foreground text-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-foreground hover:text-background transition">
               See how it works
             </button>
           </div>
@@ -94,15 +102,10 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Dashboard Preview */}
-          <div className="bg-card rounded-xl border border-border shadow-lg overflow-hidden">
-            <div className="aspect-video bg-muted flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="text-6xl font-bold text-muted-foreground/20 mb-2">70</div>
-                <p className="text-muted-foreground">Segment library preview</p>
-              </div>
-            </div>
-          </div>
+          {/* Visual Demo */}
+          <AnimatedSegmentVisual />
+          
+          <TrustLogos />
         </div>
       </section>
 
@@ -195,7 +198,7 @@ export default function LandingPage() {
           <div className="mt-16 text-center">
             <button
               onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-8 py-4 rounded-md text-base font-semibold hover:bg-primary/90 transition shadow-sm inline-flex items-center gap-2"
+              className="bg-primary text-primary-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-primary/90 transition shadow-lg inline-flex items-center gap-2"
             >
               Start now
               <ArrowRight className="w-5 h-5" />
@@ -241,8 +244,48 @@ export default function LandingPage() {
 
       <TornPaperDivider className="text-background flip" />
 
+      {/* Testimonials */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Loved by brands & agencies</h2>
+            <p className="text-xl text-muted-foreground">Real results from real customers</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <TestimonialCard
+              quote="Deployed 70 segments in under a minute. Email revenue jumped 42% in the first month."
+              author="Marcus Rodriguez"
+              role="Head of Growth"
+              company="Premium Beauty Co."
+              metric="+42%"
+            />
+            <TestimonialCard
+              quote="What used to take my team 2 weeks now takes 30 seconds. This is a game-changer for our agency."
+              author="Sarah Chen"
+              role="Founder"
+              company="Growth Labs Agency"
+              metric="2 weeks → 30s"
+            />
+            <TestimonialCard
+              quote="The AI suggester is incredible. It recommended segments I never would have thought of."
+              author="James Wilson"
+              role="Marketing Director"
+              company="Luxe Lifestyle"
+              metric="+$87K"
+            />
+          </div>
+          
+          <div className="text-center">
+            <PoweredByBadge />
+          </div>
+        </div>
+      </section>
+
+      <TornPaperDivider className="text-muted" />
+
       {/* Pricing */}
-      <section id="pricing" className="py-20 px-6">
+      <section id="pricing" className="py-20 px-6 bg-muted">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Simple pricing</h2>
@@ -280,7 +323,7 @@ export default function LandingPage() {
               </ul>
               <button
                 onClick={handleGetStarted}
-                className="w-full bg-primary text-primary-foreground py-3 rounded-md font-semibold hover:bg-primary/90 transition"
+                className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:bg-primary/90 transition"
               >
                 Get started
               </button>
@@ -311,7 +354,7 @@ export default function LandingPage() {
               </ul>
               <button
                 onClick={handleGetStarted}
-                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-md font-semibold hover:bg-foreground hover:text-background transition"
+                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition"
               >
                 Get started
               </button>
@@ -342,14 +385,20 @@ export default function LandingPage() {
               </ul>
               <button
                 onClick={handleGetStarted}
-                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-md font-semibold hover:bg-foreground hover:text-background transition"
+                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition"
               >
                 Get started
               </button>
             </div>
           </div>
+          
+          <div className="mt-16 text-center">
+            <PoweredByBadge />
+          </div>
         </div>
       </section>
+      
+      <TornPaperDivider className="text-background flip" />
 
       {/* Footer */}
       <footer className="border-t border-border py-12 px-6 bg-muted">
@@ -411,8 +460,9 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            © 2025 Aderai. Powered by Klaviyo.
+          <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground gap-4">
+            <div>© 2025 Aderai. All rights reserved.</div>
+            <PoweredByBadge />
           </div>
         </div>
       </footer>
