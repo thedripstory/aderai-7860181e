@@ -159,7 +159,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>One-time $49</span>
+                <span>One-time cost</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
@@ -167,7 +167,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>Cancel anytime</span>
+                <span>Instant access</span>
               </div>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function LandingPage() {
                       <Clock className="w-6 h-6 text-muted-foreground" />
                     </div>
                     <div className="px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold rounded-full border border-red-500/20">
-                      OLD WAY
+                      YOUR CURRENT WAY
                     </div>
                   </div>
 
@@ -474,7 +474,7 @@ export default function LandingPage() {
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">Our Clients</span>
             </div>
             <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              Success Stories to <span className="italic text-primary">Inspire</span>
+              Success Stories that <span className="italic text-primary">Inspire</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Discover how businesses and creators achieve results
