@@ -76,8 +76,8 @@ export const AnimatedSegmentVisual = () => {
               animationDelay: "100ms",
               animationFillMode: "forwards"
             }}>
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20">
-                  <activeStep.icon className="w-7 h-7 text-primary" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary border border-primary/20">
+                  <activeStep.icon className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
                   {activeStep.title}
