@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MousePointerClick, Sparkles, CheckCircle2, Zap } from "lucide-react";
+import { MousePointerClick, Sparkles, CheckCircle2, Zap, ChevronRight } from "lucide-react";
 interface Step {
   id: string;
   number: string;
@@ -105,21 +105,40 @@ export const AnimatedSegmentVisual = () => {
 
           {/* Bottom: Step Navigation */}
           <div className="relative px-8 lg:px-16 pb-8">
-            <div className="flex items-center justify-center gap-8">
-              {STEPS.map((step, index) => <button key={step.id} onClick={() => {
-              setActiveIndex(index);
-              setIsAutoPlaying(false);
-            }} className="group relative flex flex-col items-center gap-2 min-w-[60px]" aria-label={`View step ${step.number}`}>
-                  {/* Progress bar for active item */}
-                  {index === activeIndex && <div className="absolute -top-3 left-0 right-0 h-0.5 bg-border rounded-full overflow-hidden">
-                      <div className="h-full bg-primary animate-[slide-in-right_4s_linear]" />
-                    </div>}
+            <div className="flex items-center justify-center gap-3">
+              {STEPS.map((step, index) => (
+                <div key={step.id} className="flex items-center gap-3">
+                  <button 
+                    onClick={() => {
+                      setActiveIndex(index);
+                      setIsAutoPlaying(false);
+                    }} 
+                    className="group relative flex flex-col items-center gap-2 min-w-[60px]" 
+                    aria-label={`View step ${step.number}`}
+                  >
+                    {/* Progress bar for active item */}
+                    {index === activeIndex && (
+                      <div className="absolute -top-3 left-0 right-0 h-0.5 bg-border rounded-full overflow-hidden">
+                        <div className="h-full bg-primary animate-[slide-in-right_4s_linear]" />
+                      </div>
+                    )}
+                    
+                    {/* Step number */}
+                    <span className={`text-xs font-bold transition-all duration-300 ${
+                      index === activeIndex 
+                        ? "text-primary scale-110" 
+                        : "text-muted-foreground/50 group-hover:text-muted-foreground"
+                    }`}>
+                      {step.number}
+                    </span>
+                  </button>
                   
-                  {/* Step number */}
-                  <span className={`text-xs font-bold transition-all duration-300 ${index === activeIndex ? "text-primary scale-110" : "text-muted-foreground/50 group-hover:text-muted-foreground"}`}>
-                    {step.number}
-                  </span>
-                </button>)}
+                  {/* Arrow between steps */}
+                  {index < STEPS.length - 1 && (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
