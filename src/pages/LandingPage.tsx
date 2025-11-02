@@ -23,7 +23,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="text-2xl font-playfair font-bold tracking-wide">
+          <div className="text-2xl font-playfair font-bold">
             aderai<span className="text-accent">.</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
@@ -478,7 +478,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-playfair font-bold tracking-wide mb-4">
+              <div className="text-2xl font-playfair font-bold mb-4">
                 aderai<span className="text-accent">.</span>
               </div>
               <p className="text-sm text-muted-foreground">

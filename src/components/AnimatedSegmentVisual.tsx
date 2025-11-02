@@ -215,7 +215,10 @@ export const AnimatedSegmentVisual = () => {
           <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{ animationDelay: "800ms", animationFillMode: "forwards" }}>
             <div className="text-left">
               <div className="text-3xl font-bold text-primary">30 seconds</div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">With Aderai</div>
+              <div className="text-xs text-muted-foreground mt-1 flex items-center gap-0.5">
+                <span className="uppercase tracking-tight">With</span>
+                <span className="font-playfair font-bold">aderai<span className="text-accent">.</span></span>
+              </div>
             </div>
           </div>
         </div>
