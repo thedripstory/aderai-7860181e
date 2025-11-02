@@ -10,8 +10,8 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
 
   useEffect(() => {
     // Check if popup was already closed in this session
-    const hasClosedPopup = sessionStorage.getItem('aderai-popup-closed');
-    
+    const hasClosedPopup = sessionStorage.getItem("aderai-popup-closed");
+
     if (hasClosedPopup) {
       return;
     }
@@ -25,7 +25,7 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
 
   const handleClose = () => {
     setIsVisible(false);
-    sessionStorage.setItem('aderai-popup-closed', 'true');
+    sessionStorage.setItem("aderai-popup-closed", "true");
   };
 
   if (!isVisible) return null;
@@ -33,11 +33,8 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center animate-fade-in">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-background/60 backdrop-blur-sm"
-        onClick={handleClose}
-      />
-      
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={handleClose} />
+
       {/* Popup Content */}
       <div className="relative bg-card border border-border rounded-3xl p-8 max-w-md mx-4 shadow-2xl animate-scale-in">
         <button
@@ -47,20 +44,19 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
         >
           <X className="w-5 h-5" />
         </button>
-        
+
         <div className="text-center space-y-6">
           <div className="mx-auto flex items-center justify-center mb-2">
             <span className="text-4xl font-playfair font-bold">
               aderai<span className="text-accent">.</span>
             </span>
           </div>
-          
+
           <div className="space-y-3">
-            <h3 className="text-2xl font-bold">
-              You've been here for 30 seconds
-            </h3>
+            <h3 className="text-2xl font-bold">You've been here for 30 seconds.</h3>
             <p className="text-muted-foreground leading-relaxed">
-              This is exactly the amount of time it takes to create 70+ segments directly in your Klaviyo account using Aderai.
+              This is exactly the amount of time it takes to create 70+ segments directly in your Klaviyo account using
+              Aderai.
             </p>
           </div>
 
@@ -74,7 +70,7 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
             <span>Start Building Segments</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
-          
+
           <button
             onClick={handleClose}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
