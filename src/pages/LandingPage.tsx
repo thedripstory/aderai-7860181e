@@ -9,28 +9,19 @@ import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
-
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const handleGetStarted = () => {
     window.location.href = "/signup";
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"
-        }`}
-      >
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="text-2xl font-bold tracking-tight">
             ADERAI<span className="text-accent">.</span>
@@ -47,10 +38,7 @@ export default function LandingPage() {
             <a href="/login" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
               Log in
             </a>
-            <button
-              onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary/90 transition"
-            >
+            <button onClick={handleGetStarted} className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary/90 transition">
               Sign up
             </button>
           </div>
@@ -62,7 +50,9 @@ export default function LandingPage() {
         {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{
+          animationDelay: "1s"
+        }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
         </div>
 
@@ -71,9 +61,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm">
             <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
               <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background" />
-                ))}
+                {[1, 2, 3, 4].map(i => <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background" />)}
               </div>
               <span className="text-muted-foreground">200+ brands using Aderai</span>
             </div>
@@ -108,16 +96,11 @@ export default function LandingPage() {
               <AnimatedUnderline delay="1s">70 segments</AnimatedUnderline> in 30 seconds. What takes <AnimatedUnderline delay="1.2s">10+ hours</AnimatedUnderline> manually, done <strong className="text-foreground">instantly</strong> with Aderai.
             </p>
             
-            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Deploy enterprise-grade customer segmentation without the enterprise price tag or complexity.
-            </p>
+            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">Deploy expert-grade customer segmentation without the agency price tag.</p>
             
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-              <button
-                onClick={handleGetStarted}
-                className="group relative bg-primary text-primary-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3"
-              >
+              <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3">
                 <span>Start building segments</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -165,17 +148,10 @@ export default function LandingPage() {
                   <div className="text-5xl font-bold mb-4 text-foreground">10+ hours</div>
                   
                   <div className="space-y-3">
-                    {[
-                      "Build 70 segments one by one",
-                      "Debug complex Boolean logic",
-                      "Test each segment manually",
-                      "Fix errors & edge cases"
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
+                    {["Build 70 segments one by one", "Debug complex Boolean logic", "Test each segment manually", "Fix errors & edge cases"].map((item, i) => <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
                         <X className="w-4 h-4 text-red-500 flex-shrink-0" />
                         <span>{item}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </div>
@@ -201,17 +177,10 @@ export default function LandingPage() {
                   </div>
                   
                   <div className="space-y-3">
-                    {[
-                      "Select from 70 pre-built segments",
-                      "Customize to your metrics",
-                      "One-click deploy to Klaviyo",
-                      "All segments auto-created"
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-sm">
+                    {["Select from 70 pre-built segments", "Customize to your metrics", "One-click deploy to Klaviyo", "All segments auto-created"].map((item, i) => <div key={i} className="flex items-center gap-3 text-sm">
                         <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
                         <span className="text-foreground/90">{item}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </div>
@@ -305,43 +274,33 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-12">
-            {[
-              {
-                step: "01",
-                title: "Connect Klaviyo",
-                description: "Add your Klaviyo API key. Instant validation. Secure connection.",
-              },
-              {
-                step: "02",
-                title: "Choose your segments",
-                description: "Browse 70 pre-built segments organized by strategy. Or use AI to suggest custom ones.",
-              },
-              {
-                step: "03",
-                title: "Customize metrics",
-                description: "Enter your AOV, currency, lifecycle thresholds. Segments auto-adjust to your business.",
-              },
-              {
-                step: "04",
-                title: "Deploy instantly",
-                description: "One click. All segments created in Klaviyo. Ready to use in campaigns.",
-              },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-8 items-start">
+            {[{
+            step: "01",
+            title: "Connect Klaviyo",
+            description: "Add your Klaviyo API key. Instant validation. Secure connection."
+          }, {
+            step: "02",
+            title: "Choose your segments",
+            description: "Browse 70 pre-built segments organized by strategy. Or use AI to suggest custom ones."
+          }, {
+            step: "03",
+            title: "Customize metrics",
+            description: "Enter your AOV, currency, lifecycle thresholds. Segments auto-adjust to your business."
+          }, {
+            step: "04",
+            title: "Deploy instantly",
+            description: "One click. All segments created in Klaviyo. Ready to use in campaigns."
+          }].map(item => <div key={item.step} className="flex gap-8 items-start">
                 <div className="text-6xl font-bold text-muted-foreground/20 flex-shrink-0">{item.step}</div>
                 <div className="flex-1 pt-2">
                   <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
                   <p className="text-lg text-muted-foreground">{item.description}</p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
 
           <div className="mt-16 text-center">
-            <button
-              onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-primary/90 transition shadow-lg inline-flex items-center gap-2"
-            >
+            <button onClick={handleGetStarted} className="bg-primary text-primary-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-primary/90 transition shadow-lg inline-flex items-center gap-2">
               Start now
               <ArrowRight className="w-5 h-5" />
             </button>
@@ -395,27 +354,9 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <TestimonialCard
-              quote="Deployed 70 segments in under a minute. Email revenue jumped 42% in the first month."
-              author="Marcus Rodriguez"
-              role="Head of Growth"
-              company="Premium Beauty Co."
-              metric="+42%"
-            />
-            <TestimonialCard
-              quote="What used to take my team 2 weeks now takes 30 seconds. This is a game-changer for our agency."
-              author="Sarah Chen"
-              role="Founder"
-              company="Growth Labs Agency"
-              metric="2 weeks → 30s"
-            />
-            <TestimonialCard
-              quote="The AI suggester is incredible. It recommended segments I never would have thought of."
-              author="James Wilson"
-              role="Marketing Director"
-              company="Luxe Lifestyle"
-              metric="+$87K"
-            />
+            <TestimonialCard quote="Deployed 70 segments in under a minute. Email revenue jumped 42% in the first month." author="Marcus Rodriguez" role="Head of Growth" company="Premium Beauty Co." metric="+42%" />
+            <TestimonialCard quote="What used to take my team 2 weeks now takes 30 seconds. This is a game-changer for our agency." author="Sarah Chen" role="Founder" company="Growth Labs Agency" metric="2 weeks → 30s" />
+            <TestimonialCard quote="The AI suggester is incredible. It recommended segments I never would have thought of." author="James Wilson" role="Marketing Director" company="Luxe Lifestyle" metric="+$87K" />
           </div>
           
           <div className="text-center">
@@ -463,10 +404,7 @@ export default function LandingPage() {
                   <span className="text-sm">1 Klaviyo account</span>
                 </li>
               </ul>
-              <button
-                onClick={handleGetStarted}
-                className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:bg-primary/90 transition"
-              >
+              <button onClick={handleGetStarted} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:bg-primary/90 transition">
                 Get started
               </button>
             </div>
@@ -494,10 +432,7 @@ export default function LandingPage() {
                   <span className="text-sm">Client switching</span>
                 </li>
               </ul>
-              <button
-                onClick={handleGetStarted}
-                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition"
-              >
+              <button onClick={handleGetStarted} className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition">
                 Get started
               </button>
             </div>
@@ -525,10 +460,7 @@ export default function LandingPage() {
                   <span className="text-sm">Priority support</span>
                 </li>
               </ul>
-              <button
-                onClick={handleGetStarted}
-                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition"
-              >
+              <button onClick={handleGetStarted} className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition">
                 Get started
               </button>
             </div>
@@ -608,6 +540,5 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 }
