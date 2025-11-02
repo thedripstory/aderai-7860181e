@@ -23,8 +23,8 @@ export default function LandingPage() {
       {/* Header */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold tracking-tight">
-            ADERAI<span className="text-accent">.</span>
+          <div className="text-2xl font-playfair font-bold tracking-tight">
+            aderai<span className="text-accent">.</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
@@ -479,8 +479,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-bold tracking-tight mb-4">
-                ADERAI<span className="text-accent">.</span>
+              <div className="text-2xl font-playfair font-bold tracking-tight mb-4">
+                aderai<span className="text-accent">.</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 AI-powered segmentation
