@@ -242,9 +242,7 @@ export default function LandingPage() {
               
               <div>
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                  Save 10+ hours
-                  <br />
-                  <span className="text-muted-foreground">every week</span>
+                  Literally 1 click segmentation.
                 </h2>
                 
                 <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
