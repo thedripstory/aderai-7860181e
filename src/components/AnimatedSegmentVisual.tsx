@@ -44,13 +44,14 @@ export const AnimatedSegmentVisual = () => {
   }, [isAutoPlaying]);
   const activeStep = STEPS[activeIndex];
   return <div className="relative w-full max-w-6xl mx-auto my-16">
-      {/* Minimal ambient glow */}
-      <div className="absolute inset-0 bg-primary/3 rounded-3xl blur-3xl" />
+      {/* Orange ambient glow */}
+      <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-3xl" />
+      <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-2xl animate-pulse" style={{ animationDuration: "4s" }} />
       
       <div className="relative">
         {/* Section header */}
         <div className="text-center mb-12 space-y-3">
-          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+          <p className="text-sm font-semibold text-primary/80 uppercase tracking-wider">
             Deploy in 4 Steps
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold">
@@ -59,7 +60,7 @@ export const AnimatedSegmentVisual = () => {
         </div>
 
         {/* Main Step Display */}
-        <div className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-border/50 overflow-hidden" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
+        <div className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-primary/20 overflow-hidden shadow-[0_0_40px_-10px_hsl(var(--primary)/0.3)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
           {/* Content */}
           <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
             {/* Left: Step Info */}
@@ -76,8 +77,8 @@ export const AnimatedSegmentVisual = () => {
               animationDelay: "100ms",
               animationFillMode: "forwards"
             }}>
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20">
-                  <activeStep.icon className="w-7 h-7 text-primary" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)]">
+                  <activeStep.icon className="w-7 h-7 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
                 </div>
                 <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
                   {activeStep.title}
@@ -103,17 +104,17 @@ export const AnimatedSegmentVisual = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
                     {/* Outer ring */}
-                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/20 animate-pulse" style={{
+                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/30 shadow-[0_0_30px_-10px_hsl(var(--primary)/0.4)] animate-pulse" style={{
                     animationDuration: "3s"
                   }} />
                     
                     {/* Middle ring */}
-                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/10" />
+                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/20" />
                     
                     {/* Center icon */}
                     <div className="absolute inset-0 w-48 h-48 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                        <activeStep.icon className="w-10 h-10 text-primary" />
+                      <div className="w-20 h-20 rounded-2xl bg-primary/15 border border-primary/30 shadow-[0_0_25px_-5px_hsl(var(--primary)/0.5)] flex items-center justify-center">
+                        <activeStep.icon className="w-10 h-10 text-primary drop-shadow-[0_0_10px_hsl(var(--primary)/0.6)]" />
                       </div>
                     </div>
 
@@ -176,10 +177,10 @@ export const AnimatedSegmentVisual = () => {
           animationDelay: "600ms",
           animationFillMode: "forwards"
         }}>
-            <div className="w-12 h-12 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary animate-pulse" />
+            <div className="w-12 h-12 rounded-full bg-primary/15 border-2 border-primary shadow-[0_0_20px_-5px_hsl(var(--primary)/0.5)] flex items-center justify-center">
+              <Zap className="w-6 h-6 text-primary animate-pulse drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
             </div>
-            <div className="absolute -inset-2 rounded-full border-2 border-primary/20 animate-ping" style={{
+            <div className="absolute -inset-2 rounded-full border-2 border-primary/30 animate-ping shadow-[0_0_15px_-5px_hsl(var(--primary)/0.4)]" style={{
             animationDuration: "2s"
           }} />
           </div>
