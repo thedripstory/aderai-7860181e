@@ -7,7 +7,7 @@ export const EmailHero = () => {
       <div className="max-w-2xl mx-auto">
         <div className="inline-block mb-4 px-4 py-1.5 rounded-md bg-accent/10 border border-accent/20">
           <span className="text-sm font-semibold text-accent">
-            Klaviyo AI Segmentation
+            ADERAI for Klaviyo
           </span>
         </div>
         
@@ -33,7 +33,7 @@ export const EmailHero = () => {
         <div className="rounded-lg overflow-hidden shadow-lg border border-border">
           <img 
             src={heroImage} 
-            alt="Klaviyo AI Segmentation Dashboard" 
+            alt="Aderai Segmentation Dashboard for Klaviyo" 
             className="w-full h-auto"
           />
         </div>

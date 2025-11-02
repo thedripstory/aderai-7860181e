@@ -25,7 +25,7 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="text-2xl font-bold tracking-tight">
-            klaviyo<span className="text-accent">.</span>
+            ADERAI<span className="text-accent">.</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
@@ -52,13 +52,13 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight">
-            70 segments.
-            <br />
-            <span className="text-muted-foreground">One click.</span>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+            Segment like a<br />
+            <span className="text-accent">$50M brand.</span>
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
-            What takes 10+ hours manually, done in 30 seconds. Deploy enterprise-level Klaviyo segmentation without the agency price tag.
+          
+          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            70 segments in 30 seconds. What takes 10+ hours manually, done instantly with Aderai.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -86,7 +86,7 @@ export default function LandingPage() {
             </div>
             <div className="bg-card rounded-lg p-8 text-left border-2 border-accent shadow-md">
               <MousePointerClick className="w-8 h-8 text-accent mb-4" />
-              <div className="text-sm text-accent font-semibold mb-2">With Klaviyo AI</div>
+              <div className="text-sm text-accent font-semibold mb-2">With Aderai</div>
               <div className="text-4xl font-bold mb-3">30 seconds</div>
               <div className="text-sm text-muted-foreground">
                 Select segments, customize to your metrics, deploy. All segments auto-created.
@@ -107,7 +107,7 @@ export default function LandingPage() {
       </section>
 
       {/* Torn Paper Divider */}
-      <TornPaperDivider className="text-muted" fillColor="hsl(var(--muted))" />
+      <TornPaperDivider className="text-muted" />
 
       {/* The Problem */}
       <section className="py-20 px-6 bg-muted">
@@ -149,7 +149,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <TornPaperDivider className="text-background rotate-180" fillColor="hsl(var(--background))" />
+      <TornPaperDivider className="text-background flip" />
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 px-6">
@@ -204,7 +204,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <TornPaperDivider className="text-muted" fillColor="hsl(var(--muted))" />
+      <TornPaperDivider className="text-muted" />
 
       {/* Features */}
       <section className="py-20 px-6 bg-muted">
@@ -239,7 +239,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <TornPaperDivider className="text-background rotate-180" fillColor="hsl(var(--background))" />
+      <TornPaperDivider className="text-background flip" />
 
       {/* Pricing */}
       <section id="pricing" className="py-20 px-6">
@@ -357,7 +357,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="text-2xl font-bold tracking-tight mb-4">
-                klaviyo<span className="text-accent">.</span>
+                ADERAI<span className="text-accent">.</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 AI-powered segmentation
@@ -412,7 +412,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            © 2025 Klaviyo AI Segmentation. Powered by Klaviyo.
+            © 2025 Aderai. Powered by Klaviyo.
           </div>
         </div>
       </footer>
