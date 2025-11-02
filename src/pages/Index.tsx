@@ -2174,11 +2174,90 @@ export default function AderaiApp() {
     );
   }
 
-  // Keep existing ANALYTICS, CREATING, RESULTS views from original (too long to include here)
-  // Just add loading state
-  return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+  // Creating View
+  if (view === "creating") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="text-center">
+          <Loader className="w-16 h-16 text-[#EF3F3F] mx-auto mb-4 animate-spin" />
+          <h2 className="text-2xl font-bold text-white mb-2">Creating Your Segments...</h2>
+          <p className="text-gray-400">This may take a minute</p>
+        </div>
+      </div>
+    );
+  }
 
+  // Results View
+  if (view === "results") {
+    const successCount = results.filter((r) => r.status === "success").length;
+    const errorCount = results.filter((r) => r.status === "error").length;
+
+    return (
+      <div className="min-h-screen bg-[#0A0A0A]">
+        <div className="max-w-4xl mx-auto px-6 py-12">
+          <div className="text-center mb-8">
+            <div
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+                errorCount === 0 ? "bg-green-500/20" : "bg-yellow-500/20"
+              }`}
+            >
+              {errorCount === 0 ? (
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              ) : (
+                <AlertCircle className="w-8 h-8 text-yellow-500" />
+              )}
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-2">
+              {errorCount === 0 ? "All Segments Created!" : "Creation Complete"}
+            </h2>
+            <p className="text-gray-400">
+              {successCount} successful, {errorCount} failed
+            </p>
+          </div>
+
+          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg divide-y divide-[#2A2A2A] mb-8">
+            {results.map((result, index) => (
+              <div key={index} className="p-4 flex items-center gap-4">
+                {result.status === "success" ? (
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                ) : result.status === "error" ? (
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                ) : (
+                  <Info className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                )}
+                <div className="flex-1">
+                  <div className="text-white font-medium">{result.segmentId}</div>
+                  <div className="text-sm text-gray-400">{result.message}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => {
+                setView("dashboard");
+                setSelectedSegments([]);
+                setResults([]);
+              }}
+              className="bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 px-8 rounded-lg transition"
+            >
+              Back to Dashboard
+            </button>
+            <button
+              onClick={() => setView("analytics")}
+              className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white font-semibold py-3 px-8 rounded-lg transition flex items-center gap-2"
+            >
+              <BarChart3 className="w-5 h-5" />
+              View Analytics
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Analytics View
   if (view === "analytics") {
     const summary = getAnalyticsSummary();
     const topSegments = getTopSegments(5);
@@ -2908,85 +2987,67 @@ export default function AderaiApp() {
                             <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
                               Days without purchase to be considered "lapsed" (typically 60 days)
                             </div>
-  if (view === "creating") {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
-        <div className="text-center">
-          <Loader className="w-16 h-16 text-[#EF3F3F] mx-auto mb-4 animate-spin" />
-          <h2 className="text-2xl font-bold text-white mb-2">Creating Your Segments...</h2>
-          <p className="text-gray-400">This may take a minute</p>
-        </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.lapsedDays}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, lapsedDays: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">Churned</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("churned-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "churned-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Days without purchase to be considered "churned" (typically 90 days)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.churnedDays}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, churnedDays: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-[#2A2A2A]">
+                  <button
+                    onClick={() => setShowSettingsModal(false)}
+                    className="px-6 py-3 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white font-semibold rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveSettings}
+                    className="px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold rounded-lg transition"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
-  // Results View
-  if (view === "results") {
-    const successCount = results.filter((r) => r.status === "success").length;
-    const errorCount = results.filter((r) => r.status === "error").length;
-
-    return (
-      <div className="min-h-screen bg-[#0A0A0A]">
-        <div className="max-w-4xl mx-auto px-6 py-12">
-          <div className="text-center mb-8">
-            <div
-              className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-                errorCount === 0 ? "bg-green-500/20" : "bg-yellow-500/20"
-              }`}
-            >
-              {errorCount === 0 ? (
-                <CheckCircle className="w-8 h-8 text-green-500" />
-              ) : (
-                <AlertCircle className="w-8 h-8 text-yellow-500" />
-              )}
-            </div>
-            <h2 className="text-3xl font-bold text-white mb-2">
-              {errorCount === 0 ? "All Segments Created!" : "Creation Complete"}
-            </h2>
-            <p className="text-gray-400">
-              {successCount} successful, {errorCount} failed
-            </p>
-          </div>
-
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg divide-y divide-[#2A2A2A] mb-8">
-            {results.map((result, index) => (
-              <div key={index} className="p-4 flex items-center gap-4">
-                {result.status === "success" ? (
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                ) : result.status === "error" ? (
-                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                ) : (
-                  <Info className="w-5 h-5 text-yellow-500 flex-shrink-0" />
-                )}
-                <div className="flex-1">
-                  <div className="text-white font-medium">{result.segmentId}</div>
-                  <div className="text-sm text-gray-400">{result.message}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => {
-                setView("dashboard");
-                setSelectedSegments([]);
-                setResults([]);
-              }}
-              className="bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 px-8 rounded-lg transition"
-            >
-              Back to Dashboard
-            </button>
-            <button
-              onClick={() => setView("analytics")}
-              className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white font-semibold py-3 px-8 rounded-lg transition flex items-center gap-2"
-            >
-              <BarChart3 className="w-5 h-5" />
-              View Analytics
-            </button>
-          </div>
-        </div>
-      </div>
-    );
 
   return null;
 }
