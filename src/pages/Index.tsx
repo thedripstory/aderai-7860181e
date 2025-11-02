@@ -459,12 +459,12 @@ const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) =>
     </div>
   );
 };
-interface AderaiAppProps {
+interface KlaviyoAIProps {
   initialView?: "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "auth" | "ai-suggester" | "affiliate" | "settings";
   initialAuthView?: "choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login";
 }
 
-export default function AderaiApp({ initialView = "login", initialAuthView = "choice" }: AderaiAppProps = {}) {
+export default function AderaiApp({ initialView = "login", initialAuthView = "choice" }: KlaviyoAIProps = {}) {
   // View state - Extended with all views
   const [view, setView] = useState<
     "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "auth" | "ai-suggester" | "affiliate" | "settings"

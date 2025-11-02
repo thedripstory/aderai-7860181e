@@ -4,12 +4,12 @@ export const EmailCTA = () => {
   return (
     <section className="px-4 py-12 sm:py-16">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-gradient-primary rounded-xl p-8 sm:p-12 text-center text-primary-foreground shadow-elegant">
+        <div className="bg-foreground text-background rounded-lg p-8 sm:p-12 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Your Investment Is Protected
+            100% money-back guarantee
           </h2>
-          <p className="text-lg mb-8 opacity-95 max-w-xl mx-auto">
-            Try risk-free. If these 70 segments don't boost your email performance, get 100% of your money back. Zero risk.
+          <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto">
+            Try risk-free. If these 70 segments don't boost your email performance, get your money back. Zero risk.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -17,19 +17,19 @@ export const EmailCTA = () => {
               size="lg" 
               className="text-base font-semibold bg-background text-foreground hover:bg-background/90"
             >
-              Start For $49
+              Get started for $49
             </Button>
             <Button 
               variant="outline" 
               size="lg" 
-              className="text-base font-semibold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+              className="text-base font-semibold border-2 border-background/30 text-background hover:bg-background/10"
             >
-              Watch Demo
+              See how it works
             </Button>
           </div>
           
-          <p className="text-sm opacity-90 font-medium">
-            Instant setup • 100% money-back guarantee • Works with Klaviyo
+          <p className="text-sm opacity-80 font-medium">
+            Instant setup • Money-back guarantee • Works with Klaviyo
           </p>
         </div>
       </div>
