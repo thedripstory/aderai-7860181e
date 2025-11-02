@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Play } from "lucide-react";
-import { TornPaperDivider } from "@/components/TornPaperDivider";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { TestimonialCard } from "@/components/TestimonialCard";
@@ -230,11 +229,6 @@ export default function LandingPage() {
             <TrustLogos />
           </div>
         </div>
-        
-        {/* Torn Paper Effect - positioned to bridge sections */}
-        <div className="absolute bottom-0 left-0 right-0 z-40 pointer-events-none" style={{ transform: 'translateY(100%)' }}>
-          <TornPaperDivider />
-        </div>
       </section>
 
       {/* Automation Section */}
@@ -305,8 +299,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <TornPaperDivider className="text-background flip" />
-
       {/* How It Works */}
       <section id="how-it-works" className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
@@ -350,8 +342,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <TornPaperDivider className="text-muted" />
-
       {/* Features */}
       <section className="py-20 px-6 bg-muted">
         <div className="max-w-6xl mx-auto">
@@ -385,8 +375,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <TornPaperDivider className="text-background flip" />
-
       {/* Testimonials */}
       <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
@@ -406,8 +394,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <TornPaperDivider className="text-muted" />
 
       {/* Pricing */}
       <section id="pricing" className="py-20 px-6 bg-muted">
@@ -514,8 +500,6 @@ export default function LandingPage() {
         </div>
       </section>
       
-      <TornPaperDivider className="text-background flip" />
-
       {/* Footer */}
       <footer className="border-t border-border py-12 px-6 bg-muted">
         <div className="max-w-7xl mx-auto">
