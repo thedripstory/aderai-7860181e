@@ -95,7 +95,7 @@ export default function LandingPage() {
               Aderai does <CircleDoodle delay="1s"><strong className="text-foreground">instantly.</strong></CircleDoodle>
             </p>
             
-            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">Deploy expert-grade customer segmentation without the agency price tag.</p>
+            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">Deploy expert-grade Klaviyo segmentation without the agency price tag.</p>
             
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
