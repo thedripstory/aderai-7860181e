@@ -10,6 +10,7 @@ import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { EnquiryModal } from "@/components/EnquiryModal";
+import { AnimatedStatsBar } from "@/components/AnimatedStatsBar";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
@@ -198,21 +199,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Stats Bar Below */}
-            <div className="mt-8 grid grid-cols-3 gap-4 max-w-3xl mx-auto">
-              <div className="text-center p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border">
-                <div className="text-3xl font-bold text-primary mb-1">200x</div>
-                <div className="text-xs text-muted-foreground">Faster setup</div>
-              </div>
-              <div className="text-center p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border">
-                <div className="text-3xl font-bold text-primary mb-1">$0</div>
-                <div className="text-xs text-muted-foreground">Monthly fees</div>
-              </div>
-              <div className="text-center p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border">
-                <div className="text-3xl font-bold text-primary mb-1">70</div>
-                <div className="text-xs text-muted-foreground">Segments ready</div>
-              </div>
-            </div>
+            {/* Animated Stats Bar */}
+            <AnimatedStatsBar />
           </div>
 
           {/* Visual Demo */}
