@@ -59,7 +59,7 @@ export const AnimatedSegmentVisual = () => {
         </div>
 
         {/* Main Step Display */}
-        <div className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-primary/40 overflow-hidden shadow-[0_0_60px_-10px_hsl(var(--primary)/0.5)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
+        <div className="relative bg-white/80 dark:bg-white/10 backdrop-blur-sm rounded-3xl border border-primary/40 overflow-hidden shadow-[0_0_60px_-10px_hsl(var(--primary)/0.5)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
           {/* Content */}
           <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
             {/* Left: Step Info */}
