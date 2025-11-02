@@ -49,8 +49,8 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="w-full max-w-lg">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold mb-4">
-              ADERAI<span className="text-accent">.</span>
+            <h1 className="text-5xl font-playfair font-bold tracking-wide mb-4">
+              aderai<span className="text-accent">.</span>
             </h1>
             <p className="text-muted-foreground text-xl mb-6">Choose your account type</p>
             <PoweredByBadge />
