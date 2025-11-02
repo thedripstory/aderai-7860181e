@@ -325,9 +325,24 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-16 text-center">
-            <button onClick={handleGetStarted} className="bg-primary text-primary-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-primary/90 transition shadow-lg inline-flex items-center gap-2">
-              Start now
-              <ArrowRight className="w-5 h-5" />
+            <button 
+              onClick={handleGetStarted} 
+              className="group relative bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] text-primary-foreground px-14 py-7 rounded-2xl text-xl font-bold shadow-2xl inline-flex items-center gap-4 overflow-hidden transition-all duration-500 hover:bg-[position:100%_0] hover:scale-110 hover:shadow-[0_20px_60px_rgba(0,0,0,0.3)] hover:-rotate-1 active:scale-105"
+            >
+              {/* Animated background shimmer */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              
+              {/* Pulsing glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
+              
+              <span className="relative z-10 group-hover:tracking-wider transition-all duration-300">
+                Get My Segments Now - $49
+              </span>
+              <ArrowRight className="relative z-10 w-6 h-6 group-hover:translate-x-2 group-hover:scale-125 transition-all duration-300" />
+              
+              {/* Corner sparkles */}
+              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" />
+              <div className="absolute bottom-2 left-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{ animationDelay: "0.2s" }} />
             </button>
           </div>
         </div>
