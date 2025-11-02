@@ -2505,7 +2505,69 @@ const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) =>
                             <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
                               Days without purchase to be considered "lapsed" (typically 60 days)
                             </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.lapsedDays}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, lapsedDays: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
 
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <label className="block text-sm text-gray-400">Churned</label>
+                        <div className="relative">
+                          <button
+                            onMouseEnter={() => setActiveTooltip("churned-setting")}
+                            onMouseLeave={() => setActiveTooltip(null)}
+                            className="text-gray-400 hover:text-[#EF3F3F] transition"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          {activeTooltip === "churned-setting" && (
+                            <div className="absolute z-50 left-6 top-0 w-64 bg-[#1A1A1A] border border-[#EF3F3F] rounded-lg p-3 text-xs text-gray-300 shadow-xl">
+                              Days without purchase to be considered "churned" (typically 180 days)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="number"
+                        value={editingSettings.churnedDays}
+                        onChange={(e) => setEditingSettings({ ...editingSettings, churnedDays: e.target.value })}
+                        className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white focus:border-[#EF3F3F] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-4 pt-6 border-t border-[#2A2A2A]">
+                  <button
+                    onClick={handleSaveSettings}
+                    className="flex-1 bg-[#EF3F3F] hover:bg-[#DC2626] text-white font-semibold py-3 rounded-lg transition"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={() => setShowSettingsModal(false)}
+                    className="flex-1 bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white font-semibold py-3 rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Creating View
   if (view === "creating") {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
@@ -2586,6 +2648,7 @@ const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) =>
         </div>
       </div>
     );
+  }
 
   return null;
 }
