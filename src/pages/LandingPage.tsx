@@ -63,16 +63,16 @@ export default function LandingPage() {
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map(i => <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background" />)}
               </div>
-              <span className="text-muted-foreground">200+ brands using Aderai</span>
+              <span className="text-muted-foreground">10,00 brands+ use Aderai</span>
             </div>
             <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
               <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-              <span className="font-semibold">4.9/5</span>
-              <span className="text-muted-foreground">(127 reviews)</span>
+              <span className="font-semibold">4.8/5</span>
+              <span className="text-muted-foreground">(727 reviews)</span>
             </div>
             <div className="flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Setup in 60 seconds</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Works directly with Klaviyo</span>
             </div>
           </div>
 
