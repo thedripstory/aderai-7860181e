@@ -9,7 +9,6 @@ import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
-import { AutomationFlow } from "@/components/AutomationFlow";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -47,7 +46,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-16 px-6 overflow-visible">
+      <section className="relative pt-24 pb-32 px-6 overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
@@ -213,93 +212,51 @@ export default function LandingPage() {
           {/* Visual Demo */}
           <AnimatedSegmentVisual />
           
-          {/* CTA Button */}
-          <div className="mt-20 text-center">
-            <button 
-              onClick={handleGetStarted}
-              className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3"
-            >
-              <span>Start Building Segments</span>
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-2xl" />
-            </button>
-          </div>
-          
           {/* Trust Logos */}
-          <div className="mt-20 mb-0">
+          <div className="mt-20">
             <TrustLogos />
           </div>
         </div>
-        
-        {/* Torn Paper Effect - positioned to bridge sections */}
-        <div className="absolute bottom-0 left-0 right-0 z-20" style={{ transform: 'translateY(50%)' }}>
-          <TornPaperDivider className="text-muted" />
-        </div>
       </section>
 
-      {/* Automation Section */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                  Klaviyo&apos;s Official API Partner
-                </span>
-              </div>
-              
-              <div>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">Literal 1 click segmentation.</h2>
-                
-                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">With official API integration, Aderai deploys high-impact audience segments directly into your Klaviyo account, instantly.</p>
-              </div>
+      {/* Torn Paper Divider */}
+      <TornPaperDivider className="text-muted" />
 
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Smart Triggers</h3>
-                    <p className="text-muted-foreground text-sm">Automatically detect customer behaviors and segment in real-time</p>
-                  </div>
-                </div>
+      {/* The Problem */}
+      <section className="py-20 px-6 bg-muted">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Most brands leave <CircleDoodle delay="0.3s"><span className="text-accent">40%</span></CircleDoodle> of email revenue on the table
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              While top brands deploy <AnimatedUnderline delay="0.5s">70 segments</AnimatedUnderline>, you&apos;re stuck with 5 basic ones.
+            </p>
+          </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-accent" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Segment Score</h3>
-                    <p className="text-muted-foreground text-sm">Monitor segment health with actionable performance indicators</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Instant Deployment</h3>
-                    <p className="text-muted-foreground text-sm">Push segments to Klaviyo with one click - no manual work</p>
-                  </div>
-                </div>
-              </div>
-
-              <button className="group px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 hover:scale-105 inline-flex items-center justify-center">
-                Unlock Forever
-              </button>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-card rounded-lg p-8 shadow-sm border border-border">
+              <div className="text-5xl font-bold text-accent mb-4">10-15h</div>
+              <h3 className="text-xl font-bold mb-3">Takes forever</h3>
+              <p className="text-muted-foreground">
+                Creating 70 segments manually. Most brands give up after 5-10.
+              </p>
             </div>
 
-            {/* Right Workflow Visual */}
-            <div className="relative">
-              <AutomationFlow />
+            <div className="bg-card rounded-lg p-8 shadow-sm border border-border">
+              <div className="text-5xl font-bold text-accent mb-4">$5-15K</div>
+              <h3 className="text-xl font-bold mb-3">Agency costs</h3>
+              <p className="text-muted-foreground">
+                Expensive setup fees. You don't own the methodology.
+              </p>
+            </div>
+
+            <div className="bg-card rounded-lg p-8 shadow-sm border border-border">
+              <div className="text-5xl font-bold text-accent mb-4">40%</div>
+              <h3 className="text-xl font-bold mb-3">Revenue lost</h3>
+              <p className="text-muted-foreground">
+                Without proper segmentation, you miss high-value opportunities.
+              </p>
             </div>
           </div>
         </div>
