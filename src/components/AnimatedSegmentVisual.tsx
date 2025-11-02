@@ -196,11 +196,28 @@ export const AnimatedSegmentVisual = () => {
           </div>
         </div>
 
-        {/* Bottom tagline */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            What takes 10+ hours manually • <span className="text-primary font-semibold">Done in 30 seconds</span>
-          </p>
+        {/* Bottom animated comparison */}
+        <div className="mt-12 flex items-center justify-center gap-8">
+          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{ animationDelay: "400ms", animationFillMode: "forwards" }}>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-muted-foreground/30 line-through">10+ hours</div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Manual setup</div>
+            </div>
+          </div>
+          
+          <div className="relative opacity-0 animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "forwards" }}>
+            <div className="w-12 h-12 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
+              <Zap className="w-6 h-6 text-primary animate-pulse" />
+            </div>
+            <div className="absolute -inset-2 rounded-full border-2 border-primary/20 animate-ping" style={{ animationDuration: "2s" }} />
+          </div>
+          
+          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{ animationDelay: "800ms", animationFillMode: "forwards" }}>
+            <div className="text-left">
+              <div className="text-3xl font-bold text-primary">30 seconds</div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">With Aderai</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
