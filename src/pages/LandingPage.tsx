@@ -134,6 +134,76 @@ export default function LandingPage() {
 
           {/* Main Hero Content */}
           <div className="relative text-center mb-16 z-10">
+            {/* Floating Dashboard Screenshots - Left Side */}
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 hidden xl:block pointer-events-none">
+              {/* Stacked card effect - back cards */}
+              <div 
+                className="absolute w-72 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(-120% + ${scrollY * 0.08}px)) translateY(calc(${scrollY * 0.12}px - 30px)) rotate(-12deg)`,
+                  animationDelay: "400ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 1
+                }}
+              >
+                <div className="rounded-xl overflow-hidden shadow-xl border-2 border-white/10 backdrop-blur-sm opacity-60">
+                  <img src={dashboardMetrics} alt="Dashboard" className="w-full h-auto" />
+                </div>
+              </div>
+              
+              {/* Front card */}
+              <div 
+                className="relative w-80 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(-100% + ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(-8deg)`,
+                  animationDelay: "600ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 2
+                }}
+              >
+                <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
+                  <img src={dashboardRevenue} alt="Revenue Analytics" className="w-full h-auto" />
+                </div>
+              </div>
+            </div>
+
+            {/* Floating Dashboard Screenshots - Right Side */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 hidden xl:block pointer-events-none">
+              {/* Stacked card effect - back cards */}
+              <div 
+                className="absolute w-72 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(120% - ${scrollY * 0.08}px)) translateY(calc(${scrollY * 0.12}px + 30px)) rotate(12deg)`,
+                  animationDelay: "500ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 1
+                }}
+              >
+                <div className="rounded-xl overflow-hidden shadow-xl border-2 border-white/10 backdrop-blur-sm opacity-60">
+                  <img src={dashboardRevenue} alt="Dashboard" className="w-full h-auto" />
+                </div>
+              </div>
+              
+              {/* Front card */}
+              <div 
+                className="relative w-80 opacity-0 animate-fade-in"
+                style={{
+                  transform: `translateX(calc(100% - ${scrollY * 0.1}px)) translateY(${scrollY * 0.15}px) rotate(8deg)`,
+                  animationDelay: "700ms",
+                  animationFillMode: "forwards",
+                  transition: "transform 0.1s ease-out",
+                  zIndex: 2
+                }}
+              >
+                <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm">
+                  <img src={dashboardMetrics} alt="User Metrics" className="w-full h-auto" />
+                </div>
+              </div>
+            </div>
+
             <div className="inline-flex items-center gap-2 bg-gradient-to-br from-orange-400 via-yellow-500 to-orange-600 backdrop-blur-sm px-5 py-2.5 rounded-full border border-orange-300/30 mb-8 animate-fade-in shadow-lg shadow-orange-500/20 hover:scale-110 hover:rotate-2 hover:shadow-2xl hover:shadow-orange-400/40 transition-all duration-300 cursor-pointer relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <CheckCircle2 className="w-4 h-4 text-white relative z-10" />
