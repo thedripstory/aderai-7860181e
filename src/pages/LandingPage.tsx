@@ -241,13 +241,9 @@ export default function LandingPage() {
               </div>
               
               <div>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                  Literally 1 click segmentation.
-                </h2>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"> 1 click segmentation.</h2>
                 
-                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
-                  Let our intelligent automation handle repetitive segmentation tasks, so you can reclaim your time and focus on strategic initiatives.
-                </p>
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">With official API integration, Aderai deploys high-impact audience segments directly into your Klaviyo account, instantly.</p>
               </div>
 
               <div className="space-y-4">
@@ -266,8 +262,8 @@ export default function LandingPage() {
                     <div className="w-2 h-2 rounded-full bg-accent" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Conditional Logic</h3>
-                    <p className="text-muted-foreground text-sm">Build complex workflows with branching paths and conditions</p>
+                    <h3 className="font-semibold mb-1">Segment Score</h3>
+                    <p className="text-muted-foreground text-sm">Monitor segment health with actionable performance indicators</p>
                   </div>
                 </div>
 
