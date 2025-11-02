@@ -233,7 +233,7 @@ export default function LandingPage() {
         
         {/* Torn Paper Effect - positioned to bridge sections */}
         <div className="absolute bottom-0 left-0 right-0 z-40 pointer-events-none" style={{ transform: 'translateY(100%)' }}>
-          <TornPaperDivider className="text-background" />
+          <TornPaperDivider />
         </div>
       </section>
 
