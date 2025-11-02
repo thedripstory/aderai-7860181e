@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, ArrowRight, Zap, Clock, MousePointerClick } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Play } from "lucide-react";
 import { TornPaperDivider } from "@/components/TornPaperDivider";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -58,67 +58,196 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="mb-6 flex justify-center">
-            <PoweredByBadge />
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-            Segment like a<br />
-            <CircleDoodle delay="0.8s">
-              <span className="text-accent">$50M brand.</span>
-            </CircleDoodle>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            <AnimatedUnderline delay="1s">70 segments</AnimatedUnderline> in 30 seconds. What takes <AnimatedUnderline delay="1.2s">10+ hours</AnimatedUnderline> manually, done <strong>instantly</strong> with Aderai.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <button
-              onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-primary/90 transition shadow-lg flex items-center gap-2"
-            >
-              Get started for $49
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <button className="bg-transparent border-2 border-foreground text-foreground px-8 py-4 rounded-full text-base font-semibold hover:bg-foreground hover:text-background transition">
-              See how it works
-            </button>
+      <section className="relative pt-24 pb-32 px-6 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto">
+          {/* Top Bar - Social Proof */}
+          <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm">
+            <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background" />
+                ))}
+              </div>
+              <span className="text-muted-foreground">200+ brands using Aderai</span>
+            </div>
+            <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
+              <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+              <span className="font-semibold">4.9/5</span>
+              <span className="text-muted-foreground">(127 reviews)</span>
+            </div>
+            <div className="flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Setup in 60 seconds</span>
+            </div>
           </div>
 
-          {/* Time comparison */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-20 relative">
-            <div className="bg-muted rounded-lg p-8 text-left border border-border">
-              <Clock className="w-8 h-8 text-muted-foreground mb-4" />
-              <div className="text-sm text-muted-foreground mb-2">Manual segmentation</div>
-              <div className="text-4xl font-bold mb-3">10+ hours</div>
-              <div className="text-sm text-muted-foreground">
-                Building 70 segments manually in Klaviyo, debugging Boolean logic, testing each one.
+          {/* Main Hero Content */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/20 mb-8 animate-fade-in">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">AI-powered segmentation engine</span>
+            </div>
+            
+            <h1 className="text-6xl md:text-8xl font-bold mb-8 tracking-tight leading-none">
+              Segment like a<br />
+              <CircleDoodle delay="0.8s">
+                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_linear_infinite]">
+                  $50M brand.
+                </span>
+              </CircleDoodle>
+            </h1>
+            
+            <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium">
+              <AnimatedUnderline delay="1s">70 segments</AnimatedUnderline> in 30 seconds. What takes <AnimatedUnderline delay="1.2s">10+ hours</AnimatedUnderline> manually, done <strong className="text-foreground">instantly</strong> with Aderai.
+            </p>
+            
+            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Deploy enterprise-grade customer segmentation without the enterprise price tag or complexity.
+            </p>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+              <button
+                onClick={handleGetStarted}
+                className="group relative bg-primary text-primary-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3"
+              >
+                <span>Start building segments</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              </button>
+              <button className="group bg-card hover:bg-muted border-2 border-border text-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-lg flex items-center gap-3">
+                <Play className="w-5 h-5" />
+                <span>Watch 60s demo</span>
+              </button>
+            </div>
+
+            {/* Pricing & Trust */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                <span>One-time $49</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                <span>No monthly fees</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                <span>Cancel anytime</span>
               </div>
             </div>
-            <div className="bg-card rounded-lg p-8 text-left border-2 border-accent shadow-md relative">
-              <MousePointerClick className="w-8 h-8 text-accent mb-4" />
-              <div className="text-sm text-accent font-semibold mb-2">With Aderai</div>
-              <div className="text-4xl font-bold mb-3 relative inline-block">
-                <CircleDoodle delay="1.5s">
-                  <AnimatedTimeCounter />
-                </CircleDoodle>
+          </div>
+
+          {/* Interactive Comparison Cards */}
+          <div className="relative max-w-5xl mx-auto mb-24">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Before Card */}
+              <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/5 rounded-full blur-2xl" />
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="p-3 bg-background/50 rounded-xl border border-border">
+                      <Clock className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <div className="px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold rounded-full border border-red-500/20">
+                      OLD WAY
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm text-muted-foreground mb-2 font-medium uppercase tracking-wide">Manual Segmentation</div>
+                  <div className="text-5xl font-bold mb-4 text-foreground">10+ hours</div>
+                  
+                  <div className="space-y-3">
+                    {[
+                      "Build 70 segments one by one",
+                      "Debug complex Boolean logic",
+                      "Test each segment manually",
+                      "Fix errors & edge cases"
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <X className="w-4 h-4 text-red-500 flex-shrink-0" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground">
-                Select segments, customize to your metrics, deploy. All segments auto-created.
+
+              {/* After Card */}
+              <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-2xl animate-pulse" />
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="p-3 bg-primary/10 rounded-xl border border-primary/20">
+                      <Zap className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="px-3 py-1 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/30 animate-pulse">
+                      NEW WAY
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm text-primary mb-2 font-bold uppercase tracking-wide">With Aderai</div>
+                  <div className="text-5xl font-bold mb-4 text-foreground">
+                    <CircleDoodle delay="1.5s">
+                      <AnimatedTimeCounter />
+                    </CircleDoodle>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {[
+                      "Select from 70 pre-built segments",
+                      "Customize to your metrics",
+                      "One-click deploy to Klaviyo",
+                      "All segments auto-created"
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 text-sm">
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-foreground/90">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Arrow Connection */}
+              <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                <div className="bg-background border-2 border-primary rounded-full p-4 shadow-xl">
+                  <ArrowRight className="w-8 h-8 text-primary animate-pulse" />
+                </div>
               </div>
             </div>
-            <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <ArrowDoodle direction="right" />
+
+            {/* Stats Bar Below */}
+            <div className="mt-8 grid grid-cols-3 gap-4 max-w-3xl mx-auto">
+              <div className="text-center p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border">
+                <div className="text-3xl font-bold text-primary mb-1">200x</div>
+                <div className="text-xs text-muted-foreground">Faster setup</div>
+              </div>
+              <div className="text-center p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border">
+                <div className="text-3xl font-bold text-primary mb-1">$0</div>
+                <div className="text-xs text-muted-foreground">Monthly fees</div>
+              </div>
+              <div className="text-center p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border">
+                <div className="text-3xl font-bold text-primary mb-1">70</div>
+                <div className="text-xs text-muted-foreground">Segments ready</div>
+              </div>
             </div>
           </div>
 
           {/* Visual Demo */}
           <AnimatedSegmentVisual />
           
-          <TrustLogos />
+          {/* Trust Logos */}
+          <div className="mt-20">
+            <TrustLogos />
+          </div>
         </div>
       </section>
 
