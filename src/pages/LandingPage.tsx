@@ -5,6 +5,9 @@ import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { TestimonialCard } from "@/components/TestimonialCard";
 import { AnimatedSegmentVisual } from "@/components/AnimatedSegmentVisual";
+import { AnimatedUnderline } from "@/components/AnimatedUnderline";
+import { CircleDoodle } from "@/components/CircleDoodle";
+import { ArrowDoodle } from "@/components/ArrowDoodle";
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -62,11 +65,13 @@ export default function LandingPage() {
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
             Segment like a<br />
-            <span className="text-accent">$50M brand.</span>
+            <CircleDoodle delay="0.8s">
+              <span className="text-accent">$50M brand.</span>
+            </CircleDoodle>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            70 segments in 30 seconds. What takes 10+ hours manually, done instantly with Aderai.
+            <AnimatedUnderline delay="1s">70 segments</AnimatedUnderline> in 30 seconds. What takes <AnimatedUnderline delay="1.2s">10+ hours</AnimatedUnderline> manually, done <strong>instantly</strong> with Aderai.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -83,7 +88,7 @@ export default function LandingPage() {
           </div>
 
           {/* Time comparison */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-20">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-20 relative">
             <div className="bg-muted rounded-lg p-8 text-left border border-border">
               <Clock className="w-8 h-8 text-muted-foreground mb-4" />
               <div className="text-sm text-muted-foreground mb-2">Manual segmentation</div>
@@ -92,13 +97,18 @@ export default function LandingPage() {
                 Building 70 segments manually in Klaviyo, debugging Boolean logic, testing each one.
               </div>
             </div>
-            <div className="bg-card rounded-lg p-8 text-left border-2 border-accent shadow-md">
+            <div className="bg-card rounded-lg p-8 text-left border-2 border-accent shadow-md relative">
               <MousePointerClick className="w-8 h-8 text-accent mb-4" />
               <div className="text-sm text-accent font-semibold mb-2">With Aderai</div>
-              <div className="text-4xl font-bold mb-3">30 seconds</div>
+              <div className="text-4xl font-bold mb-3 relative inline-block">
+                <CircleDoodle delay="1.5s">30 seconds</CircleDoodle>
+              </div>
               <div className="text-sm text-muted-foreground">
                 Select segments, customize to your metrics, deploy. All segments auto-created.
               </div>
+            </div>
+            <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <ArrowDoodle direction="right" />
             </div>
           </div>
 
@@ -117,10 +127,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Most brands leave 40% of email revenue on the table
+              Most brands leave <CircleDoodle delay="0.3s"><span className="text-accent">40%</span></CircleDoodle> of email revenue on the table
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              While top brands deploy 70 segments, you're stuck with 5 basic ones.
+              While top brands deploy <AnimatedUnderline delay="0.5s">70 segments</AnimatedUnderline>, you&apos;re stuck with 5 basic ones.
             </p>
           </div>
 
@@ -158,8 +168,8 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Deploy in 4 steps</h2>
-            <p className="text-xl text-muted-foreground">From signup to live segments in under 3 minutes</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Deploy in <CircleDoodle delay="0.2s">4 steps</CircleDoodle></h2>
+            <p className="text-xl text-muted-foreground">From signup to live segments in <AnimatedUnderline delay="0.4s">under 3 minutes</AnimatedUnderline></p>
           </div>
 
           <div className="space-y-12">
@@ -289,7 +299,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Simple pricing</h2>
-            <p className="text-xl text-muted-foreground">Pay once. Use forever. 100% money-back guarantee.</p>
+            <p className="text-xl text-muted-foreground"><AnimatedUnderline delay="0.2s">Pay once</AnimatedUnderline>. Use forever. <strong>100% money-back guarantee.</strong></p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
