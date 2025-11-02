@@ -85,7 +85,7 @@ export default function LandingPage() {
             
             <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
               Segment like a<br />
-              <span className="text-accent">
+              <span className="text-accent block my-4">
                 $50M brand.
               </span>
             </h1>
