@@ -9,6 +9,13 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Check if popup was already closed in this session
+    const hasClosedPopup = sessionStorage.getItem('aderai-popup-closed');
+    
+    if (hasClosedPopup) {
+      return;
+    }
+
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 30000); // 30 seconds
@@ -18,6 +25,7 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
 
   const handleClose = () => {
     setIsVisible(false);
+    sessionStorage.setItem('aderai-popup-closed', 'true');
   };
 
   if (!isVisible) return null;
