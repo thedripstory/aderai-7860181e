@@ -63,7 +63,7 @@ export default function LandingPage() {
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map(i => <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background" />)}
               </div>
-              <span className="text-muted-foreground">10,00 brands+ use Aderai</span>
+              <span className="text-muted-foreground">10,00+ brands use Aderai</span>
             </div>
             <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
               <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
