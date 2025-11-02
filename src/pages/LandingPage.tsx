@@ -214,10 +214,7 @@ export default function LandingPage() {
           
           {/* CTA Button */}
           <div className="mt-20 text-center">
-            <button 
-              onClick={handleGetStarted}
-              className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3"
-            >
+            <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3">
               <span>Start Building Segments</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-2xl" />
@@ -398,45 +395,33 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mt-16">
-            <FlipTestimonialCard 
-              name="Sophia"
-              role="Marketing Lead"
-              company="Trendify"
-              story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships."
-              metrics={[
-                { label: "gain in retention", value: "40%" },
-                { label: "surge in profits", value: "50%" }
-              ]}
-              delay="0s"
-            />
+            <FlipTestimonialCard name="Sophia" role="Marketing Lead" company="Trendify" story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships." metrics={[{
+            label: "gain in retention",
+            value: "40%"
+          }, {
+            label: "surge in profits",
+            value: "50%"
+          }]} delay="0s" />
             
-            <FlipTestimonialCard 
-              name="Marcus"
-              role="Head of Growth"
-              company="Premium Beauty Co."
-              story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy."
-              metrics={[
-                { label: "email revenue increase", value: "+42%" },
-                { label: "deployment time", value: "60 sec" }
-              ]}
-              delay="0.1s"
-            />
+            <FlipTestimonialCard name="Marcus" role="Head of Growth" company="Premium Beauty Co." story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy." metrics={[{
+            label: "email revenue increase",
+            value: "+42%"
+          }, {
+            label: "deployment time",
+            value: "60 sec"
+          }]} delay="0.1s" />
             
-            <FlipTestimonialCard 
-              name="Sarah"
-              role="Founder"
-              company="Growth Labs Agency"
-              story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue."
-              metrics={[
-                { label: "time saved", value: "99%" },
-                { label: "revenue increase", value: "+$200K" }
-              ]}
-              delay="0.2s"
-            />
+            <FlipTestimonialCard name="Sarah" role="Founder" company="Growth Labs Agency" story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue." metrics={[{
+            label: "time saved",
+            value: "99%"
+          }, {
+            label: "revenue increase",
+            value: "+$200K"
+          }]} delay="0.2s" />
           </div>
           
           <div className="mt-16 text-center">
-            <p className="text-sm text-muted-foreground mb-8 italic">Click any card to see the full story</p>
+            
             <PoweredByBadge />
           </div>
         </div>
