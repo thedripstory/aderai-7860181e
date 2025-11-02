@@ -47,7 +47,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-16 px-6 overflow-visible">
+      <section className="relative z-10 pt-24 pb-12 px-6 overflow-visible">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
@@ -232,13 +232,13 @@ export default function LandingPage() {
         </div>
         
         {/* Torn Paper Effect - positioned to bridge sections */}
-        <div className="absolute bottom-0 left-0 right-0 z-20" style={{ transform: 'translateY(50%)' }}>
-          <TornPaperDivider className="text-muted" />
+        <div className="absolute bottom-0 left-0 right-0 z-40 pointer-events-none" style={{ transform: 'translateY(100%)' }}>
+          <TornPaperDivider className="text-background" />
         </div>
       </section>
 
       {/* Automation Section */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative overflow-hidden">
+      <section className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
