@@ -41,8 +41,10 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
         </button>
         
         <div className="text-center space-y-6">
-          <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-            <span className="text-3xl font-bold text-primary">30s</span>
+          <div className="mx-auto flex items-center justify-center mb-2">
+            <span className="text-4xl font-playfair font-bold">
+              aderai<span className="text-accent">.</span>
+            </span>
           </div>
           
           <div className="space-y-3">
