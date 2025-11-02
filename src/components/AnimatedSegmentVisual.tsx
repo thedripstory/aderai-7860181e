@@ -1,186 +1,235 @@
-import { useState } from "react";
-import { TrendingUp, Users, DollarSign, Target, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, Crown, Heart, ShoppingBag, Zap, TrendingUp, Users, Target } from "lucide-react";
 
-interface Segment {
+interface Feature {
   id: string;
-  name: string;
-  count: number;
-  revenue: string;
-  engagement: number;
-  color: string;
-  trend: "up" | "down";
-  criteria: string;
+  icon: any;
+  category: string;
+  title: string;
+  description: string;
+  gradient: string;
+  stats?: {
+    primary: string;
+    secondary: string;
+  };
 }
 
-const SEGMENTS: Segment[] = [
+const FEATURES: Feature[] = [
   {
     id: "1",
-    name: "VIP Customers",
-    count: 1247,
-    revenue: "$124.5K",
-    engagement: 89,
-    color: "from-purple-500 to-pink-500",
-    trend: "up",
-    criteria: "LTV > $500 • Purchase frequency > 5/mo"
+    icon: Crown,
+    category: "Core Essentials",
+    title: "VIP & Loyalty Segments",
+    description: "Identify and nurture your most valuable customers with intelligent lifetime value tracking",
+    gradient: "from-purple-600 via-pink-600 to-purple-700",
+    stats: {
+      primary: "Top 10% LTV",
+      secondary: "Auto-updating"
+    }
   },
   {
     id: "2",
-    name: "At-Risk Buyers",
-    count: 3891,
-    revenue: "$67.2K",
-    engagement: 34,
-    color: "from-orange-500 to-red-500",
-    trend: "down",
-    criteria: "No purchase in 30 days • Previous regular buyer"
+    icon: Heart,
+    category: "Engagement & Activity",
+    title: "Behavioral Intelligence",
+    description: "Track engagement patterns, email interactions, and site activity across your entire customer base",
+    gradient: "from-blue-600 via-cyan-600 to-blue-700",
+    stats: {
+      primary: "Real-time sync",
+      secondary: "30+ metrics"
+    }
   },
   {
     id: "3",
-    name: "High AOV Shoppers",
-    count: 892,
-    revenue: "$98.7K",
-    engagement: 72,
-    color: "from-blue-500 to-cyan-500",
-    trend: "up",
-    criteria: "AOV > $150 • Purchase in last 14 days"
+    icon: ShoppingBag,
+    category: "Shopping Behavior",
+    title: "Purchase Insights",
+    description: "Deep dive into shopping patterns, cart behavior, and product preferences to drive conversions",
+    gradient: "from-emerald-600 via-teal-600 to-emerald-700",
+    stats: {
+      primary: "15+ behaviors",
+      secondary: "Live tracking"
+    }
   },
   {
     id: "4",
-    name: "Cart Abandoners",
-    count: 5234,
-    revenue: "$45.1K",
-    engagement: 28,
-    color: "from-yellow-500 to-orange-500",
-    trend: "up",
-    criteria: "Cart value > $50 • Abandoned < 24hrs ago"
+    icon: Zap,
+    category: "Value & Lifecycle",
+    title: "Predictive Segments",
+    description: "AI-powered predictions for churn risk, future VIPs, and lifecycle stage transitions",
+    gradient: "from-orange-600 via-amber-600 to-orange-700",
+    stats: {
+      primary: "ML-powered",
+      secondary: "Daily updates"
+    }
   },
 ];
 
 export const AnimatedSegmentVisual = () => {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % FEATURES.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  const activeFeature = FEATURES[activeIndex];
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto my-12">
-      <div className="bg-gradient-to-br from-background via-muted/50 to-background rounded-2xl border-2 border-border/50 p-8 shadow-lg backdrop-blur-sm">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-2xl font-bold mb-1">Active Segments</h3>
-            <p className="text-sm text-muted-foreground">Live performance metrics • Updated in real-time</p>
-          </div>
-          <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-primary/20">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm font-semibold text-primary">Live</span>
-          </div>
-        </div>
+    <div className="relative w-full max-w-6xl mx-auto my-16">
+      {/* Background ambient glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 rounded-3xl blur-3xl" />
+      
+      <div className="relative">
+        {/* Main Feature Display */}
+        <div 
+          className="relative bg-gradient-to-br from-background/80 via-background/60 to-background/80 backdrop-blur-xl rounded-3xl border border-border/50 overflow-hidden"
+          onMouseEnter={() => setIsAutoPlaying(false)}
+          onMouseLeave={() => setIsAutoPlaying(true)}
+        >
+          {/* Animated gradient background */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${activeFeature.gradient} opacity-5 transition-all duration-700`} />
+          
+          {/* Content Grid */}
+          <div className="relative grid lg:grid-cols-2 gap-8 p-8 lg:p-12">
+            {/* Left: Feature Info */}
+            <div className="flex flex-col justify-center space-y-6">
+              {/* Category badge */}
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider opacity-0 animate-fade-in">
+                <Sparkles className="w-3 h-3" />
+                {activeFeature.category}
+              </div>
 
-        {/* Segments Grid */}
-        <div className="grid gap-4">
-          {SEGMENTS.map((segment, index) => {
-            const isHovered = hoveredId === segment.id;
-            const isSelected = selectedId === segment.id;
-            
-            return (
-              <div
-                key={segment.id}
-                className="group relative cursor-pointer transition-all duration-300 opacity-0 animate-fade-in"
-                style={{ 
-                  animationDelay: `${index * 100}ms`,
-                  animationFillMode: "forwards"
-                }}
-                onMouseEnter={() => setHoveredId(segment.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                onClick={() => setSelectedId(selectedId === segment.id ? null : segment.id)}
-              >
-                {/* Gradient background on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${segment.color} opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300`} />
-                
-                {/* Card content */}
-                <div className={`relative bg-card border-2 rounded-xl p-5 transition-all duration-300 ${
-                  isHovered || isSelected 
-                    ? "border-primary shadow-lg scale-[1.02]" 
-                    : "border-border hover:border-primary/50"
-                }`}>
-                  <div className="flex items-start justify-between gap-4">
-                    {/* Left side - Segment info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${segment.color}`} />
-                        <h4 className="font-bold text-lg truncate">{segment.name}</h4>
-                        <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
-                          segment.trend === "up" 
-                            ? "bg-green-500/10 text-green-600 dark:text-green-400" 
-                            : "bg-red-500/10 text-red-600 dark:text-red-400"
-                        }`}>
-                          <TrendingUp className={`w-3 h-3 ${segment.trend === "down" ? "rotate-180" : ""}`} />
-                          {segment.trend === "up" ? "+12%" : "-8%"}
-                        </div>
-                      </div>
-                      
-                      {/* Metrics */}
-                      <div className="flex items-center gap-6 mb-3">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-semibold">{segment.count.toLocaleString()}</span>
-                          <span className="text-xs text-muted-foreground">users</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-semibold">{segment.revenue}</span>
-                          <span className="text-xs text-muted-foreground">revenue</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Target className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-semibold">{segment.engagement}%</span>
-                          <span className="text-xs text-muted-foreground">engaged</span>
-                        </div>
-                      </div>
+              {/* Title with icon */}
+              <div className="space-y-4 opacity-0 animate-fade-in" style={{ animationDelay: "100ms", animationFillMode: "forwards" }}>
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${activeFeature.gradient} shadow-lg`}>
+                  <activeFeature.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-3xl lg:text-4xl font-bold leading-tight">
+                  {activeFeature.title}
+                </h3>
+              </div>
 
-                      {/* Criteria - shown on hover/select */}
-                      <div className={`overflow-hidden transition-all duration-300 ${
-                        isHovered || isSelected ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
-                      }`}>
-                        <div className="text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 font-mono">
-                          {segment.criteria}
-                        </div>
-                      </div>
-                    </div>
+              {/* Description */}
+              <p className="text-lg text-muted-foreground leading-relaxed opacity-0 animate-fade-in" style={{ animationDelay: "200ms", animationFillMode: "forwards" }}>
+                {activeFeature.description}
+              </p>
 
-                    {/* Right side - Action */}
-                    <div className="flex items-center gap-2">
-                      <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary/90">
-                        Launch Campaign
-                      </button>
-                      <ChevronRight className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${
-                        isSelected ? "rotate-90" : ""
-                      }`} />
-                    </div>
+              {/* Stats */}
+              {activeFeature.stats && (
+                <div className="flex items-center gap-6 pt-4 opacity-0 animate-fade-in" style={{ animationDelay: "300ms", animationFillMode: "forwards" }}>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${activeFeature.gradient}`} />
+                    <span className="font-semibold">{activeFeature.stats.primary}</span>
                   </div>
-
-                  {/* Engagement bar */}
-                  <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full bg-gradient-to-r ${segment.color} transition-all duration-1000 ease-out`}
-                      style={{ 
-                        width: isHovered || isSelected ? `${segment.engagement}%` : "0%"
-                      }}
-                    />
+                  <div className="w-px h-4 bg-border" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>{activeFeature.stats.secondary}</span>
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Right: Interactive Visualization */}
+            <div className="flex items-center justify-center opacity-0 animate-fade-in" style={{ animationDelay: "200ms", animationFillMode: "forwards" }}>
+              <div className="relative w-full aspect-square max-w-md">
+                {/* Floating segments visualization */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Center pulse */}
+                  <div className={`absolute w-32 h-32 rounded-full bg-gradient-to-br ${activeFeature.gradient} opacity-20 animate-pulse`} />
+                  <div className={`absolute w-24 h-24 rounded-full bg-gradient-to-br ${activeFeature.gradient} opacity-30`} />
+                  
+                  {/* Orbiting elements */}
+                  {[0, 1, 2, 3, 4, 5].map((i) => {
+                    const angle = (i * 60) + (activeIndex * 15);
+                    const radius = 120;
+                    const x = Math.cos((angle * Math.PI) / 180) * radius;
+                    const y = Math.sin((angle * Math.PI) / 180) * radius;
+                    const icons = [Users, TrendingUp, Target, ShoppingBag, Crown, Heart];
+                    const Icon = icons[i % icons.length];
+                    
+                    return (
+                      <div
+                        key={i}
+                        className="absolute transition-all duration-1000 ease-out"
+                        style={{
+                          transform: `translate(${x}px, ${y}px)`,
+                          transitionDelay: `${i * 50}ms`
+                        }}
+                      >
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${activeFeature.gradient} shadow-lg flex items-center justify-center hover:scale-110 transition-transform cursor-pointer`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* Bottom: Feature Navigation */}
+          <div className="relative px-8 lg:px-12 pb-8">
+            <div className="flex items-center justify-center gap-3">
+              {FEATURES.map((feature, index) => (
+                <button
+                  key={feature.id}
+                  onClick={() => {
+                    setActiveIndex(index);
+                    setIsAutoPlaying(false);
+                  }}
+                  className="group relative"
+                  aria-label={`View ${feature.title}`}
+                >
+                  {/* Progress bar for active item */}
+                  {index === activeIndex && (
+                    <div className="absolute -top-2 left-0 right-0 h-0.5 bg-border rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full bg-gradient-to-r ${feature.gradient} animate-[slide-in-right_4s_linear]`}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Dot indicator */}
+                  <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    index === activeIndex 
+                      ? `bg-gradient-to-r ${feature.gradient} scale-125` 
+                      : "bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                  }`} />
+                </button>
+              ))}
+            </div>
+
+            {/* Feature counter */}
+            <div className="text-center mt-4 text-xs text-muted-foreground font-medium">
+              {activeIndex + 1} of {FEATURES.length}
+            </div>
+          </div>
         </div>
 
-        {/* Footer stats */}
-        <div className="mt-6 pt-6 border-t border-border flex items-center justify-between text-sm">
-          <div className="text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">4 of 70</span> active segments
-          </div>
-          <button className="text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors">
-            View all segments
-            <ChevronRight className="w-4 h-4" />
-          </button>
+        {/* Capability tags */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {[
+            "70+ Segment Types",
+            "Real-time Sync",
+            "AI-Powered Insights",
+            "Lifetime Value Tracking",
+            "Behavioral Targeting"
+          ].map((tag, i) => (
+            <div
+              key={tag}
+              className="px-4 py-2 bg-muted/50 backdrop-blur-sm rounded-full text-sm text-muted-foreground border border-border/50 hover:border-primary/50 transition-colors opacity-0 animate-fade-in"
+              style={{ animationDelay: `${400 + i * 50}ms`, animationFillMode: "forwards" }}
+            >
+              {tag}
+            </div>
+          ))}
         </div>
       </div>
     </div>
