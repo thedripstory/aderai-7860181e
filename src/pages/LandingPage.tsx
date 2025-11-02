@@ -138,14 +138,15 @@ export default function LandingPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-              <button
-                onClick={handleGetStarted}
-                className="group relative bg-primary text-primary-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3"
-              >
-                <span>Start building segments</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              </button>
+            <button
+              onClick={handleGetStarted}
+              className="group relative bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-10 py-5 rounded-full text-lg font-bold transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3 overflow-hidden"
+            >
+              <span className="relative z-10 transition-colors duration-500">Start building segments</span>
+              <div className="relative z-10 w-5 h-5 flex items-center justify-center transition-all duration-500 group-hover:w-12 group-hover:h-12 group-hover:bg-background group-hover:rounded-full group-hover:ml-2">
+                <ArrowRight className="w-5 h-5 transition-all duration-500 group-hover:text-primary" />
+              </div>
+            </button>
               <button
                 onClick={() => setEnquiryModalOpen(true)}
                 className="group bg-card hover:bg-muted border-2 border-border text-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-lg flex items-center gap-3"
