@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Play } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
-import { TestimonialCard } from "@/components/TestimonialCard";
+import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
 import { AnimatedSegmentVisual } from "@/components/AnimatedSegmentVisual";
 import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
@@ -375,21 +375,68 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Loved by brands & agencies</h2>
-            <p className="text-xl text-muted-foreground">Real results from real customers</p>
+      {/* Success Stories */}
+      <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        
+        <div className="max-w-7xl mx-auto relative">
+          <div className="text-center mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+                Our Clients
+              </span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Success Stories to <span className="italic text-primary">Inspire</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Discover how businesses and creators achieve results
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <TestimonialCard quote="Deployed 70 segments in under a minute. Email revenue jumped 42% in the first month." author="Marcus Rodriguez" role="Head of Growth" company="Premium Beauty Co." metric="+42%" />
-            <TestimonialCard quote="What used to take my team 2 weeks now takes 30 seconds. This is a game-changer for our agency." author="Sarah Chen" role="Founder" company="Growth Labs Agency" metric="2 weeks → 30s" />
-            <TestimonialCard quote="The AI suggester is incredible. It recommended segments I never would have thought of." author="James Wilson" role="Marketing Director" company="Luxe Lifestyle" metric="+$87K" />
+          <div className="grid md:grid-cols-3 gap-8 mt-16">
+            <FlipTestimonialCard 
+              name="Sophia"
+              role="Marketing Lead"
+              company="Trendify"
+              story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships."
+              metrics={[
+                { label: "gain in retention", value: "40%" },
+                { label: "surge in profits", value: "50%" }
+              ]}
+              delay="0s"
+            />
+            
+            <FlipTestimonialCard 
+              name="Marcus"
+              role="Head of Growth"
+              company="Premium Beauty Co."
+              story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy."
+              metrics={[
+                { label: "email revenue increase", value: "+42%" },
+                { label: "deployment time", value: "60 sec" }
+              ]}
+              delay="0.1s"
+            />
+            
+            <FlipTestimonialCard 
+              name="Sarah"
+              role="Founder"
+              company="Growth Labs Agency"
+              story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue."
+              metrics={[
+                { label: "time saved", value: "99%" },
+                { label: "revenue increase", value: "+$200K" }
+              ]}
+              delay="0.2s"
+            />
           </div>
           
-          <div className="text-center">
+          <div className="mt-16 text-center">
+            <p className="text-sm text-muted-foreground mb-8 italic">Click any card to see the full story</p>
             <PoweredByBadge />
           </div>
         </div>
