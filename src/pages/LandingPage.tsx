@@ -83,9 +83,9 @@ export default function LandingPage() {
               <span className="text-sm font-medium text-primary">AI-powered segmentation engine</span>
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-none">
+            <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
               Segment like a<br />
-              <span className="text-primary">
+              <span className="text-accent">
                 $50M brand.
               </span>
             </h1>
