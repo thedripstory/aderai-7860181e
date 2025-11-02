@@ -3,8 +3,8 @@ export const EmailFooter = () => {
     <footer className="px-4 py-8 border-t border-border bg-muted">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold tracking-tight mb-2">
-            ADERAI<span className="text-accent">.</span>
+          <h3 className="text-2xl font-playfair font-bold tracking-wide mb-2">
+            aderai<span className="text-accent">.</span>
           </h3>
           <p className="text-sm text-muted-foreground">
             AI-powered segmentation for Klaviyo
