@@ -19,22 +19,11 @@ export const AnimatedTimeCounter = () => {
     const targetTime = 30; // 30 seconds
     const duration = 2500; // Animation duration in ms
     const startTime = Date.now();
-    const startValue = 36000; // Always start from 10 hours
+    const startValue = timeInSeconds;
 
-    // Easing function for smooth bounce deceleration
-    const easeOutBounce = (t: number): number => {
-      const n1 = 7.5625;
-      const d1 = 2.75;
-
-      if (t < 1 / d1) {
-        return n1 * t * t;
-      } else if (t < 2 / d1) {
-        return n1 * (t -= 1.5 / d1) * t + 0.75;
-      } else if (t < 2.5 / d1) {
-        return n1 * (t -= 2.25 / d1) * t + 0.9375;
-      } else {
-        return n1 * (t -= 2.625 / d1) * t + 0.984375;
-      }
+    // Easing function for deceleration
+    const easeOutExpo = (t: number): number => {
+      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
     };
 
     const animate = () => {
@@ -42,7 +31,7 @@ export const AnimatedTimeCounter = () => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      const easedProgress = easeOutBounce(progress);
+      const easedProgress = easeOutExpo(progress);
       const currentValue = startValue - (startValue - targetTime) * easedProgress;
       
       setTimeInSeconds(Math.max(targetTime, Math.round(currentValue)));
@@ -53,7 +42,7 @@ export const AnimatedTimeCounter = () => {
     };
 
     requestAnimationFrame(animate);
-  }, [isAnimating]);
+  }, [isAnimating, timeInSeconds]);
 
   const formatTime = (seconds: number): string => {
     if (seconds >= 3600) {

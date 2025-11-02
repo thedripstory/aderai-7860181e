@@ -1,203 +1,188 @@
-import { useState, useEffect } from "react";
-import { MousePointerClick, Sparkles, CheckCircle2, Zap } from "lucide-react";
-interface Step {
+import { useState } from "react";
+import { TrendingUp, Users, DollarSign, Target, ChevronRight } from "lucide-react";
+
+interface Segment {
   id: string;
-  number: string;
-  icon: any;
-  title: string;
-  description: string;
+  name: string;
+  count: number;
+  revenue: string;
+  engagement: number;
+  color: string;
+  trend: "up" | "down";
+  criteria: string;
 }
-const STEPS: Step[] = [{
-  id: "1",
-  number: "01",
-  icon: MousePointerClick,
-  title: "Connect Klaviyo",
-  description: "One-click authentication. No API keys, no technical setup required."
-}, {
-  id: "2",
-  number: "02",
-  icon: Sparkles,
-  title: "Select Segments",
-  description: "Choose from 70+ pre-built segments or let AI create custom ones for your brand."
-}, {
-  id: "3",
-  number: "03",
-  icon: Zap,
-  title: "Deploy Instantly",
-  description: "All segments auto-created in Klaviyo in 30 seconds. No manual work."
-}, {
-  id: "4",
-  number: "04",
-  icon: CheckCircle2,
-  title: "Start Targeting",
-  description: "Segments sync in real-time. Begin creating personalized campaigns immediately."
-}];
+
+const SEGMENTS: Segment[] = [
+  {
+    id: "1",
+    name: "VIP Customers",
+    count: 1247,
+    revenue: "$124.5K",
+    engagement: 89,
+    color: "from-purple-500 to-pink-500",
+    trend: "up",
+    criteria: "LTV > $500 • Purchase frequency > 5/mo"
+  },
+  {
+    id: "2",
+    name: "At-Risk Buyers",
+    count: 3891,
+    revenue: "$67.2K",
+    engagement: 34,
+    color: "from-orange-500 to-red-500",
+    trend: "down",
+    criteria: "No purchase in 30 days • Previous regular buyer"
+  },
+  {
+    id: "3",
+    name: "High AOV Shoppers",
+    count: 892,
+    revenue: "$98.7K",
+    engagement: 72,
+    color: "from-blue-500 to-cyan-500",
+    trend: "up",
+    criteria: "AOV > $150 • Purchase in last 14 days"
+  },
+  {
+    id: "4",
+    name: "Cart Abandoners",
+    count: 5234,
+    revenue: "$45.1K",
+    engagement: 28,
+    color: "from-yellow-500 to-orange-500",
+    trend: "up",
+    criteria: "Cart value > $50 • Abandoned < 24hrs ago"
+  },
+];
+
 export const AnimatedSegmentVisual = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    const interval = setInterval(() => {
-      setActiveIndex(current => (current + 1) % STEPS.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
-  const activeStep = STEPS[activeIndex];
-  return <div className="relative w-full max-w-6xl mx-auto my-16">
-      {/* Orange ambient glow */}
-      <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-3xl" />
-      <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-2xl animate-pulse" style={{ animationDuration: "4s" }} />
-      
-      <div className="relative">
-        {/* Section header */}
-        <div className="text-center mb-12 space-y-3">
-          <p className="text-sm font-semibold text-primary/80 uppercase tracking-wider">
-            Deploy in 4 Steps
-          </p>
-          <h2 className="text-3xl lg:text-4xl font-bold">
-            Segmentation in <span className="text-primary">30 seconds</span>
-          </h2>
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  return (
+    <div className="relative w-full max-w-4xl mx-auto my-12">
+      <div className="bg-gradient-to-br from-background via-muted/50 to-background rounded-2xl border-2 border-border/50 p-8 shadow-lg backdrop-blur-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-2xl font-bold mb-1">Active Segments</h3>
+            <p className="text-sm text-muted-foreground">Live performance metrics • Updated in real-time</p>
+          </div>
+          <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-primary/20">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-sm font-semibold text-primary">Live</span>
+          </div>
         </div>
 
-        {/* Main Step Display */}
-        <div className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-primary/20 overflow-hidden shadow-[0_0_40px_-10px_hsl(var(--primary)/0.3)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
-          {/* Content */}
-          <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
-            {/* Left: Step Info */}
-            <div className="flex flex-col justify-center space-y-8">
-              {/* Step number */}
-              <div className="opacity-0 animate-fade-in">
-                <span className="text-7xl font-bold text-primary/20">
-                  {activeStep.number}
-                </span>
-              </div>
+        {/* Segments Grid */}
+        <div className="grid gap-4">
+          {SEGMENTS.map((segment, index) => {
+            const isHovered = hoveredId === segment.id;
+            const isSelected = selectedId === segment.id;
+            
+            return (
+              <div
+                key={segment.id}
+                className="group relative cursor-pointer transition-all duration-300 opacity-0 animate-fade-in"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  animationFillMode: "forwards"
+                }}
+                onMouseEnter={() => setHoveredId(segment.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onClick={() => setSelectedId(selectedId === segment.id ? null : segment.id)}
+              >
+                {/* Gradient background on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-r ${segment.color} opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300`} />
+                
+                {/* Card content */}
+                <div className={`relative bg-card border-2 rounded-xl p-5 transition-all duration-300 ${
+                  isHovered || isSelected 
+                    ? "border-primary shadow-lg scale-[1.02]" 
+                    : "border-border hover:border-primary/50"
+                }`}>
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Left side - Segment info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${segment.color}`} />
+                        <h4 className="font-bold text-lg truncate">{segment.name}</h4>
+                        <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
+                          segment.trend === "up" 
+                            ? "bg-green-500/10 text-green-600 dark:text-green-400" 
+                            : "bg-red-500/10 text-red-600 dark:text-red-400"
+                        }`}>
+                          <TrendingUp className={`w-3 h-3 ${segment.trend === "down" ? "rotate-180" : ""}`} />
+                          {segment.trend === "up" ? "+12%" : "-8%"}
+                        </div>
+                      </div>
+                      
+                      {/* Metrics */}
+                      <div className="flex items-center gap-6 mb-3">
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-semibold">{segment.count.toLocaleString()}</span>
+                          <span className="text-xs text-muted-foreground">users</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-semibold">{segment.revenue}</span>
+                          <span className="text-xs text-muted-foreground">revenue</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Target className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-semibold">{segment.engagement}%</span>
+                          <span className="text-xs text-muted-foreground">engaged</span>
+                        </div>
+                      </div>
 
-              {/* Title with icon */}
-              <div className="space-y-4 opacity-0 animate-fade-in" style={{
-              animationDelay: "100ms",
-              animationFillMode: "forwards"
-            }}>
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)]">
-                  <activeStep.icon className="w-7 h-7 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
-                </div>
-                <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
-                  {activeStep.title}
-                </h3>
-              </div>
-
-              {/* Description */}
-              <p className="text-lg text-muted-foreground leading-relaxed opacity-0 animate-fade-in" style={{
-              animationDelay: "200ms",
-              animationFillMode: "forwards"
-            }}>
-                {activeStep.description}
-              </p>
-            </div>
-
-            {/* Right: Minimal Visualization */}
-            <div className="flex items-center justify-center opacity-0 animate-fade-in" style={{
-            animationDelay: "200ms",
-            animationFillMode: "forwards"
-          }}>
-              <div className="relative w-full aspect-square max-w-md">
-                {/* Central icon display */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative">
-                    {/* Outer ring */}
-                    <div className="absolute inset-0 w-48 h-48 rounded-full border-2 border-primary/30 shadow-[0_0_30px_-10px_hsl(var(--primary)/0.4)] animate-pulse" style={{
-                    animationDuration: "3s"
-                  }} />
-                    
-                    {/* Middle ring */}
-                    <div className="absolute inset-8 w-32 h-32 rounded-full border border-primary/20" />
-                    
-                    {/* Center icon */}
-                    <div className="absolute inset-0 w-48 h-48 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-2xl bg-primary/15 border border-primary/30 shadow-[0_0_25px_-5px_hsl(var(--primary)/0.5)] flex items-center justify-center">
-                        <activeStep.icon className="w-10 h-10 text-primary drop-shadow-[0_0_10px_hsl(var(--primary)/0.6)]" />
+                      {/* Criteria - shown on hover/select */}
+                      <div className={`overflow-hidden transition-all duration-300 ${
+                        isHovered || isSelected ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+                      }`}>
+                        <div className="text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 font-mono">
+                          {segment.criteria}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Progress dots */}
-                    {STEPS.map((step, i) => {
-                    const angle = i * 90 - 90;
-                    const radius = 96;
-                    const x = Math.cos(angle * Math.PI / 180) * radius;
-                    const y = Math.sin(angle * Math.PI / 180) * radius;
-                    const isActive = i === activeIndex;
-                    const isPast = i < activeIndex;
-                    return <div key={i} className="absolute transition-all duration-700" style={{
-                      left: '50%',
-                      top: '50%',
-                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
-                    }}>
-                          <div className={`w-3 h-3 rounded-full transition-all duration-500 ${isActive ? "bg-primary scale-150 shadow-lg shadow-primary/50" : isPast ? "bg-primary/50" : "bg-border"}`} />
-                        </div>;
-                  })}
+                    {/* Right side - Action */}
+                    <div className="flex items-center gap-2">
+                      <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary/90">
+                        Launch Campaign
+                      </button>
+                      <ChevronRight className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${
+                        isSelected ? "rotate-90" : ""
+                      }`} />
+                    </div>
+                  </div>
+
+                  {/* Engagement bar */}
+                  <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full bg-gradient-to-r ${segment.color} transition-all duration-1000 ease-out`}
+                      style={{ 
+                        width: isHovered || isSelected ? `${segment.engagement}%` : "0%"
+                      }}
+                    />
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Bottom: Step Navigation */}
-          <div className="relative px-8 lg:px-16 pb-8">
-            <div className="flex items-center justify-center gap-8">
-              {STEPS.map((step, index) => <button key={step.id} onClick={() => {
-              setActiveIndex(index);
-              setIsAutoPlaying(false);
-            }} className="group relative flex flex-col items-center gap-2 min-w-[60px]" aria-label={`View step ${step.number}`}>
-                  {/* Progress bar for active item */}
-                  {index === activeIndex && <div className="absolute -top-3 left-0 right-0 h-0.5 bg-border rounded-full overflow-hidden">
-                      <div className="h-full bg-primary animate-[slide-in-right_4s_linear]" />
-                    </div>}
-                  
-                  {/* Step number */}
-                  <span className={`text-xs font-bold transition-all duration-300 ${index === activeIndex ? "text-primary scale-110" : "text-muted-foreground/50 group-hover:text-muted-foreground"}`}>
-                    {step.number}
-                  </span>
-                </button>)}
-            </div>
-          </div>
+            );
+          })}
         </div>
 
-        {/* Bottom animated comparison */}
-        <div className="mt-12 flex items-center justify-center gap-8">
-          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{
-          animationDelay: "400ms",
-          animationFillMode: "forwards"
-        }}>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-muted-foreground/30 line-through">10+ hours</div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Manual setup</div>
-            </div>
+        {/* Footer stats */}
+        <div className="mt-6 pt-6 border-t border-border flex items-center justify-between text-sm">
+          <div className="text-muted-foreground">
+            Showing <span className="font-semibold text-foreground">4 of 70</span> active segments
           </div>
-          
-          <div className="relative opacity-0 animate-fade-in" style={{
-          animationDelay: "600ms",
-          animationFillMode: "forwards"
-        }}>
-            <div className="w-12 h-12 rounded-full bg-primary/15 border-2 border-primary shadow-[0_0_20px_-5px_hsl(var(--primary)/0.5)] flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary animate-pulse drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
-            </div>
-            <div className="absolute -inset-2 rounded-full border-2 border-primary/30 animate-ping shadow-[0_0_15px_-5px_hsl(var(--primary)/0.4)]" style={{
-            animationDuration: "2s"
-          }} />
-          </div>
-          
-          <div className="flex items-center gap-3 opacity-0 animate-fade-in" style={{
-          animationDelay: "800ms",
-          animationFillMode: "forwards"
-        }}>
-            <div className="text-left">
-              <div className="text-3xl font-bold text-primary">30 seconds</div>
-              <div className="text-xs text-muted-foreground mt-1 flex items-center gap-0.5">
-                
-                <span className="font-playfair font-bold">aderai<span className="text-accent">.</span></span>
-              </div>
-            </div>
-          </div>
+          <button className="text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors">
+            View all segments
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
