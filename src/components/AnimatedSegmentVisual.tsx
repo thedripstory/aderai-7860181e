@@ -50,9 +50,7 @@ export const AnimatedSegmentVisual = () => {
       <div className="relative">
         {/* Section header */}
         <div className="text-center mb-12 space-y-3">
-          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            Deploy in 4 Steps
-          </p>
+          
           <h2 className="text-3xl lg:text-4xl font-bold">
             Powered by <span className="text-primary">Klaviyo.</span>
           </h2>
