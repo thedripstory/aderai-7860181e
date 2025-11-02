@@ -18,8 +18,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/app" element={<Index />} />
-          <Route path="/signup" element={<Index />} />
-          <Route path="/login" element={<Index />} />
+          <Route path="/signup" element={<Index initialView="auth" initialAuthView="choice" />} />
+          <Route path="/login" element={<Index initialView="auth" initialAuthView="brand-login" />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

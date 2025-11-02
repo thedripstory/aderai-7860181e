@@ -459,16 +459,21 @@ const HealthScoreModal = ({ segment, stats, onClose }: HealthScoreModalProps) =>
     </div>
   );
 };
-export default function AderaiApp() {
+interface AderaiAppProps {
+  initialView?: "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "auth" | "ai-suggester" | "affiliate" | "settings";
+  initialAuthView?: "choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login";
+}
+
+export default function AderaiApp({ initialView = "login", initialAuthView = "choice" }: AderaiAppProps = {}) {
   // View state - Extended with all views
   const [view, setView] = useState<
     "login" | "signup" | "onboarding" | "dashboard" | "creating" | "results" | "analytics" | "auth" | "ai-suggester" | "affiliate" | "settings"
-  >("login");
+  >(initialView);
 
   // Auth state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [authView, setAuthView] = useState<"choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login">("choice");
+  const [authView, setAuthView] = useState<"choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login">(initialAuthView);
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [copiedLink, setCopiedLink] = useState(false);
