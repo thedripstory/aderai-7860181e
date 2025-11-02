@@ -213,55 +213,16 @@ export default function LandingPage() {
           {/* Visual Demo */}
           <AnimatedSegmentVisual />
           
-          {/* Grand CTA */}
-          <div className="mt-32 mb-20">
-            <div className="relative bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 rounded-3xl p-12 md:p-16 border-2 border-primary/20 shadow-2xl overflow-hidden">
-              {/* Decorative Elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-              
-              <div className="relative text-center space-y-8">
-                <div className="inline-flex items-center gap-2 bg-primary/20 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/30">
-                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                  <span className="text-sm font-bold text-primary uppercase tracking-wider">Limited Time Offer</span>
-                </div>
-                
-                <h2 className="text-4xl md:text-6xl font-bold leading-tight">
-                  Ready to transform your<br />
-                  <span className="text-primary">segmentation game?</span>
-                </h2>
-                
-                <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-                  Join 200+ brands already saving 10+ hours per week on manual segmentation
-                </p>
-                
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                  <button 
-                    onClick={handleGetStarted}
-                    className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 flex items-center gap-3"
-                  >
-                    <span>Unlock Forever - $49</span>
-                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-2xl" />
-                  </button>
-                </div>
-                
-                <div className="flex flex-wrap items-center justify-center gap-6 text-sm pt-2">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                    <span className="text-foreground/80">No monthly fees</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                    <span className="text-foreground/80">70 segments included</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                    <span className="text-foreground/80">100% money-back guarantee</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* CTA Button */}
+          <div className="mt-20 text-center">
+            <button 
+              onClick={handleGetStarted}
+              className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3"
+            >
+              <span>Start Building Segments</span>
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-2xl" />
+            </button>
           </div>
           
           {/* Trust Logos */}
