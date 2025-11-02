@@ -3,9 +3,9 @@ export const EmailFooter = () => {
     <footer className="px-4 py-8 border-t border-border">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold mb-2">Sales Strategy Portal</h3>
+          <h3 className="text-2xl font-bold mb-2">Klaviyo AI Segmentation</h3>
           <p className="text-sm text-muted-foreground">
-            Empowering sales teams to achieve their full potential
+            Enterprise-level email segmentation for growing brands
           </p>
         </div>
         
@@ -17,9 +17,6 @@ export const EmailFooter = () => {
             Pricing
           </a>
           <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-            Resources
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
             Support
           </a>
           <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
@@ -28,9 +25,9 @@ export const EmailFooter = () => {
         </div>
         
         <div className="text-center text-sm text-muted-foreground space-y-2">
-          <p>© 2025 Sales Strategy Portal. All rights reserved.</p>
+          <p>© 2025 Klaviyo AI Segmentation. Powered by Klaviyo.</p>
           <p className="text-xs">
-            You're receiving this because you signed up for our product updates.{" "}
+            You're receiving this because you signed up for product updates.{" "}
             <a href="#" className="text-primary hover:underline">
               Unsubscribe
             </a>

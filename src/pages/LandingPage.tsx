@@ -30,39 +30,39 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Sticky Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#0A0A0A]/95 backdrop-blur-lg border-b border-[#2A2A2A]" : "bg-transparent"}`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-lg border-b border-border shadow-sm" : "bg-transparent"}`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="text-2xl font-black">
-              <span className="text-[#EF3F3F]">ADER</span>
-              <span className="text-white">AI</span>
+            <div className="text-2xl font-bold tracking-tight">
+              <span className="text-primary">Klaviyo</span>
+              <span className="text-foreground"> AI</span>
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-gray-400 hover:text-white transition">
+            <a href="#features" className="text-muted-foreground hover:text-foreground transition font-medium">
               Features
             </a>
-            <a href="#how-it-works" className="text-gray-400 hover:text-white transition">
+            <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition font-medium">
               How It Works
             </a>
-            <a href="#pricing" className="text-gray-400 hover:text-white transition">
+            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition font-medium">
               Pricing
             </a>
-            <a href="#testimonials" className="text-gray-400 hover:text-white transition">
+            <a href="#testimonials" className="text-muted-foreground hover:text-foreground transition font-medium">
               Testimonials
             </a>
           </nav>
           <div className="flex items-center gap-4">
-            <a href="/login" className="text-gray-400 hover:text-white transition">
+            <a href="/login" className="text-muted-foreground hover:text-foreground transition font-medium">
               Login
             </a>
             <button
               onClick={handleGetStarted}
-              className="bg-[#EF3F3F] hover:bg-[#DC2626] px-6 py-2 rounded-lg font-semibold transition"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-semibold transition shadow-button"
             >
               Get Started
             </button>
@@ -71,57 +71,54 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-32 pb-20 px-6 bg-gradient-hero">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-[#EF3F3F]/10 border border-[#EF3F3F]/30 rounded-full px-4 py-2 mb-6">
-              <Sparkles className="w-4 h-4 text-[#EF3F3F]" />
-              <span className="text-sm text-gray-300">Powered by AI + $50M in Proven Email Strategies</span>
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 mb-6">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">AI-Powered Segmentation for Klaviyo</span>
             </div>
-            <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
-              Create <span className="text-[#EF3F3F]">70 Klaviyo Segments</span>
-              <br />
-              In 30 Seconds
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
+              Segment Like A <span className="text-primary">$50M Brand</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-400 mb-8 max-w-3xl mx-auto">
-              Stop wasting 10+ hours manually building segments. Let AI create agency-level email segmentation for your
-              e-commerce brand in under a minute.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto font-medium">
+              Deploy 70 battle-tested segments in 30 seconds. Zero guesswork. Enterprise-level segmentation without the agency price tag.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <button
                 onClick={handleGetStarted}
-                className="bg-[#EF3F3F] hover:bg-[#DC2626] px-8 py-4 rounded-lg font-bold text-lg flex items-center gap-2 transition"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-lg font-bold text-lg flex items-center gap-2 transition shadow-button"
               >
                 Start For $49
                 <ArrowRight className="w-5 h-5" />
               </button>
-              <button className="bg-[#1A1A1A] hover:bg-[#2A2A2A] border border-[#2A2A2A] px-8 py-4 rounded-lg font-semibold text-lg flex items-center gap-2 transition">
+              <button className="bg-secondary hover:bg-secondary/80 border border-border px-8 py-4 rounded-lg font-semibold text-lg flex items-center gap-2 transition">
                 <Play className="w-5 h-5" />
                 Watch Demo
               </button>
             </div>
-            <div className="flex items-center justify-center gap-8 text-sm text-gray-500">
+            <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground font-medium">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                No credit card required
+                <CheckCircle className="w-4 h-4 text-primary" />
+                Instant setup
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                Setup in 3 minutes
+                <CheckCircle className="w-4 h-4 text-primary" />
+                100% money-back guarantee
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                Works with any platform
+                <CheckCircle className="w-4 h-4 text-primary" />
+                Works with Klaviyo
               </div>
             </div>
           </div>
 
           {/* Hero Image Placeholder */}
-          <div className="bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] border border-[#2A2A2A] rounded-2xl p-8 mb-12">
-            <div className="aspect-video bg-[#0A0A0A] rounded-lg flex items-center justify-center border border-[#EF3F3F]/20">
+          <div className="bg-card border border-border rounded-xl p-8 mb-12 shadow-elegant">
+            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
               <div className="text-center">
-                <BarChart3 className="w-16 h-16 text-[#EF3F3F] mx-auto mb-4" />
-                <p className="text-gray-500">[Hero Product Screenshot - Dashboard View]</p>
+                <BarChart3 className="w-16 h-16 text-primary mx-auto mb-4" />
+                <p className="text-muted-foreground font-medium">[Dashboard Preview - Klaviyo AI Segmentation]</p>
               </div>
             </div>
           </div>
@@ -129,23 +126,23 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="py-12 px-6 bg-[#1A1A1A] border-y border-[#2A2A2A]">
+      <section className="py-12 px-6 bg-secondary/50 border-y border-border">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="text-center">
-            <div className="text-4xl font-black text-[#EF3F3F] mb-2">70</div>
-            <div className="text-gray-400">Pre-Built Segments</div>
+            <div className="text-4xl font-bold text-primary mb-2">70</div>
+            <div className="text-muted-foreground font-medium">Pre-Built Segments</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-black text-[#EF3F3F] mb-2">30s</div>
-            <div className="text-gray-400">Setup Time</div>
+            <div className="text-4xl font-bold text-primary mb-2">30s</div>
+            <div className="text-muted-foreground font-medium">Setup Time</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-black text-[#EF3F3F] mb-2">$50M+</div>
-            <div className="text-gray-400">Revenue Driven</div>
+            <div className="text-4xl font-bold text-primary mb-2">40%+</div>
+            <div className="text-muted-foreground font-medium">Revenue Increase</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-black text-[#EF3F3F] mb-2">16</div>
-            <div className="text-gray-400">Currencies Supported</div>
+            <div className="text-4xl font-bold text-primary mb-2">16</div>
+            <div className="text-muted-foreground font-medium">Currencies Supported</div>
           </div>
         </div>
       </section>
@@ -154,40 +151,39 @@ export default function LandingPage() {
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6">The Problem With Klaviyo Segmentation</h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Most e-commerce brands leave millions on the table because they don't have the time or expertise to build
-              proper segments.
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">The Segment Gap Is Costing You</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-medium">
+              While competitors deploy 70 segments, you're stuck with 5. Most brands leave 40% of potential email revenue on the table.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8">
-              <div className="w-12 h-12 bg-[#EF3F3F]/10 rounded-lg flex items-center justify-center mb-4">
-                <Clock className="w-6 h-6 text-[#EF3F3F]" />
+            <div className="bg-card border border-border rounded-xl p-8 hover:shadow-lg transition">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Clock className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Takes Forever</h3>
-              <p className="text-gray-400">
+              <h3 className="text-2xl font-bold mb-4">Takes 10+ Hours</h3>
+              <p className="text-muted-foreground">
                 Creating 70 segments manually takes 10-15 hours. Most brands give up after building 5-10 basic segments.
               </p>
             </div>
 
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8">
-              <div className="w-12 h-12 bg-[#EF3F3F]/10 rounded-lg flex items-center justify-center mb-4">
-                <Target className="w-6 h-6 text-[#EF3F3F]" />
+            <div className="bg-card border border-border rounded-xl p-8 hover:shadow-lg transition">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Target className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-2xl font-bold mb-4">Too Complex</h3>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 Klaviyo's Boolean logic is intimidating. Small syntax errors cause segments to fail silently.
               </p>
             </div>
 
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8">
-              <div className="w-12 h-12 bg-[#EF3F3F]/10 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-[#EF3F3F]" />
+            <div className="bg-card border border-border rounded-xl p-8 hover:shadow-lg transition">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-2xl font-bold mb-4">Expensive Agencies</h3>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 Agencies charge $5K-$15K for segmentation setup. You don't own the knowledge or methodology.
               </p>
             </div>
@@ -196,49 +192,47 @@ export default function LandingPage() {
       </section>
 
       {/* Solution Section */}
-      <section id="features" className="py-20 px-6 bg-[#1A1A1A]">
+      <section id="features" className="py-20 px-6 bg-secondary/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6">The Aderai Solution</h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Agency-level segmentation in 30 seconds, not 10 hours. AI-powered, platform-agnostic, and customized to
-              YOUR business metrics.
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Stop Guessing. Start Converting.</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-medium">
+              Enterprise-level segmentation in 30 seconds. AI-powered, Klaviyo-native, customized to YOUR business.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
             <div>
-              <div className="bg-gradient-to-br from-[#0A0A0A] to-[#1A1A1A] border border-[#EF3F3F]/20 rounded-xl p-8">
-                <div className="aspect-video bg-[#0A0A0A] rounded-lg flex items-center justify-center border border-[#2A2A2A]">
-                  <p className="text-gray-500">[Screenshot: Segment Selection Dashboard]</p>
+              <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
+                  <p className="text-muted-foreground font-medium">[Screenshot: 70 Segment Library]</p>
                 </div>
               </div>
             </div>
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#EF3F3F]/10 border border-[#EF3F3F]/30 rounded-full px-4 py-2 mb-6">
-                <Zap className="w-4 h-4 text-[#EF3F3F]" />
-                <span className="text-sm text-gray-300">Core Feature</span>
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 mb-6">
+                <Zap className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-primary">Core Feature</span>
               </div>
-              <h3 className="text-3xl font-black mb-4">70 Pre-Built Segments</h3>
-              <p className="text-lg text-gray-400 mb-6">
-                VIP Customers, Cart Abandoners, Lapsed Buyers, At-Risk VIPs, and 66 more segments organized into 7
-                strategic categories. Every segment proven to drive revenue in real e-commerce brands.
+              <h3 className="text-3xl font-bold mb-4">70 Battle-Tested Segments</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                VIP Customers, At-Risk Buyers, Lapsed Customers, High-Intent Browsers, and 66 more proven segments. Every segment drives revenue.
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">
-                    Automatically customized to your AOV, currency, and lifecycle metrics
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">
+                    Automatically customized to your AOV, currency, and lifecycle
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">Works across Shopify, WooCommerce, BigCommerce, and more</span>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">Works across Shopify, WooCommerce, BigCommerce, and more</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">
-                    Intelligent fallbacks ensure segments work even with limited data
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">
+                    Intelligent fallbacks ensure segments work with limited data
                   </span>
                 </li>
               </ul>
@@ -247,34 +241,33 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-2 bg-[#EF3F3F]/10 border border-[#EF3F3F]/30 rounded-full px-4 py-2 mb-6">
-                <Sparkles className="w-4 h-4 text-[#EF3F3F]" />
-                <span className="text-sm text-gray-300">NEW: AI-Powered</span>
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 mb-6">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-primary">AI-Powered</span>
               </div>
-              <h3 className="text-3xl font-black mb-4">AI Segment Suggester</h3>
-              <p className="text-lg text-gray-400 mb-6">
-                Tell us your business goal (revenue, retention, engagement) and our AI creates custom segments
-                specifically for YOUR brand's industry, use case, and customer behavior.
+              <h3 className="text-3xl font-bold mb-4">AI Segment Suggester</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                Tell our AI your business goal. Get custom segments specifically for YOUR industry, use case, and customer behavior.
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">Conversational wizard understands your business context</span>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">Conversational wizard understands your context</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">Suggests 3-5 custom segments with reasoning and campaign ideas</span>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">Suggests 3-5 custom segments with reasoning</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">One-tap creation directly in Klaviyo</span>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">One-tap creation directly in Klaviyo</span>
                 </li>
               </ul>
             </div>
             <div className="order-1 md:order-2">
-              <div className="bg-gradient-to-br from-[#0A0A0A] to-[#1A1A1A] border border-[#EF3F3F]/20 rounded-xl p-8">
-                <div className="aspect-video bg-[#0A0A0A] rounded-lg flex items-center justify-center border border-[#2A2A2A]">
-                  <p className="text-gray-500">[Screenshot: AI Suggester Interface]</p>
+              <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
+                  <p className="text-muted-foreground font-medium">[Screenshot: AI Suggester]</p>
                 </div>
               </div>
             </div>
@@ -282,34 +275,33 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="bg-gradient-to-br from-[#0A0A0A] to-[#1A1A1A] border border-[#EF3F3F]/20 rounded-xl p-8">
-                <div className="aspect-video bg-[#0A0A0A] rounded-lg flex items-center justify-center border border-[#2A2A2A]">
-                  <p className="text-gray-500">[Screenshot: Analytics Dashboard]</p>
+              <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
+                  <p className="text-muted-foreground font-medium">[Screenshot: Analytics Dashboard]</p>
                 </div>
               </div>
             </div>
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#EF3F3F]/10 border border-[#EF3F3F]/30 rounded-full px-4 py-2 mb-6">
-                <BarChart3 className="w-4 h-4 text-[#EF3F3F]" />
-                <span className="text-sm text-gray-300">Analytics Included</span>
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 mb-6">
+                <BarChart3 className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-primary">Analytics Included</span>
               </div>
-              <h3 className="text-3xl font-black mb-4">Real-Time Segment Analytics</h3>
-              <p className="text-lg text-gray-400 mb-6">
-                Track segment performance, monitor growth trends, identify top performers, and export reports. All your
-                segment data in one beautiful dashboard.
+              <h3 className="text-3xl font-bold mb-4">Real-Time Performance Tracking</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                Track segment performance, monitor growth, identify top performers. All your segment data in one dashboard.
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">Live profile counts and growth metrics</span>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">Live profile counts and growth metrics</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">7-day trend visualization</span>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">7-day trend visualization</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">CSV export for reporting</span>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground font-medium">CSV export for reporting</span>
                 </li>
               </ul>
             </div>
@@ -321,50 +313,50 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6">How It Works</h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              From signup to segments live in Klaviyo in under 3 minutes. No coding, no complexity, no bullshit.
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Deploy In Minutes, Not Weeks</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-medium">
+              From signup to live segments in under 3 minutes. No coding, no complexity, no BS.
             </p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#EF3F3F] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
                 1
               </div>
               <h3 className="text-xl font-bold mb-2">Sign Up</h3>
-              <p className="text-gray-400">Choose Brand or Agency account. Enter your details.</p>
+              <p className="text-muted-foreground">Choose Brand or Agency. Enter your details.</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#EF3F3F] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
                 2
               </div>
               <h3 className="text-xl font-bold mb-2">Connect Klaviyo</h3>
-              <p className="text-gray-400">Add your Klaviyo API key. We validate it instantly.</p>
+              <p className="text-muted-foreground">Add your Klaviyo API key. Instant validation.</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#EF3F3F] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
                 3
               </div>
-              <h3 className="text-xl font-bold mb-2">Customize Metrics</h3>
-              <p className="text-gray-400">Enter your AOV, currency, and lifecycle thresholds.</p>
+              <h3 className="text-xl font-bold mb-2">Customize</h3>
+              <p className="text-muted-foreground">Enter AOV, currency, lifecycle thresholds.</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#EF3F3F] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
                 4
               </div>
-              <h3 className="text-xl font-bold mb-2">Create Segments</h3>
-              <p className="text-gray-400">Select segments or use AI. Hit create. Done.</p>
+              <h3 className="text-xl font-bold mb-2">Deploy</h3>
+              <p className="text-muted-foreground">Select segments or use AI. Hit create. Done.</p>
             </div>
           </div>
 
           <div className="mt-12 text-center">
             <button
               onClick={handleGetStarted}
-              className="bg-[#EF3F3F] hover:bg-[#DC2626] px-8 py-4 rounded-lg font-bold text-lg inline-flex items-center gap-2 transition"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-lg font-bold text-lg inline-flex items-center gap-2 transition shadow-button"
             >
               Start Creating Segments
               <ArrowRight className="w-5 h-5" />
@@ -640,16 +632,16 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-[#2A2A2A] py-12 px-6">
+      <footer className="bg-background border-t border-border py-12 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-black mb-4">
-                <span className="text-[#EF3F3F]">ADER</span>
-                <span className="text-white">AI</span>
+              <div className="text-2xl font-bold tracking-tight mb-4">
+                <span className="text-primary">Klaviyo</span>
+                <span className="text-foreground"> AI</span>
               </div>
-              <p className="text-gray-400 text-sm">
-                By THE DRIP STORY
+              <p className="text-muted-foreground text-sm">
+                Powered by Klaviyo
                 <br />
                 70 Segments. 30 Seconds.
               </p>
@@ -725,8 +717,8 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-[#2A2A2A] pt-8 text-center text-sm text-gray-500">
-            © 2025 Aderai by THE DRIP STORY. All rights reserved.
+          <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
+            © 2025 Klaviyo AI Segmentation. Powered by Klaviyo.
           </div>
         </div>
       </footer>

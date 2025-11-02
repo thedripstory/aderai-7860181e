@@ -11,14 +11,14 @@ export const EmailTestimonial = () => {
         </div>
         
         <blockquote className="text-xl sm:text-2xl font-medium mb-6 leading-relaxed">
-          "The Sales Strategy Portal transformed how we approach our sales pipeline. We've seen a 40% increase in conversion rates in just 3 months."
+          "Deployed 70 segments in under a minute. Our email revenue jumped 42% in the first month. This is what we've been missing."
         </blockquote>
         
         <div className="flex items-center justify-center gap-4">
           <div className="w-12 h-12 rounded-full bg-gradient-primary" />
           <div className="text-left">
-            <div className="font-semibold">Sarah Chen</div>
-            <div className="text-sm text-muted-foreground">VP of Sales, TechCorp</div>
+            <div className="font-semibold">Marcus Rodriguez</div>
+            <div className="text-sm text-muted-foreground">Head of Growth, Premium Beauty Co.</div>
           </div>
         </div>
       </div>

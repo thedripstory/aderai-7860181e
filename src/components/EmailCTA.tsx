@@ -4,33 +4,32 @@ export const EmailCTA = () => {
   return (
     <section className="px-4 py-12 sm:py-16">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-gradient-primary rounded-2xl p-8 sm:p-12 text-center text-primary-foreground shadow-elegant">
+        <div className="bg-gradient-primary rounded-xl p-8 sm:p-12 text-center text-primary-foreground shadow-elegant">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Ready to Accelerate Your Sales?
+            Your Investment Is Protected
           </h2>
           <p className="text-lg mb-8 opacity-95 max-w-xl mx-auto">
-            Join thousands of sales teams already using the Sales Strategy Portal to close more deals and drive revenue growth.
+            Try risk-free. If these 70 segments don't boost your email performance, get 100% of your money back. Zero risk.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button 
-              variant="secondary" 
               size="lg" 
-              className="text-base bg-background text-foreground hover:bg-background/90"
+              className="text-base font-semibold bg-background text-foreground hover:bg-background/90"
             >
-              Start Free Trial
+              Start For $49
             </Button>
             <Button 
               variant="outline" 
               size="lg" 
-              className="text-base border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
+              className="text-base font-semibold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
             >
-              Schedule Demo
+              Watch Demo
             </Button>
           </div>
           
-          <p className="text-sm opacity-80">
-            No credit card required • 14-day free trial • Cancel anytime
+          <p className="text-sm opacity-90 font-medium">
+            Instant setup • 100% money-back guarantee • Works with Klaviyo
           </p>
         </div>
       </div>
