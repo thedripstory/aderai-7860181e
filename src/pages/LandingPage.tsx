@@ -140,11 +140,11 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <button
               onClick={handleGetStarted}
-              className="group relative bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-10 py-5 rounded-full text-lg font-bold transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3 overflow-hidden"
+              className="group relative bg-primary text-primary-foreground px-10 py-5 rounded-full text-lg font-bold transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3 overflow-hidden"
             >
-              <span className="relative z-10 transition-colors duration-500">Start building segments</span>
-              <div className="relative z-10 w-5 h-5 flex items-center justify-center transition-all duration-500 group-hover:w-12 group-hover:h-12 group-hover:bg-background group-hover:rounded-full group-hover:ml-2">
-                <ArrowRight className="w-5 h-5 transition-all duration-500 group-hover:text-primary" />
+              <span className="relative z-10 transition-colors duration-500 group-hover:text-primary">Start building segments</span>
+              <div className="relative z-10 w-12 h-12 flex items-center justify-center bg-background rounded-full transition-all duration-500 group-hover:scale-[20]">
+                <ArrowRight className="w-5 h-5 text-primary transition-transform duration-500 group-hover:translate-x-1" />
               </div>
             </button>
               <button
