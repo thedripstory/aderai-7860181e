@@ -59,31 +59,31 @@ export const AnimatedSegmentVisual = () => {
         {/* Main Step Display */}
         <div className="relative bg-background/40 backdrop-blur-sm rounded-3xl border border-border/50 overflow-hidden shadow-[0_20px_60px_-15px_hsl(var(--primary)/0.9)]" onMouseEnter={() => setIsAutoPlaying(false)} onMouseLeave={() => setIsAutoPlaying(true)}>
           {/* Content */}
-          <div className="relative grid lg:grid-cols-2 gap-8 p-6 lg:p-10">
+          <div className="relative grid lg:grid-cols-2 gap-12 p-8 lg:p-16">
             {/* Left: Step Info */}
-            <div className="flex flex-col justify-center space-y-4">
+            <div className="flex flex-col justify-center space-y-6">
               {/* Step number */}
               <div className="opacity-0 animate-fade-in">
-                <span className="text-5xl font-bold text-primary/20">
+                <span className="text-7xl font-bold text-primary/20">
                   {activeStep.number}
                 </span>
               </div>
 
               {/* Title with icon */}
-              <div className="space-y-2 opacity-0 animate-fade-in" style={{
+              <div className="space-y-4 opacity-0 animate-fade-in" style={{
               animationDelay: "100ms",
               animationFillMode: "forwards"
             }}>
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary border border-primary/20">
-                  <activeStep.icon className="w-6 h-6 text-white" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary border border-primary/20">
+                  <activeStep.icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl lg:text-2xl font-bold leading-tight">
+                <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
                   {activeStep.title}
                 </h3>
               </div>
 
               {/* Description */}
-              <p className="text-base text-muted-foreground leading-relaxed opacity-0 animate-fade-in" style={{
+              <p className="text-lg text-muted-foreground leading-relaxed opacity-0 animate-fade-in" style={{
               animationDelay: "200ms",
               animationFillMode: "forwards"
             }}>
