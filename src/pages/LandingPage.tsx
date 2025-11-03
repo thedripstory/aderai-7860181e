@@ -9,7 +9,7 @@ import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
-import { AutomationFlow } from "@/components/AutomationFlow";
+import { ScrollSteps } from "@/components/ScrollSteps";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 export default function LandingPage() {
@@ -221,82 +221,30 @@ export default function LandingPage() {
       </section>
 
       {/* Automation Section */}
-      <section className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden">
+      <section id="how-it-works" className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-1">
-                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" /> Official API Partner
-                </span>
-              </div>
-
-              <div>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                  Literal 1 click segmentation.
-                </h2>
-
-                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
-                  With official API integration, Aderai deploys high-impact audience segments directly into your{" "}
-                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom mx-1" />
-                  {" "}account, instantly.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Smart Triggers</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Automatically detect customer behaviors and segment in real-time
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-accent" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Segment Score</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Monitor segment health with actionable performance indicators
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Instant Deployment</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Push segments to <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> with one click - no manual work
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button className="group px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 hover:scale-105 inline-flex items-center justify-center">
-                Unlock Forever
-              </button>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                How it Works
+              </span>
             </div>
 
-            {/* Right Workflow Visual */}
-            <div className="relative">
-              <AutomationFlow />
-            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              4 steps to better segmentation
+            </h2>
+
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
+              Deploy expert-grade segments in under 60 seconds
+            </p>
           </div>
+
+          <ScrollSteps />
         </div>
       </section>
 
