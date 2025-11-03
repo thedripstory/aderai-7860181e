@@ -749,11 +749,11 @@ export default function LandingPage() {
                     <ul className="space-y-2.5 mb-6 flex-grow">
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Everything in Brand</span>
+                        <span className="text-sm">Everything in Brand</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs flex items-end gap-1">
+                        <span className="text-sm flex items-end gap-1">
                           2{" "}
                           <img
                             src={klaviyoLogo}
@@ -765,11 +765,11 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Client switching</span>
+                        <span className="text-sm">Client switching</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Email support</span>
+                        <span className="text-sm">Email support</span>
                       </li>
                     </ul>
 
@@ -810,11 +810,11 @@ export default function LandingPage() {
                     <ul className="space-y-2.5 mb-6 flex-grow">
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Everything in Starter</span>
+                        <span className="text-sm">Everything in Starter</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs flex items-end gap-1">
+                        <span className="text-sm flex items-end gap-1">
                           5{" "}
                           <img
                             src={klaviyoLogo}
@@ -826,15 +826,15 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Priority support</span>
+                        <span className="text-sm">Priority support</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Custom segments</span>
+                        <span className="text-sm">Custom segments</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">White-label reports</span>
+                        <span className="text-sm">White-label reports</span>
                       </li>
                     </ul>
 
@@ -864,11 +864,11 @@ export default function LandingPage() {
                     <ul className="space-y-2.5 mb-6 flex-grow">
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Everything in Pro</span>
+                        <span className="text-sm">Everything in Pro</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs flex items-end gap-1">
+                        <span className="text-sm flex items-end gap-1">
                           10+{" "}
                           <img
                             src={klaviyoLogo}
@@ -880,19 +880,19 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Dedicated manager</span>
+                        <span className="text-sm">Dedicated manager</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">24/7 phone support</span>
+                        <span className="text-sm">24/7 phone support</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">API access</span>
+                        <span className="text-sm">API access</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-xs">Custom integrations</span>
+                        <span className="text-sm">Custom integrations</span>
                       </li>
                     </ul>
 
