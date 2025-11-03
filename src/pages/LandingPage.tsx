@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X } from "lucide-react";
-import klaviyoLogo from "@/assets/klaviyo-logo.png";
+const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
@@ -92,7 +92,9 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Works directly with Klaviyo</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                Works directly with <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" />
+              </span>
             </div>
           </div>
 
@@ -267,8 +269,8 @@ export default function LandingPage() {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                  Klaviyo&apos;s Official API Partner
+                <span className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-1">
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" /> Official API Partner
                 </span>
               </div>
 
@@ -278,8 +280,9 @@ export default function LandingPage() {
                 </h2>
 
                 <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
-                  With official API integration, Aderai deploys high-impact audience segments directly into your Klaviyo
-                  account, instantly.
+                  With official API integration, Aderai deploys high-impact audience segments directly into your{" "}
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom mx-1" />
+                  {" "}account, instantly.
                 </p>
               </div>
 
@@ -315,7 +318,7 @@ export default function LandingPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Instant Deployment</h3>
                     <p className="text-muted-foreground text-sm">
-                      Push segments to Klaviyo with one click - no manual work
+                      Push segments to <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> with one click - no manual work
                     </p>
                   </div>
                 </div>
@@ -350,8 +353,16 @@ export default function LandingPage() {
             {[
               {
                 step: "01",
-                title: "Connect Klaviyo",
-                description: "Add your Klaviyo API key. Instant validation. Secure connection.",
+                title: (
+                  <span className="flex items-center gap-2">
+                    Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+                  </span>
+                ),
+                description: (
+                  <span>
+                    Add your <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> API key. Instant validation. Secure connection.
+                  </span>
+                ),
               },
               {
                 step: "02",
@@ -366,7 +377,11 @@ export default function LandingPage() {
               {
                 step: "04",
                 title: "Deploy instantly",
-                description: "One click. All segments created in Klaviyo. Ready to use in campaigns.",
+                description: (
+                  <span>
+                    One click. All segments created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" />. Ready to use in campaigns.
+                  </span>
+                ),
               },
             ].map((item) => (
               <div key={item.step} className="flex gap-8 items-start">
@@ -556,7 +571,9 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">1 Klaviyo account</span>
+                  <span className="text-sm flex items-center gap-1">
+                    1 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" /> account
+                  </span>
                 </li>
               </ul>
               <button
@@ -583,7 +600,9 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">2 Klaviyo accounts</span>
+                  <span className="text-sm flex items-center gap-1">
+                    2 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" /> accounts
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -614,7 +633,9 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">5 Klaviyo accounts</span>
+                  <span className="text-sm flex items-center gap-1">
+                    5 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" /> accounts
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -644,10 +665,11 @@ export default function LandingPage() {
               <div className="text-2xl font-playfair font-bold mb-4">
                 aderai<span className="text-accent">.</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                AI-powered segmentation
-                <br />
-                for Klaviyo
+              <p className="text-sm text-muted-foreground flex flex-col items-start gap-1">
+                <span>AI-powered segmentation</span>
+                <span className="flex items-center gap-1">
+                  for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+                </span>
               </p>
             </div>
             <div>
