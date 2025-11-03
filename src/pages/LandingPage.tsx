@@ -229,10 +229,11 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Arrow Connection */}
-              <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                <div className="bg-background border-2 border-primary rounded-full p-4 shadow-xl">
-                  <ArrowRight className="w-8 h-8 text-primary animate-pulse" />
+              {/* Arrow Connection - Repositioned to top */}
+              <div className="hidden md:block absolute -top-6 left-1/2 -translate-x-1/2 z-10">
+                <div className="flex items-center gap-2 bg-background/95 backdrop-blur-sm border-2 border-primary/50 rounded-full px-4 py-2 shadow-lg">
+                  <span className="text-xs font-semibold text-primary uppercase tracking-wide">Saving Time</span>
+                  <ArrowRight className="w-5 h-5 text-primary animate-pulse" />
                 </div>
               </div>
             </div>
