@@ -984,69 +984,177 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-12 px-6 bg-muted">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="text-2xl font-playfair font-bold mb-4">
-                aderai<span className="text-accent">.</span>
+      <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        
+        <div className="max-w-7xl mx-auto px-6 relative">
+          {/* Stats Bar - Unique Element */}
+          <div className="py-12 border-b border-border/50">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  10,000+
+                </div>
+                <div className="text-sm text-muted-foreground">Happy Users</div>
               </div>
-              <p className="text-sm text-muted-foreground flex flex-col items-start gap-1">
-                <span>AI-powered segmentation</span>
-                <span className="flex items-center gap-1">
-                  for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
-                </span>
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-sm">Product</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition">
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a href="#pricing" className="hover:text-foreground transition">
-                    Pricing
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-sm">Company</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition">
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-sm">Legal</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition">
-                    Privacy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition">
-                    Terms
-                  </a>
-                </li>
-              </ul>
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  70+
+                </div>
+                <div className="text-sm text-muted-foreground">Pre-built Segments</div>
+              </div>
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  99%
+                </div>
+                <div className="text-sm text-muted-foreground">Time Saved</div>
+              </div>
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  4.8★
+                </div>
+                <div className="text-sm text-muted-foreground">User Rating</div>
+              </div>
             </div>
           </div>
-          <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground gap-4">
-            <div>© 2025 Aderai. All rights reserved.</div>
-            <PoweredByBadge />
+
+          {/* Newsletter Section - Unique Element */}
+          <div className="py-16 border-b border-border/50">
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+                  Stay Updated
+                </span>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-3">
+                Get segmentation tips & updates
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Join 10,000+ marketers getting weekly insights on 
+                <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom mx-1" /> 
+                segmentation
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <button className="px-8 py-3 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold hover:scale-105 transition-all shadow-lg hover:shadow-xl whitespace-nowrap">
+                  Subscribe
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                No spam. Unsubscribe anytime.
+              </p>
+            </div>
+          </div>
+
+          {/* Main Footer Content */}
+          <div className="py-12">
+            <div className="grid md:grid-cols-5 gap-8 mb-12">
+              {/* Brand Column - Larger */}
+              <div className="md:col-span-2">
+                <div className="text-3xl font-playfair font-bold mb-4">
+                  aderai<span className="text-accent">.</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-6 flex flex-col items-start gap-1">
+                  <span>AI-powered segmentation</span>
+                  <span className="flex items-center gap-1">
+                    for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+                  </span>
+                </p>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">Made with</span>
+                  <span className="text-red-500 text-lg animate-pulse">❤️</span>
+                  <span className="text-muted-foreground">for marketers</span>
+                </div>
+              </div>
+
+              {/* Links Columns */}
+              <div>
+                <h4 className="font-bold mb-4 text-sm">Product</h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>
+                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Features</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#pricing" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Pricing</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#how-it-works" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>How it Works</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold mb-4 text-sm">Company</h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>
+                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>About</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Contact</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Careers</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold mb-4 text-sm">Legal</h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>
+                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Privacy</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Terms</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Security</span>
+                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="border-t border-border/50 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-muted-foreground">
+                © 2025 Aderai. All rights reserved.
+              </div>
+              <PoweredByBadge />
+            </div>
           </div>
         </div>
       </footer>
