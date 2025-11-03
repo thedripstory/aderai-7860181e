@@ -34,6 +34,7 @@ import {
   Copy,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * ADERAI - COMPLETE APP WITH SEGMENT ANALYTICS
@@ -482,6 +483,8 @@ export default function AderaiApp() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [error, setError] = useState("");
+  const [affiliateStats, setAffiliateStats] = useState<any>(null);
+  const [loadingAffiliateStats, setLoadingAffiliateStats] = useState(false);
 
   // Onboarding state
   const [accountName, setAccountName] = useState("");
@@ -1254,8 +1257,36 @@ export default function AderaiApp() {
     setView("dashboard");
   };
 
+  const fetchAffiliateStats = async () => {
+    setLoadingAffiliateStats(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.log('No session found');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('affiliate-get-stats', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error fetching affiliate stats:', error);
+      } else {
+        setAffiliateStats(data);
+        console.log('Affiliate stats loaded:', data);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+    } finally {
+      setLoadingAffiliateStats(false);
+    }
+  };
+
   const copyAffiliateLink = () => {
-    const link = `https://aderai.com/ref/${userData?.email || 'user'}`;
+    const link = `https://aderai.com?ref=${affiliateStats?.affiliateCode || 'LOADING'}`;
     navigator.clipboard.writeText(link);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
@@ -1856,6 +1887,11 @@ export default function AderaiApp() {
 
   // AFFILIATE VIEW
   if (view === 'affiliate') {
+    // Fetch stats when view loads
+    useEffect(() => {
+      fetchAffiliateStats();
+    }, []);
+
     return (
       <div className="min-h-screen bg-[#0A0A0A] p-6">
         <div className="max-w-4xl mx-auto">
@@ -1869,55 +1905,89 @@ export default function AderaiApp() {
               <h2 className="text-3xl font-black">Affiliate Program</h2>
             </div>
             <p className="text-gray-300 text-lg">
-              Earn <span className="font-bold text-[#EF3F3F]">20% one-time</span> + <span className="font-bold text-[#EF3F3F]">10% recurring</span> commissions for every referral.
+              Earn <span className="font-bold text-[#EF3F3F]">30% recurring</span> commissions for every referral — for life.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 text-center">
-              <div className="text-4xl font-black text-[#EF3F3F] mb-2">0</div>
-              <div className="text-gray-400">Total Referrals</div>
+          {loadingAffiliateStats ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="relative w-8 h-8">
+                <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+                <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+                </div>
+              </div>
             </div>
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 text-center">
-              <div className="text-4xl font-black text-green-500 mb-2">$0</div>
-              <div className="text-gray-400">Total Earnings</div>
-            </div>
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 text-center">
-              <div className="text-4xl font-black text-yellow-500 mb-2">$0</div>
-              <div className="text-gray-400">Pending Payout</div>
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-4 gap-6 mb-8">
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 text-center">
+                  <div className="text-4xl font-black text-blue-500 mb-2">
+                    {affiliateStats?.totalClicks || 0}
+                  </div>
+                  <div className="text-gray-400">Total Clicks</div>
+                </div>
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 text-center">
+                  <div className="text-4xl font-black text-[#EF3F3F] mb-2">
+                    {affiliateStats?.totalConversions || 0}
+                  </div>
+                  <div className="text-gray-400">Conversions</div>
+                </div>
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 text-center">
+                  <div className="text-4xl font-black text-green-500 mb-2">
+                    ${affiliateStats?.totalEarnings?.toFixed(2) || '0.00'}
+                  </div>
+                  <div className="text-gray-400">Total Earned</div>
+                </div>
+                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 text-center">
+                  <div className="text-4xl font-black text-yellow-500 mb-2">
+                    ${affiliateStats?.pendingPayment?.toFixed(2) || '0.00'}
+                  </div>
+                  <div className="text-gray-400">Pending</div>
+                </div>
+              </div>
 
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8 mb-8">
-            <h3 className="text-xl font-bold mb-4">Your Referral Link</h3>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={`https://aderai.com?ref=${currentUser?.affiliate_code || 'LOADING'}`}
-                readOnly
-                className="flex-1 px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white"
-              />
-              <button
-                onClick={copyAffiliateLink}
-                className="px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] rounded-lg font-bold transition flex items-center gap-2"
-              >
-                {copiedLink ? (
+              <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8 mb-8">
+                <h3 className="text-xl font-bold mb-4">Your Referral Link</h3>
+                {affiliateStats?.affiliateCode ? (
                   <>
-                    <CheckCircle className="w-5 h-5" />
-                    Copied!
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        value={`https://aderai.com?ref=${affiliateStats.affiliateCode}`}
+                        readOnly
+                        className="flex-1 px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg text-white"
+                      />
+                      <button
+                        onClick={copyAffiliateLink}
+                        className="px-6 py-3 bg-[#EF3F3F] hover:bg-[#DC2626] rounded-lg font-bold transition flex items-center gap-2"
+                      >
+                        {copiedLink ? (
+                          <>
+                            <CheckCircle className="w-5 h-5" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-5 h-5" />
+                            Copy
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-400 mt-3">
+                      Share this link with your audience. When they sign up, you'll earn 30% recurring commissions.
+                    </p>
                   </>
                 ) : (
-                  <>
-                    <Copy className="w-5 h-5" />
-                    Copy
-                  </>
+                  <div className="text-gray-400 text-center py-4">
+                    Loading your affiliate code...
+                  </div>
                 )}
-              </button>
-            </div>
-            <p className="text-sm text-gray-400 mt-3">
-              Share this link with your audience. When they sign up, you'll earn commissions automatically.
-            </p>
-          </div>
+              </div>
+            </>
+          )}
 
           <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-8">
             <h3 className="text-xl font-bold mb-6">How It Works</h3>

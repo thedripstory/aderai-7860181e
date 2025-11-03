@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.performance-flows]
 verify_jwt = false
+
+[functions.affiliate-track-click]
+verify_jwt = false
+
+[functions.affiliate-track-conversion]
+verify_jwt = false
+
+[functions.affiliate-get-stats]
+verify_jwt = true

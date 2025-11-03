@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building2, Users } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { CircleDoodle } from "@/components/CircleDoodle";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthProps {
   onComplete: (user: any) => void;
@@ -15,8 +17,49 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
   const [accountName, setAccountName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const handleAuth = () => {
+  // Capture referral code from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    
+    if (ref) {
+      setReferralCode(ref);
+      localStorage.setItem('aderai_ref', ref);
+      
+      // Track the affiliate click
+      trackAffiliateClick(ref);
+    } else {
+      // Check if we have a stored referral code
+      const storedRef = localStorage.getItem('aderai_ref');
+      if (storedRef) {
+        setReferralCode(storedRef);
+      }
+    }
+  }, []);
+
+  const trackAffiliateClick = async (code: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('affiliate-track-click', {
+        body: {
+          affiliateCode: code,
+          referrer: document.referrer || null,
+        },
+      });
+
+      if (error) {
+        console.error('Failed to track affiliate click:', error);
+      } else {
+        console.log('Affiliate click tracked:', data);
+      }
+    } catch (err) {
+      console.error('Error tracking click:', err);
+    }
+  };
+
+  const handleAuth = async () => {
     if (!email || !password) {
       setError("Please fill in all fields");
       return;
@@ -28,19 +71,107 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
     }
 
     setLoading(true);
+    setError("");
     
-    // Simulate auth - replace with real logic
-    setTimeout(() => {
-      const user = {
-        email,
-        accountName: accountName || email.split("@")[0],
-        accountType: authView.includes("agency") ? "agency" : "brand",
-      };
-      
-      localStorage.setItem("aderai_user", JSON.stringify(user));
-      onComplete(user);
+    try {
+      if (authView.includes("signup")) {
+        // Sign up
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/app`,
+            data: {
+              account_name: accountName,
+              account_type: authView.includes("agency") ? "agency" : "brand",
+              referred_by: referralCode || null,
+            },
+          },
+        });
+
+        if (signUpError) {
+          setError(signUpError.message);
+          setLoading(false);
+          return;
+        }
+
+        if (authData.user) {
+          // Insert user into users table with referral code
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert({
+              id: authData.user.id,
+              email: authData.user.email!,
+              password_hash: 'handled_by_auth',
+              account_name: accountName,
+              account_type: authView.includes("agency") ? "agency" : "brand",
+              referred_by: referralCode || null,
+              email_verified: false,
+            });
+
+          if (insertError) {
+            console.error('Error inserting user:', insertError);
+          }
+
+          // Clear stored referral code
+          localStorage.removeItem('aderai_ref');
+
+          toast({
+            title: "Account created!",
+            description: "Welcome to Aderai. Check your email to verify your account.",
+          });
+
+          // Store user info
+          const user = {
+            email,
+            accountName,
+            accountType: authView.includes("agency") ? "agency" : "brand",
+          };
+          localStorage.setItem("aderai_user", JSON.stringify(user));
+          
+          onComplete(user);
+        }
+      } else {
+        // Sign in
+        const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          setError(signInError.message);
+          setLoading(false);
+          return;
+        }
+
+        if (authData.user) {
+          // Get user data from users table
+          const { data: userData } = await supabase
+            .from('users')
+            .select('account_name, account_type')
+            .eq('id', authData.user.id)
+            .single();
+
+          const user = {
+            email: authData.user.email!,
+            accountName: userData?.account_name || email.split("@")[0],
+            accountType: userData?.account_type || "brand",
+          };
+          
+          localStorage.setItem("aderai_user", JSON.stringify(user));
+          
+          toast({
+            title: "Welcome back!",
+            description: "You've successfully signed in.",
+          });
+          
+          onComplete(user);
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred");
       setLoading(false);
-    }, 1000);
+    }
   };
 
   // Choice View
@@ -53,6 +184,13 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
               aderai<span className="text-accent">.</span>
             </h1>
             <p className="text-muted-foreground text-xl mb-6">Choose your account type</p>
+            {referralCode && (
+              <div className="inline-block bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-4">
+                <p className="text-sm text-primary font-semibold">
+                  🎁 Referred by: {referralCode}
+                </p>
+              </div>
+            )}
             <PoweredByBadge />
           </div>
 
