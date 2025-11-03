@@ -947,13 +947,13 @@ export default function LandingPage() {
                     {/* Floating Doodle Arrow and Text */}
                     <div className="absolute -top-20 left-1/2 -translate-x-1/2 flex items-start gap-2">
                       <svg 
-                        className="w-24 h-20 text-orange-500 -rotate-12" 
-                        viewBox="0 0 100 80" 
+                        className="w-20 h-24 text-orange-500 rotate-12" 
+                        viewBox="0 0 80 100" 
                         fill="none" 
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path 
-                          d="M10 10 Q 30 5, 50 15 T 80 25 L 75 35 M 80 25 L 70 20" 
+                          d="M15 10 Q 25 30, 40 50 T 50 85 L 45 75 M 50 85 L 55 75" 
                           stroke="currentColor" 
                           strokeWidth="3" 
                           strokeLinecap="round"
