@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Users, TrendingUp, Target } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X } from "lucide-react";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -12,8 +12,6 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
-import { EnergyFlowAnimation } from "@/components/EnergyFlowAnimation";
-import { AnimatedStatsBar } from "@/components/AnimatedStatsBar";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -24,21 +22,15 @@ export default function LandingPage() {
   const handleGetStarted = () => {
     window.location.href = "/signup";
   };
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}
-      >
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="text-2xl font-playfair font-bold">
             aderai<span className="text-accent">.</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <a
-              href="#how-it-works"
-              className="text-sm text-muted-foreground hover:text-foreground transition font-medium"
-            >
+            <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
               How it works
             </a>
             <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
@@ -49,10 +41,7 @@ export default function LandingPage() {
             <a href="/login" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
               Log in
             </a>
-            <button
-              onClick={handleGetStarted}
-              className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary/90 transition"
-            >
+            <button onClick={handleGetStarted} className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary/90 transition">
               Sign up
             </button>
           </div>
@@ -64,12 +53,9 @@ export default function LandingPage() {
         {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-          <div
-            className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
-            style={{
-              animationDelay: "1s",
-            }}
-          />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{
+          animationDelay: "1s"
+        }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
         </div>
 
@@ -78,12 +64,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm">
             <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
               <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background"
-                  />
-                ))}
+                {[1, 2, 3, 4].map(i => <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background" />)}
               </div>
               <span className="text-muted-foreground">10,00+ brands use Aderai</span>
             </div>
@@ -95,7 +76,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                Works directly with <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-baseline -mb-0.5" />
+                Works directly with <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" />
               </span>
             </div>
           </div>
@@ -117,7 +98,7 @@ export default function LandingPage() {
 
             <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium text-center">
               Instantly Create 70+ segments, with one click- straight inside{" "}
-              <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5 ml-1" />
+              <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />
             </p>
 
             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -126,10 +107,7 @@ export default function LandingPage() {
 
             {/* CTA Button */}
             <div className="flex justify-center mb-8">
-              <button
-                onClick={handleGetStarted}
-                className="group relative bg-primary text-primary-foreground px-14 py-6 rounded-full text-xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/30 flex items-center gap-3 hover:scale-105 hover:bg-primary/90"
-              >
+              <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-14 py-6 rounded-full text-xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/30 flex items-center gap-3 hover:scale-105 hover:bg-primary/90">
                 <span>Start building segments</span>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -154,12 +132,7 @@ export default function LandingPage() {
 
           {/* Interactive Comparison Cards */}
           <div className="relative max-w-5xl mx-auto mb-24">
-            {/* Energy Flow Animation */}
-            <div className="absolute inset-0 -z-10">
-              <EnergyFlowAnimation />
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6 relative z-10">
+            <div className="grid md:grid-cols-2 gap-6">
               {/* Before Card */}
               <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/5 rounded-full blur-2xl" />
@@ -179,17 +152,10 @@ export default function LandingPage() {
                   <div className="text-5xl font-bold mb-4 text-foreground">10+ hours</div>
 
                   <div className="space-y-3">
-                    {[
-                      "Build 70 segments one by one",
-                      "Debug complex Boolean logic",
-                      "Test each segment manually",
-                      "Fix errors & edge cases",
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
+                    {["Build 70 segments one by one", "Debug complex Boolean logic", "Test each segment manually", "Fix errors & edge cases"].map((item, i) => <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
                         <X className="w-4 h-4 text-red-500 flex-shrink-0" />
                         <span>{item}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </div>
@@ -215,25 +181,19 @@ export default function LandingPage() {
                   </div>
 
                   <div className="space-y-3">
-                    {[
-                      "Select from 70 pre-built segments",
-                      "Customize to your metrics",
-                      "One-click deploy to Klaviyo",
-                      "All segments auto-created",
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-sm">
+                    {["Select from 70 pre-built segments", "Customize to your metrics", "One-click deploy to Klaviyo", "All segments auto-created"].map((item, i) => <div key={i} className="flex items-center gap-3 text-sm">
                         <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
                         <span className="text-foreground/90">{item}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </div>
 
-              {/* Arrow Connection - Top Center */}
-              <div className="hidden md:flex absolute -top-8 left-1/2 -translate-x-1/2 z-10 items-center gap-2 bg-background/95 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-2 shadow-lg">
-                <span className="text-xs font-semibold text-primary uppercase tracking-wider">Saving Time</span>
-                <ArrowRight className="w-4 h-4 text-primary" />
+              {/* Arrow Connection */}
+              <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                <div className="bg-background border-2 border-primary rounded-full p-4 shadow-xl">
+                  <ArrowRight className="w-8 h-8 text-primary animate-pulse" />
+                </div>
               </div>
             </div>
 
@@ -246,10 +206,7 @@ export default function LandingPage() {
 
           {/* CTA Button */}
           <div className="mt-20 text-center">
-            <button
-              onClick={handleGetStarted}
-              className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3"
-            >
+            <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3">
               <span>Start Building Segments</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-2xl" />
@@ -276,7 +233,7 @@ export default function LandingPage() {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-1">
-                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-baseline -mb-0.5" /> Official API Partner
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" /> Official API Partner
                 </span>
               </div>
 
@@ -287,7 +244,7 @@ export default function LandingPage() {
 
                 <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
                   With official API integration, Aderai deploys high-impact audience segments directly into your{" "}
-                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5 mx-1" />
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom mx-1" />
                   {" "}account, instantly.
                 </p>
               </div>
@@ -324,7 +281,7 @@ export default function LandingPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Instant Deployment</h3>
                     <p className="text-muted-foreground text-sm">
-                      Push segments to <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-baseline -mb-0.5 mx-1" /> with one click - no manual work
+                      Push segments to <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> with one click - no manual work
                     </p>
                   </div>
                 </div>
@@ -356,55 +313,39 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-12">
-            {[
-              {
-                step: "01",
-                title: (
-                  <span className="flex items-center gap-2">
-                    Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" />
+            {[{
+            step: "01",
+            title: <span className="flex items-center gap-2">
+                    Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+                  </span>,
+            description: <span>
+                    Add your <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> API key. Instant validation. Secure connection.
                   </span>
-                ),
-                description: (
-                  <span>
-                    Add your <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-baseline -mb-0.5 mx-1" /> API key. Instant validation. Secure connection.
+          }, {
+            step: "02",
+            title: "Choose your segments",
+            description: "Browse 70 pre-built segments organized by strategy. Or use AI to suggest custom ones."
+          }, {
+            step: "03",
+            title: "Customize metrics",
+            description: "Enter your AOV, currency, lifecycle thresholds. Segments auto-adjust to your business."
+          }, {
+            step: "04",
+            title: "Deploy instantly",
+            description: <span>
+                    One click. All segments created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" />. Ready to use in campaigns.
                   </span>
-                ),
-              },
-              {
-                step: "02",
-                title: "Choose your segments",
-                description: "Browse 70 pre-built segments organized by strategy. Or use AI to suggest custom ones.",
-              },
-              {
-                step: "03",
-                title: "Customize metrics",
-                description: "Enter your AOV, currency, lifecycle thresholds. Segments auto-adjust to your business.",
-              },
-              {
-                step: "04",
-                title: "Deploy instantly",
-                description: (
-                  <span>
-                    One click. All segments created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-baseline -mb-0.5 mx-1" />. Ready to use in campaigns.
-                  </span>
-                ),
-              },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-8 items-start">
+          }].map(item => <div key={item.step} className="flex gap-8 items-start">
                 <div className="text-6xl font-bold text-muted-foreground/20 flex-shrink-0">{item.step}</div>
                 <div className="flex-1 pt-2">
                   <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
                   <p className="text-lg text-muted-foreground">{item.description}</p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
 
           <div className="mt-16 text-center">
-            <button
-              onClick={handleGetStarted}
-              className="group relative bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] text-primary-foreground px-14 py-7 rounded-2xl text-xl font-bold shadow-2xl inline-flex items-center gap-4 overflow-hidden transition-all duration-500 hover:bg-[position:100%_0] hover:scale-110 hover:shadow-[0_20px_60px_rgba(0,0,0,0.3)] hover:-rotate-1 active:scale-105"
-            >
+            <button onClick={handleGetStarted} className="group relative bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] text-primary-foreground px-14 py-7 rounded-2xl text-xl font-bold shadow-2xl inline-flex items-center gap-4 overflow-hidden transition-all duration-500 hover:bg-[position:100%_0] hover:scale-110 hover:shadow-[0_20px_60px_rgba(0,0,0,0.3)] hover:-rotate-1 active:scale-105">
               {/* Animated background shimmer */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
 
@@ -418,10 +359,9 @@ export default function LandingPage() {
 
               {/* Corner sparkles */}
               <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" />
-              <div
-                className="absolute bottom-2 left-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping"
-                style={{ animationDelay: "0.2s" }}
-              />
+              <div className="absolute bottom-2 left-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{
+              animationDelay: "0.2s"
+            }} />
             </button>
           </div>
         </div>
@@ -434,110 +374,47 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Everything you need</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div>
-              <Zap className="w-8 h-8 mb-4 text-accent" />
-              <h3 className="text-xl font-bold mb-3">70 proven segments</h3>
-              <p className="text-muted-foreground">
-                VIP customers, at-risk buyers, cart abandoners. Every segment drives revenue.
-              </p>
-            </div>
-            <div>
-              <Zap className="w-8 h-8 mb-4 text-accent" />
-              <h3 className="text-xl font-bold mb-3">AI suggester</h3>
-              <p className="text-muted-foreground">
-                Describe your goal. Get custom segments specifically for your brand.
-              </p>
-            </div>
-            <div>
-              <Zap className="w-8 h-8 mb-4 text-accent" />
-              <h3 className="text-xl font-bold mb-3">Real-time analytics</h3>
-              <p className="text-muted-foreground">Track segment performance. Monitor growth. Export reports.</p>
-            </div>
-          </div>
+          
         </div>
       </section>
 
-      {/* Pain Points Section */}
-      <section className="py-32 px-6 bg-background relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          {/* Main Content */}
-          <div className="text-center space-y-16">
-            {/* Header with doodle */}
-            <div className="relative inline-block">
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold">
-                <span className="relative inline-block">
-                  Wave goodbye to
-                  <svg className="absolute -left-6 -top-4 w-12 h-12 text-foreground/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M7 3 L5 5 L7 7" />
-                  </svg>
-                </span>
-              </h2>
-            </div>
+      {/* Success Stories */}
+      <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
-            {/* Pain Points Grid */}
-            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto leading-relaxed">
-              <span className="relative text-muted-foreground/50">
-                wasted time
-                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
-              </span>
+        <div className="max-w-7xl mx-auto relative">
+          
 
-              <span className="relative text-muted-foreground/50">
-                manual work
-                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
-              </span>
+          <div className="grid md:grid-cols-3 gap-8 mt-16">
+            <FlipTestimonialCard name="Sophia" role="Marketing Lead" company="Trendify" story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships." metrics={[{
+            label: "gain in retention",
+            value: "40%"
+          }, {
+            label: "surge in profits",
+            value: "50%"
+          }]} delay="0s" />
 
-              <span className="relative font-bold text-3xl md:text-4xl lg:text-5xl">
-                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                  complex setup
-                </span>
-                <svg className="absolute -bottom-2 left-0 right-0 w-full h-4" viewBox="0 0 300 20" preserveAspectRatio="none">
-                  <path d="M5 10 Q75 5 150 10 T295 10" stroke="hsl(var(--primary))" strokeWidth="3" fill="none" />
-                  <path d="M5 15 Q75 10 150 15 T295 15" stroke="hsl(var(--accent))" strokeWidth="2" fill="none" opacity="0.5" />
-                </svg>
-              </span>
+            <FlipTestimonialCard name="Marcus" role="Head of Growth" company="Premium Beauty Co." story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy." metrics={[{
+            label: "email revenue increase",
+            value: "+42%"
+          }, {
+            label: "deployment time",
+            value: "60 sec"
+          }]} delay="0.1s" />
 
-              <span className="relative text-muted-foreground/50">
-                agency costs
-                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
-              </span>
+            <FlipTestimonialCard name="Sarah" role="Founder" company="Growth Labs Agency" story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue." metrics={[{
+            label: "time saved",
+            value: "99%"
+          }, {
+            label: "revenue increase",
+            value: "+$200K"
+          }]} delay="0.2s" />
+          </div>
 
-              <span className="relative text-muted-foreground/50">
-                slow results
-                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
-              </span>
-            </div>
-
-            {/* Stats Ticker */}
-            <div className="relative w-full overflow-hidden border-y border-border py-8">
-              <div className="flex gap-16 animate-[slide-left_30s_linear_infinite]">
-                {/* First Set */}
-                {[
-                  { icon: Users, value: "10K+", label: "Active Users" },
-                  { icon: Zap, value: "70+", label: "Segments" },
-                  { icon: TrendingUp, value: "42%", label: "Revenue Increase" },
-                  { icon: Target, value: "99%", label: "Time Saved" },
-                  { icon: Users, value: "10K+", label: "Active Users" },
-                  { icon: Zap, value: "70+", label: "Segments" },
-                  { icon: TrendingUp, value: "42%", label: "Revenue Increase" },
-                  { icon: Target, value: "99%", label: "Time Saved" },
-                ].map((stat, idx) => (
-                  <div key={`stat-${idx}`} className="flex items-center gap-4 flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-border">
-                      <stat.icon className="w-6 h-6 text-foreground" />
-                    </div>
-                    <div>
-                      <div className="text-3xl font-bold text-foreground">{stat.value}</div>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">{stat.label}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Fade edges */}
-              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent pointer-events-none" />
-              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent pointer-events-none" />
-            </div>
+          <div className="mt-16 text-center">
+            <PoweredByBadge />
           </div>
         </div>
       </section>
@@ -580,14 +457,11 @@ export default function LandingPage() {
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-sm flex items-center gap-1">
-                    1 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" /> account
+                    1 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" /> account
                   </span>
                 </li>
               </ul>
-              <button
-                onClick={handleGetStarted}
-                className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:bg-primary/90 transition"
-              >
+              <button onClick={handleGetStarted} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:bg-primary/90 transition">
                 Get started
               </button>
             </div>
@@ -609,7 +483,7 @@ export default function LandingPage() {
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-sm flex items-center gap-1">
-                    2 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" /> accounts
+                    2 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" /> accounts
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -617,10 +491,7 @@ export default function LandingPage() {
                   <span className="text-sm">Client switching</span>
                 </li>
               </ul>
-              <button
-                onClick={handleGetStarted}
-                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition"
-              >
+              <button onClick={handleGetStarted} className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition">
                 Get started
               </button>
             </div>
@@ -642,7 +513,7 @@ export default function LandingPage() {
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-sm flex items-center gap-1">
-                    5 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" /> accounts
+                    5 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" /> accounts
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -650,10 +521,7 @@ export default function LandingPage() {
                   <span className="text-sm">Priority support</span>
                 </li>
               </ul>
-              <button
-                onClick={handleGetStarted}
-                className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition"
-              >
+              <button onClick={handleGetStarted} className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background transition">
                 Get started
               </button>
             </div>
@@ -676,7 +544,7 @@ export default function LandingPage() {
               <p className="text-sm text-muted-foreground flex flex-col items-start gap-1">
                 <span>AI-powered segmentation</span>
                 <span className="flex items-center gap-1">
-                  for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" />
+                  for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
                 </span>
               </p>
             </div>
@@ -734,6 +602,5 @@ export default function LandingPage() {
       </footer>
 
       <TimeBasedPopup onGetStarted={handleGetStarted} />
-    </div>
-  );
+    </div>;
 }
