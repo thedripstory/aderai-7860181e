@@ -4,14 +4,20 @@ interface Step {
   id: string;
   number: string;
   icon: any;
-  title: string;
-  description: string;
+  title: string | JSX.Element;
+  description: string | JSX.Element;
 }
+const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
+
 const STEPS: Step[] = [{
   id: "1",
   number: "01",
   icon: MousePointerClick,
-  title: "Connect Klaviyo",
+  title: (
+    <span className="flex items-center gap-2">
+      Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+    </span>
+  ),
   description: "One-click authentication. No API keys, no technical setup required."
 }, {
   id: "2",
@@ -24,7 +30,11 @@ const STEPS: Step[] = [{
   number: "03",
   icon: Zap,
   title: "Deploy Instantly",
-  description: "All segments auto-created in Klaviyo in 30 seconds. No manual work."
+  description: (
+    <span>
+      All segments auto-created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> in 30 seconds. No manual work.
+    </span>
+  )
 }, {
   id: "4",
   number: "04",
@@ -51,8 +61,8 @@ export const AnimatedSegmentVisual = () => {
         {/* Section header */}
         <div className="text-center mb-12 space-y-3">
           
-          <h2 className="text-3xl lg:text-4xl font-bold">
-            Powered by <span className="text-primary">Klaviyo.</span>
+          <h2 className="text-3xl lg:text-4xl font-bold flex items-center justify-center gap-2">
+            Powered by <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
           </h2>
         </div>
 
