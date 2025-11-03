@@ -62,7 +62,7 @@ export const ScrollSteps = () => {
       <div className="grid lg:grid-cols-5 gap-12 items-start">
         {/* Left – single sticky number + line */}
         <div className="hidden lg:block lg:col-span-2">
-          <div className="sticky top-1/4 h-screen flex items-center">
+          <div className="sticky top-24">
             <div className="flex items-start gap-6">
               <div className="leading-none select-none">
                 <div className="text-[120px] font-bold bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
