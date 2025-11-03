@@ -595,7 +595,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               <AnimatedUnderline delay="0.2s">Pay once</AnimatedUnderline>. Use forever.{" "}
-              <strong className="text-foreground">100% money-back guarantee.</strong>
+              <strong className="text-foreground">24x7 customer support.</strong>
             </p>
           </div>
 
@@ -689,7 +689,7 @@ export default function LandingPage() {
                           <div className="text-center md:text-left text-xs text-muted-foreground">
                             <div className="flex items-center justify-center md:justify-start gap-2">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                              <span>30-day money-back guarantee</span>
+                              <span>24x7 customer support</span>
                             </div>
                           </div>
                         </div>
@@ -927,7 +927,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                <span className="text-muted-foreground">30-day money back guarantee</span>
+                <span className="text-muted-foreground">24x7 customer support</span>
               </div>
             </div>
             <PoweredByBadge />
