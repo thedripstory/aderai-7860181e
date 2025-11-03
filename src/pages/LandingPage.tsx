@@ -1073,11 +1073,6 @@ export default function LandingPage() {
                     for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
                   </span>
                 </p>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Made with</span>
-                  <span className="text-red-500 text-lg animate-pulse">❤️</span>
-                  <span className="text-muted-foreground">for marketers</span>
-                </div>
               </div>
 
               {/* Links Columns */}
