@@ -506,9 +506,25 @@ export default function LandingPage() {
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto relative">
-          
+          {/* Header Section */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                Success Stories
+              </span>
+            </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mt-16">
+            <h2 className="text-4xl md:text-6xl font-bold mb-6">
+              Real results from real brands
+            </h2>
+
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              See how marketing teams are using Aderai to drive exponential growth with expert-grade segmentation
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
             <FlipTestimonialCard name="Sophia" role="Marketing Lead" company="Trendify" story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships." metrics={[{
             label: "gain in retention",
             value: "40%"
