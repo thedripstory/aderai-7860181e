@@ -638,92 +638,96 @@ export default function LandingPage() {
           </div>
 
           {/* Pricing Cards */}
-          <div className="relative min-h-[600px]">
+          <div className="relative">
             {/* Brands View - Single Card */}
             {pricingView === "brands" && (
               <div className="flex justify-center animate-fade-in">
-                <div className="w-full max-w-md group">
-                  <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary p-10 shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-500">
+                <div className="w-full max-w-4xl group">
+                  <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-500">
                     {/* Glow Effect */}
                     <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 to-accent/20 blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
                     
                     {/* Badge */}
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <div className="px-6 py-2 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 rounded-full shadow-lg animate-pulse">
-                        <span className="text-sm font-bold text-white uppercase tracking-wide flex items-center gap-2">
-                          <Star className="w-4 h-4 fill-white" />
+                      <div className="px-6 py-1.5 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 rounded-full shadow-lg animate-pulse">
+                        <span className="text-xs font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                          <Star className="w-3.5 h-3.5 fill-white" />
                           Most Popular
                         </span>
                       </div>
                     </div>
 
-                    <div className="relative">
-                      {/* Header */}
-                      <div className="text-center mb-8 pt-4">
-                        <h3 className="text-3xl font-bold mb-6">Brand Plan</h3>
-                        <div className="mb-6">
-                          <div className="flex items-baseline justify-center gap-2">
-                            <span className="text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                              $49
-                            </span>
+                    <div className="relative p-8 pt-10">
+                      <div className="grid md:grid-cols-2 gap-8 items-center">
+                        {/* Left: Pricing */}
+                        <div className="text-center md:text-left">
+                          <h3 className="text-3xl font-bold mb-4">Brand Plan</h3>
+                          <div className="mb-4">
+                            <div className="flex items-baseline justify-center md:justify-start gap-2">
+                              <span className="text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                                $49
+                              </span>
+                            </div>
+                            <div className="text-muted-foreground mt-2 text-sm font-medium">
+                              One-time payment • Lifetime access
+                            </div>
                           </div>
-                          <div className="text-muted-foreground mt-2 font-medium">
-                            One-time payment • Lifetime access
+                          
+                          {/* CTA Button */}
+                          <button
+                            onClick={handleGetStarted}
+                            className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-3.5 rounded-full font-bold text-base hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50 overflow-hidden mb-4"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+                            <span className="relative z-10 flex items-center justify-center gap-2">
+                              Get started now
+                              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                            </span>
+                          </button>
+
+                          {/* Trust Badge */}
+                          <div className="text-center md:text-left text-xs text-muted-foreground">
+                            <div className="flex items-center justify-center md:justify-start gap-2">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                              <span>30-day money-back guarantee</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Features */}
-                      <ul className="space-y-4 mb-10">
-                        {[
-                          { icon: CheckCircle, text: "70 pre-built segments" },
-                          { icon: Sparkles, text: "AI segment suggester" },
-                          { icon: BarChart3, text: "Advanced analytics dashboard" },
-                          { icon: Zap, text: "One-click deployment" },
-                        ].map((feature, i) => (
-                          <li
-                            key={i}
-                            className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300">
-                              <feature.icon className="w-4 h-4 text-primary" />
-                            </div>
-                            <span className="text-base">{feature.text}</span>
-                          </li>
-                        ))}
-                        <li className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300">
-                            <CheckCircle className="w-4 h-4 text-primary" />
-                          </div>
-                          <span className="text-base flex items-end gap-1.5">
-                            1{" "}
-                            <img
-                              src={klaviyoLogo}
-                              alt="Klaviyo"
-                              className="h-[1em] inline-block"
-                            />{" "}
-                            account
-                          </span>
-                        </li>
-                      </ul>
-
-                      {/* CTA Button */}
-                      <button
-                        onClick={handleGetStarted}
-                        className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-4 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50 overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
-                        <span className="relative z-10 flex items-center justify-center gap-2">
-                          Get started now
-                          <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                        </span>
-                      </button>
-
-                      {/* Trust Badge */}
-                      <div className="text-center mt-6 text-sm text-muted-foreground">
-                        <div className="flex items-center justify-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                          <span>30-day money-back guarantee</span>
+                        {/* Right: Features */}
+                        <div>
+                          <ul className="grid grid-cols-1 gap-3">
+                            {[
+                              { icon: CheckCircle, text: "70 pre-built segments" },
+                              { icon: Sparkles, text: "AI segment suggester" },
+                              { icon: BarChart3, text: "Advanced analytics" },
+                              { icon: Zap, text: "One-click deployment" },
+                            ].map((feature, i) => (
+                              <li
+                                key={i}
+                                className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300"
+                              >
+                                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300 flex-shrink-0">
+                                  <feature.icon className="w-3.5 h-3.5 text-primary" />
+                                </div>
+                                <span className="text-sm">{feature.text}</span>
+                              </li>
+                            ))}
+                            <li className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300">
+                              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300 flex-shrink-0">
+                                <CheckCircle className="w-3.5 h-3.5 text-primary" />
+                              </div>
+                              <span className="text-sm flex items-end gap-1.5">
+                                1{" "}
+                                <img
+                                  src={klaviyoLogo}
+                                  alt="Klaviyo"
+                                  className="h-[0.95em] inline-block"
+                                />{" "}
+                                account
+                              </span>
+                            </li>
+                          </ul>
                         </div>
                       </div>
                     </div>
@@ -734,28 +738,28 @@ export default function LandingPage() {
 
             {/* Agencies View - Three Cards */}
             {pricingView === "agencies" && (
-              <div className="grid md:grid-cols-3 gap-8 animate-fade-in">
+              <div className="grid md:grid-cols-3 gap-6 animate-fade-in">
                 {/* Starter Agency */}
                 <div className="group relative">
-                  <div className="bg-card rounded-3xl border border-border p-8 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
-                    <div className="text-center mb-8">
-                      <h3 className="text-2xl font-bold mb-4">Starter</h3>
-                      <div className="mb-4">
-                        <div className="flex items-baseline justify-center gap-2">
-                          <span className="text-5xl font-bold">$89</span>
+                  <div className="bg-card rounded-3xl border border-border p-6 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold mb-3">Starter</h3>
+                      <div className="mb-3">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-4xl font-bold">$89</span>
                         </div>
-                        <div className="text-muted-foreground text-sm mt-2">/month</div>
+                        <div className="text-muted-foreground text-xs mt-1">/month</div>
                       </div>
                     </div>
 
-                    <ul className="space-y-4 mb-8 flex-grow">
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Everything in Brand</span>
+                    <ul className="space-y-2.5 mb-6 flex-grow">
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Everything in Brand</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm flex items-end gap-1.5">
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs flex items-end gap-1">
                           2{" "}
                           <img
                             src={klaviyoLogo}
@@ -765,19 +769,19 @@ export default function LandingPage() {
                           accounts
                         </span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Client switching</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Client switching</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Email support</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Email support</span>
                       </li>
                     </ul>
 
                     <button
                       onClick={handleGetStarted}
-                      className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300"
+                      className="w-full bg-transparent border-2 border-foreground text-foreground py-2.5 rounded-full text-sm font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300"
                     >
                       Get started
                     </button>
@@ -785,38 +789,38 @@ export default function LandingPage() {
                 </div>
 
                 {/* Pro Agency - Featured */}
-                <div className="group relative md:-mt-4">
+                <div className="group relative">
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary rounded-3xl blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary p-8 hover:scale-105 transition-all duration-500 shadow-2xl h-full flex flex-col">
+                  <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary p-6 hover:scale-105 transition-all duration-500 shadow-2xl h-full flex flex-col">
                     {/* Badge */}
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <div className="px-4 py-1.5 bg-primary rounded-full shadow-lg">
-                        <span className="text-xs font-bold text-primary-foreground uppercase tracking-wide">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <div className="px-3 py-1 bg-primary rounded-full shadow-lg">
+                        <span className="text-[10px] font-bold text-primary-foreground uppercase tracking-wide">
                           Recommended
                         </span>
                       </div>
                     </div>
 
-                    <div className="text-center mb-8 pt-2">
-                      <h3 className="text-2xl font-bold mb-4">Pro</h3>
-                      <div className="mb-4">
-                        <div className="flex items-baseline justify-center gap-2">
-                          <span className="text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    <div className="text-center mb-6 pt-2">
+                      <h3 className="text-xl font-bold mb-3">Pro</h3>
+                      <div className="mb-3">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                             $149
                           </span>
                         </div>
-                        <div className="text-muted-foreground text-sm mt-2">/month</div>
+                        <div className="text-muted-foreground text-xs mt-1">/month</div>
                       </div>
                     </div>
 
-                    <ul className="space-y-4 mb-8 flex-grow">
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Everything in Starter</span>
+                    <ul className="space-y-2.5 mb-6 flex-grow">
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Everything in Starter</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm flex items-end gap-1.5">
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs flex items-end gap-1">
                           5{" "}
                           <img
                             src={klaviyoLogo}
@@ -826,23 +830,23 @@ export default function LandingPage() {
                           accounts
                         </span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Priority support</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Priority support</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Custom segments</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Custom segments</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">White-label reports</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">White-label reports</span>
                       </li>
                     </ul>
 
                     <button
                       onClick={handleGetStarted}
-                      className="group/btn w-full relative bg-gradient-to-r from-primary to-accent text-primary-foreground py-3 rounded-full font-bold hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden"
+                      className="group/btn w-full relative bg-gradient-to-r from-primary to-accent text-primary-foreground py-2.5 rounded-full text-sm font-bold hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
                       <span className="relative z-10">Get started</span>
@@ -852,25 +856,25 @@ export default function LandingPage() {
 
                 {/* Enterprise Agency */}
                 <div className="group relative">
-                  <div className="bg-card rounded-3xl border border-border p-8 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
-                    <div className="text-center mb-8">
-                      <h3 className="text-2xl font-bold mb-4">Enterprise</h3>
-                      <div className="mb-4">
-                        <div className="flex items-baseline justify-center gap-2">
-                          <span className="text-5xl font-bold">$299</span>
+                  <div className="bg-card rounded-3xl border border-border p-6 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold mb-3">Enterprise</h3>
+                      <div className="mb-3">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-4xl font-bold">$299</span>
                         </div>
-                        <div className="text-muted-foreground text-sm mt-2">/month</div>
+                        <div className="text-muted-foreground text-xs mt-1">/month</div>
                       </div>
                     </div>
 
-                    <ul className="space-y-4 mb-8 flex-grow">
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Everything in Pro</span>
+                    <ul className="space-y-2.5 mb-6 flex-grow">
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Everything in Pro</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm flex items-end gap-1.5">
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs flex items-end gap-1">
                           10+{" "}
                           <img
                             src={klaviyoLogo}
@@ -880,27 +884,27 @@ export default function LandingPage() {
                           accounts
                         </span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Dedicated account manager</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Dedicated manager</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">24/7 phone support</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">24/7 phone support</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">API access</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">API access</span>
                       </li>
-                      <li className="flex items-center gap-3 hover:translate-x-1 transition-transform duration-200">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">Custom integrations</span>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs">Custom integrations</span>
                       </li>
                     </ul>
 
                     <button
                       onClick={handleGetStarted}
-                      className="w-full bg-transparent border-2 border-foreground text-foreground py-3 rounded-full font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300"
+                      className="w-full bg-transparent border-2 border-foreground text-foreground py-2.5 rounded-full text-sm font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300"
                     >
                       Get started
                     </button>
