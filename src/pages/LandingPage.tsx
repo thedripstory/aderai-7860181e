@@ -24,24 +24,36 @@ export default function LandingPage() {
   };
   return <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"}`}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="text-2xl font-playfair font-bold">
-            aderai<span className="text-accent">.</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+          {/* Logo */}
+          <a href="/" className="group flex items-center">
+            <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
+              aderai<span className="text-accent group-hover:animate-pulse">.</span>
+            </div>
+          </a>
+
+          {/* Navigation */}
+          <nav className="hidden md:flex items-center gap-10">
+            <a href="#how-it-works" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
               How it works
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
             </a>
-            <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
+            <a href="#pricing" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
               Pricing
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
             </a>
           </nav>
-          <div className="flex items-center gap-3">
-            <a href="/login" className="text-sm text-muted-foreground hover:text-foreground transition font-medium">
+
+          {/* CTA Buttons */}
+          <div className="flex items-center gap-4">
+            <a href="/login" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium hidden sm:block">
               Log in
             </a>
-            <button onClick={handleGetStarted} className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary/90 transition">
+            <button 
+              onClick={handleGetStarted} 
+              className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-base font-semibold hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary/30"
+            >
               Sign up
             </button>
           </div>
