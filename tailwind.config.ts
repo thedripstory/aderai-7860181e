@@ -141,6 +141,30 @@ export default {
             borderColor: "rgba(249, 115, 22, 0.5)",
           },
         },
+        "burst-1": {
+          "0%": { transform: "translate(-50%, -50%) scale(0)", opacity: "1" },
+          "100%": { transform: "translate(-50%, -150%) scale(1)", opacity: "0" },
+        },
+        "burst-2": {
+          "0%": { transform: "translate(-50%, -50%) scale(0)", opacity: "1" },
+          "100%": { transform: "translate(50%, -150%) scale(1)", opacity: "0" },
+        },
+        "burst-3": {
+          "0%": { transform: "translate(-50%, -50%) scale(0)", opacity: "1" },
+          "100%": { transform: "translate(-150%, -50%) scale(1)", opacity: "0" },
+        },
+        "burst-4": {
+          "0%": { transform: "translate(-50%, -50%) scale(0)", opacity: "1" },
+          "100%": { transform: "translate(50%, 50%) scale(1)", opacity: "0" },
+        },
+        "burst-5": {
+          "0%": { transform: "translate(-50%, -50%) scale(0)", opacity: "1" },
+          "100%": { transform: "translate(-150%, 50%) scale(1)", opacity: "0" },
+        },
+        "burst-6": {
+          "0%": { transform: "translate(-50%, -50%) scale(0)", opacity: "1" },
+          "100%": { transform: "translate(-50%, 50%) scale(1)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
