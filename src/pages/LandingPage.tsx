@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  CheckCircle,
-  CheckCircle2,
-  ArrowRight,
-  Zap,
-  Clock,
-  MousePointerClick,
-  Star,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
@@ -121,7 +111,9 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium">
-              <span className="whitespace-nowrap">Create 70+ segments, with one click- straight inside Klaviyo,</span>
+              <span className="whitespace-nowrap">
+                Instantly Create 70+ segments, with one click- straight inside Klaviyo.
+              </span>
               <br />
               with{" "}
               <CircleDoodle delay="1s">
