@@ -221,13 +221,15 @@ export default function LandingPage() {
       </section>
 
       {/* Automation Section */}
-      <section id="how-it-works" className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden">
+      {/* How it Works - Scroll Steps Section */}
+      <section id="how-it-works" className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-16">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
@@ -244,6 +246,7 @@ export default function LandingPage() {
             </p>
           </div>
 
+          {/* Scroll Steps Component */}
           <ScrollSteps />
         </div>
       </section>
