@@ -139,7 +139,7 @@ export const AutomationFlow = () => {
           </div>
 
           {/* Klaviyo Connection Indicator - Aggressive Loader */}
-          <div className="flex items-center justify-center gap-3 py-4 px-4 bg-muted/50 rounded-xl border border-border/50 relative overflow-hidden">
+          <div className="flex items-center justify-center gap-2 py-4 px-4 bg-muted/50 rounded-xl border border-border/50 relative overflow-hidden">
             {/* Background pulse effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-[slide-in-right_1.5s_ease-in-out_infinite]" />
             
