@@ -944,11 +944,6 @@ export default function LandingPage() {
 
                   {/* Item 2 */}
                   <div className="relative text-center">
-                    <div className="absolute -top-20 left-1/2 -translate-x-1/2">
-                      <span className="font-bad-script text-2xl text-orange-500 rotate-[-5deg] block">
-                        best part!
-                      </span>
-                    </div>
                     <div className="flex justify-center mb-6">
                       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
                         <BarChart3 className="w-7 h-7 text-white" />
@@ -962,6 +957,11 @@ export default function LandingPage() {
 
                   {/* Item 3 */}
                   <div className="relative text-center">
+                    <div className="absolute -top-20 left-1/2 -translate-x-1/2">
+                      <span className="font-bad-script text-2xl text-orange-500 rotate-[-5deg] block">
+                        best part!
+                      </span>
+                    </div>
                     <div className="flex justify-center mb-6">
                       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
                         <CheckCircle2 className="w-7 h-7 text-white" />
