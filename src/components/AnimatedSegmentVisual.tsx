@@ -15,7 +15,7 @@ const STEPS: Step[] = [{
   icon: MousePointerClick,
   title: (
     <span className="flex items-center gap-2">
-      Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" />
+      Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block relative top-[0.1em]" />
     </span>
   ),
   description: "One-click authentication. No API keys, no technical setup required."
