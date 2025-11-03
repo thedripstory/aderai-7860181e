@@ -11,6 +11,7 @@ import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
+import { DashboardScreenMockup } from "@/components/DashboardScreenMockup";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { EnergyFlowAnimation } from "@/components/EnergyFlowAnimation";
 export default function LandingPage() {
@@ -235,6 +236,9 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4 text-primary" />
               </div>
             </div>
+
+            {/* Dashboard Screen Mockup - Emerges on scroll */}
+            <DashboardScreenMockup />
 
             {/* Revolving Testimonials */}
             <RevolvingTestimonials />

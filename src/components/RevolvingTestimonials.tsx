@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Quote, Star } from "lucide-react";
-import { ScrollScreenMockup } from "./ScrollScreenMockup";
 
 const testimonials = [
   {
@@ -46,11 +45,8 @@ export function RevolvingTestimonials() {
   }, []);
 
   return (
-    <div className="mt-8 relative" style={{ minHeight: '300vh' }}>
-      {/* Screen mockup that animates on scroll */}
-      <ScrollScreenMockup />
-      
-      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-10 border border-border overflow-hidden relative z-20">
+    <div className="mt-8 relative">
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-10 border border-border overflow-hidden relative">
         {/* Quote icon */}
         <div className="absolute top-6 left-6 opacity-5">
           <Quote className="w-10 h-10 text-foreground" />
