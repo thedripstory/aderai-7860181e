@@ -93,7 +93,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                Works directly with <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" />
+                Works directly with Klaviyo
               </span>
             </div>
           </div>
