@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Users, TrendingUp, Target } from "lucide-react";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -458,74 +458,86 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pain Points Ticker Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-
-        <div className="max-w-7xl mx-auto relative">
-          {/* Pain Points Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-semibold text-primary uppercase tracking-wider">The Old Way</span>
+      {/* Pain Points Section */}
+      <section className="py-32 px-6 bg-background relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          {/* Main Content */}
+          <div className="text-center space-y-16">
+            {/* Header with doodle */}
+            <div className="relative inline-block">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold">
+                <span className="relative inline-block">
+                  Wave goodbye to
+                  <svg className="absolute -left-6 -top-4 w-12 h-12 text-foreground/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M7 3 L5 5 L7 7" />
+                  </svg>
+                </span>
+              </h2>
             </div>
-            
-            <h2 className="text-5xl md:text-6xl font-bold mb-12 leading-tight">
-              <span className="relative inline-block">
-                Wave goodbye to
-                <svg className="absolute -left-4 -top-2 w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M7 7l10 10M7 17L17 7" />
-                </svg>
-              </span>
-            </h2>
 
-            {/* Crossed Out Pain Points */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-2xl md:text-3xl max-w-4xl mx-auto">
-              <span className="relative text-muted-foreground/40 font-medium">
+            {/* Pain Points Grid */}
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto leading-relaxed">
+              <span className="relative text-muted-foreground/50">
                 wasted time
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
-                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
-                </svg>
+                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
               </span>
-              
-              <span className="relative text-muted-foreground/40 font-medium">
+
+              <span className="relative text-muted-foreground/50">
                 manual work
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
-                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
+                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
+              </span>
+
+              <span className="relative font-bold text-3xl md:text-4xl lg:text-5xl">
+                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  complex setup
+                </span>
+                <svg className="absolute -bottom-2 left-0 right-0 w-full h-4" viewBox="0 0 300 20" preserveAspectRatio="none">
+                  <path d="M5 10 Q75 5 150 10 T295 10" stroke="hsl(var(--primary))" strokeWidth="3" fill="none" />
+                  <path d="M5 15 Q75 10 150 15 T295 15" stroke="hsl(var(--accent))" strokeWidth="2" fill="none" opacity="0.5" />
                 </svg>
               </span>
-              
-              <span className="relative text-primary font-bold text-4xl md:text-5xl">
-                complex setup
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 280 60" preserveAspectRatio="none">
-                  <path d="M10 30 Q70 15 140 30 T270 30" stroke="hsl(var(--primary))" strokeWidth="4" fill="none" />
-                  <path d="M10 35 Q70 20 140 35 T270 35" stroke="hsl(var(--accent))" strokeWidth="3" fill="none" opacity="0.6" />
-                </svg>
-              </span>
-              
-              <span className="relative text-muted-foreground/40 font-medium">
+
+              <span className="relative text-muted-foreground/50">
                 agency costs
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
-                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
-                </svg>
+                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
               </span>
-              
-              <span className="relative text-muted-foreground/40 font-medium">
+
+              <span className="relative text-muted-foreground/50">
                 slow results
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
-                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
-                </svg>
+                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/50" />
               </span>
             </div>
-          </div>
 
-          {/* Animated Stats Ticker */}
-          <AnimatedStatsBar />
-
-          <div className="mt-16 text-center">
-            <PoweredByBadge />
+            {/* Stats Ticker */}
+            <div className="relative w-full overflow-hidden border-y border-border py-8">
+              <div className="flex gap-16 animate-[slide-left_30s_linear_infinite]">
+                {/* First Set */}
+                {[
+                  { icon: Users, value: "10K+", label: "Active Users" },
+                  { icon: Zap, value: "70+", label: "Segments" },
+                  { icon: TrendingUp, value: "42%", label: "Revenue Increase" },
+                  { icon: Target, value: "99%", label: "Time Saved" },
+                  { icon: Users, value: "10K+", label: "Active Users" },
+                  { icon: Zap, value: "70+", label: "Segments" },
+                  { icon: TrendingUp, value: "42%", label: "Revenue Increase" },
+                  { icon: Target, value: "99%", label: "Time Saved" },
+                ].map((stat, idx) => (
+                  <div key={`stat-${idx}`} className="flex items-center gap-4 flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-border">
+                      <stat.icon className="w-6 h-6 text-foreground" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-foreground">{stat.value}</div>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">{stat.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Fade edges */}
+              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            </div>
           </div>
         </div>
       </section>
