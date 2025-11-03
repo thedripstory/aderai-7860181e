@@ -84,7 +84,7 @@ export const AnimatedSegmentVisual = () => {
 
             <div className="grid lg:grid-cols-2 gap-12 flex-1">
               {/* Left: Step Info */}
-              <div className="flex flex-col justify-center space-y-6">
+              <div className="flex flex-col justify-center space-y-3">
               {/* Step number */}
               <div className="opacity-0 animate-fade-in">
                 <span className="text-7xl font-bold text-primary/20">
