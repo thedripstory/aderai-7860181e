@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Building2, Users } from "lucide-react";
+import { Building2, Users, Sparkles, Zap } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { supabase } from "@/integrations/supabase/client";
@@ -174,21 +174,61 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
   // Choice View
   if (authView === "choice") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <div className="w-full max-w-lg">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+        {/* Futuristic background effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        
+        <div className="w-full max-w-lg relative z-10">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-playfair font-bold mb-4">
-              aderai<span className="text-accent">.</span>
-            </h1>
-            <p className="text-muted-foreground text-xl mb-6">Choose your account type</p>
+            {/* Futuristic Klaviyo 10x Logo */}
+            <div className="relative inline-block mb-6 group">
+              {/* Glow effect behind logo */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500 animate-pulse" />
+              
+              {/* Logo container with glass effect */}
+              <div className="relative bg-background/80 backdrop-blur-xl border-2 border-primary/30 rounded-3xl p-6 shadow-2xl hover:shadow-primary/20 transition-all duration-500 hover:scale-105">
+                <img 
+                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png" 
+                  alt="Klaviyo" 
+                  className="h-12 w-auto mx-auto mb-2 animate-fade-in"
+                />
+                
+                {/* 10x Badge with special effects */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-md opacity-50" />
+                  <div className="relative flex items-center justify-center gap-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                    <Zap className="w-5 h-5 text-primary animate-pulse" />
+                    <span className="text-4xl font-black tracking-wider">10X</span>
+                    <Sparkles className="w-5 h-5 text-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
+                  </div>
+                </div>
+                
+                {/* Subtitle with glow */}
+                <p className="text-sm font-semibold mt-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-fade-in">
+                  Next-Gen Segmentation Platform
+                </p>
+              </div>
+              
+              {/* Orbiting particles */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary animate-[spin_3s_linear_infinite]" style={{ transformOrigin: '0 80px' }} />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-accent animate-[spin_4s_linear_infinite_reverse]" style={{ transformOrigin: '0 80px', animationDelay: '1.5s' }} />
+            </div>
+
+            <p className="text-muted-foreground text-xl mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Choose your account type
+            </p>
             {referralCode && (
-              <div className="inline-block bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-4">
+              <div className="inline-block bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 <p className="text-sm text-primary font-semibold">
                   🎁 Referred by: {referralCode}
                 </p>
               </div>
             )}
-            <PoweredByBadge />
+            <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <PoweredByBadge />
+            </div>
           </div>
 
           <div className="grid gap-6">
@@ -246,17 +286,43 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
   // Login/Signup Forms
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Futuristic background effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      
+      <div className="w-full max-w-md relative z-10">
         <button
           onClick={() => setAuthView("choice")}
-          className="text-muted-foreground hover:text-foreground mb-6 flex items-center gap-2"
+          className="text-muted-foreground hover:text-foreground mb-6 flex items-center gap-2 transition-all hover:gap-3"
         >
           ← Back
         </button>
 
-        <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+        <div className="bg-card/80 backdrop-blur-xl border-2 border-primary/20 rounded-2xl p-8 shadow-2xl hover:shadow-primary/10 transition-all animate-fade-in">
           <div className="text-center mb-8">
+            {/* Futuristic Klaviyo 10x Logo for login */}
+            <div className="relative inline-block mb-4 group">
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
+              
+              <div className="relative bg-background/60 backdrop-blur-xl border border-primary/20 rounded-2xl p-4">
+                <img 
+                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png" 
+                  alt="Klaviyo" 
+                  className="h-8 w-auto mx-auto mb-1"
+                />
+                <div className="flex items-center justify-center gap-1">
+                  <Zap className="w-3 h-3 text-primary" />
+                  <span className="text-xl font-black bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                    10X
+                  </span>
+                  <Sparkles className="w-3 h-3 text-accent" />
+                </div>
+              </div>
+            </div>
+
             <h2 className="text-3xl font-bold mb-2">
               {authView.includes("signup") ? "Create Account" : "Welcome Back"}
             </h2>
