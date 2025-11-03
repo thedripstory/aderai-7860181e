@@ -926,80 +926,70 @@ export default function LandingPage() {
                 </h3>
               </div>
 
-              {/* Three floating cards with staggered layout */}
-              <div className="grid md:grid-cols-3 gap-8 relative">
-                {/* Card 1 - Elevated */}
-                <div className="group md:-translate-y-8">
-                  <div className="relative">
-                    {/* Card */}
-                    <div className="relative bg-white dark:bg-card rounded-3xl p-8 border-2 border-gray-200 dark:border-border hover:border-primary/60 transition-all duration-300 hover:scale-105 hover:-translate-y-2 shadow-lg">
-                      {/* Icon */}
-                      <div className="relative mb-6 inline-block">
-                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
-                          <Zap className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                      
-                      <h4 className="text-xl font-bold mb-3">Set Once, Live Forever</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
-                      </p>
-                      
-                      {/* Decorative corner */}
-                      <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-primary/20 rounded-tr-2xl" />
+              {/* Vertical Flow Design */}
+              <div className="max-w-4xl mx-auto space-y-12 relative">
+                {/* Connecting Line */}
+                <div className="absolute left-12 top-0 bottom-0 w-0.5 bg-gradient-to-b from-orange-500 via-orange-400 to-orange-500 hidden md:block" />
+                
+                {/* Item 1 */}
+                <div className="group relative flex gap-8 items-start">
+                  {/* Number */}
+                  <div className="relative flex-shrink-0">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl z-10 relative">
+                      <Zap className="w-12 h-12 text-white" />
                     </div>
+                    <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl" />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1 pt-4">
+                    <h4 className="text-3xl font-bold mb-4">Set Once, Live Forever</h4>
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
+                    </p>
                   </div>
                 </div>
 
-                {/* Card 2 - Center (normal position, highlighted) */}
-                <div className="group">
-                  <div className="relative">
-                    {/* Card with special treatment */}
-                    <div className="relative bg-white dark:bg-card rounded-3xl p-8 border-2 border-accent hover:border-accent/80 transition-all duration-300 hover:scale-105 shadow-lg">
-                      {/* Floating badge */}
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-orange-500 to-accent rounded-full text-xs font-bold text-white shadow-lg">
-                        BEST PART
-                      </div>
-                      
-                      {/* Icon */}
-                      <div className="relative mb-6 inline-block mt-4">
-                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
-                          <BarChart3 className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                      
-                      <h4 className="text-xl font-bold mb-3">Lifetime Dashboard Access</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Monitor performance, track metrics, optimize campaigns. <span className="text-accent font-semibold">All analytics, forever</span>. No subscription. No expiration.
-                      </p>
-                      
-                      {/* Decorative elements */}
-                      <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-accent/20 rounded-bl-2xl" />
-                      <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-accent/20 rounded-tr-2xl" />
+                {/* Item 2 - Highlighted */}
+                <div className="group relative flex gap-8 items-start">
+                  {/* Badge */}
+                  <div className="absolute -top-6 left-32 px-4 py-1.5 bg-gradient-to-r from-orange-500 to-accent rounded-full text-sm font-bold text-white shadow-lg z-20">
+                    BEST PART
+                  </div>
+                  
+                  {/* Number */}
+                  <div className="relative flex-shrink-0">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl z-10 relative ring-4 ring-orange-500/20">
+                      <BarChart3 className="w-12 h-12 text-white" />
                     </div>
+                    <div className="absolute inset-0 bg-orange-500/30 rounded-full blur-2xl animate-pulse" />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1 pt-4 bg-gradient-to-br from-orange-50/50 to-accent/5 dark:from-orange-950/20 dark:to-accent/5 p-8 rounded-2xl border-2 border-orange-500/20">
+                    <h4 className="text-3xl font-bold mb-4">Lifetime Dashboard Access</h4>
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      Monitor performance, track metrics, optimize campaigns. <span className="text-accent font-semibold">All analytics, forever</span>. No subscription. No expiration.
+                    </p>
                   </div>
                 </div>
 
-                {/* Card 3 - Elevated */}
-                <div className="group md:-translate-y-8">
-                  <div className="relative">
-                    {/* Card */}
-                    <div className="relative bg-white dark:bg-card rounded-3xl p-8 border-2 border-gray-200 dark:border-border hover:border-orange-500/60 transition-all duration-300 hover:scale-105 hover:-translate-y-2 shadow-lg">
-                      {/* Icon */}
-                      <div className="relative mb-6 inline-block">
-                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
-                          <CheckCircle2 className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                      
-                      <h4 className="text-xl font-bold mb-3">One-Time Investment</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        <span className="text-orange-500 font-semibold">Pay once. Own forever.</span> No hidden fees. No subscriptions. No agency retainers eating your budget every month.
-                      </p>
-                      
-                      {/* Decorative corner */}
-                      <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-orange-500/20 rounded-br-2xl" />
+                {/* Item 3 */}
+                <div className="group relative flex gap-8 items-start">
+                  {/* Number */}
+                  <div className="relative flex-shrink-0">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl z-10 relative">
+                      <CheckCircle2 className="w-12 h-12 text-white" />
                     </div>
+                    <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl" />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1 pt-4">
+                    <h4 className="text-3xl font-bold mb-4">One-Time Investment</h4>
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      <span className="text-orange-500 font-semibold">Pay once. Own forever.</span> No hidden fees. No subscriptions. No agency retainers eating your budget every month.
+                    </p>
                   </div>
                 </div>
               </div>
