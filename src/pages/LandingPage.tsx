@@ -492,11 +492,16 @@ export default function LandingPage() {
       <div className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-muted via-background to-muted/30" />
         
-        {/* Radiating Energy Rings */}
+        {/* Radiating Energy Beams */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="absolute w-20 h-20 rounded-full border-2 border-primary/30 animate-[ping_2s_ease-out_infinite]" />
-          <div className="absolute w-20 h-20 rounded-full border-2 border-accent/30 animate-[ping_2s_ease-out_infinite_0.7s]" />
-          <div className="absolute w-20 h-20 rounded-full border-2 border-primary/20 animate-[ping_2s_ease-out_infinite_1.4s]" />
+          <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent rotate-45 animate-pulse" />
+          <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-accent/50 to-transparent -rotate-45 animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent rotate-90 animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }} />
+          
+          {/* Expanding dots */}
+          <div className="absolute w-2 h-2 rounded-full bg-primary/60 animate-ping" style={{ animationDuration: '2s' }} />
+          <div className="absolute w-1 h-1 rounded-full bg-accent/60 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
