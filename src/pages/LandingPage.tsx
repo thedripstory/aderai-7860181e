@@ -488,16 +488,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 px-6 bg-muted">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Everything you need</h2>
+      {/* Decorative Divider */}
+      <div className="relative py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted via-background to-muted/30" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full max-w-4xl mx-auto px-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t-2 border-dashed border-border opacity-30" />
+              </div>
+              <div className="relative flex justify-center">
+                <div className="bg-background px-6 py-3 rounded-full border-2 border-primary/20 shadow-lg">
+                  <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+                </div>
+              </div>
+            </div>
           </div>
-
-          
         </div>
-      </section>
+      </div>
 
       {/* Success Stories */}
       <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
