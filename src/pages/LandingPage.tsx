@@ -300,69 +300,190 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Deploy in <CircleDoodle delay="0.2s">4 steps</CircleDoodle>
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              From signup to live segments in <AnimatedUnderline delay="0.4s">under 3 minutes</AnimatedUnderline>
-            </p>
-          </div>
-
-          <div className="space-y-12">
-            {[{
-            step: "01",
-            title: <span className="flex items-center gap-2">
-                    Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
-                  </span>,
-            description: <span>
-                    Add your <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> API key. Instant validation. Secure connection.
-                  </span>
-          }, {
-            step: "02",
-            title: "Choose your segments",
-            description: "Browse 70 pre-built segments organized by strategy. Or use AI to suggest custom ones."
-          }, {
-            step: "03",
-            title: "Customize metrics",
-            description: "Enter your AOV, currency, lifecycle thresholds. Segments auto-adjust to your business."
-          }, {
-            step: "04",
-            title: "Deploy instantly",
-            description: <span>
-                    One click. All segments created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" />. Ready to use in campaigns.
-                  </span>
-          }].map(item => <div key={item.step} className="flex gap-8 items-start">
-                <div className="text-6xl font-bold text-muted-foreground/20 flex-shrink-0">{item.step}</div>
-                <div className="flex-1 pt-2">
-                  <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-lg text-muted-foreground">{item.description}</p>
-                </div>
-              </div>)}
-          </div>
-
-          <div className="mt-16 text-center">
-            <button onClick={handleGetStarted} className="group relative bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] text-primary-foreground px-14 py-7 rounded-2xl text-xl font-bold shadow-2xl inline-flex items-center gap-4 overflow-hidden transition-all duration-500 hover:bg-[position:100%_0] hover:scale-110 hover:shadow-[0_20px_60px_rgba(0,0,0,0.3)] hover:-rotate-1 active:scale-105">
-              {/* Animated background shimmer */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
-              {/* Pulsing glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
-
-              <span className="relative z-10 group-hover:tracking-wider transition-all duration-300">
-                Get My Segments Now - $49
+      {/* Discover Hidden Segments */}
+      <section id="how-it-works" className="py-20 px-6 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                Segment Discovery
               </span>
-              <ArrowRight className="relative z-10 w-6 h-6 group-hover:translate-x-2 group-hover:scale-125 transition-all duration-300" />
+            </div>
+          </div>
 
-              {/* Corner sparkles */}
-              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" />
-              <div className="absolute bottom-2 left-2 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{
-              animationDelay: "0.2s"
-            }} />
+          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-center">
+            Segments you didn't know existed
+          </h2>
+
+          <p className="text-xl text-muted-foreground text-center mb-16 max-w-3xl mx-auto">
+            Access expert-grade audience segments that top brands use to drive 40%+ revenue increases
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
+            {/* Card 1 - VIP Reactivation */}
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
+              {/* EXPLOSIVE Confetti Effect */}
+              <div className="absolute inset-0 pointer-events-none z-50">
+                <span className="absolute top-0 left-[5%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out]">💵</span>
+                <span className="absolute top-0 left-[15%] text-7xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.05s]">💵</span>
+                <span className="absolute top-0 left-[25%] text-9xl opacity-0 group-hover:animate-[confetti-3_2.1s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-0 left-[35%] text-8xl opacity-0 group-hover:animate-[confetti-4_2.3s_ease-out_0.15s]">💵</span>
+                <span className="absolute top-0 left-[45%] text-7xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.2s]">💵</span>
+                <span className="absolute top-0 left-[55%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.25s]">💵</span>
+                <span className="absolute top-0 left-[65%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.3s]">💵</span>
+                <span className="absolute top-0 left-[75%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.35s]">💵</span>
+                <span className="absolute top-0 left-[85%] text-9xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.4s]">💵</span>
+                <span className="absolute top-0 left-[95%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.45s]">💵</span>
+                <span className="absolute top-0 left-[10%] text-7xl opacity-0 group-hover:animate-[confetti-4_2.1s_ease-out_0.5s]">💵</span>
+                <span className="absolute top-0 left-[20%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.3s_ease-out_0.55s]">💵</span>
+                <span className="absolute top-0 left-[30%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out_0.6s]">💵</span>
+                <span className="absolute top-0 left-[40%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.2s_ease-out_0.65s]">💵</span>
+                <span className="absolute top-0 left-[50%] text-9xl opacity-0 group-hover:animate-[confetti-5_2.1s_ease-out_0.7s]">💵</span>
+                <span className="absolute top-0 left-[60%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.3s_ease-out_0.75s]">💵</span>
+                <span className="absolute top-0 left-[70%] text-7xl opacity-0 group-hover:animate-[confetti-4_2s_ease-out_0.8s]">💵</span>
+                <span className="absolute top-0 left-[80%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.85s]">💵</span>
+                <span className="absolute top-0 left-[90%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.9s]">💵</span>
+                <span className="absolute top-0 left-[12%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.95s]">💵</span>
+              </div>
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-500">
+                <div className="relative w-full space-y-3">
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-black font-medium">VIP At-Risk</span>
+                      <span className="text-xs font-bold text-black">2,847 profiles</span>
+                    </div>
+                    <div className="text-sm font-semibold text-black">LTV &gt; $5k, no purchase 60d</div>
+                  </div>
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
+                    <div className="text-xs text-black mb-1">Suggested action</div>
+                    <div className="text-sm font-semibold text-black">Exclusive 20% VIP comeback</div>
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                    Hidden gem
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold mb-2 text-black">VIP Reactivation</h3>
+              <p className="text-sm text-gray-700">
+                Target high-value customers before they churn with AI-powered win-back campaigns.
+              </p>
+            </div>
+
+            {/* Card 2 - Browse Abandoners */}
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-600 hover:shadow-2xl hover:shadow-orange-600/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
+              {/* EXPLOSIVE Confetti Effect */}
+              <div className="absolute inset-0 pointer-events-none z-50">
+                <span className="absolute top-0 left-[5%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out]">💵</span>
+                <span className="absolute top-0 left-[15%] text-7xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.05s]">💵</span>
+                <span className="absolute top-0 left-[25%] text-9xl opacity-0 group-hover:animate-[confetti-3_2.1s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-0 left-[35%] text-8xl opacity-0 group-hover:animate-[confetti-4_2.3s_ease-out_0.15s]">💵</span>
+                <span className="absolute top-0 left-[45%] text-7xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.2s]">💵</span>
+                <span className="absolute top-0 left-[55%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.25s]">💵</span>
+                <span className="absolute top-0 left-[65%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.3s]">💵</span>
+                <span className="absolute top-0 left-[75%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.35s]">💵</span>
+                <span className="absolute top-0 left-[85%] text-9xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.4s]">💵</span>
+                <span className="absolute top-0 left-[95%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.45s]">💵</span>
+                <span className="absolute top-0 left-[10%] text-7xl opacity-0 group-hover:animate-[confetti-4_2.1s_ease-out_0.5s]">💵</span>
+                <span className="absolute top-0 left-[20%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.3s_ease-out_0.55s]">💵</span>
+                <span className="absolute top-0 left-[30%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out_0.6s]">💵</span>
+                <span className="absolute top-0 left-[40%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.2s_ease-out_0.65s]">💵</span>
+                <span className="absolute top-0 left-[50%] text-9xl opacity-0 group-hover:animate-[confetti-5_2.1s_ease-out_0.7s]">💵</span>
+                <span className="absolute top-0 left-[60%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.3s_ease-out_0.75s]">💵</span>
+                <span className="absolute top-0 left-[70%] text-7xl opacity-0 group-hover:animate-[confetti-4_2s_ease-out_0.8s]">💵</span>
+                <span className="absolute top-0 left-[80%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.85s]">💵</span>
+                <span className="absolute top-0 left-[90%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.9s]">💵</span>
+                <span className="absolute top-0 left-[12%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.95s]">💵</span>
+              </div>
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-600 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-red-50 transition-all duration-500">
+                <div className="relative w-full space-y-3">
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-black font-medium">Intent Buyers</span>
+                      <span className="text-xs font-bold text-black">12,493 profiles</span>
+                    </div>
+                    <div className="text-sm font-semibold text-black">3+ views, $0 cart, 7d</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
+                      <div className="text-xs font-bold text-black">42%</div>
+                      <div className="text-[10px] text-gray-700">Conversion rate</div>
+                    </div>
+                    <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
+                      <div className="text-xs font-bold text-black">$127</div>
+                      <div className="text-[10px] text-gray-700">Avg order</div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    Top performer
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold mb-2 text-black">Browse Abandoners</h3>
+              <p className="text-sm text-gray-700">
+                Convert window shoppers into buyers with behavior-triggered nudges and social proof.
+              </p>
+            </div>
+
+            {/* Card 3 - Category Champions */}
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
+              {/* EXPLOSIVE Confetti Effect */}
+              <div className="absolute inset-0 pointer-events-none z-50">
+                <span className="absolute top-0 left-[5%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out]">💵</span>
+                <span className="absolute top-0 left-[15%] text-7xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.05s]">💵</span>
+                <span className="absolute top-0 left-[25%] text-9xl opacity-0 group-hover:animate-[confetti-3_2.1s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-0 left-[35%] text-8xl opacity-0 group-hover:animate-[confetti-4_2.3s_ease-out_0.15s]">💵</span>
+                <span className="absolute top-0 left-[45%] text-7xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.2s]">💵</span>
+                <span className="absolute top-0 left-[55%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.25s]">💵</span>
+                <span className="absolute top-0 left-[65%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.3s]">💵</span>
+                <span className="absolute top-0 left-[75%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.35s]">💵</span>
+                <span className="absolute top-0 left-[85%] text-9xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.4s]">💵</span>
+                <span className="absolute top-0 left-[95%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.45s]">💵</span>
+                <span className="absolute top-0 left-[10%] text-7xl opacity-0 group-hover:animate-[confetti-4_2.1s_ease-out_0.5s]">💵</span>
+                <span className="absolute top-0 left-[20%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.3s_ease-out_0.55s]">💵</span>
+                <span className="absolute top-0 left-[30%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out_0.6s]">💵</span>
+                <span className="absolute top-0 left-[40%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.2s_ease-out_0.65s]">💵</span>
+                <span className="absolute top-0 left-[50%] text-9xl opacity-0 group-hover:animate-[confetti-5_2.1s_ease-out_0.7s]">💵</span>
+                <span className="absolute top-0 left-[60%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.3s_ease-out_0.75s]">💵</span>
+                <span className="absolute top-0 left-[70%] text-7xl opacity-0 group-hover:animate-[confetti-4_2s_ease-out_0.8s]">💵</span>
+                <span className="absolute top-0 left-[80%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.85s]">💵</span>
+                <span className="absolute top-0 left-[90%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.9s]">💵</span>
+                <span className="absolute top-0 left-[12%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.95s]">💵</span>
+              </div>
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-yellow-50 group-hover:to-orange-50 transition-all duration-500">
+                <div className="relative w-full space-y-3">
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-black font-medium">Skincare Enthusiasts</span>
+                      <span className="text-xs font-bold text-black">8,234 profiles</span>
+                    </div>
+                    <div className="text-sm font-semibold text-black">70%+ orders in category</div>
+                  </div>
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
+                    <div className="text-xs text-black mb-1">Cross-sell opportunity</div>
+                    <div className="text-sm font-semibold text-black">New arrivals + bundles</div>
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    High intent
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold mb-2 text-black">Category Champions</h3>
+              <p className="text-sm text-gray-700">
+                Identify category lovers and cross-sell with laser precision based on purchase patterns.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-full text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3">
+              <span>Unlock All 70 Segments</span>
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
+            <p className="text-sm text-muted-foreground mt-4">One-time payment • Instant access • No monthly fees</p>
           </div>
         </div>
       </section>
@@ -396,7 +517,13 @@ export default function LandingPage() {
             value: "50%"
           }]} delay="0s" />
 
-            
+            <FlipTestimonialCard name="Marcus" role="Head of Growth" company="Premium Beauty Co." story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy." metrics={[{
+            label: "email revenue increase",
+            value: "+42%"
+          }, {
+            label: "deployment time",
+            value: "60 sec"
+          }]} delay="0.1s" />
 
             <FlipTestimonialCard name="Sarah" role="Founder" company="Growth Labs Agency" story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue." metrics={[{
             label: "time saved",
