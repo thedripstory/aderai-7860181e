@@ -595,7 +595,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               <AnimatedUnderline delay="0.2s">Pay once</AnimatedUnderline>. Use forever.{" "}
-              <strong className="text-foreground">24x7 customer support.</strong>
+              <strong className="text-foreground">Native Klaviyo support.</strong>
             </p>
           </div>
 
