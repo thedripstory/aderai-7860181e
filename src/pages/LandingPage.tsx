@@ -137,10 +137,10 @@ export default function LandingPage() {
             <div className="flex justify-center mb-8">
               <button
                 onClick={handleGetStarted}
-                className="group relative bg-primary text-primary-foreground px-12 py-5 rounded-full text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/30 flex items-center gap-3 hover:scale-105 hover:bg-primary/90"
+                className="group relative bg-primary text-primary-foreground px-14 py-6 rounded-full text-xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/30 flex items-center gap-3 hover:scale-105 hover:bg-primary/90"
               >
                 <span>Start building segments</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
 
