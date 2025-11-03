@@ -491,15 +491,34 @@ export default function LandingPage() {
       {/* Decorative Divider */}
       <div className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-muted via-background to-muted/30" />
+        
+        {/* Radiating Energy Rings */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-full max-w-4xl mx-auto px-6">
+          <div className="absolute w-32 h-32 rounded-full border-2 border-primary/30 animate-[ping_3s_ease-out_infinite]" />
+          <div className="absolute w-32 h-32 rounded-full border-2 border-accent/30 animate-[ping_3s_ease-out_infinite_1s]" />
+          <div className="absolute w-32 h-32 rounded-full border-2 border-primary/20 animate-[ping_3s_ease-out_infinite_2s]" />
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full max-w-5xl mx-auto px-6">
             <div className="relative">
+              {/* Animated gradient lines */}
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t-2 border-dashed border-border opacity-30" />
+                <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent animate-pulse" />
               </div>
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" 
+                     style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s' }} />
+              </div>
+              
+              {/* Center Icon with Glow */}
               <div className="relative flex justify-center">
-                <div className="bg-background px-6 py-3 rounded-full border-2 border-primary/20 shadow-lg">
-                  <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+                <div className="relative bg-background px-6 py-3 rounded-full border-2 border-primary shadow-xl">
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/30 to-accent/30 blur-lg animate-pulse" 
+                       style={{ animationDelay: '0.5s' }} />
+                  <Sparkles className="w-6 h-6 text-primary relative z-10 animate-pulse" />
                 </div>
               </div>
             </div>
