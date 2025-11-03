@@ -9,7 +9,6 @@ import {
   Star,
   Sparkles,
   X,
-  MessageSquare,
 } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -20,12 +19,10 @@ import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
-import { EnquiryModal } from "@/components/EnquiryModal";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -136,30 +133,14 @@ export default function LandingPage() {
               Deploy expert-grade Klaviyo segmentation without the agency price tag.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <button
-              onClick={handleGetStarted}
-              className="group relative bg-primary text-primary-foreground px-10 py-5 rounded-full text-lg font-bold transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3 overflow-hidden"
-            >
-              {/* White fill that expands from the arrow circle */}
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 bg-background rounded-full scale-100 group-hover:scale-[20] origin-center" 
-                style={{ transition: 'transform 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)' }} />
-              
-              <span className="relative z-10 group-hover:text-orange-500"
-                style={{ transition: 'color 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
-                Start building segments
-              </span>
-              <div className="relative z-10 w-12 h-12 flex items-center justify-center bg-background rounded-full">
-                <ArrowRight className="w-5 h-5 text-primary" />
-              </div>
-            </button>
+            {/* CTA Button */}
+            <div className="flex justify-center mb-8">
               <button
-                onClick={() => setEnquiryModalOpen(true)}
-                className="group bg-card hover:bg-muted border-2 border-border text-foreground px-10 py-5 rounded-2xl text-lg font-bold hover:scale-105 transition-all shadow-lg flex items-center gap-3"
+                onClick={handleGetStarted}
+                className="group relative bg-primary text-primary-foreground px-12 py-5 rounded-full text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/30 flex items-center gap-3 hover:scale-105 hover:bg-primary/90"
               >
-                <MessageSquare className="w-5 h-5" />
-                <span>Custom Enquiry</span>
+                <span>Start building segments</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
 
@@ -735,7 +716,6 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      <EnquiryModal open={enquiryModalOpen} onOpenChange={setEnquiryModalOpen} />
       <TimeBasedPopup onGetStarted={handleGetStarted} />
     </div>
   );
