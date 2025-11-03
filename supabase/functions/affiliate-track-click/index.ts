@@ -35,10 +35,10 @@ Deno.serve(async (req) => {
       .single();
 
     if (affiliateError || !affiliateUser) {
-      console.log('Invalid affiliate code:', affiliateCode);
+      console.log('Invalid affiliate code attempt');
       return new Response(
-        JSON.stringify({ error: 'Invalid affiliate code' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Invalid request' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -62,9 +62,9 @@ Deno.serve(async (req) => {
       .single();
 
     if (clickError) {
-      console.error('Error tracking click:', clickError);
+      console.error('Database error:', { code: clickError.code, timestamp: new Date().toISOString() });
       return new Response(
-        JSON.stringify({ error: 'Failed to track click' }),
+        JSON.stringify({ error: 'Operation failed' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

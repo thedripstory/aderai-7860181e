@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       .eq('affiliate_code', userData.affiliate_code);
 
     if (clicksError) {
-      console.error('Error fetching clicks:', clicksError);
+      console.error('Database error:', { type: 'clicks', timestamp: new Date().toISOString() });
     }
 
     // Get conversion stats
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       .eq('affiliate_user_id', user.id);
 
     if (statsError) {
-      console.error('Error fetching stats:', statsError);
+      console.error('Database error:', { type: 'stats', timestamp: new Date().toISOString() });
     }
 
     const totalClicks = clicks?.length || 0;

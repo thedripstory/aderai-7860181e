@@ -81,10 +81,10 @@ Deno.serve(async (req) => {
       .single();
 
     if (userError || !referredUser || !referredUser.referred_by) {
-      console.log('User not found or no referral code:', referredUserId);
+      console.log('Invalid referral data');
       return new Response(
-        JSON.stringify({ error: 'User not found or not referred' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Invalid request' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -96,10 +96,10 @@ Deno.serve(async (req) => {
       .single();
 
     if (affiliateError || !affiliateUser) {
-      console.log('Affiliate not found for code:', referredUser.referred_by);
+      console.log('Invalid affiliate reference');
       return new Response(
-        JSON.stringify({ error: 'Affiliate not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Invalid request' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -120,9 +120,9 @@ Deno.serve(async (req) => {
       .single();
 
     if (statsError) {
-      console.error('Error creating affiliate stats:', statsError);
+      console.error('Database error:', { type: 'stats_insert', timestamp: new Date().toISOString() });
       return new Response(
-        JSON.stringify({ error: 'Failed to track conversion' }),
+        JSON.stringify({ error: 'Operation failed' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
       .limit(1);
 
     if (clickUpdateError) {
-      console.error('Error updating click conversion:', clickUpdateError);
+      console.error('Database error:', { type: 'click_update', timestamp: new Date().toISOString() });
     }
 
     console.log(`Conversion tracked: ${affiliateUser.email} earned $${commissionAmount} from ${referredUser.email}`);
