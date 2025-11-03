@@ -82,7 +82,7 @@ export const AnimatedSegmentVisual = () => {
               <ChevronLeft className="w-5 h-5 text-muted-foreground" />
             </button>
 
-            <div className="grid lg:grid-cols-2 gap-12 flex-1">
+            <div className="grid lg:grid-cols-2 gap-12 flex-1 items-center">
               {/* Left: Step Info */}
               <div className="flex flex-col justify-center space-y-3">
               {/* Step number */}
