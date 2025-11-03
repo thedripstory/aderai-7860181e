@@ -958,7 +958,7 @@ export default function LandingPage() {
                   {/* Item 3 */}
                   <div className="relative text-center">
                     <div className="absolute -top-12 left-1/2 -translate-x-1/2">
-                      <span className="font-bad-script text-2xl text-orange-500 rotate-[-5deg] block">
+                      <span className="font-bad-script text-2xl text-orange-500 rotate-[-5deg] block animate-slide-in-left">
                         best part!
                       </span>
                     </div>
