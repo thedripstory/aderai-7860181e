@@ -926,45 +926,50 @@ export default function LandingPage() {
                 </h3>
               </div>
 
-              {/* Compact Grid Layout */}
-              <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                {/* Item 1 */}
-                <div className="group relative">
-                  <div className="flex flex-col items-center text-center p-6 rounded-2xl border-2 border-border hover:border-orange-500/40 transition-all duration-300 bg-card/50 backdrop-blur-sm">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4 shadow-lg">
-                      <Zap className="w-8 h-8 text-white" />
+              {/* Horizontal Timeline Flow */}
+              <div className="relative max-w-6xl mx-auto">
+                {/* Connecting Line */}
+                <div className="absolute top-12 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-accent to-orange-500 hidden md:block opacity-20" />
+                
+                <div className="grid md:grid-cols-3 gap-12 relative">
+                  {/* Item 1 */}
+                  <div className="relative">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl flex-shrink-0">
+                        <Zap className="w-12 h-12 text-white" />
+                      </div>
                     </div>
-                    <h4 className="text-xl font-bold mb-3">Set Once, Live Forever</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <h4 className="text-2xl font-bold mb-3">Set Once, Live Forever</h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
                       Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
                     </p>
                   </div>
-                </div>
 
-                {/* Item 2 - Highlighted */}
-                <div className="group relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-orange-500 to-accent rounded-full text-xs font-bold text-white shadow-lg z-10">
-                    BEST PART
-                  </div>
-                  <div className="flex flex-col items-center text-center p-6 pt-8 rounded-2xl border-2 border-orange-500/40 bg-gradient-to-br from-orange-50/50 to-accent/5 dark:from-orange-950/20 dark:to-accent/5 h-full shadow-lg">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4 shadow-lg ring-4 ring-orange-500/20">
-                      <BarChart3 className="w-8 h-8 text-white" />
+                  {/* Item 2 - Highlighted */}
+                  <div className="relative">
+                    <div className="absolute -top-4 left-0 px-4 py-1.5 bg-gradient-to-r from-orange-500 to-accent rounded-full text-xs font-bold text-white shadow-lg">
+                      BEST PART
                     </div>
-                    <h4 className="text-xl font-bold mb-3">Lifetime Dashboard Access</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <div className="flex items-start gap-4 mb-4 mt-6">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl flex-shrink-0 ring-4 ring-orange-500/20">
+                        <BarChart3 className="w-12 h-12 text-white" />
+                      </div>
+                    </div>
+                    <h4 className="text-2xl font-bold mb-3">Lifetime Dashboard Access</h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
                       Monitor performance, track metrics, optimize campaigns. <span className="text-accent font-semibold">All analytics, forever</span>. No subscription. No expiration.
                     </p>
                   </div>
-                </div>
 
-                {/* Item 3 */}
-                <div className="group relative">
-                  <div className="flex flex-col items-center text-center p-6 rounded-2xl border-2 border-border hover:border-orange-500/40 transition-all duration-300 bg-card/50 backdrop-blur-sm">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4 shadow-lg">
-                      <CheckCircle2 className="w-8 h-8 text-white" />
+                  {/* Item 3 */}
+                  <div className="relative">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl flex-shrink-0">
+                        <CheckCircle2 className="w-12 h-12 text-white" />
+                      </div>
                     </div>
-                    <h4 className="text-xl font-bold mb-3">One-Time Investment</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <h4 className="text-2xl font-bold mb-3">One-Time Investment</h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
                       <span className="text-orange-500 font-semibold">Pay once. Own forever.</span> No hidden fees. No subscriptions. No agency retainers eating your budget every month.
                     </p>
                   </div>
