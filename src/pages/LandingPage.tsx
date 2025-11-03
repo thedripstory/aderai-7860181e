@@ -324,13 +324,17 @@ export default function LandingPage() {
             {/* Card 1 - VIP Reactivation */}
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
               {/* Cash Burst Effect */}
-              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl animate-[burst-1_0.8s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl animate-[burst-2_0.8s_ease-out]">💵</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl animate-[burst-3_0.8s_ease-out]">💸</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-4_0.8s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-5_0.8s_ease-out]">💵</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-6_0.8s_ease-out]">💸</span>
+              <div className="absolute inset-0 pointer-events-none z-50">
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-1_1s_ease-out]">💰</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-3_1s_ease-out_0.2s]">💸</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-4_1s_ease-out_0.15s]">💰</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_1s_ease-out_0.05s]">💵</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-6_1s_ease-out_0.25s]">💸</span>
+                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-1_1.2s_ease-out_0.3s]">🤑</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-3_1.1s_ease-out_0.35s]">💎</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_0.9s_ease-out_0.4s]">🎉</span>
+                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.2s]">✨</span>
               </div>
               <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-500">
                 <div className="relative w-full space-y-3">
@@ -360,13 +364,17 @@ export default function LandingPage() {
             {/* Card 2 - Browse Abandoners */}
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-600 hover:shadow-2xl hover:shadow-orange-600/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
               {/* Cash Burst Effect */}
-              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl animate-[burst-1_0.8s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl animate-[burst-2_0.8s_ease-out]">💵</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl animate-[burst-3_0.8s_ease-out]">💸</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-4_0.8s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-5_0.8s_ease-out]">💵</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-6_0.8s_ease-out]">💸</span>
+              <div className="absolute inset-0 pointer-events-none z-50">
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-1_1s_ease-out]">💰</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-3_1s_ease-out_0.2s]">💸</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-4_1s_ease-out_0.15s]">💰</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_1s_ease-out_0.05s]">💵</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-6_1s_ease-out_0.25s]">💸</span>
+                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-1_1.2s_ease-out_0.3s]">🤑</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-3_1.1s_ease-out_0.35s]">💎</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_0.9s_ease-out_0.4s]">🎉</span>
+                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.2s]">✨</span>
               </div>
               <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-600 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-red-50 transition-all duration-500">
                 <div className="relative w-full space-y-3">
@@ -402,13 +410,17 @@ export default function LandingPage() {
             {/* Card 3 - Category Champions */}
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
               {/* Cash Burst Effect */}
-              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl animate-[burst-1_0.8s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl animate-[burst-2_0.8s_ease-out]">💵</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl animate-[burst-3_0.8s_ease-out]">💸</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-4_0.8s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-5_0.8s_ease-out]">💵</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl animate-[burst-6_0.8s_ease-out]">💸</span>
+              <div className="absolute inset-0 pointer-events-none z-50">
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-1_1s_ease-out]">💰</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-3_1s_ease-out_0.2s]">💸</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-4_1s_ease-out_0.15s]">💰</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_1s_ease-out_0.05s]">💵</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-6_1s_ease-out_0.25s]">💸</span>
+                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-1_1.2s_ease-out_0.3s]">🤑</span>
+                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-3_1.1s_ease-out_0.35s]">💎</span>
+                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_0.9s_ease-out_0.4s]">🎉</span>
+                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.2s]">✨</span>
               </div>
               <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-yellow-50 group-hover:to-orange-50 transition-all duration-500">
                 <div className="relative w-full space-y-3">
