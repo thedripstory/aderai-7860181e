@@ -907,17 +907,12 @@ export default function LandingPage() {
 
           {/* Bottom Trust Section */}
           <div className="mt-20 text-center relative">
-            {/* Floating orbs background */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-10 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-            </div>
 
             <div className="max-w-7xl mx-auto mb-10 relative">
               {/* Header with badge */}
               <div className="mb-12">
-                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500/20 via-emerald-400/20 to-emerald-500/20 border-2 border-emerald-500/30 mb-6 animate-fade-in shadow-lg shadow-emerald-500/20">
-                  <Sparkles className="w-5 h-5 text-emerald-500 animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500/10 border-2 border-emerald-500/20 mb-6">
+                  <Sparkles className="w-5 h-5 text-emerald-500" />
                   <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
                     The Ultimate Win-Win
                   </span>
@@ -934,16 +929,12 @@ export default function LandingPage() {
               {/* Three floating cards with staggered layout */}
               <div className="grid md:grid-cols-3 gap-8 relative">
                 {/* Card 1 - Elevated */}
-                <div className="group md:-translate-y-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                <div className="group md:-translate-y-8">
                   <div className="relative">
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
                     {/* Card */}
-                    <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl p-8 border-2 border-primary/30 hover:border-primary/60 transition-all duration-500 hover:scale-105 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover:shadow-primary/30">
-                      {/* Icon with animated ring */}
+                    <div className="relative bg-white dark:bg-card rounded-3xl p-8 border-2 border-gray-200 dark:border-border hover:border-primary/60 transition-all duration-300 hover:scale-105 hover:-translate-y-2 shadow-lg">
+                      {/* Icon */}
                       <div className="relative mb-6 inline-block">
-                        <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl animate-pulse" />
                         <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
                           <Zap className="w-8 h-8 text-white" />
                         </div>
@@ -961,21 +952,17 @@ export default function LandingPage() {
                 </div>
 
                 {/* Card 2 - Center (normal position, highlighted) */}
-                <div className="group animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <div className="group">
                   <div className="relative">
-                    {/* Enhanced glow for center card */}
-                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent rounded-3xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse" />
-                    
                     {/* Card with special treatment */}
-                    <div className="relative bg-gradient-to-br from-card via-accent/5 to-card rounded-3xl p-8 border-2 border-accent/50 hover:border-accent transition-all duration-500 hover:scale-105 shadow-2xl hover:shadow-3xl hover:shadow-accent/30">
+                    <div className="relative bg-white dark:bg-card rounded-3xl p-8 border-2 border-accent hover:border-accent/80 transition-all duration-300 hover:scale-105 shadow-lg">
                       {/* Floating badge */}
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-orange-500 to-accent rounded-full text-xs font-bold text-white shadow-lg">
                         BEST PART
                       </div>
                       
-                      {/* Icon with animated ring */}
+                      {/* Icon */}
                       <div className="relative mb-6 inline-block mt-4">
-                        <div className="absolute inset-0 bg-accent/20 rounded-2xl blur-xl animate-pulse" style={{ animationDelay: '0.5s' }} />
                         <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-accent/50 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
                           <BarChart3 className="w-8 h-8 text-white" />
                         </div>
@@ -994,16 +981,12 @@ export default function LandingPage() {
                 </div>
 
                 {/* Card 3 - Elevated */}
-                <div className="group md:-translate-y-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                <div className="group md:-translate-y-8">
                   <div className="relative">
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/30 to-transparent rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
                     {/* Card */}
-                    <div className="relative bg-gradient-to-br from-card via-card to-orange-500/5 rounded-3xl p-8 border-2 border-orange-500/30 hover:border-orange-500/60 transition-all duration-500 hover:scale-105 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover:shadow-orange-500/30">
-                      {/* Icon with animated ring */}
+                    <div className="relative bg-white dark:bg-card rounded-3xl p-8 border-2 border-gray-200 dark:border-border hover:border-orange-500/60 transition-all duration-300 hover:scale-105 hover:-translate-y-2 shadow-lg">
+                      {/* Icon */}
                       <div className="relative mb-6 inline-block">
-                        <div className="absolute inset-0 bg-orange-500/20 rounded-2xl blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
                         <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
                           <CheckCircle2 className="w-8 h-8 text-white" />
                         </div>
@@ -1024,9 +1007,9 @@ export default function LandingPage() {
               {/* Bottom visual connector */}
               <div className="mt-16 flex items-center justify-center gap-4">
                 <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent" />
-                <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                <div className="w-3 h-3 rounded-full bg-primary" />
                 <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-accent to-transparent" />
-                <div className="w-3 h-3 rounded-full bg-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <div className="w-3 h-3 rounded-full bg-accent" />
                 <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent" />
               </div>
             </div>
