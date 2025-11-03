@@ -31,6 +31,7 @@ export const EnergyFlowAnimation = () => {
       maxLife: number;
       size: number;
       hue: number;
+      initialHue: number;
     }
 
     const particles: Particle[] = [];
@@ -44,6 +45,7 @@ export const EnergyFlowAnimation = () => {
       const rect = canvas.getBoundingClientRect();
       const startX = 0;
       const startY = rect.height / 2 + (Math.random() - 0.5) * 80;
+      const initialHue = 220 + Math.random() * 60; // Blue to purple range
       
       particles.push({
         x: startX,
@@ -53,7 +55,8 @@ export const EnergyFlowAnimation = () => {
         life: 1,
         maxLife: 1,
         size: 2 + Math.random() * 3,
-        hue: 220 + Math.random() * 60, // Blue to purple range
+        hue: initialHue,
+        initialHue: initialHue,
       });
     };
 
@@ -75,7 +78,25 @@ export const EnergyFlowAnimation = () => {
         // Update position
         particle.x += particle.vx;
         particle.y += particle.vy + Math.sin(particle.x * 0.02 + waveOffset) * 0.5;
-        particle.life -= 0.005;
+        
+        // Calculate progress across canvas
+        const progress = particle.x / rect.width;
+        
+        // Transition to right card area (starts around 50% across)
+        if (progress > 0.5) {
+          // Calculate how far into the right card area (0 = just entering, 1 = at edge)
+          const rightProgress = (progress - 0.5) / 0.5;
+          
+          // Smoothly transition hue from initial (blue/purple) to primary/accent (orange/red hue 5)
+          const targetHue = 5;
+          particle.hue = particle.initialHue + (targetHue - particle.initialHue) * rightProgress;
+          
+          // Start dissolving as particle enters right card
+          particle.life = 1 - (rightProgress * 0.8); // Fade out gradually
+        } else {
+          // Normal life decay in left half
+          particle.life -= 0.005;
+        }
 
         // Remove dead particles
         if (particle.life <= 0 || particle.x > rect.width) {
