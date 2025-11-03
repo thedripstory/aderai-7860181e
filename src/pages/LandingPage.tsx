@@ -906,69 +906,134 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom Trust Section */}
-          <div className="mt-20 text-center">
-            <div className="max-w-4xl mx-auto mb-10">
-              <div className="bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl border-2 border-primary/20 p-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-                <div className="relative">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-                    <Sparkles className="w-4 h-4 text-emerald-500" />
-                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
-                      The Win-Win Model
-                    </span>
+          <div className="mt-20 text-center relative">
+            {/* Floating orbs background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-10 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            </div>
+
+            <div className="max-w-7xl mx-auto mb-10 relative">
+              {/* Header with badge */}
+              <div className="mb-12">
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500/20 via-emerald-400/20 to-emerald-500/20 border-2 border-emerald-500/30 mb-6 animate-fade-in shadow-lg shadow-emerald-500/20">
+                  <Sparkles className="w-5 h-5 text-emerald-500 animate-pulse" />
+                  <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                    The Ultimate Win-Win
+                  </span>
+                </div>
+                
+                <h3 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                  No retainers. No recurring fees.<br />
+                  <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                    Just pure, permanent value.
+                  </span>
+                </h3>
+              </div>
+
+              {/* Three floating cards with staggered layout */}
+              <div className="grid md:grid-cols-3 gap-8 relative">
+                {/* Card 1 - Elevated */}
+                <div className="group md:-translate-y-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                  <div className="relative">
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    {/* Card */}
+                    <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl p-8 border-2 border-primary/30 hover:border-primary/60 transition-all duration-500 hover:scale-105 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover:shadow-primary/30">
+                      {/* Icon with animated ring */}
+                      <div className="relative mb-6 inline-block">
+                        <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl animate-pulse" />
+                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
+                          <Zap className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                      
+                      <h4 className="text-xl font-bold mb-3">Set Once, Live Forever</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
+                      </p>
+                      
+                      {/* Decorative corner */}
+                      <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-primary/20 rounded-tr-2xl" />
+                    </div>
                   </div>
-                  
-                  <h3 className="text-2xl md:text-3xl font-bold mb-6 leading-tight">
-                    No retainers. No recurring fees. Just <span className="text-primary">pure value</span>.
-                  </h3>
-                  
-                  <div className="grid md:grid-cols-3 gap-6 text-left">
-                    <div className="group">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
-                          <Zap className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold mb-1">Set Once, Live Forever</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Create segments once and they auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever. No maintenance needed.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                </div>
+
+                {/* Card 2 - Center (normal position, highlighted) */}
+                <div className="group animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <div className="relative">
+                    {/* Enhanced glow for center card */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent rounded-3xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse" />
                     
-                    <div className="group">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
-                          <BarChart3 className="w-5 h-5 text-accent" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold mb-1">Lifetime Dashboard Access</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Monitor performance, track metrics, and optimize campaigns with zero ongoing costs.
-                          </p>
+                    {/* Card with special treatment */}
+                    <div className="relative bg-gradient-to-br from-card via-accent/5 to-card rounded-3xl p-8 border-2 border-accent/50 hover:border-accent transition-all duration-500 hover:scale-105 shadow-2xl hover:shadow-3xl hover:shadow-accent/30">
+                      {/* Floating badge */}
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-orange-500 to-accent rounded-full text-xs font-bold text-white shadow-lg">
+                        BEST PART
+                      </div>
+                      
+                      {/* Icon with animated ring */}
+                      <div className="relative mb-6 inline-block mt-4">
+                        <div className="absolute inset-0 bg-accent/20 rounded-2xl blur-xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-accent/50 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
+                          <BarChart3 className="w-8 h-8 text-white" />
                         </div>
                       </div>
+                      
+                      <h4 className="text-xl font-bold mb-3">Lifetime Dashboard Access</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Monitor performance, track metrics, optimize campaigns. <span className="text-accent font-semibold">All analytics, forever</span>. No subscription. No expiration.
+                      </p>
+                      
+                      {/* Decorative elements */}
+                      <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-accent/20 rounded-bl-2xl" />
+                      <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-accent/20 rounded-tr-2xl" />
                     </div>
+                  </div>
+                </div>
+
+                {/* Card 3 - Elevated */}
+                <div className="group md:-translate-y-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                  <div className="relative">
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/30 to-transparent rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     
-                    <div className="group">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
-                          <CheckCircle2 className="w-5 h-5 text-orange-500" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold mb-1">One-Time Investment</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Pay once. Own forever. No hidden fees, subscriptions, or agency retainers.
-                          </p>
+                    {/* Card */}
+                    <div className="relative bg-gradient-to-br from-card via-card to-orange-500/5 rounded-3xl p-8 border-2 border-orange-500/30 hover:border-orange-500/60 transition-all duration-500 hover:scale-105 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover:shadow-orange-500/30">
+                      {/* Icon with animated ring */}
+                      <div className="relative mb-6 inline-block">
+                        <div className="absolute inset-0 bg-orange-500/20 rounded-2xl blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
+                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
+                          <CheckCircle2 className="w-8 h-8 text-white" />
                         </div>
                       </div>
+                      
+                      <h4 className="text-xl font-bold mb-3">One-Time Investment</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        <span className="text-orange-500 font-semibold">Pay once. Own forever.</span> No hidden fees. No subscriptions. No agency retainers eating your budget every month.
+                      </p>
+                      
+                      {/* Decorative corner */}
+                      <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-orange-500/20 rounded-br-2xl" />
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* Bottom visual connector */}
+              <div className="mt-16 flex items-center justify-center gap-4">
+                <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent" />
+                <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-accent to-transparent" />
+                <div className="w-3 h-3 rounded-full bg-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent" />
+              </div>
             </div>
-            <PoweredByBadge />
+            
+            <div className="relative z-10">
+              <PoweredByBadge />
+            </div>
           </div>
         </div>
       </section>
