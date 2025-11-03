@@ -87,6 +87,7 @@ interface AnalyticsCache {
 interface KlaviyoKey {
   id: string;
   client_name: string;
+  klaviyo_api_key_hash: string;
   currency: string;
   currency_symbol: string;
   aov: number;
@@ -633,7 +634,7 @@ export default function AderaiApp() {
       return;
     }
 
-    if (!userData?.klaviyoApiKey) {
+    if (klaviyoKeys.length === 0 || !klaviyoKeys[activeKeyIndex]) {
       alert("Klaviyo API key not found. Please complete onboarding first.");
       return;
     }
@@ -698,7 +699,7 @@ export default function AderaiApp() {
   };
 
   const fetchAllSegments = async () => {
-    if (!userData?.klaviyoApiKey) return;
+    if (klaviyoKeys.length === 0 || !klaviyoKeys[activeKeyIndex]) return;
 
     const cached = loadCachedAnalytics();
     if (cached) {
@@ -713,7 +714,7 @@ export default function AderaiApp() {
     try {
       const response = await fetch("https://a.klaviyo.com/api/segments/", {
         headers: {
-          Authorization: `Klaviyo-API-Key ${userData.klaviyoApiKey}`,
+          Authorization: `Klaviyo-API-Key ${klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}`,
           revision: "2024-02-15",
         },
       });
@@ -744,7 +745,7 @@ export default function AderaiApp() {
       try {
         const response = await fetch(`https://a.klaviyo.com/api/segments/${segment.id}/profiles/`, {
           headers: {
-            Authorization: `Klaviyo-API-Key ${userData?.klaviyoApiKey}`,
+            Authorization: `Klaviyo-API-Key ${klaviyoKeys[activeKeyIndex]?.klaviyo_api_key_hash}`,
             revision: "2024-02-15",
           },
         });
