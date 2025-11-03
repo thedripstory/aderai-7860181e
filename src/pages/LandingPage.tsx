@@ -111,14 +111,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium">
-              <span className="whitespace-nowrap">
-                Instantly Create 70+ segments, with one click- straight inside Klaviyo.
-              </span>
-              <br />
-              with{" "}
-              <CircleDoodle delay="1s">
-                <strong className="text-foreground">Aderai.</strong>
-              </CircleDoodle>
+              Instantly Create 70+ segments, with one click- straight inside Klaviyo.
             </p>
 
             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
