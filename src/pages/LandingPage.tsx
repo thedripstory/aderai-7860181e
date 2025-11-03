@@ -488,45 +488,25 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Decorative Divider */}
-      <div className="relative py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-muted via-background to-muted/30" />
-        
-        {/* Radiating Energy Beams */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent rotate-45 animate-pulse" />
-          <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-accent/50 to-transparent -rotate-45 animate-pulse" style={{ animationDelay: '0.5s' }} />
-          <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent rotate-90 animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }} />
-          
-          {/* Expanding dots */}
-          <div className="absolute w-2 h-2 rounded-full bg-primary/60 animate-ping" style={{ animationDuration: '2s' }} />
-          <div className="absolute w-1 h-1 rounded-full bg-accent/60 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
-        </div>
-
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-full max-w-5xl mx-auto px-6">
-            <div className="relative">
-              {/* Animated gradient lines */}
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent animate-pulse" />
-              </div>
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" 
-                     style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s' }} />
-              </div>
-              
-              {/* Center Icon with Glow */}
-              <div className="relative flex justify-center">
-                <div className="relative bg-background px-6 py-3 rounded-full border-2 border-primary shadow-xl">
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/30 to-accent/30 blur-lg animate-pulse" 
-                       style={{ animationDelay: '0.5s' }} />
-                  <Sparkles className="w-6 h-6 text-primary relative z-10 animate-pulse" />
-                </div>
+      {/* Elegant Divider */}
+      <div className="relative py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative flex items-center gap-4">
+            {/* Left Line */}
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-border to-border" />
+            
+            {/* Center Ornament */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full shadow-sm">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: '1s' }} />
               </div>
             </div>
+            
+            {/* Right Line */}
+            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-border to-border" />
           </div>
         </div>
       </div>
