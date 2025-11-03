@@ -656,7 +656,7 @@ export default function LandingPage() {
                     </div>
 
                     <div className="relative p-8 pt-10">
-                      <div className="grid md:grid-cols-[0.85fr,1.35fr] gap-8 items-center">
+                      <div className="grid md:grid-cols-[1fr,1fr] gap-8 items-start">
                         {/* Left: Pricing */}
                         <div className="text-center md:text-left">
                           <h3 className="text-3xl font-bold mb-4">Brand Plan</h3>
@@ -693,7 +693,7 @@ export default function LandingPage() {
 
                         {/* Right: Features */}
                         <div className="pl-0 md:pl-2">
-                          <ul className="grid grid-cols-1 gap-3">
+                          <ul className="grid grid-cols-2 gap-x-8 gap-y-3">
                             {[
                               { icon: CheckCircle, text: "70 pre-built segments" },
                               { icon: Sparkles, text: "AI segment suggester" },
