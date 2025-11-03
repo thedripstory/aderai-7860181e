@@ -60,13 +60,31 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
   };
 
   const handleAuth = async () => {
-    if (!email || !password) {
+    // Input validation using basic checks (Zod would be better for production)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!email?.trim() || !password) {
       setError("Please fill in all fields");
       return;
     }
 
-    if (authView.includes("signup") && !accountName) {
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
+    if (authView.includes("signup") && !accountName?.trim()) {
       setError("Please enter your account name");
+      return;
+    }
+
+    if (authView.includes("signup") && accountName.length > 100) {
+      setError("Account name is too long (max 100 characters)");
       return;
     }
 
@@ -120,16 +138,9 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
             title: "Account created!",
             description: "Welcome to Aderai. Check your email to verify your account.",
           });
-
-          // Store user info
-          const user = {
-            email,
-            accountName,
-            accountType: authView.includes("agency") ? "agency" : "brand",
-          };
-          localStorage.setItem("aderai_user", JSON.stringify(user));
           
-          onComplete(user);
+          // User is now authenticated via Supabase - no localStorage needed
+          onComplete(authData.user);
         }
       } else {
         // Sign in
@@ -145,27 +156,13 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
         }
 
         if (authData.user) {
-          // Get user data from users table
-          const { data: userData } = await supabase
-            .from('users')
-            .select('account_name, account_type')
-            .eq('id', authData.user.id)
-            .single();
-
-          const user = {
-            email: authData.user.email!,
-            accountName: userData?.account_name || email.split("@")[0],
-            accountType: userData?.account_type || "brand",
-          };
-          
-          localStorage.setItem("aderai_user", JSON.stringify(user));
-          
           toast({
             title: "Welcome back!",
             description: "You've successfully signed in.",
           });
           
-          onComplete(user);
+          // User is now authenticated via Supabase - no localStorage needed
+          onComplete(authData.user);
         }
       }
     } catch (err: any) {
