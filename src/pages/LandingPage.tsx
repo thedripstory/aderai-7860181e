@@ -322,91 +322,88 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {/* Card 1 - VIP Reactivation */}
-            <div className="group bg-gradient-to-br from-orange-500/5 via-background to-orange-600/5 rounded-3xl p-6 border border-border hover:border-orange-500/30 transition-all hover:shadow-xl">
-              <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(16_100%_50%/0.1),transparent_50%)]" />
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:shadow-xl transition-all">
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black">
                 <div className="relative w-full space-y-3">
-                  <div className="bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-border shadow-sm">
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-muted-foreground font-medium">VIP At-Risk</span>
-                      <span className="text-xs font-bold text-orange-600">2,847 profiles</span>
+                      <span className="text-xs text-black font-medium">VIP At-Risk</span>
+                      <span className="text-xs font-bold text-black">2,847 profiles</span>
                     </div>
-                    <div className="text-sm font-semibold">LTV &gt; $5k, no purchase 60d</div>
+                    <div className="text-sm font-semibold text-black">LTV &gt; $5k, no purchase 60d</div>
                   </div>
-                  <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-dashed border-orange-500/30">
-                    <div className="text-xs text-muted-foreground mb-1">Suggested action</div>
-                    <div className="text-sm font-semibold">Exclusive 20% VIP comeback</div>
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
+                    <div className="text-xs text-black mb-1">Suggested action</div>
+                    <div className="text-sm font-semibold text-black">Exclusive 20% VIP comeback</div>
                   </div>
-                  <div className="absolute -bottom-2 -right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
                     Hidden gem
                   </div>
                 </div>
               </div>
 
-              <h3 className="text-xl font-bold mb-2">VIP Reactivation</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-xl font-bold mb-2 text-black">VIP Reactivation</h3>
+              <p className="text-sm text-gray-700">
                 Target high-value customers before they churn with AI-powered win-back campaigns.
               </p>
             </div>
 
             {/* Card 2 - Browse Abandoners */}
-            <div className="group bg-gradient-to-br from-orange-600/5 via-background to-orange-500/5 rounded-3xl p-6 border border-border hover:border-orange-600/30 transition-all hover:shadow-xl">
-              <div className="bg-gradient-to-br from-orange-600/10 to-orange-500/10 rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(20_100%_50%/0.1),transparent_50%)]" />
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:shadow-xl transition-all">
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black">
                 <div className="relative w-full space-y-3">
-                  <div className="bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-border shadow-sm">
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-muted-foreground font-medium">Intent Buyers</span>
-                      <span className="text-xs font-bold text-orange-600">12,493 profiles</span>
+                      <span className="text-xs text-black font-medium">Intent Buyers</span>
+                      <span className="text-xs font-bold text-black">12,493 profiles</span>
                     </div>
-                    <div className="text-sm font-semibold">3+ views, $0 cart, 7d</div>
+                    <div className="text-sm font-semibold text-black">3+ views, $0 cart, 7d</div>
                   </div>
                   <div className="flex gap-2">
-                    <div className="flex-1 bg-orange-500/10 backdrop-blur-sm rounded-lg p-2 border border-orange-500/20">
-                      <div className="text-xs font-bold text-orange-600">42%</div>
-                      <div className="text-[10px] text-muted-foreground">Conversion rate</div>
+                    <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
+                      <div className="text-xs font-bold text-black">42%</div>
+                      <div className="text-[10px] text-gray-700">Conversion rate</div>
                     </div>
-                    <div className="flex-1 bg-orange-500/10 backdrop-blur-sm rounded-lg p-2 border border-orange-500/20">
-                      <div className="text-xs font-bold text-orange-600">$127</div>
-                      <div className="text-[10px] text-muted-foreground">Avg order</div>
+                    <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
+                      <div className="text-xs font-bold text-black">$127</div>
+                      <div className="text-[10px] text-gray-700">Avg order</div>
                     </div>
                   </div>
-                  <div className="absolute -bottom-2 -right-2 bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     Top performer
                   </div>
                 </div>
               </div>
 
-              <h3 className="text-xl font-bold mb-2">Browse Abandoners</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-xl font-bold mb-2 text-black">Browse Abandoners</h3>
+              <p className="text-sm text-gray-700">
                 Convert window shoppers into buyers with behavior-triggered nudges and social proof.
               </p>
             </div>
 
             {/* Card 3 - Category Champions */}
-            <div className="group bg-gradient-to-br from-orange-500/5 via-background to-yellow-500/5 rounded-3xl p-6 border border-border hover:border-orange-500/30 transition-all hover:shadow-xl">
-              <div className="bg-gradient-to-br from-orange-500/10 to-yellow-500/10 rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(24_100%_50%/0.1),transparent_50%)]" />
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:shadow-xl transition-all">
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black">
                 <div className="relative w-full space-y-3">
-                  <div className="bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-border shadow-sm">
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-muted-foreground font-medium">Skincare Enthusiasts</span>
-                      <span className="text-xs font-bold text-orange-600">8,234 profiles</span>
+                      <span className="text-xs text-black font-medium">Skincare Enthusiasts</span>
+                      <span className="text-xs font-bold text-black">8,234 profiles</span>
                     </div>
-                    <div className="text-sm font-semibold">70%+ orders in category</div>
+                    <div className="text-sm font-semibold text-black">70%+ orders in category</div>
                   </div>
-                  <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-dashed border-orange-500/30">
-                    <div className="text-xs text-muted-foreground mb-1">Cross-sell opportunity</div>
-                    <div className="text-sm font-semibold">New arrivals + bundles</div>
+                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
+                    <div className="text-xs text-black mb-1">Cross-sell opportunity</div>
+                    <div className="text-sm font-semibold text-black">New arrivals + bundles</div>
                   </div>
-                  <div className="absolute -bottom-2 -right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     High intent
                   </div>
                 </div>
               </div>
 
-              <h3 className="text-xl font-bold mb-2">Category Champions</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-xl font-bold mb-2 text-black">Category Champions</h3>
+              <p className="text-sm text-gray-700">
                 Identify category lovers and cross-sell with laser precision based on purchase patterns.
               </p>
             </div>
