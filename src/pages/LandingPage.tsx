@@ -676,9 +676,8 @@ export default function LandingPage() {
                             onClick={handleGetStarted}
                             className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-3.5 rounded-full font-bold text-base hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50"
                           >
-                            <span className="relative z-10 flex items-center justify-center gap-2">
-                              Get started now
-                              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                            <span className="relative z-10">
+                              Activate Aderai Now→
                             </span>
                           </button>
 
