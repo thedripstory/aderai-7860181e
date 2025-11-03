@@ -538,7 +538,7 @@ export default function LandingPage() {
           {/* Header Section */}
           <div className="text-center mb-6">
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              Success Stories that <span className="text-[#ff6b6b] italic font-bold">Inspire</span>
+              Success Stories that <span className="text-[#ff6b6b] font-bold">INSPIRE</span>
             </h2>
 
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
