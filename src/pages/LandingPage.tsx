@@ -944,7 +944,7 @@ export default function LandingPage() {
 
                   {/* Item 2 */}
                   <div className="relative text-center">
-                    <div className="inline-block mb-3 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                       <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
                         Best Part
                       </span>
