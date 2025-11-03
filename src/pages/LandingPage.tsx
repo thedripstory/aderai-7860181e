@@ -907,18 +907,65 @@ export default function LandingPage() {
 
           {/* Bottom Trust Section */}
           <div className="mt-20 text-center">
-            <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
-              <div className="flex items-center gap-2 text-sm">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                <span className="text-muted-foreground">No credit card required</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                <span className="text-muted-foreground">Cancel anytime</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                <span className="text-muted-foreground">24x7 customer support</span>
+            <div className="max-w-4xl mx-auto mb-10">
+              <div className="bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl border-2 border-primary/20 p-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+                <div className="relative">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
+                    <Sparkles className="w-4 h-4 text-emerald-500" />
+                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                      The Win-Win Model
+                    </span>
+                  </div>
+                  
+                  <h3 className="text-2xl md:text-3xl font-bold mb-6 leading-tight">
+                    No retainers. No recurring fees. Just <span className="text-primary">pure value</span>.
+                  </h3>
+                  
+                  <div className="grid md:grid-cols-3 gap-6 text-left">
+                    <div className="group">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
+                          <Zap className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold mb-1">Set Once, Live Forever</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Create segments once and they auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever. No maintenance needed.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="group">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
+                          <BarChart3 className="w-5 h-5 text-accent" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold mb-1">Lifetime Dashboard Access</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Monitor performance, track metrics, and optimize campaigns with zero ongoing costs.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="group">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
+                          <CheckCircle2 className="w-5 h-5 text-orange-500" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold mb-1">One-Time Investment</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Pay once. Own forever. No hidden fees, subscriptions, or agency retainers.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <PoweredByBadge />
