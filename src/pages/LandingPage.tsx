@@ -11,7 +11,6 @@ import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
-import { DashboardScreenMockup } from "@/components/DashboardScreenMockup";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { EnergyFlowAnimation } from "@/components/EnergyFlowAnimation";
 export default function LandingPage() {
@@ -152,16 +151,16 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Interactive Comparison Cards with Energy Flow */}
-          <div className="relative max-w-5xl mx-auto mb-32">
-            <div className="grid md:grid-cols-2 gap-6 relative">
-              {/* Energy Flow Animation - Contained within cards */}
-              <div className="absolute inset-0 pointer-events-none z-0">
-                <EnergyFlowAnimation />
-              </div>
-              
+          {/* Interactive Comparison Cards */}
+          <div className="relative max-w-5xl mx-auto mb-24">
+            {/* Energy Flow Animation */}
+            <div className="absolute inset-0 -z-10">
+              <EnergyFlowAnimation />
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6 relative z-10">
               {/* Before Card */}
-              <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden z-10">
+              <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/5 rounded-full blur-2xl" />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-6">
@@ -195,7 +194,7 @@ export default function LandingPage() {
               </div>
 
               {/* After Card */}
-              <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl animate-[slide-in-right_0.8s_ease-out_0.3s_both] z-10">
+              <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl animate-[slide-in-right_0.8s_ease-out_0.3s_both]">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-2xl animate-pulse" />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-6">
@@ -231,18 +230,13 @@ export default function LandingPage() {
               </div>
 
               {/* Arrow Connection - Top Center */}
-              <div className="hidden md:flex absolute -top-8 left-1/2 -translate-x-1/2 z-20 items-center gap-2 bg-background/95 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-2 shadow-lg">
+              <div className="hidden md:flex absolute -top-8 left-1/2 -translate-x-1/2 z-10 items-center gap-2 bg-background/95 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-2 shadow-lg">
                 <span className="text-xs font-semibold text-primary uppercase tracking-wider">Saving Time</span>
                 <ArrowRight className="w-4 h-4 text-primary" />
               </div>
             </div>
-          </div>
 
-          {/* Dashboard Screen Mockup - Independent scroll section */}
-          <DashboardScreenMockup />
-
-          {/* Revolving Testimonials - Independent section */}
-          <div className="max-w-5xl mx-auto">
+            {/* Revolving Testimonials */}
             <RevolvingTestimonials />
           </div>
 
