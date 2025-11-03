@@ -138,14 +138,34 @@ export const AutomationFlow = () => {
             </div>
           </div>
 
-          {/* Klaviyo Connection Indicator */}
-          <div className="flex items-center justify-center gap-2 py-3 px-4 bg-muted/50 rounded-xl border border-border/50">
-            <span className="text-sm font-medium">Syncing to</span>
-            <img src={klaviyoLogo} alt="Klaviyo" className="h-4" />
-            <div className="flex gap-1 ml-2">
-              <div className="w-1 h-4 bg-primary/30 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
-              <div className="w-1 h-4 bg-primary/50 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
-              <div className="w-1 h-4 bg-primary rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+          {/* Klaviyo Connection Indicator - Aggressive Loader */}
+          <div className="flex items-center justify-center gap-3 py-4 px-4 bg-muted/50 rounded-xl border border-border/50 relative overflow-hidden">
+            {/* Background pulse effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-[slide-in-right_1.5s_ease-in-out_infinite]" />
+            
+            <span className="text-sm font-medium relative z-10">Syncing to</span>
+            <img src={klaviyoLogo} alt="Klaviyo" className="h-4 relative z-10" />
+            
+            {/* Aggressive rotating loader */}
+            <div className="relative w-8 h-8 ml-2">
+              {/* Outer rotating ring */}
+              <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+              
+              {/* Middle counter-rotating ring */}
+              <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+              
+              {/* Inner pulsing core */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+              </div>
+              
+              {/* Orbiting particles */}
+              <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
+              </div>
+              <div className="absolute inset-0 animate-[spin_2s_linear_infinite_reverse]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-500" />
+              </div>
             </div>
           </div>
         </div>
