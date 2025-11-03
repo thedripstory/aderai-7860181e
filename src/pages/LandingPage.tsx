@@ -644,8 +644,6 @@ export default function LandingPage() {
               <div className="flex justify-center animate-fade-in">
                 <div className="w-full max-w-4xl group">
                   <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-500">
-                    {/* Glow Effect */}
-                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 to-accent/20 blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
                     
                     {/* Badge */}
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -658,11 +656,11 @@ export default function LandingPage() {
                     </div>
 
                     <div className="relative p-8 pt-10">
-                      <div className="grid md:grid-cols-2 gap-8 items-center">
+                      <div className="grid md:grid-cols-[1fr,1.2fr] gap-10 items-center">
                         {/* Left: Pricing */}
                         <div className="text-center md:text-left">
                           <h3 className="text-3xl font-bold mb-4">Brand Plan</h3>
-                          <div className="mb-4">
+                          <div className="mb-6">
                             <div className="flex items-baseline justify-center md:justify-start gap-2">
                               <span className="text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                                 $49
@@ -676,9 +674,8 @@ export default function LandingPage() {
                           {/* CTA Button */}
                           <button
                             onClick={handleGetStarted}
-                            className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-3.5 rounded-full font-bold text-base hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50 overflow-hidden mb-4"
+                            className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-3.5 rounded-full font-bold text-base hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50"
                           >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
                             <span className="relative z-10 flex items-center justify-center gap-2">
                               Get started now
                               <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -686,7 +683,7 @@ export default function LandingPage() {
                           </button>
 
                           {/* Trust Badge */}
-                          <div className="text-center md:text-left text-xs text-muted-foreground">
+                          <div className="text-center md:text-left text-xs text-muted-foreground mt-4">
                             <div className="flex items-center justify-center md:justify-start gap-2">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                               <span>24x7 customer support</span>
@@ -695,7 +692,7 @@ export default function LandingPage() {
                         </div>
 
                         {/* Right: Features */}
-                        <div>
+                        <div className="pl-0 md:pl-4">
                           <ul className="grid grid-cols-1 gap-3">
                             {[
                               { icon: CheckCircle, text: "70 pre-built segments" },
