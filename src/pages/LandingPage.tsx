@@ -323,18 +323,18 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {/* Card 1 - VIP Reactivation */}
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
-              {/* Cash Burst Effect */}
+              {/* Confetti Effect */}
               <div className="absolute inset-0 pointer-events-none z-50">
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-1_1s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.1s]">💵</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-3_1s_ease-out_0.2s]">💸</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-4_1s_ease-out_0.15s]">💰</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_1s_ease-out_0.05s]">💵</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-6_1s_ease-out_0.25s]">💸</span>
-                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-1_1.2s_ease-out_0.3s]">🤑</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-3_1.1s_ease-out_0.35s]">💎</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_0.9s_ease-out_0.4s]">🎉</span>
-                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.2s]">✨</span>
+                <span className="absolute top-0 left-[20%] text-5xl opacity-0 group-hover:animate-[confetti-1_1.5s_ease-out]">💵</span>
+                <span className="absolute top-0 left-[40%] text-4xl opacity-0 group-hover:animate-[confetti-2_1.8s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-0 left-[60%] text-6xl opacity-0 group-hover:animate-[confetti-3_1.6s_ease-out_0.2s]">💵</span>
+                <span className="absolute top-0 left-[80%] text-5xl opacity-0 group-hover:animate-[confetti-4_1.7s_ease-out_0.15s]">💵</span>
+                <span className="absolute top-0 left-[30%] text-4xl opacity-0 group-hover:animate-[confetti-5_1.9s_ease-out_0.25s]">💵</span>
+                <span className="absolute top-0 left-[70%] text-5xl opacity-0 group-hover:animate-[confetti-6_1.6s_ease-out_0.3s]">💵</span>
+                <span className="absolute top-0 left-[10%] text-4xl opacity-0 group-hover:animate-[confetti-1_1.8s_ease-out_0.35s]">💵</span>
+                <span className="absolute top-0 left-[50%] text-6xl opacity-0 group-hover:animate-[confetti-3_1.5s_ease-out_0.4s]">💵</span>
+                <span className="absolute top-0 left-[90%] text-5xl opacity-0 group-hover:animate-[confetti-5_1.7s_ease-out_0.45s]">💵</span>
+                <span className="absolute top-0 left-[25%] text-4xl opacity-0 group-hover:animate-[confetti-2_1.6s_ease-out_0.5s]">💵</span>
               </div>
               <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-500">
                 <div className="relative w-full space-y-3">
@@ -363,18 +363,18 @@ export default function LandingPage() {
 
             {/* Card 2 - Browse Abandoners */}
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-600 hover:shadow-2xl hover:shadow-orange-600/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
-              {/* Cash Burst Effect */}
+              {/* Confetti Effect */}
               <div className="absolute inset-0 pointer-events-none z-50">
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-1_1s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.1s]">💵</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-3_1s_ease-out_0.2s]">💸</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-4_1s_ease-out_0.15s]">💰</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_1s_ease-out_0.05s]">💵</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-6_1s_ease-out_0.25s]">💸</span>
-                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-1_1.2s_ease-out_0.3s]">🤑</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-3_1.1s_ease-out_0.35s]">💎</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_0.9s_ease-out_0.4s]">🎉</span>
-                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.2s]">✨</span>
+                <span className="absolute top-0 left-[20%] text-5xl opacity-0 group-hover:animate-[confetti-1_1.5s_ease-out]">💵</span>
+                <span className="absolute top-0 left-[40%] text-4xl opacity-0 group-hover:animate-[confetti-2_1.8s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-0 left-[60%] text-6xl opacity-0 group-hover:animate-[confetti-3_1.6s_ease-out_0.2s]">💵</span>
+                <span className="absolute top-0 left-[80%] text-5xl opacity-0 group-hover:animate-[confetti-4_1.7s_ease-out_0.15s]">💵</span>
+                <span className="absolute top-0 left-[30%] text-4xl opacity-0 group-hover:animate-[confetti-5_1.9s_ease-out_0.25s]">💵</span>
+                <span className="absolute top-0 left-[70%] text-5xl opacity-0 group-hover:animate-[confetti-6_1.6s_ease-out_0.3s]">💵</span>
+                <span className="absolute top-0 left-[10%] text-4xl opacity-0 group-hover:animate-[confetti-1_1.8s_ease-out_0.35s]">💵</span>
+                <span className="absolute top-0 left-[50%] text-6xl opacity-0 group-hover:animate-[confetti-3_1.5s_ease-out_0.4s]">💵</span>
+                <span className="absolute top-0 left-[90%] text-5xl opacity-0 group-hover:animate-[confetti-5_1.7s_ease-out_0.45s]">💵</span>
+                <span className="absolute top-0 left-[25%] text-4xl opacity-0 group-hover:animate-[confetti-2_1.6s_ease-out_0.5s]">💵</span>
               </div>
               <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-600 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-red-50 transition-all duration-500">
                 <div className="relative w-full space-y-3">
@@ -409,18 +409,18 @@ export default function LandingPage() {
 
             {/* Card 3 - Category Champions */}
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
-              {/* Cash Burst Effect */}
+              {/* Confetti Effect */}
               <div className="absolute inset-0 pointer-events-none z-50">
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-1_1s_ease-out]">💰</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.1s]">💵</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-3_1s_ease-out_0.2s]">💸</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-4_1s_ease-out_0.15s]">💰</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_1s_ease-out_0.05s]">💵</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-6_1s_ease-out_0.25s]">💸</span>
-                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-1_1.2s_ease-out_0.3s]">🤑</span>
-                <span className="absolute top-1/2 left-1/2 text-6xl opacity-0 group-hover:animate-[burst-3_1.1s_ease-out_0.35s]">💎</span>
-                <span className="absolute top-1/2 left-1/2 text-7xl opacity-0 group-hover:animate-[burst-5_0.9s_ease-out_0.4s]">🎉</span>
-                <span className="absolute top-1/2 left-1/2 text-5xl opacity-0 group-hover:animate-[burst-2_1s_ease-out_0.2s]">✨</span>
+                <span className="absolute top-0 left-[20%] text-5xl opacity-0 group-hover:animate-[confetti-1_1.5s_ease-out]">💵</span>
+                <span className="absolute top-0 left-[40%] text-4xl opacity-0 group-hover:animate-[confetti-2_1.8s_ease-out_0.1s]">💵</span>
+                <span className="absolute top-0 left-[60%] text-6xl opacity-0 group-hover:animate-[confetti-3_1.6s_ease-out_0.2s]">💵</span>
+                <span className="absolute top-0 left-[80%] text-5xl opacity-0 group-hover:animate-[confetti-4_1.7s_ease-out_0.15s]">💵</span>
+                <span className="absolute top-0 left-[30%] text-4xl opacity-0 group-hover:animate-[confetti-5_1.9s_ease-out_0.25s]">💵</span>
+                <span className="absolute top-0 left-[70%] text-5xl opacity-0 group-hover:animate-[confetti-6_1.6s_ease-out_0.3s]">💵</span>
+                <span className="absolute top-0 left-[10%] text-4xl opacity-0 group-hover:animate-[confetti-1_1.8s_ease-out_0.35s]">💵</span>
+                <span className="absolute top-0 left-[50%] text-6xl opacity-0 group-hover:animate-[confetti-3_1.5s_ease-out_0.4s]">💵</span>
+                <span className="absolute top-0 left-[90%] text-5xl opacity-0 group-hover:animate-[confetti-5_1.7s_ease-out_0.45s]">💵</span>
+                <span className="absolute top-0 left-[25%] text-4xl opacity-0 group-hover:animate-[confetti-2_1.6s_ease-out_0.5s]">💵</span>
               </div>
               <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-yellow-50 group-hover:to-orange-50 transition-all duration-500">
                 <div className="relative w-full space-y-3">
