@@ -13,6 +13,7 @@ import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { EnergyFlowAnimation } from "@/components/EnergyFlowAnimation";
+import { AnimatedStatsBar } from "@/components/AnimatedStatsBar";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -457,81 +458,71 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Success Stories */}
+      {/* Pain Points Ticker Section */}
       <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+          {/* Pain Points Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-semibold text-primary uppercase tracking-wider">Our Clients</span>
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider">The Old Way</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              Success Stories that <span className="italic text-primary">Inspire</span>
+            
+            <h2 className="text-5xl md:text-6xl font-bold mb-12 leading-tight">
+              <span className="relative inline-block">
+                Wave goodbye to
+                <svg className="absolute -left-4 -top-2 w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M7 7l10 10M7 17L17 7" />
+                </svg>
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Discover how brands and agencies achieve results.
-            </p>
+
+            {/* Crossed Out Pain Points */}
+            <div className="flex flex-wrap items-center justify-center gap-6 text-2xl md:text-3xl max-w-4xl mx-auto">
+              <span className="relative text-muted-foreground/40 font-medium">
+                wasted time
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
+                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
+                </svg>
+              </span>
+              
+              <span className="relative text-muted-foreground/40 font-medium">
+                manual work
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
+                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
+                </svg>
+              </span>
+              
+              <span className="relative text-primary font-bold text-4xl md:text-5xl">
+                complex setup
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 280 60" preserveAspectRatio="none">
+                  <path d="M10 30 Q70 15 140 30 T270 30" stroke="hsl(var(--primary))" strokeWidth="4" fill="none" />
+                  <path d="M10 35 Q70 20 140 35 T270 35" stroke="hsl(var(--accent))" strokeWidth="3" fill="none" opacity="0.6" />
+                </svg>
+              </span>
+              
+              <span className="relative text-muted-foreground/40 font-medium">
+                agency costs
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
+                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
+                </svg>
+              </span>
+              
+              <span className="relative text-muted-foreground/40 font-medium">
+                slow results
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 50" preserveAspectRatio="none">
+                  <line x1="0" y1="25" x2="200" y2="25" stroke="hsl(var(--destructive))" strokeWidth="3" />
+                </svg>
+              </span>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mt-16">
-            <FlipTestimonialCard
-              name="Sophia"
-              role="Marketing Lead"
-              company="Trendify"
-              story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships."
-              metrics={[
-                {
-                  label: "gain in retention",
-                  value: "40%",
-                },
-                {
-                  label: "surge in profits",
-                  value: "50%",
-                },
-              ]}
-              delay="0s"
-            />
-
-            <FlipTestimonialCard
-              name="Marcus"
-              role="Head of Growth"
-              company="Premium Beauty Co."
-              story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy."
-              metrics={[
-                {
-                  label: "email revenue increase",
-                  value: "+42%",
-                },
-                {
-                  label: "deployment time",
-                  value: "60 sec",
-                },
-              ]}
-              delay="0.1s"
-            />
-
-            <FlipTestimonialCard
-              name="Sarah"
-              role="Founder"
-              company="Growth Labs Agency"
-              story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue."
-              metrics={[
-                {
-                  label: "time saved",
-                  value: "99%",
-                },
-                {
-                  label: "revenue increase",
-                  value: "+$200K",
-                },
-              ]}
-              delay="0.2s"
-            />
-          </div>
+          {/* Animated Stats Ticker */}
+          <AnimatedStatsBar />
 
           <div className="mt-16 text-center">
             <PoweredByBadge />
