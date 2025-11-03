@@ -112,7 +112,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium flex items-center justify-center flex-wrap gap-1">
-              Instantly Create 70+ segments, with one click- straight inside{" "}
+              Instantly Create 70+ segments, with one click- straight inside
               <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-baseline" />
             </p>
 
