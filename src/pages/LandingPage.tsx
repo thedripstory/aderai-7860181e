@@ -705,6 +705,8 @@ export default function LandingPage() {
                               { icon: ArrowRight, text: "Export capabilities" },
                               { icon: Sparkles, text: "Email notifications" },
                               { icon: CheckCircle, text: "Custom fields" },
+                              { icon: CheckCircle, text: "1 Klaviyo account" },
+                              { icon: Zap, text: "Priority email support" },
                             ].map((feature, i) => (
                               <li
                                 key={i}
@@ -716,20 +718,6 @@ export default function LandingPage() {
                                 <span className="text-sm">{feature.text}</span>
                               </li>
                             ))}
-                            <li className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300">
-                              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300 flex-shrink-0">
-                                <CheckCircle className="w-3.5 h-3.5 text-primary" />
-                              </div>
-                              <span className="text-sm flex items-end gap-1.5">
-                                1{" "}
-                                <img
-                                  src={klaviyoLogo}
-                                  alt="Klaviyo"
-                                  className="h-[0.95em] inline-block"
-                                />{" "}
-                                account
-                              </span>
-                            </li>
                           </ul>
                         </div>
                       </div>
