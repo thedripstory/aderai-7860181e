@@ -12,7 +12,6 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
-import AderaiTickerSection from "@/components/AderaiTickerSection";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [pricingView, setPricingView] = useState<"brands" | "agencies">("brands");
@@ -994,8 +993,41 @@ export default function LandingPage() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
         
         <div className="max-w-7xl mx-auto px-6 relative">
-          {/* Ticker Section */}
-          <AderaiTickerSection />
+          {/* Stats Bar - Unique Element */}
+          <div className="py-12 border-b border-border/50">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  10,000+
+                </div>
+                <div className="text-sm text-muted-foreground">Happy Brands</div>
+              </div>
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  70+
+                </div>
+                <div className="text-sm text-muted-foreground">Pre-built Segments</div>
+              </div>
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  99%
+                </div>
+                <div className="text-sm text-muted-foreground">Time Saved</div>
+              </div>
+              <div className="group">
+                <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                  4.8★
+                </div>
+                <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                  Rating on 
+                  <svg className="h-4 w-auto" viewBox="0 0 64 64" fill="currentColor">
+                    <path d="M32 0C14.3 0 0 14.3 0 32s14.3 32 32 32 32-14.3 32-32S49.7 0 32 0zm0 58C17.6 58 6 46.4 6 32S17.6 6 32 6s26 11.6 26 26-11.6 26-26 26z"/>
+                    <path d="M44.6 25.3c-.2-.5-.7-.9-1.2-1l-8.5-1.2-3.8-7.7c-.4-.9-1.8-.9-2.2 0l-3.8 7.7-8.5 1.2c-.6.1-1 .5-1.2 1-.2.5-.1 1.1.3 1.5l6.2 6-1.5 8.4c-.1.6.1 1.1.6 1.5.5.3 1.1.4 1.6.1l7.6-4 7.6 4c.2.1.5.2.7.2.3 0 .6-.1.9-.3.5-.3.7-.9.6-1.5l-1.5-8.4 6.2-6c.4-.4.5-1 .3-1.5z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Newsletter Section - Unique Element */}
           <div className="py-16 border-b border-border/50">
