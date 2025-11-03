@@ -15,7 +15,7 @@ const STEPS: Step[] = [{
   icon: MousePointerClick,
   title: (
     <span className="flex items-center gap-2">
-      Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+      Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle" />
     </span>
   ),
   description: "One-click authentication. No API keys, no technical setup required."
@@ -32,7 +32,7 @@ const STEPS: Step[] = [{
   title: "Deploy Instantly",
   description: (
     <span>
-      All segments auto-created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> in 30 seconds. No manual work.
+      All segments auto-created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-middle mx-1" /> in 30 seconds. No manual work.
     </span>
   )
 }, {
@@ -62,7 +62,7 @@ export const AnimatedSegmentVisual = () => {
         <div className="text-center mb-12 space-y-3">
           
           <h2 className="text-3xl lg:text-4xl font-bold flex items-center justify-center gap-2">
-            Powered by <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+            Powered by <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle" />
           </h2>
         </div>
 
