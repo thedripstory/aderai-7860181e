@@ -5,18 +5,20 @@ export function DashboardScreenMockup() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const element = document.getElementById('dashboard-mockup-section');
-      if (!element) return;
+      const section = document.getElementById('dashboard-screen-section');
+      if (!section) return;
 
-      const rect = element.getBoundingClientRect();
+      const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
-
-      // Progress from when section top is near bottom (85vh) to mid viewport (35vh)
-      const start = vh * 0.85;
-      const end = vh * 0.35;
-      const raw = (start - rect.top) / (start - end);
-      const progress = Math.max(0, Math.min(1, raw));
-
+      
+      // Animation starts when section top is 80vh from top, completes at 30vh
+      const startTrigger = vh * 0.8;
+      const endTrigger = vh * 0.3;
+      const range = startTrigger - endTrigger;
+      
+      const rawProgress = (startTrigger - rect.top) / range;
+      const progress = Math.max(0, Math.min(1, rawProgress));
+      
       setScrollProgress(progress);
     };
 
@@ -25,51 +27,47 @@ export function DashboardScreenMockup() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calculate transform: single-phase entry to flat center
-  const calculateTransform = () => {
-    // 0 => tilted/partially hidden, 1 => flat/centered/fully visible
-    const p = scrollProgress;
-    const rotateX = -16 * (1 - p);
-    const rotateZ = -3 * (1 - p);
-    const translateY = 8 * (1 - p); // percent
-    const scale = 0.9 + 0.1 * p;
-    const opacity = 0.1 + 0.9 * p;
+  // Smooth easing function
+  const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+  const easedProgress = easeOutCubic(scrollProgress);
 
-    return {
-      transform: `perspective(1400px) rotateX(${rotateX}deg) rotateZ(${rotateZ}deg) translateY(${translateY}%) scale(${scale})`,
-      opacity,
-      willChange: 'transform, opacity',
-    };
-  };
-
-  const style = calculateTransform();
+  // Transform: starts tilted back, becomes flat and centered
+  const rotateX = -20 * (1 - easedProgress);
+  const rotateY = -4 * (1 - easedProgress);
+  const scale = 0.85 + 0.15 * easedProgress;
+  const translateY = 12 * (1 - easedProgress);
+  const opacity = 0.15 + 0.85 * easedProgress;
 
   return (
     <section 
-      id="dashboard-mockup-section" 
-      className="relative h-[160vh] overflow-visible"
+      id="dashboard-screen-section" 
+      className="relative h-[140vh] overflow-visible mb-16"
     >
-      <div className="container mx-auto px-4 h-full">
-        <div className="sticky top-[22vh] z-10 flex items-center justify-center">
-          <div
-            className="w-full max-w-6xl transition-transform duration-200 ease-out"
-            style={style}
-          >
-            <div className="relative w-full aspect-[16/10] rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
-              {/* Placeholder for future dashboard screenshot */}
+      <div className="sticky top-[18vh] z-10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div
+              className="relative w-full aspect-[16/9.5] rounded-2xl overflow-hidden border border-border/60 bg-card shadow-2xl transition-all duration-300 ease-out"
+              style={{
+                transform: `perspective(1800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale}) translateY(${translateY}%)`,
+                opacity,
+                willChange: 'transform, opacity',
+              }}
+            >
+              {/* Placeholder image */}
               <img
                 src="/placeholder.svg"
-                alt="Product dashboard preview - Klaviyo segmentation tool"
-                loading="lazy"
+                alt="Aderai Dashboard - Klaviyo Segmentation Tool"
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
 
-              {/* Subtle glare using semantic token */}
-              <div className="absolute inset-0 bg-gradient-to-br from-foreground/5 via-transparent to-transparent pointer-events-none" />
+              {/* Subtle overlay gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-foreground/[0.02] via-transparent to-transparent pointer-events-none" />
 
-              {/* Screen edge highlights */}
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+              {/* Edge highlights */}
+              <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             </div>
           </div>
         </div>
