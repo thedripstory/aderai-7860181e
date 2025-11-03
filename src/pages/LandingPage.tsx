@@ -997,7 +997,7 @@ export default function LandingPage() {
                 <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
                   10,000+
                 </div>
-                <div className="text-sm text-muted-foreground">Happy Users</div>
+                <div className="text-sm text-muted-foreground">Happy Brands</div>
               </div>
               <div className="group">
                 <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
