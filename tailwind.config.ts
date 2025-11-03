@@ -131,6 +131,16 @@ export default {
             transform: "translateX(-50%)",
           },
         },
+        "glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 5px rgba(0, 0, 0, 0.1)",
+            borderColor: "black",
+          },
+          "50%": {
+            boxShadow: "0 0 30px rgba(249, 115, 22, 0.4), 0 0 60px rgba(249, 115, 22, 0.2)",
+            borderColor: "rgba(249, 115, 22, 0.5)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",

@@ -322,8 +322,8 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {/* Card 1 - VIP Reactivation */}
-            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:shadow-xl transition-all">
-              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black">
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 hover:scale-105 animate-[glow_8s_ease-in-out_infinite]">
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-300">
                 <div className="relative w-full space-y-3">
                   <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
                     <div className="flex items-center justify-between mb-2">
@@ -349,8 +349,8 @@ export default function LandingPage() {
             </div>
 
             {/* Card 2 - Browse Abandoners */}
-            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:shadow-xl transition-all">
-              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black">
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-600 hover:shadow-2xl hover:shadow-orange-600/50 transition-all duration-300 hover:scale-105 animate-[glow_8s_ease-in-out_infinite_2s]">
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-600 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-red-50 transition-all duration-300">
                 <div className="relative w-full space-y-3">
                   <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
                     <div className="flex items-center justify-between mb-2">
@@ -382,8 +382,8 @@ export default function LandingPage() {
             </div>
 
             {/* Card 3 - Category Champions */}
-            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:shadow-xl transition-all">
-              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black">
+            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 hover:scale-105 animate-[glow_8s_ease-in-out_infinite_4s]">
+              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-yellow-50 group-hover:to-orange-50 transition-all duration-300">
                 <div className="relative w-full space-y-3">
                   <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
                     <div className="flex items-center justify-between mb-2">
