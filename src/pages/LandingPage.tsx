@@ -413,7 +413,7 @@ export default function LandingPage() {
           </div>
 
           <div className="text-center">
-            <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-2xl text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3">
+            <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-full text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3">
               <span>Unlock All 70 Segments</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
