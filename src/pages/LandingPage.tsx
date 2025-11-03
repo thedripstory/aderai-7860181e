@@ -337,7 +337,7 @@ export default function LandingPage() {
                     <div className="text-xs text-muted-foreground mb-1">Suggested action</div>
                     <div className="text-sm font-semibold">Exclusive 20% VIP comeback</div>
                   </div>
-                  <div className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                  <div className="absolute -bottom-2 -right-2 bg-accent text-accent-foreground text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
                     Hidden gem
                   </div>
                 </div>
@@ -371,7 +371,7 @@ export default function LandingPage() {
                       <div className="text-[10px] text-muted-foreground">Avg order</div>
                     </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     Top performer
                   </div>
                 </div>
@@ -399,7 +399,7 @@ export default function LandingPage() {
                     <div className="text-xs text-muted-foreground mb-1">Cross-sell opportunity</div>
                     <div className="text-sm font-semibold">New arrivals + bundles</div>
                   </div>
-                  <div className="absolute -top-2 -right-2 bg-yellow-500 text-yellow-950 text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-yellow-500 text-yellow-950 text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     High intent
                   </div>
                 </div>
