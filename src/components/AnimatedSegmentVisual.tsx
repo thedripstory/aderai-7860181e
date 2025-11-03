@@ -62,7 +62,7 @@ export const AnimatedSegmentVisual = () => {
         <div className="text-center mb-12 space-y-3">
           
           <h2 className="text-3xl lg:text-4xl font-bold flex items-center justify-center gap-2">
-            Powered by <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" />
+            Powered by <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block relative top-[0.1em]" />
           </h2>
         </div>
 
