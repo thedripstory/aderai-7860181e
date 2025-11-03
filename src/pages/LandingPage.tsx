@@ -45,6 +45,10 @@ export default function LandingPage() {
               Pricing
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
             </a>
+            <a href="/affiliate" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
+              Become an Affiliate
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
           </nav>
 
           {/* CTA Buttons */}

@@ -12,14 +12,14 @@ export const EmailFooter = () => {
         </div>
         
         <div className="flex flex-wrap justify-center gap-6 mb-6 text-sm">
-          <a href="#" className="text-muted-foreground hover:text-foreground transition">
-            Features
+          <a href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition">
+            How it works
           </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition">
+          <a href="/#pricing" className="text-muted-foreground hover:text-foreground transition">
             Pricing
           </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition">
-            Support
+          <a href="/affiliate" className="text-muted-foreground hover:text-foreground transition">
+            Become an Affiliate
           </a>
           <a href="#" className="text-muted-foreground hover:text-foreground transition">
             Contact
