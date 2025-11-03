@@ -144,18 +144,21 @@ export const EnergyFlowAnimation = () => {
         style={{ mixBlendMode: "screen" }}
       />
       
-      {/* Energy entering right card - subtle glow */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-32 h-48">
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-20 h-32 bg-gradient-to-l from-primary/20 via-accent/10 to-transparent rounded-l-full blur-xl animate-pulse" />
-        {/* Subtle sparkles entering */}
+      {/* Energy entering right card - subtle glow on left edge */}
+      <div className="absolute right-1/2 top-1/2 -translate-y-1/2 translate-x-3 w-32 h-48">
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-40 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent rounded-r-full blur-2xl animate-pulse" 
+          style={{ animationDuration: "3s" }} 
+        />
+        {/* Subtle sparkles entering left edge of right card */}
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="absolute right-4 w-1 h-1 bg-primary rounded-full animate-pulse"
+            className="absolute left-2 w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse"
             style={{
-              top: `${40 + i * 20}%`,
-              animationDelay: `${i * 0.3}s`,
-              boxShadow: "0 0 6px hsl(var(--primary))",
+              top: `${35 + i * 15}%`,
+              animationDelay: `${i * 0.4}s`,
+              animationDuration: "2s",
+              boxShadow: "0 0 8px hsl(var(--primary) / 0.6)",
             }}
           />
         ))}
