@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         'playfair': ['Playfair Display', 'serif'],
+        'bad-script': ['Bad Script', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",
