@@ -62,7 +62,7 @@ export const ScrollSteps = () => {
       <div className="grid lg:grid-cols-5 gap-12 items-start">
         {/* Left – single sticky number + line */}
         <div className="hidden lg:block lg:col-span-2">
-          <div className="sticky top-28">
+          <div className="sticky top-1/4 h-screen flex items-center">
             <div className="flex items-start gap-6">
               <div className="leading-none select-none">
                 <div className="text-[120px] font-bold bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
@@ -70,7 +70,7 @@ export const ScrollSteps = () => {
                 </div>
               </div>
               <div className="relative mt-6">
-                <div className="w-[3px] h-[70vh] rounded-full bg-gradient-to-b from-primary via-accent to-primary" />
+                <div className="w-[3px] h-[400px] rounded-full bg-gradient-to-b from-primary via-accent to-primary" />
               </div>
             </div>
           </div>
