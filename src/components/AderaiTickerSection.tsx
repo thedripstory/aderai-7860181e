@@ -3,154 +3,120 @@ import { Users, CheckCircle2, Briefcase, Zap } from 'lucide-react';
 
 const AderaiTickerSection = () => {
   const problems = [
-    { text: "manual segmentation", style: "gray" },
-    { text: "wasted agency fees", style: "gradient-orange" },
-    { text: "complex Boolean logic", style: "gray" },
-    { text: "10+ hours of work", style: "gradient-purple" },
-    { text: "scattered segments", style: "gray" },
-    { text: "missed revenue", style: "gradient-orange" },
-    { text: "debugging nightmares", style: "gray" }
+    { text: "manual segmentation", color: "muted" },
+    { text: "wasted agency fees", color: "orange" },
+    { text: "complex Boolean logic", color: "muted" },
+    { text: "10+ hours of work", color: "purple" },
+    { text: "scattered segments", color: "muted" },
+    { text: "missed revenue", color: "orange" },
+    { text: "debugging nightmares", color: "muted" }
   ];
 
-  const getTextStyle = (style: string) => {
-    switch(style) {
-      case "gradient-orange":
-        return "bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent";
-      case "gradient-purple":
-        return "bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent";
-      default:
-        return "text-muted-foreground";
-    }
+  const getColorClass = (color: string) => {
+    if (color === "orange") return "text-orange-500";
+    if (color === "purple") return "text-purple-600";
+    return "text-muted-foreground";
   };
 
   return (
-    <section className="relative w-full py-20 px-6 bg-muted/30 overflow-hidden">
+    <section className="relative w-full py-16 px-6 bg-muted/20 overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        {/* Main Content - Flex Layout */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-12 lg:gap-20 mb-20">
-          {/* Left: Heading with Star Decoration */}
+        {/* Main Content */}
+        <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-16 mb-16">
+          {/* Left: Heading */}
           <div className="relative flex-shrink-0">
-            {/* Decorative Star Icon */}
-            <div className="absolute -left-3 -top-3 w-6 h-6 text-primary">
+            {/* Star decoration */}
+            <div className="absolute -left-2 -top-2 w-5 h-5 text-orange-500">
               <svg viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12.5 0L14.5 10.5L25 13L14.5 15.5L12.5 26L10.5 15.5L0 13L10.5 10.5L12.5 0Z" fill="currentColor"/>
               </svg>
             </div>
             
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground">
               Wave goodbye to
             </h2>
 
-            {/* Decorative Arrow - Desktop Only */}
-            <div className="hidden lg:block absolute -right-32 top-8 w-[140px] h-[100px] pointer-events-none">
-              <svg viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            {/* Curved arrow */}
+            <div className="hidden lg:block absolute -right-28 top-6 w-32 h-20 pointer-events-none opacity-60">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                 <path 
-                  d="M10 15 Q 60 -5, 110 25 L 105 35 M 110 25 L 100 28" 
-                  stroke="url(#arrowGradient)" 
-                  strokeWidth="3" 
+                  d="M5 10 Q 50 -5, 95 20 L 90 28 M 95 20 L 87 23" 
+                  stroke="#f97316" 
+                  strokeWidth="2.5" 
                   fill="none" 
                   strokeLinecap="round"
-                  strokeLinejoin="round"
                 />
-                <defs>
-                  <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" />
-                    <stop offset="100%" stopColor="hsl(var(--accent))" />
-                  </linearGradient>
-                </defs>
               </svg>
             </div>
           </div>
 
-          {/* Right: Ticker Animation */}
+          {/* Right: Ticker */}
           <div className="flex-1 w-full">
-            <div className="relative h-[300px] md:h-[320px]">
-              {/* Top Fade */}
-              <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-muted/30 to-transparent z-10 pointer-events-none" />
+            <div className="relative h-[280px]">
+              {/* Gradient fades */}
+              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-muted/20 to-transparent z-10" />
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-muted/20 to-transparent z-10" />
               
-              {/* Ticker Content */}
-              <div 
-                className="absolute inset-0 flex flex-col gap-3 overflow-hidden"
-                style={{
-                  maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)',
-                  WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)'
-                }}
-              >
+              {/* Scrolling content */}
+              <div className="absolute inset-0 overflow-hidden">
                 <div 
-                  className="flex flex-col gap-3 hover:[animation-play-state:paused]"
-                  style={{
-                    animation: 'tickerScroll 18s linear infinite'
-                  }}
+                  className="flex flex-col gap-2"
+                  style={{ animation: 'tickerScroll 16s linear infinite' }}
                 >
-                  {/* Triple the items for seamless loop */}
-                  {[...problems, ...problems, ...problems].map((problem, index) => (
-                    <div 
-                      key={index}
-                      className="flex-shrink-0 h-[60px] flex items-center"
-                    >
-                      <h3 className={`text-4xl md:text-5xl lg:text-6xl font-bold ${getTextStyle(problem.style)}`}>
+                  {[...problems, ...problems, ...problems].map((problem, idx) => (
+                    <div key={idx} className="h-[56px] flex items-center">
+                      <h3 className={`text-4xl md:text-5xl lg:text-6xl font-bold ${getColorClass(problem.color)}`}>
                         {problem.text}
                       </h3>
                     </div>
                   ))}
                 </div>
               </div>
-
-              {/* Bottom Fade */}
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-muted/30 to-transparent z-10 pointer-events-none" />
             </div>
           </div>
         </div>
 
         {/* Stats Bar */}
-        <div className="border-t border-border pt-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="group">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Users className="w-6 h-6 text-primary" />
+        <div className="border-t border-border/40 pt-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <div className="flex justify-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary" />
                 </div>
               </div>
-              <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-                10,000+
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">Brands Using Aderai</div>
+              <div className="text-3xl font-bold text-foreground mb-1">10,000+</div>
+              <div className="text-xs text-muted-foreground">Brands Using Aderai</div>
             </div>
 
-            <div className="group">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <CheckCircle2 className="w-6 h-6 text-orange-500" />
+            <div>
+              <div className="flex justify-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 text-orange-500" />
                 </div>
               </div>
-              <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2">
-                70+
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">Pre-built Segments</div>
+              <div className="text-3xl font-bold text-foreground mb-1">70+</div>
+              <div className="text-xs text-muted-foreground">Pre-built Segments</div>
             </div>
 
-            <div className="group">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Briefcase className="w-6 h-6 text-primary" />
+            <div>
+              <div className="flex justify-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-primary" />
                 </div>
               </div>
-              <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-                99%
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">Time Saved</div>
+              <div className="text-3xl font-bold text-foreground mb-1">99%</div>
+              <div className="text-xs text-muted-foreground">Time Saved</div>
             </div>
 
-            <div className="group">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Zap className="w-6 h-6 text-orange-500" />
+            <div>
+              <div className="flex justify-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-orange-500" />
                 </div>
               </div>
-              <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2">
-                4.8★
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">Average Rating</div>
+              <div className="text-3xl font-bold text-foreground mb-1">4.8★</div>
+              <div className="text-xs text-muted-foreground">Average Rating</div>
             </div>
           </div>
         </div>
@@ -158,12 +124,8 @@ const AderaiTickerSection = () => {
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes tickerScroll {
-          0% {
-            transform: translateY(0);
-          }
-          100% {
-            transform: translateY(-${problems.length * 63}px);
-          }
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-${problems.length * 58}px); }
         }
       `}} />
     </section>
