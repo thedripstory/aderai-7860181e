@@ -12,7 +12,6 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
-import { EnergyFlowAnimation } from "@/components/EnergyFlowAnimation";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -94,7 +93,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                Works directly with <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-baseline -mb-0.5" />
+                Works directly with <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-middle" />
               </span>
             </div>
           </div>
@@ -116,7 +115,7 @@ export default function LandingPage() {
 
             <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium text-center">
               Instantly Create 70+ segments, with one click- straight inside{" "}
-              <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5 ml-1" />
+              <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle ml-1" />
             </p>
 
             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -153,12 +152,7 @@ export default function LandingPage() {
 
           {/* Interactive Comparison Cards */}
           <div className="relative max-w-5xl mx-auto mb-24">
-            {/* Energy Flow Animation */}
-            <div className="absolute inset-0 -z-10">
-              <EnergyFlowAnimation />
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6 relative z-10">
+            <div className="grid md:grid-cols-2 gap-6">
               {/* Before Card */}
               <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/5 rounded-full blur-2xl" />
@@ -229,10 +223,11 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Arrow Connection - Top Center */}
-              <div className="hidden md:flex absolute -top-8 left-1/2 -translate-x-1/2 z-10 items-center gap-2 bg-background/95 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-2 shadow-lg">
-                <span className="text-xs font-semibold text-primary uppercase tracking-wider">Saving Time</span>
-                <ArrowRight className="w-4 h-4 text-primary" />
+              {/* Arrow Connection */}
+              <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                <div className="bg-background border-2 border-primary rounded-full p-4 shadow-xl">
+                  <ArrowRight className="w-8 h-8 text-primary animate-pulse" />
+                </div>
               </div>
             </div>
 
@@ -275,7 +270,7 @@ export default function LandingPage() {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-1">
-                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-baseline -mb-0.5" /> Official API Partner
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-middle" /> Official API Partner
                 </span>
               </div>
 
@@ -286,7 +281,7 @@ export default function LandingPage() {
 
                 <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
                   With official API integration, Aderai deploys high-impact audience segments directly into your{" "}
-                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5 mx-1" />
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle mx-1" />
                   {" "}account, instantly.
                 </p>
               </div>
@@ -323,7 +318,7 @@ export default function LandingPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Instant Deployment</h3>
                     <p className="text-muted-foreground text-sm">
-                      Push segments to <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-baseline -mb-0.5 mx-1" /> with one click - no manual work
+                      Push segments to <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-middle mx-1" /> with one click - no manual work
                     </p>
                   </div>
                 </div>
@@ -360,12 +355,12 @@ export default function LandingPage() {
                 step: "01",
                 title: (
                   <span className="flex items-center gap-2">
-                    Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" />
+                    Connect <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle" />
                   </span>
                 ),
                 description: (
                   <span>
-                    Add your <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-baseline -mb-0.5 mx-1" /> API key. Instant validation. Secure connection.
+                    Add your <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-middle mx-1" /> API key. Instant validation. Secure connection.
                   </span>
                 ),
               },
@@ -384,7 +379,7 @@ export default function LandingPage() {
                 title: "Deploy instantly",
                 description: (
                   <span>
-                    One click. All segments created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-baseline -mb-0.5 mx-1" />. Ready to use in campaigns.
+                    One click. All segments created in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-middle mx-1" />. Ready to use in campaigns.
                   </span>
                 ),
               },
@@ -577,7 +572,7 @@ export default function LandingPage() {
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-sm flex items-center gap-1">
-                    1 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" /> account
+                    1 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle" /> account
                   </span>
                 </li>
               </ul>
@@ -606,7 +601,7 @@ export default function LandingPage() {
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-sm flex items-center gap-1">
-                    2 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" /> accounts
+                    2 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle" /> accounts
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -639,7 +634,7 @@ export default function LandingPage() {
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-sm flex items-center gap-1">
-                    5 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" /> accounts
+                    5 <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle" /> accounts
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -673,7 +668,7 @@ export default function LandingPage() {
               <p className="text-sm text-muted-foreground flex flex-col items-start gap-1">
                 <span>AI-powered segmentation</span>
                 <span className="flex items-center gap-1">
-                  for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-baseline -mb-0.5" />
+                  for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-middle" />
                 </span>
               </p>
             </div>
