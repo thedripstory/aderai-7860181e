@@ -15,7 +15,6 @@ import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [pricingView, setPricingView] = useState<"brands" | "agencies">("brands");
-  
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -52,10 +51,7 @@ export default function LandingPage() {
             <a href="/login" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium hidden sm:block">
               Log in
             </a>
-            <button 
-              onClick={handleGetStarted} 
-              className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-base font-semibold hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary/30"
-            >
+            <button onClick={handleGetStarted} className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-base font-semibold hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary/30">
               Sign up
             </button>
           </div>
@@ -514,8 +510,12 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full shadow-sm">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
-                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{
+                animationDelay: '0.5s'
+              }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{
+                animationDelay: '1s'
+              }} />
               </div>
             </div>
             
@@ -579,7 +579,9 @@ export default function LandingPage() {
       <section id="pricing" className="py-24 px-6 bg-gradient-to-br from-muted via-background to-muted relative overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute top-20 left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{
+        animationDelay: "1s"
+      }} />
         
         <div className="max-w-6xl mx-auto relative">
           {/* Header */}
@@ -595,40 +597,22 @@ export default function LandingPage() {
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               <AnimatedUnderline delay="0.2s">Pay once</AnimatedUnderline>. Use forever.{" "}
-              <strong className="text-foreground">24x7 customer support.</strong>
+              <strong className="text-foreground">Native Klaviyo Integration.</strong>
             </p>
           </div>
 
           {/* Toggle Buttons */}
           <div className="flex justify-center mb-16">
             <div className="inline-flex items-center gap-2 p-2 bg-muted/50 backdrop-blur-sm rounded-full border border-border shadow-xl">
-              <button
-                onClick={() => setPricingView("brands")}
-                className={`group relative px-8 py-3 rounded-full font-semibold text-base transition-all duration-300 ${
-                  pricingView === "brands"
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:scale-105"
-                }`}
-              >
-                {pricingView === "brands" && (
-                  <div className="absolute inset-0 bg-primary rounded-full animate-pulse" />
-                )}
+              <button onClick={() => setPricingView("brands")} className={`group relative px-8 py-3 rounded-full font-semibold text-base transition-all duration-300 ${pricingView === "brands" ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105" : "text-muted-foreground hover:text-foreground hover:scale-105"}`}>
+                {pricingView === "brands" && <div className="absolute inset-0 bg-primary rounded-full animate-pulse" />}
                 <span className="relative z-10 flex items-center gap-2">
                   <Building2 className="w-4 h-4" />
                   Brands
                 </span>
               </button>
-              <button
-                onClick={() => setPricingView("agencies")}
-                className={`group relative px-8 py-3 rounded-full font-semibold text-base transition-all duration-300 ${
-                  pricingView === "agencies"
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:scale-105"
-                }`}
-              >
-                {pricingView === "agencies" && (
-                  <div className="absolute inset-0 bg-primary rounded-full animate-pulse" />
-                )}
+              <button onClick={() => setPricingView("agencies")} className={`group relative px-8 py-3 rounded-full font-semibold text-base transition-all duration-300 ${pricingView === "agencies" ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105" : "text-muted-foreground hover:text-foreground hover:scale-105"}`}>
+                {pricingView === "agencies" && <div className="absolute inset-0 bg-primary rounded-full animate-pulse" />}
                 <span className="relative z-10 flex items-center gap-2">
                   <Users className="w-4 h-4" />
                   Agencies
@@ -640,8 +624,7 @@ export default function LandingPage() {
           {/* Pricing Cards */}
           <div className="relative">
             {/* Brands View - Single Card */}
-            {pricingView === "brands" && (
-              <div className="flex justify-center animate-fade-in">
+            {pricingView === "brands" && <div className="flex justify-center animate-fade-in">
                 <div className="w-full max-w-4xl group">
                   <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-500">
                     
@@ -672,12 +655,9 @@ export default function LandingPage() {
                           </div>
                           
                           {/* CTA Button */}
-                          <button
-                            onClick={handleGetStarted}
-                            className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-3.5 rounded-full font-bold text-base hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50"
-                          >
+                          <button onClick={handleGetStarted} className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-3.5 rounded-full font-bold text-base hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50">
                             <span className="relative z-10 flex items-center justify-center gap-2">
-                              Activate Aderai Now
+                              Get started now
                               <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                             </span>
                           </button>
@@ -694,42 +674,62 @@ export default function LandingPage() {
                         {/* Right: Features */}
                         <div className="pl-0 md:pl-2">
                           <ul className="grid grid-cols-2 gap-x-8 gap-y-3">
-                            {[
-                              { icon: CheckCircle, text: "70 pre-built segments" },
-                              { icon: Sparkles, text: "AI segment suggester" },
-                              { icon: BarChart3, text: "Advanced analytics" },
-                              { icon: Zap, text: "One-click deployment" },
-                              { icon: Clock, text: "Real-time sync" },
-                              { icon: MousePointerClick, text: "Segment templates" },
-                              { icon: CheckCircle2, text: "Performance tracking" },
-                              { icon: ArrowRight, text: "Export capabilities" },
-                              { icon: Sparkles, text: "Email notifications" },
-                              { icon: CheckCircle, text: "Custom fields" },
-                              { icon: CheckCircle, text: "1 Klaviyo account" },
-                              { icon: Zap, text: "Priority email support" },
-                            ].map((feature, i) => (
-                              <li
-                                key={i}
-                                className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300"
-                              >
+                            {[{
+                          icon: CheckCircle,
+                          text: "70 pre-built segments"
+                        }, {
+                          icon: Sparkles,
+                          text: "AI segment suggester"
+                        }, {
+                          icon: BarChart3,
+                          text: "Advanced analytics"
+                        }, {
+                          icon: Zap,
+                          text: "One-click deployment"
+                        }, {
+                          icon: Clock,
+                          text: "Real-time sync"
+                        }, {
+                          icon: MousePointerClick,
+                          text: "Segment templates"
+                        }, {
+                          icon: CheckCircle2,
+                          text: "Performance tracking"
+                        }, {
+                          icon: ArrowRight,
+                          text: "Export capabilities"
+                        }, {
+                          icon: Sparkles,
+                          text: "Email notifications"
+                        }, {
+                          icon: CheckCircle,
+                          text: "Custom fields"
+                        }].map((feature, i) => <li key={i} className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300">
                                 <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300 flex-shrink-0">
                                   <feature.icon className="w-3.5 h-3.5 text-primary" />
                                 </div>
                                 <span className="text-sm">{feature.text}</span>
-                              </li>
-                            ))}
+                              </li>)}
+                            <li className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300">
+                              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300 flex-shrink-0">
+                                <CheckCircle className="w-3.5 h-3.5 text-primary" />
+                              </div>
+                              <span className="text-sm flex items-end gap-1.5">
+                                1{" "}
+                                <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.95em] inline-block" />{" "}
+                                account
+                              </span>
+                            </li>
                           </ul>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
 
             {/* Agencies View - Three Cards */}
-            {pricingView === "agencies" && (
-              <div className="grid md:grid-cols-3 gap-6 animate-fade-in">
+            {pricingView === "agencies" && <div className="grid md:grid-cols-3 gap-6 animate-fade-in">
                 {/* Starter Agency */}
                 <div className="group relative">
                   <div className="bg-card rounded-3xl border border-border p-6 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
@@ -752,11 +752,7 @@ export default function LandingPage() {
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
                         <span className="text-xs flex items-end gap-1">
                           2{" "}
-                          <img
-                            src={klaviyoLogo}
-                            alt="Klaviyo"
-                            className="h-[0.95em] inline-block"
-                          />{" "}
+                          <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.95em] inline-block" />{" "}
                           accounts
                         </span>
                       </li>
@@ -770,10 +766,7 @@ export default function LandingPage() {
                       </li>
                     </ul>
 
-                    <button
-                      onClick={handleGetStarted}
-                      className="w-full bg-transparent border-2 border-foreground text-foreground py-2.5 rounded-full text-sm font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300"
-                    >
+                    <button onClick={handleGetStarted} className="w-full bg-transparent border-2 border-foreground text-foreground py-2.5 rounded-full text-sm font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300">
                       Get started
                     </button>
                   </div>
@@ -813,11 +806,7 @@ export default function LandingPage() {
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
                         <span className="text-xs flex items-end gap-1">
                           5{" "}
-                          <img
-                            src={klaviyoLogo}
-                            alt="Klaviyo"
-                            className="h-[0.95em] inline-block"
-                          />{" "}
+                          <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.95em] inline-block" />{" "}
                           accounts
                         </span>
                       </li>
@@ -835,10 +824,7 @@ export default function LandingPage() {
                       </li>
                     </ul>
 
-                    <button
-                      onClick={handleGetStarted}
-                      className="group/btn w-full relative bg-gradient-to-r from-primary to-accent text-primary-foreground py-2.5 rounded-full text-sm font-bold hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden"
-                    >
+                    <button onClick={handleGetStarted} className="group/btn w-full relative bg-gradient-to-r from-primary to-accent text-primary-foreground py-2.5 rounded-full text-sm font-bold hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
                       <span className="relative z-10">Get started</span>
                     </button>
@@ -867,11 +853,7 @@ export default function LandingPage() {
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
                         <span className="text-xs flex items-end gap-1">
                           10+{" "}
-                          <img
-                            src={klaviyoLogo}
-                            alt="Klaviyo"
-                            className="h-[0.95em] inline-block"
-                          />{" "}
+                          <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.95em] inline-block" />{" "}
                           accounts
                         </span>
                       </li>
@@ -893,16 +875,12 @@ export default function LandingPage() {
                       </li>
                     </ul>
 
-                    <button
-                      onClick={handleGetStarted}
-                      className="w-full bg-transparent border-2 border-foreground text-foreground py-2.5 rounded-full text-sm font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300"
-                    >
+                    <button onClick={handleGetStarted} className="w-full bg-transparent border-2 border-foreground text-foreground py-2.5 rounded-full text-sm font-semibold hover:bg-foreground hover:text-background hover:scale-105 transition-all duration-300">
                       Get started
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
 
           {/* Bottom Trust Section */}
