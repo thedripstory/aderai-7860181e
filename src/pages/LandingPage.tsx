@@ -494,9 +494,9 @@ export default function LandingPage() {
         
         {/* Radiating Energy Rings */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="absolute w-32 h-32 rounded-full border-2 border-primary/30 animate-[ping_3s_ease-out_infinite]" />
-          <div className="absolute w-32 h-32 rounded-full border-2 border-accent/30 animate-[ping_3s_ease-out_infinite_1s]" />
-          <div className="absolute w-32 h-32 rounded-full border-2 border-primary/20 animate-[ping_3s_ease-out_infinite_2s]" />
+          <div className="absolute w-20 h-20 rounded-full border-2 border-primary/30 animate-[ping_2s_ease-out_infinite]" />
+          <div className="absolute w-20 h-20 rounded-full border-2 border-accent/30 animate-[ping_2s_ease-out_infinite_0.7s]" />
+          <div className="absolute w-20 h-20 rounded-full border-2 border-primary/20 animate-[ping_2s_ease-out_infinite_1.4s]" />
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
