@@ -699,6 +699,12 @@ export default function LandingPage() {
                               { icon: Sparkles, text: "AI segment suggester" },
                               { icon: BarChart3, text: "Advanced analytics" },
                               { icon: Zap, text: "One-click deployment" },
+                              { icon: Clock, text: "Real-time sync" },
+                              { icon: MousePointerClick, text: "Segment templates" },
+                              { icon: CheckCircle2, text: "Performance tracking" },
+                              { icon: ArrowRight, text: "Export capabilities" },
+                              { icon: Sparkles, text: "Email notifications" },
+                              { icon: CheckCircle, text: "Custom fields" },
                             ].map((feature, i) => (
                               <li
                                 key={i}
