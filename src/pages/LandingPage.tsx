@@ -528,11 +528,11 @@ export default function LandingPage() {
             </div>
 
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              Real results from real brands
+              Success Stories that <span className="text-[#ff6b6b] italic font-bold">Inspire</span>
             </h2>
 
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              See how marketing teams are using Aderai to drive exponential growth with expert-grade segmentation
+              Discover how brands and agencies achieve results.
             </p>
           </div>
 
