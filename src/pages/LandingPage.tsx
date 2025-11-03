@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X } from "lucide-react";
+import klaviyoLogo from "@/assets/klaviyo-logo.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
@@ -110,8 +111,9 @@ export default function LandingPage() {
               <span className="text-accent block my-4">$50M brand.</span>
             </h1>
 
-            <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium">
-              Instantly Create 70+ segments, with one click- straight inside Klaviyo.
+            <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium flex items-center justify-center flex-wrap gap-2">
+              <span>Instantly Create 70+ segments, with one click- straight inside</span>
+              <img src={klaviyoLogo} alt="Klaviyo" className="h-8 md:h-10 inline-block" />
             </p>
 
             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
