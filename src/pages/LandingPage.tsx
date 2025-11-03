@@ -143,7 +143,7 @@ export default function LandingPage() {
               className="group relative bg-primary text-primary-foreground px-10 py-5 rounded-full text-lg font-bold transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-primary/20 flex items-center gap-3 overflow-hidden"
             >
               {/* White fill that expands from the arrow circle */}
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 bg-background rounded-full scale-0 group-hover:scale-[20] origin-center" 
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 bg-background rounded-full scale-100 group-hover:scale-[20] origin-center" 
                 style={{ transition: 'transform 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)' }} />
               
               <span className="relative z-10 group-hover:text-orange-500"
