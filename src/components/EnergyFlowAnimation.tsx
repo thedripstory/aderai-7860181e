@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { ArrowRight } from "lucide-react";
 
 export const EnergyFlowAnimation = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -144,31 +143,6 @@ export const EnergyFlowAnimation = () => {
         style={{ mixBlendMode: "screen" }}
       />
       
-      {/* Energy entering right card - subtle glow on left edge */}
-      <div
-        className="absolute top-1/2 -translate-y-1/2 w-24 h-48 pointer-events-none"
-        style={{ left: "calc(50% + 12px)" }}
-      >
-        <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-40 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent rounded-r-full blur-2xl animate-pulse"
-          style={{ animationDuration: "3s" }}
-        />
-        {/* Subtle sparkles entering left edge of right card */}
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="absolute w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse"
-            style={{
-              left: "6px",
-              top: `${35 + i * 15}%`,
-              animationDelay: `${i * 0.4}s`,
-              animationDuration: "2s",
-              boxShadow: "0 0 8px hsl(var(--primary) / 0.6)",
-            }}
-          />
-        ))}
-      </div>
-      
       {/* Central energy core - simplified */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="relative w-10 h-10">
@@ -186,11 +160,6 @@ export const EnergyFlowAnimation = () => {
           
           {/* Core orb */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/40 to-accent/40 animate-pulse shadow-[0_0_20px_rgba(139,92,246,0.3)]" />
-          
-          {/* Arrow indicating direction */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <ArrowRight className="w-4 h-4 text-white animate-pulse" strokeWidth={3} />
-          </div>
         </div>
       </div>
     </div>
