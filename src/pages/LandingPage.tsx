@@ -649,7 +649,7 @@ export default function LandingPage() {
                     
                     {/* Badge */}
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <div className="px-6 py-1.5 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 rounded-full shadow-lg animate-pulse">
+                      <div className="px-6 py-1.5 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 rounded-full shadow-lg">
                         <span className="text-xs font-bold text-white uppercase tracking-wide flex items-center gap-2">
                           <Star className="w-3.5 h-3.5 fill-white" />
                           Most Popular
