@@ -935,7 +935,7 @@ export default function LandingPage() {
                     <div className="relative bg-white dark:bg-card rounded-3xl p-8 border-2 border-gray-200 dark:border-border hover:border-primary/60 transition-all duration-300 hover:scale-105 hover:-translate-y-2 shadow-lg">
                       {/* Icon */}
                       <div className="relative mb-6 inline-block">
-                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
+                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
                           <Zap className="w-8 h-8 text-white" />
                         </div>
                       </div>
@@ -963,7 +963,7 @@ export default function LandingPage() {
                       
                       {/* Icon */}
                       <div className="relative mb-6 inline-block mt-4">
-                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-accent/50 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
+                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
                           <BarChart3 className="w-8 h-8 text-white" />
                         </div>
                       </div>
