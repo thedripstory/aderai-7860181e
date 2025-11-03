@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { ArrowRight } from "lucide-react";
 
 export const EnergyFlowAnimation = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -160,6 +161,11 @@ export const EnergyFlowAnimation = () => {
           
           {/* Core orb */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/40 to-accent/40 animate-pulse shadow-[0_0_20px_rgba(139,92,246,0.3)]" />
+          
+          {/* Arrow indicating direction */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <ArrowRight className="w-4 h-4 text-white animate-pulse" strokeWidth={3} />
+          </div>
         </div>
       </div>
     </div>
