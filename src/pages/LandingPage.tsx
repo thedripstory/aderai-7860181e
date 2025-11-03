@@ -12,6 +12,7 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
+import { EnergyFlowAnimation } from "@/components/EnergyFlowAnimation";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -152,7 +153,12 @@ export default function LandingPage() {
 
           {/* Interactive Comparison Cards */}
           <div className="relative max-w-5xl mx-auto mb-24">
-            <div className="grid md:grid-cols-2 gap-6">
+            {/* Energy Flow Animation */}
+            <div className="absolute inset-0 -z-10">
+              <EnergyFlowAnimation />
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6 relative z-10">
               {/* Before Card */}
               <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/5 rounded-full blur-2xl" />
