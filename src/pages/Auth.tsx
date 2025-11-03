@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Building2, Users, Sparkles, Zap } from "lucide-react";
+import { Building2, Users, ArrowRight } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { supabase } from "@/integrations/supabase/client";
@@ -174,108 +174,142 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
   // Choice View
   if (authView === "choice") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        {/* Futuristic background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        
-        <div className="w-full max-w-lg relative z-10">
-          <div className="text-center mb-12">
-            {/* Futuristic aderai 10x Logo */}
-            <div className="relative inline-block mb-6 group">
-              {/* Glow effect behind logo */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500 animate-pulse" />
-              
-              {/* Logo container with glass effect */}
-              <div className="relative bg-background/80 backdrop-blur-xl border-2 border-primary/30 rounded-3xl p-6 shadow-2xl hover:shadow-primary/20 transition-all duration-500 hover:scale-105">
-                <div className="text-5xl font-playfair font-bold mb-2 animate-fade-in">
-                  aderai<span className="text-accent">.</span>
-                </div>
-                
-                {/* 10x Badge with special effects */}
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-md opacity-50" />
-                  <div className="relative flex items-center justify-center gap-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                    <Zap className="w-5 h-5 text-primary animate-pulse" />
-                    <span className="text-4xl font-black tracking-wider">10X</span>
-                    <Sparkles className="w-5 h-5 text-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
-                  </div>
-                </div>
-                
-                {/* Subtitle with glow */}
-                <p className="text-sm font-semibold mt-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-fade-in">
-                  Next-Gen Segmentation Platform
-                </p>
-              </div>
-              
-              {/* Orbiting particles */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary animate-[spin_3s_linear_infinite]" style={{ transformOrigin: '0 80px' }} />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-accent animate-[spin_4s_linear_infinite_reverse]" style={{ transformOrigin: '0 80px', animationDelay: '1.5s' }} />
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-6">
+        <div className="w-full max-w-4xl">
+          {/* Elegant Header */}
+          <div className="text-center mb-16 animate-fade-in">
+            <div className="inline-block mb-6">
+              <h1 className="text-6xl md:text-7xl font-playfair font-bold tracking-tight">
+                aderai<span className="text-primary">.</span>
+              </h1>
+              <div className="h-1 w-full bg-gradient-to-r from-transparent via-primary to-transparent mt-2 opacity-30" />
             </div>
-
-            <p className="text-muted-foreground text-xl mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Choose your account type
+            <p className="text-xl text-muted-foreground font-light max-w-md mx-auto">
+              AI-powered segmentation for modern marketers
             </p>
+            
             {referralCode && (
-              <div className="inline-block bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <p className="text-sm text-primary font-semibold">
+              <div className="mt-6 inline-block bg-primary/10 border border-primary/20 rounded-full px-6 py-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <p className="text-sm text-primary font-medium">
                   🎁 Referred by: {referralCode}
                 </p>
               </div>
             )}
-            <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              <PoweredByBadge />
-            </div>
           </div>
 
-          <div className="grid gap-6">
+          {/* Account Type Selection */}
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {/* Brand Account */}
             <button
               onClick={() => setAuthView("brand-signup")}
-              className="bg-card border-2 border-primary rounded-2xl p-8 hover:shadow-lg transition text-left group"
+              className="group relative bg-card/50 backdrop-blur-sm border-2 border-border hover:border-primary rounded-3xl p-10 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 text-left animate-fade-in"
+              style={{ animationDelay: '0.1s' }}
             >
-              <div className="flex items-start justify-between mb-4">
-                <Building2 className="w-10 h-10 text-primary" />
-                <span className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full font-semibold">
+              <div className="absolute top-6 right-6">
+                <span className="text-xs bg-primary/10 text-primary px-4 py-1.5 rounded-full font-semibold">
                   MOST POPULAR
                 </span>
               </div>
-              <h3 className="text-2xl font-bold mb-2">Brand</h3>
-              <p className="text-muted-foreground mb-4">Perfect for single brands and businesses</p>
-              <div className="text-3xl font-bold mb-4">
-                <CircleDoodle>$49</CircleDoodle>
-                <span className="text-base text-muted-foreground font-normal">/one-time</span>
+              
+              <div className="mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Building2 className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-3xl font-bold mb-2">Brand</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Perfect for single brands looking to elevate their email marketing strategy
+                </p>
               </div>
-              <div className="text-sm text-muted-foreground">• 70 segments • AI suggester • Analytics</div>
+
+              <div className="mb-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-bold">$49</span>
+                  <span className="text-muted-foreground">/one-time</span>
+                </div>
+              </div>
+
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
+                  70 pre-built segments
+                </li>
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
+                  AI segment suggester
+                </li>
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
+                  Advanced analytics
+                </li>
+              </ul>
+
+              <div className="flex items-center text-primary font-semibold group-hover:gap-3 gap-2 transition-all">
+                Get Started <ArrowRight className="w-4 h-4" />
+              </div>
             </button>
 
+            {/* Agency Account */}
             <button
               onClick={() => setAuthView("agency-signup")}
-              className="bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition text-left group"
+              className="group relative bg-card/50 backdrop-blur-sm border-2 border-border hover:border-accent rounded-3xl p-10 transition-all duration-300 hover:shadow-2xl hover:shadow-accent/10 hover:-translate-y-1 text-left animate-fade-in"
+              style={{ animationDelay: '0.2s' }}
             >
-              <div className="flex items-start justify-between mb-4">
-                <Users className="w-10 h-10 text-accent" />
+              <div className="mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Users className="w-7 h-7 text-accent" />
+                </div>
+                <h3 className="text-3xl font-bold mb-2">Agency</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Manage multiple clients effortlessly with our agency plan
+                </p>
               </div>
-              <h3 className="text-2xl font-bold mb-2">Agency</h3>
-              <p className="text-muted-foreground mb-4">Manage multiple clients effortlessly</p>
-              <div className="text-3xl font-bold mb-4">
-                $89<span className="text-base text-muted-foreground font-normal">/month</span>
+
+              <div className="mb-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-bold">$89</span>
+                  <span className="text-muted-foreground">/month</span>
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground">• Everything in Brand • Multiple clients</div>
+
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
+                  Everything in Brand
+                </li>
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
+                  Multiple client accounts
+                </li>
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
+                  Priority support
+                </li>
+              </ul>
+
+              <div className="flex items-center text-accent font-semibold group-hover:gap-3 gap-2 transition-all">
+                Get Started <ArrowRight className="w-4 h-4" />
+              </div>
             </button>
           </div>
 
-          <div className="mt-8 text-center space-y-4">
+          {/* Footer Links */}
+          <div className="text-center space-y-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <button
               onClick={() => setAuthView("brand-login")}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Already have an account? <span className="text-accent font-semibold">Sign in</span>
+              Already have an account? <span className="text-primary font-semibold">Sign in</span>
             </button>
             <br />
-            <a href="/" className="text-sm text-muted-foreground hover:text-foreground">
+            <a 
+              href="/" 
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
               ← Back to home
             </a>
+            <div className="pt-4">
+              <PoweredByBadge />
+            </div>
           </div>
         </div>
       </div>
@@ -284,50 +318,31 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
   // Login/Signup Forms
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Futuristic background effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      
-      <div className="w-full max-w-md relative z-10">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
         <button
           onClick={() => setAuthView("choice")}
-          className="text-muted-foreground hover:text-foreground mb-6 flex items-center gap-2 transition-all hover:gap-3"
+          className="text-muted-foreground hover:text-foreground mb-8 flex items-center gap-2 transition-all hover:gap-3"
         >
-          ← Back
+          ← Back to account selection
         </button>
 
-        <div className="bg-card/80 backdrop-blur-xl border-2 border-primary/20 rounded-2xl p-8 shadow-2xl hover:shadow-primary/10 transition-all animate-fade-in">
+        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-3xl p-10 shadow-xl animate-fade-in">
+          {/* Elegant Header */}
           <div className="text-center mb-8">
-            {/* Futuristic aderai 10x Logo for login */}
-            <div className="relative inline-block mb-4 group">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
-              
-              <div className="relative bg-background/60 backdrop-blur-xl border border-primary/20 rounded-2xl p-4">
-                <div className="text-4xl font-playfair font-bold mb-1">
-                  aderai<span className="text-accent">.</span>
-                </div>
-                <div className="flex items-center justify-center gap-1">
-                  <Zap className="w-3 h-3 text-primary" />
-                  <span className="text-xl font-black bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                    10X
-                  </span>
-                  <Sparkles className="w-3 h-3 text-accent" />
-                </div>
-              </div>
+            <div className="inline-block mb-4">
+              <h1 className="text-4xl font-playfair font-bold">
+                aderai<span className="text-primary">.</span>
+              </h1>
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-primary to-transparent mt-1 opacity-30" />
             </div>
 
-            <h2 className="text-3xl font-bold mb-2">
-              {authView.includes("signup") ? "Create Account" : "Welcome Back"}
+            <h2 className="text-2xl font-bold mb-2">
+              {authView.includes("signup") ? "Create your account" : "Welcome back"}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {authView.includes("brand") ? "Brand Account" : "Agency Account"}
             </p>
-            <div className="mt-4">
-              <PoweredByBadge />
-            </div>
           </div>
 
           {error && (
@@ -377,27 +392,33 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
             <button
               onClick={handleAuth}
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground py-3 rounded-full font-bold hover:bg-primary/90 transition disabled:opacity-50 shadow-lg"
+              className="w-full bg-primary text-primary-foreground py-3.5 rounded-full font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
             >
               {loading ? "Please wait..." : authView.includes("signup") ? "Create Account" : "Sign In"}
             </button>
           </div>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                if (authView === "brand-signup") setAuthView("brand-login");
-                else if (authView === "brand-login") setAuthView("brand-signup");
-                else if (authView === "agency-signup") setAuthView("agency-login");
-                else if (authView === "agency-login") setAuthView("agency-signup");
-              }}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {authView.includes("signup") ? "Already have an account? " : "Need an account? "}
-              <span className="text-accent font-semibold">
-                {authView.includes("signup") ? "Sign in" : "Sign up"}
-              </span>
-            </button>
+          {/* Footer */}
+          <div className="mt-6 pt-6 border-t border-border">
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  if (authView === "brand-signup") setAuthView("brand-login");
+                  else if (authView === "brand-login") setAuthView("brand-signup");
+                  else if (authView === "agency-signup") setAuthView("agency-login");
+                  else if (authView === "agency-login") setAuthView("agency-signup");
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {authView.includes("signup") ? "Already have an account? " : "Need an account? "}
+                <span className="text-primary font-semibold">
+                  {authView.includes("signup") ? "Sign in" : "Sign up"}
+                </span>
+              </button>
+            </div>
+            <div className="mt-6 flex justify-center">
+              <PoweredByBadge />
+            </div>
           </div>
         </div>
       </div>
