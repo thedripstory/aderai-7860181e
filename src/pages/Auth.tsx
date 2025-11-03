@@ -182,18 +182,16 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
         
         <div className="w-full max-w-lg relative z-10">
           <div className="text-center mb-12">
-            {/* Futuristic Klaviyo 10x Logo */}
+            {/* Futuristic aderai 10x Logo */}
             <div className="relative inline-block mb-6 group">
               {/* Glow effect behind logo */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500 animate-pulse" />
               
               {/* Logo container with glass effect */}
               <div className="relative bg-background/80 backdrop-blur-xl border-2 border-primary/30 rounded-3xl p-6 shadow-2xl hover:shadow-primary/20 transition-all duration-500 hover:scale-105">
-                <img 
-                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png" 
-                  alt="Klaviyo" 
-                  className="h-12 w-auto mx-auto mb-2 animate-fade-in"
-                />
+                <div className="text-5xl font-playfair font-bold mb-2 animate-fade-in">
+                  aderai<span className="text-accent">.</span>
+                </div>
                 
                 {/* 10x Badge with special effects */}
                 <div className="relative">
@@ -302,17 +300,15 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
         <div className="bg-card/80 backdrop-blur-xl border-2 border-primary/20 rounded-2xl p-8 shadow-2xl hover:shadow-primary/10 transition-all animate-fade-in">
           <div className="text-center mb-8">
-            {/* Futuristic Klaviyo 10x Logo for login */}
+            {/* Futuristic aderai 10x Logo for login */}
             <div className="relative inline-block mb-4 group">
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
               
               <div className="relative bg-background/60 backdrop-blur-xl border border-primary/20 rounded-2xl p-4">
-                <img 
-                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png" 
-                  alt="Klaviyo" 
-                  className="h-8 w-auto mx-auto mb-1"
-                />
+                <div className="text-4xl font-playfair font-bold mb-1">
+                  aderai<span className="text-accent">.</span>
+                </div>
                 <div className="flex items-center justify-center gap-1">
                   <Zap className="w-3 h-3 text-primary" />
                   <span className="text-xl font-black bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
