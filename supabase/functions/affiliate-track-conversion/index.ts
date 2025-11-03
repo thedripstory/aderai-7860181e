@@ -12,18 +12,64 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify user authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.log('No authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.log('Invalid token:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { referredUserId, subscriptionAmount, commissionType = 'subscription' } = await req.json();
+    const { subscriptionAmount, commissionType = 'subscription' } = await req.json();
 
-    if (!referredUserId) {
-      console.log('Missing referred user ID');
+    // Use authenticated user's ID
+    const referredUserId = user.id;
+
+    // Validate subscription amount
+    if (!subscriptionAmount || subscriptionAmount <= 0 || subscriptionAmount > 1000) {
+      console.log('Invalid subscription amount:', subscriptionAmount);
       return new Response(
-        JSON.stringify({ error: 'Referred user ID is required' }),
+        JSON.stringify({ error: 'Invalid subscription amount' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check for duplicate conversion
+    const { data: existingConversion } = await supabase
+      .from('affiliate_stats')
+      .select('id')
+      .eq('referred_user_id', referredUserId)
+      .single();
+
+    if (existingConversion) {
+      console.log('Conversion already exists for user:', referredUserId);
+      return new Response(
+        JSON.stringify({ error: 'Conversion already recorded' }),
+        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

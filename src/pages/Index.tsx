@@ -712,19 +712,26 @@ export default function AderaiApp() {
     setAnalyticsProgress({ current: 0, total: 0 });
 
     try {
-      const response = await fetch("https://a.klaviyo.com/api/segments/", {
-        headers: {
-          Authorization: `Klaviyo-API-Key ${klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}`,
-          revision: "2024-02-15",
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        console.error("No active session");
+        return;
+      }
+
+      const { data: segmentsResponse, error } = await supabase.functions.invoke('klaviyo-proxy', {
+        body: {
+          keyId: klaviyoKeys[activeKeyIndex].id,
+          endpoint: 'https://a.klaviyo.com/api/segments/',
+          method: 'GET',
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+      if (error || !segmentsResponse) {
+        console.error("Error fetching segments:", error);
+        return;
       }
 
-      const data = await response.json();
-      const segments = data.data || [];
+      const segments = segmentsResponse.data || [];
 
       setAllSegments(segments);
       await fetchSegmentCounts(segments);
@@ -743,16 +750,16 @@ export default function AderaiApp() {
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       try {
-        const response = await fetch(`https://a.klaviyo.com/api/segments/${segment.id}/profiles/`, {
-          headers: {
-            Authorization: `Klaviyo-API-Key ${klaviyoKeys[activeKeyIndex]?.klaviyo_api_key_hash}`,
-            revision: "2024-02-15",
+        const { data: profilesResponse, error: profileError } = await supabase.functions.invoke('klaviyo-proxy', {
+          body: {
+            keyId: klaviyoKeys[activeKeyIndex].id,
+            endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/profiles/`,
+            method: 'GET',
           },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          const profileCount = data.data?.length || 0;
+        if (!profileError && profilesResponse) {
+          const profileCount = profilesResponse.data?.length || 0;
 
           stats[segment.id] = {
             profileCount,
