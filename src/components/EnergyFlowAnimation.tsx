@@ -144,6 +144,23 @@ export const EnergyFlowAnimation = () => {
         style={{ mixBlendMode: "screen" }}
       />
       
+      {/* Energy entering right card - subtle glow */}
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-32 h-48">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-20 h-32 bg-gradient-to-l from-primary/20 via-accent/10 to-transparent rounded-l-full blur-xl animate-pulse" />
+        {/* Subtle sparkles entering */}
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="absolute right-4 w-1 h-1 bg-primary rounded-full animate-pulse"
+            style={{
+              top: `${40 + i * 20}%`,
+              animationDelay: `${i * 0.3}s`,
+              boxShadow: "0 0 6px hsl(var(--primary))",
+            }}
+          />
+        ))}
+      </div>
+      
       {/* Central energy core - simplified */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="relative w-10 h-10">
