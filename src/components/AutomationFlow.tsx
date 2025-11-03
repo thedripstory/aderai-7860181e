@@ -12,10 +12,10 @@ interface Segment {
 }
 
 const SEGMENTS: Segment[] = [
-  { id: 1, name: "VIP High-Value Customers", profiles: 2847, status: 'creating', delay: 0 },
-  { id: 2, name: "Browse Abandoners", profiles: 12493, status: 'creating', delay: 400 },
-  { id: 3, name: "Repeat Buyers (30d)", profiles: 8234, status: 'creating', delay: 800 },
-  { id: 4, name: "Category Champions", profiles: 5621, status: 'creating', delay: 1200 },
+  { id: 1, name: "Sleeping Giants", profiles: 2847, status: 'creating', delay: 0 },
+  { id: 2, name: "Intent Lurkers", profiles: 12493, status: 'creating', delay: 400 },
+  { id: 3, name: "Velocity Buyers", profiles: 8234, status: 'creating', delay: 800 },
+  { id: 4, name: "Ghost Cart Revivalists", profiles: 5621, status: 'creating', delay: 1200 },
 ];
 
 export const AutomationFlow = () => {
