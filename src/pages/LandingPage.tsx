@@ -926,81 +926,49 @@ export default function LandingPage() {
                 </h3>
               </div>
 
-              {/* Vertical Flow Design */}
-              <div className="max-w-4xl mx-auto space-y-12 relative">
-                {/* Connecting Line */}
-                <div className="absolute left-12 top-0 bottom-0 w-0.5 bg-gradient-to-b from-orange-500 via-orange-400 to-orange-500 hidden md:block" />
-                
+              {/* Compact Grid Layout */}
+              <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 {/* Item 1 */}
-                <div className="group relative flex gap-8 items-start">
-                  {/* Number */}
-                  <div className="relative flex-shrink-0">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl z-10 relative">
-                      <Zap className="w-12 h-12 text-white" />
+                <div className="group relative">
+                  <div className="flex flex-col items-center text-center p-6 rounded-2xl border-2 border-border hover:border-orange-500/40 transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4 shadow-lg">
+                      <Zap className="w-8 h-8 text-white" />
                     </div>
-                    <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl" />
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 pt-4">
-                    <h4 className="text-3xl font-bold mb-4">Set Once, Live Forever</h4>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
+                    <h4 className="text-xl font-bold mb-3">Set Once, Live Forever</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
                     </p>
                   </div>
                 </div>
 
                 {/* Item 2 - Highlighted */}
-                <div className="group relative flex gap-8 items-start">
-                  {/* Badge */}
-                  <div className="absolute -top-6 left-32 px-4 py-1.5 bg-gradient-to-r from-orange-500 to-accent rounded-full text-sm font-bold text-white shadow-lg z-20">
+                <div className="group relative">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-orange-500 to-accent rounded-full text-xs font-bold text-white shadow-lg z-10">
                     BEST PART
                   </div>
-                  
-                  {/* Number */}
-                  <div className="relative flex-shrink-0">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl z-10 relative ring-4 ring-orange-500/20">
-                      <BarChart3 className="w-12 h-12 text-white" />
+                  <div className="flex flex-col items-center text-center p-6 pt-8 rounded-2xl border-2 border-orange-500/40 bg-gradient-to-br from-orange-50/50 to-accent/5 dark:from-orange-950/20 dark:to-accent/5 h-full shadow-lg">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4 shadow-lg ring-4 ring-orange-500/20">
+                      <BarChart3 className="w-8 h-8 text-white" />
                     </div>
-                    <div className="absolute inset-0 bg-orange-500/30 rounded-full blur-2xl animate-pulse" />
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 pt-4 bg-gradient-to-br from-orange-50/50 to-accent/5 dark:from-orange-950/20 dark:to-accent/5 p-8 rounded-2xl border-2 border-orange-500/20">
-                    <h4 className="text-3xl font-bold mb-4">Lifetime Dashboard Access</h4>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
+                    <h4 className="text-xl font-bold mb-3">Lifetime Dashboard Access</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       Monitor performance, track metrics, optimize campaigns. <span className="text-accent font-semibold">All analytics, forever</span>. No subscription. No expiration.
                     </p>
                   </div>
                 </div>
 
                 {/* Item 3 */}
-                <div className="group relative flex gap-8 items-start">
-                  {/* Number */}
-                  <div className="relative flex-shrink-0">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl z-10 relative">
-                      <CheckCircle2 className="w-12 h-12 text-white" />
+                <div className="group relative">
+                  <div className="flex flex-col items-center text-center p-6 rounded-2xl border-2 border-border hover:border-orange-500/40 transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4 shadow-lg">
+                      <CheckCircle2 className="w-8 h-8 text-white" />
                     </div>
-                    <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl" />
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 pt-4">
-                    <h4 className="text-3xl font-bold mb-4">One-Time Investment</h4>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
+                    <h4 className="text-xl font-bold mb-3">One-Time Investment</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       <span className="text-orange-500 font-semibold">Pay once. Own forever.</span> No hidden fees. No subscriptions. No agency retainers eating your budget every month.
                     </p>
                   </div>
                 </div>
-              </div>
-
-              {/* Bottom visual connector */}
-              <div className="mt-16 flex items-center justify-center gap-4">
-                <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent" />
-                <div className="w-3 h-3 rounded-full bg-primary" />
-                <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-accent to-transparent" />
-                <div className="w-3 h-3 rounded-full bg-accent" />
-                <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent" />
               </div>
             </div>
             
