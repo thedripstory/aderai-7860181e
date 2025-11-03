@@ -114,9 +114,9 @@ All colors MUST be HSL.
     scroll-behavior: smooth;
   }
 
-  body {
-    @apply bg-background text-foreground;
-  }
+body {
+  @apply bg-background text-foreground overflow-x-hidden;
+}
 }
 
 @layer utilities {
