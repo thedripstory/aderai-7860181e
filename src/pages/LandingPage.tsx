@@ -322,22 +322,22 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {/* Card 1 - VIP Reactivation */}
-            <div className="group bg-gradient-to-br from-primary/5 via-background to-accent/5 rounded-3xl p-6 border border-border hover:border-primary/30 transition-all hover:shadow-xl">
-              <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--primary)/0.1),transparent_50%)]" />
+            <div className="group bg-gradient-to-br from-orange-500/5 via-background to-orange-600/5 rounded-3xl p-6 border border-border hover:border-orange-500/30 transition-all hover:shadow-xl">
+              <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(16_100%_50%/0.1),transparent_50%)]" />
                 <div className="relative w-full space-y-3">
                   <div className="bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-border shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-muted-foreground font-medium">VIP At-Risk</span>
-                      <span className="text-xs font-bold text-primary">2,847 profiles</span>
+                      <span className="text-xs font-bold text-orange-600">2,847 profiles</span>
                     </div>
                     <div className="text-sm font-semibold">LTV &gt; $5k, no purchase 60d</div>
                   </div>
-                  <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-dashed border-primary/30">
+                  <div className="bg-background/60 backdrop-blur-sm rounded-lg p-3 border border-dashed border-orange-500/30">
                     <div className="text-xs text-muted-foreground mb-1">Suggested action</div>
                     <div className="text-sm font-semibold">Exclusive 20% VIP comeback</div>
                   </div>
-                  <div className="absolute -bottom-2 -right-2 bg-accent text-accent-foreground text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                  <div className="absolute -bottom-2 -right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
                     Hidden gem
                   </div>
                 </div>
@@ -350,28 +350,28 @@ export default function LandingPage() {
             </div>
 
             {/* Card 2 - Browse Abandoners */}
-            <div className="group bg-gradient-to-br from-accent/5 via-background to-primary/5 rounded-3xl p-6 border border-border hover:border-accent/30 transition-all hover:shadow-xl">
-              <div className="bg-gradient-to-br from-accent/10 to-primary/10 rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--accent)/0.1),transparent_50%)]" />
+            <div className="group bg-gradient-to-br from-orange-600/5 via-background to-orange-500/5 rounded-3xl p-6 border border-border hover:border-orange-600/30 transition-all hover:shadow-xl">
+              <div className="bg-gradient-to-br from-orange-600/10 to-orange-500/10 rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(20_100%_50%/0.1),transparent_50%)]" />
                 <div className="relative w-full space-y-3">
                   <div className="bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-border shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-muted-foreground font-medium">Intent Buyers</span>
-                      <span className="text-xs font-bold text-accent">12,493 profiles</span>
+                      <span className="text-xs font-bold text-orange-600">12,493 profiles</span>
                     </div>
                     <div className="text-sm font-semibold">3+ views, $0 cart, 7d</div>
                   </div>
                   <div className="flex gap-2">
-                    <div className="flex-1 bg-accent/10 backdrop-blur-sm rounded-lg p-2 border border-accent/20">
-                      <div className="text-xs font-bold text-accent">42%</div>
+                    <div className="flex-1 bg-orange-500/10 backdrop-blur-sm rounded-lg p-2 border border-orange-500/20">
+                      <div className="text-xs font-bold text-orange-600">42%</div>
                       <div className="text-[10px] text-muted-foreground">Conversion rate</div>
                     </div>
-                    <div className="flex-1 bg-accent/10 backdrop-blur-sm rounded-lg p-2 border border-accent/20">
-                      <div className="text-xs font-bold text-accent">$127</div>
+                    <div className="flex-1 bg-orange-500/10 backdrop-blur-sm rounded-lg p-2 border border-orange-500/20">
+                      <div className="text-xs font-bold text-orange-600">$127</div>
                       <div className="text-[10px] text-muted-foreground">Avg order</div>
                     </div>
                   </div>
-                  <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     Top performer
                   </div>
                 </div>
@@ -399,7 +399,7 @@ export default function LandingPage() {
                     <div className="text-xs text-muted-foreground mb-1">Cross-sell opportunity</div>
                     <div className="text-sm font-semibold">New arrivals + bundles</div>
                   </div>
-                  <div className="absolute -bottom-2 -right-2 bg-yellow-500 text-yellow-950 text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     High intent
                   </div>
                 </div>
