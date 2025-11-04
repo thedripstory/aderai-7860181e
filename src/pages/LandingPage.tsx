@@ -75,20 +75,20 @@ export default function LandingPage() {
                   className="absolute top-full right-0 pt-1 w-48 z-50 animate-fade-in"
                 >
                   <div className="bg-card border border-border rounded-lg shadow-xl py-2">
-                    <a
-                      href="/brand-login"
-                      className="block px-4 py-3 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center gap-2"
+                    <button
+                      onClick={() => navigate("/brand-login")}
+                      className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center gap-2"
                     >
                       <Building2 className="w-4 h-4 text-primary" />
                       Brand Login
-                    </a>
-                    <a
-                      href="/agency-login"
-                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent/5 transition-colors flex items-center gap-2"
+                    </button>
+                    <button
+                      onClick={() => navigate("/agency-login")}
+                      className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-accent/5 transition-colors flex items-center gap-2"
                     >
                       <Users className="w-4 h-4 text-accent" />
                       Agency Login
-                    </a>
+                    </button>
                   </div>
                 </div>
               )}
