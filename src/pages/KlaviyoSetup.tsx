@@ -386,8 +386,8 @@ const KlaviyoSetup = () => {
                   </div>
                 </div>
 
-                {/* Submit Button */}
-                <div className="pt-6">
+                {/* Submit Buttons */}
+                <div className="pt-6 space-y-3">
                   <Button
                     type="submit"
                     disabled={isSaving}
@@ -401,6 +401,31 @@ const KlaviyoSetup = () => {
                     ) : (
                       "Connect Klaviyo & Continue"
                     )}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={async () => {
+                      if (!user) return;
+                      
+                      // Mark setup as skipped but allow access
+                      await supabase
+                        .from("users")
+                        .update({ klaviyo_setup_completed: true })
+                        .eq("id", user.id);
+                      
+                      toast({
+                        title: "Skipped for now",
+                        description: "You can add your Klaviyo account later in settings.",
+                      });
+                      
+                      navigate("/app");
+                    }}
+                    className="w-full text-muted-foreground"
+                    disabled={isSaving}
+                  >
+                    Skip for now, I'll add this later
                   </Button>
                 </div>
               </form>

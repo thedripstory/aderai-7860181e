@@ -155,7 +155,7 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
           toast({
             title: "Account created!",
-            description: "Welcome to Aderai. Let's get you set up.",
+            description: "Check your email to confirm your account. You can still continue with onboarding.",
           });
           
           // Redirect to appropriate onboarding

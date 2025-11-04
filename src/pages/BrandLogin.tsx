@@ -99,6 +99,12 @@ export default function BrandLogin() {
           localStorage.setItem('aderai_remember', 'true');
         }
 
+        // Show loading state while checking user status
+        toast({
+          title: "Signing in...",
+          description: "Please wait while we load your account.",
+        });
+
         toast({
           title: "Welcome back!",
           description: "You've successfully signed in.",
