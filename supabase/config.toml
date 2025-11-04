@@ -20,3 +20,12 @@ verify_jwt = true
 
 [functions.klaviyo-proxy]
 verify_jwt = true
+
+[functions.klaviyo-suggest-segments]
+verify_jwt = true
+
+[functions.klaviyo-create-custom-segment]
+verify_jwt = true
+
+[functions.klaviyo-create-segments]
+verify_jwt = true
