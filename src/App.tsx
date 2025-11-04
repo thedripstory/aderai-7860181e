@@ -14,6 +14,8 @@ import KlaviyoSetup from "./pages/KlaviyoSetup";
 import AffiliatePage from "./pages/AffiliatePage";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import BrandDashboard from "./pages/BrandDashboard";
+import AgencyDashboard from "./pages/AgencyDashboard";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/brand-dashboard" element={<BrandDashboard />} />
+          <Route path="/agency-dashboard" element={<AgencyDashboard />} />
           <Route 
             path="/app" 
             element={<Index />} 
@@ -41,8 +45,8 @@ const App = () => (
           />
           <Route path="/onboarding/brand" element={<BrandOnboarding />} />
           <Route path="/onboarding/agency" element={<AgencyOnboarding />} />
-          <Route path="/app/klaviyo-setup" element={<KlaviyoSetup />} />
-          <Route path="/app/settings" element={<Settings />} />
+          <Route path="/klaviyo-setup" element={<KlaviyoSetup />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/affiliate" element={<AffiliatePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

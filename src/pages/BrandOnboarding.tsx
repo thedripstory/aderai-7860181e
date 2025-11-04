@@ -79,8 +79,8 @@ export default function BrandOnboarding() {
         description: "Let's set up your Klaviyo integration.",
       });
 
-      // Navigate to Klaviyo setup
-      navigate("/app/klaviyo-setup");
+      // Navigate to Brand Dashboard
+      navigate("/brand-dashboard");
     } catch (error) {
       console.error("Error completing onboarding:", error);
       toast({

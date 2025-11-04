@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, User, Lock, AlertCircle, CheckCircle, ArrowLeft, LogOut } from "lucide-react";
+import { Settings as SettingsIcon, User, Lock, AlertCircle, CheckCircle, ArrowLeft, LogOut, Bell, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { TwoFactorSetup, TwoFactorDisable } from "@/components/TwoFactorSetup";
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -15,10 +16,13 @@ const CURRENCIES = [
 ];
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications">("account");
+  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications" | "2fa">("account");
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeKey, setActiveKey] = useState<any>(null);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
+  const [showTwoFactorDisable, setShowTwoFactorDisable] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -100,6 +104,15 @@ export default function Settings() {
         setEmailOnApiKeyAdded(notifPrefs.email_on_api_key_added ?? true);
         setEmailOnSettingsUpdated(notifPrefs.email_on_settings_updated ?? false);
       }
+
+      // Load 2FA status
+      const { data: twoFactorData } = await supabase
+        .from("two_factor_auth")
+        .select("enabled")
+        .eq("user_id", user.id)
+        .single();
+
+      setTwoFactorEnabled(twoFactorData?.enabled ?? false);
     };
 
     loadSettings();
@@ -621,6 +634,78 @@ export default function Settings() {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === "2fa" && (
+              <div className="space-y-6 max-w-2xl">
+                {!showTwoFactorSetup && !showTwoFactorDisable && (
+                  <div>
+                    {twoFactorEnabled ? (
+                      <div className="space-y-6">
+                        <div className="bg-green-500/10 border-2 border-green-500/20 rounded-lg p-6">
+                          <div className="flex items-start gap-4">
+                            <Shield className="w-6 h-6 text-green-500 mt-1" />
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold mb-2">2FA is Enabled</h3>
+                              <p className="text-sm text-muted-foreground">
+                                Your account is protected with two-factor authentication
+                              </p>
+                            </div>
+                            <CheckCircle className="w-6 h-6 text-green-500" />
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setShowTwoFactorDisable(true)}
+                          className="w-full px-6 py-3 rounded-lg border-2 border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors font-medium"
+                        >
+                          Disable 2FA
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="bg-yellow-500/10 border-2 border-yellow-500/20 rounded-lg p-6">
+                          <div className="flex items-start gap-4">
+                            <AlertCircle className="w-6 h-6 text-yellow-500 mt-1" />
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold mb-2">2FA is Disabled</h3>
+                              <p className="text-sm text-muted-foreground">
+                                Add an extra layer of security to your account
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setShowTwoFactorSetup(true)}
+                          className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                        >
+                          Enable 2FA
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {showTwoFactorSetup && (
+                  <TwoFactorSetup
+                    userId={currentUser?.id}
+                    userEmail={email}
+                    onSetupComplete={() => {
+                      setShowTwoFactorSetup(false);
+                      setTwoFactorEnabled(true);
+                    }}
+                  />
+                )}
+
+                {showTwoFactorDisable && (
+                  <TwoFactorDisable
+                    userId={currentUser?.id}
+                    onDisabled={() => {
+                      setShowTwoFactorDisable(false);
+                      setTwoFactorEnabled(false);
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>

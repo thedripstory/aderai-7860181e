@@ -76,11 +76,11 @@ export default function AgencyOnboarding() {
 
       toast({
         title: "Welcome!",
-        description: "Let's add your first client's Klaviyo account.",
+        description: "Let's add your first client.",
       });
 
-      // Navigate to Klaviyo setup
-      navigate("/app/klaviyo-setup");
+      // Navigate to Agency Dashboard
+      navigate("/agency-dashboard");
     } catch (error) {
       console.error("Error completing onboarding:", error);
       toast({
