@@ -12,6 +12,58 @@ export default function AgencyLogin() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const handlePasswordReset = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!resetEmail?.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!emailRegex.test(resetEmail)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/agency-login`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Check your email",
+        description: "We've sent you a password reset link.",
+      });
+      
+      setShowPasswordReset(false);
+      setResetEmail("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleLogin = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,6 +94,11 @@ export default function AgencyLogin() {
       }
 
       if (authData.user) {
+        // Store remember me preference
+        if (rememberMe) {
+          localStorage.setItem('aderai_remember', 'true');
+        }
+
         toast({
           title: "Welcome back!",
           description: "You've successfully signed in.",
@@ -62,6 +119,52 @@ export default function AgencyLogin() {
         <div className="absolute top-20 left-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
+
+      {/* Password Reset Modal */}
+      {showPasswordReset && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
+          <div className="bg-card border border-border rounded-2xl p-8 max-w-md w-full shadow-2xl animate-scale-in">
+            <h3 className="text-2xl font-bold mb-2">Reset Password</h3>
+            <p className="text-muted-foreground mb-6">
+              Enter your email address and we'll send you a link to reset your password.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Email</label>
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="you@agency.com"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition"
+                  onKeyDown={(e) => e.key === 'Enter' && handlePasswordReset()}
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowPasswordReset(false);
+                    setResetEmail("");
+                  }}
+                  disabled={resetLoading}
+                  className="flex-1 px-4 py-3 rounded-lg border border-border hover:bg-muted transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePasswordReset}
+                  disabled={resetLoading}
+                  className="flex-1 bg-accent text-accent-foreground px-4 py-3 rounded-lg font-semibold hover:bg-accent/90 transition-all disabled:opacity-50 shadow-lg"
+                >
+                  {resetLoading ? "Sending..." : "Send Reset Link"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="w-full max-w-md relative z-10">
         <button
@@ -113,7 +216,18 @@ export default function AgencyLogin() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium">Password</label>
+                <button
+                  onClick={() => {
+                    setShowPasswordReset(true);
+                    setResetEmail(email);
+                  }}
+                  className="text-xs text-accent hover:text-accent/80 transition-colors font-medium"
+                >
+                  Forgot password?
+                </button>
+              </div>
               <input
                 type="password"
                 value={password}
@@ -122,6 +236,19 @@ export default function AgencyLogin() {
                 className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition"
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
               />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-accent focus:ring-2 focus:ring-accent/20"
+              />
+              <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
+                Remember me for 30 days
+              </label>
             </div>
 
             <button

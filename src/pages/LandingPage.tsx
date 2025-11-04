@@ -55,36 +55,38 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex items-center gap-4">
             {/* Login Dropdown */}
-            <div className="relative hidden sm:block">
+            <div 
+              className="relative hidden sm:block"
+              onMouseEnter={() => setLoginDropdownOpen(true)}
+              onMouseLeave={() => setLoginDropdownOpen(false)}
+            >
               <button
-                onMouseEnter={() => setLoginDropdownOpen(true)}
-                onMouseLeave={() => setLoginDropdownOpen(false)}
-                className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1"
+                className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1 py-2"
               >
                 Log in
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className={`w-4 h-4 transition-transform ${loginDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {loginDropdownOpen && (
                 <div
-                  onMouseEnter={() => setLoginDropdownOpen(true)}
-                  onMouseLeave={() => setLoginDropdownOpen(false)}
-                  className="absolute top-full right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-xl z-50 py-2 animate-fade-in"
+                  className="absolute top-full right-0 pt-1 w-48 z-50 animate-fade-in"
                 >
-                  <a
-                    href="/brand-login"
-                    className="block px-4 py-3 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center gap-2"
-                  >
-                    <Building2 className="w-4 h-4 text-primary" />
-                    Brand Login
-                  </a>
-                  <a
-                    href="/agency-login"
-                    className="block px-4 py-3 text-sm text-foreground hover:bg-accent/5 transition-colors flex items-center gap-2"
-                  >
-                    <Users className="w-4 h-4 text-accent" />
-                    Agency Login
-                  </a>
+                  <div className="bg-card border border-border rounded-lg shadow-xl py-2">
+                    <a
+                      href="/brand-login"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center gap-2"
+                    >
+                      <Building2 className="w-4 h-4 text-primary" />
+                      Brand Login
+                    </a>
+                    <a
+                      href="/agency-login"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent/5 transition-colors flex items-center gap-2"
+                    >
+                      <Users className="w-4 h-4 text-accent" />
+                      Agency Login
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
