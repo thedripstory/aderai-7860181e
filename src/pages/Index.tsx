@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
+import { ClientSwitcher, AddClientModal } from "@/components/ClientSwitcher";
+import { EmailVerificationBanner } from "@/components/EmailVerificationBanner";
 
 /**
  * ADERAI - COMPLETE APP WITH SEGMENT ANALYTICS
@@ -434,6 +436,39 @@ export default function AderaiApp() {
       setView("dashboard");
     } else {
       setView("onboarding");
+    }
+  };
+
+  const handleSelectClient = async (index: number) => {
+    setActiveKeyIndex(index);
+    const key = klaviyoKeys[index];
+    
+    const { data: userInfo } = await supabase
+      .from('users')
+      .select('email, account_name')
+      .eq('id', currentUser?.id)
+      .single();
+
+    setUserData({
+      email: userInfo?.email || '',
+      accountName: userInfo?.account_name || key.client_name,
+      currency: key.currency,
+      aov: key.aov.toString(),
+      vipThreshold: key.vip_threshold.toString(),
+      highValueThreshold: key.high_value_threshold.toString(),
+      newCustomerDays: key.new_customer_days.toString(),
+      lapsedDays: key.lapsed_days.toString(),
+      churnedDays: key.churned_days.toString(),
+    });
+  };
+
+  const handleAddClient = () => {
+    setShowAddClientModal(true);
+  };
+
+  const handleClientAdded = async () => {
+    if (currentUser) {
+      await loadKlaviyoKeys(currentUser.id);
     }
   };
 
@@ -1156,8 +1191,10 @@ export default function AderaiApp() {
 
   if (view === "dashboard") {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="border-b border-border bg-card">
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <EmailVerificationBanner />
+        
+        <div className="border-b-2 border-border bg-card">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -1168,6 +1205,12 @@ export default function AderaiApp() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
+                <ClientSwitcher
+                  klaviyoKeys={klaviyoKeys}
+                  activeKeyIndex={activeKeyIndex}
+                  onSelectClient={handleSelectClient}
+                  onAddClient={handleAddClient}
+                />
                 <button
                   onClick={() => setView("analytics")}
                   className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted rounded-lg"
@@ -1207,6 +1250,13 @@ export default function AderaiApp() {
             </div>
           </div>
         </div>
+
+        <AddClientModal
+          isOpen={showAddClientModal}
+          onClose={() => setShowAddClientModal(false)}
+          onSuccess={handleClientAdded}
+          userId={currentUser?.id || ""}
+        />
 
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-8">
@@ -1886,240 +1936,9 @@ export default function AderaiApp() {
   }
 
   if (view === "settings") {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="border-b border-border bg-card">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <SettingsIcon className="w-8 h-8 text-primary" />
-                <h1 className="text-2xl font-bold">Settings</h1>
-              </div>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setView("dashboard")}
-                  className="px-4 py-2 text-sm hover:bg-muted rounded-lg"
-                >
-                  Back to Dashboard
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <div className="border-b border-border">
-              <div className="flex">
-                <button
-                  onClick={() => setSettingsTab("general")}
-                  className={`px-6 py-4 font-medium ${
-                    settingsTab === "general"
-                      ? "border-b-2 border-primary text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  General
-                </button>
-                <button
-                  onClick={() => setSettingsTab("thresholds")}
-                  className={`px-6 py-4 font-medium ${
-                    settingsTab === "thresholds"
-                      ? "border-b-2 border-primary text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Thresholds
-                </button>
-                <button
-                  onClick={() => setSettingsTab("api")}
-                  className={`px-6 py-4 font-medium ${
-                    settingsTab === "api"
-                      ? "border-b-2 border-primary text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  API Keys
-                </button>
-              </div>
-            </div>
-
-            <div className="p-8">
-              {settingsTab === "general" && editedSettings && (
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Account Name</label>
-                    <input
-                      type="text"
-                      value={editedSettings.accountName}
-                      onChange={(e) =>
-                        setEditedSettings({ ...editedSettings, accountName: e.target.value })
-                      }
-                      className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={editedSettings.email}
-                      disabled
-                      className="w-full px-4 py-2 rounded-lg border border-input bg-muted"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Currency</label>
-                    <select
-                      value={editedSettings.currency}
-                      onChange={(e) =>
-                        setEditedSettings({ ...editedSettings, currency: e.target.value })
-                      }
-                      className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                    >
-                      {CURRENCIES.map((curr) => (
-                        <option key={curr.code} value={curr.code}>
-                          {curr.symbol} {curr.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {settingsTab === "thresholds" && editedSettings && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Average Order Value</label>
-                      <input
-                        type="number"
-                        value={editedSettings.aov}
-                        onChange={(e) =>
-                          setEditedSettings({ ...editedSettings, aov: e.target.value })
-                        }
-                        className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">VIP Threshold</label>
-                      <input
-                        type="number"
-                        value={editedSettings.vipThreshold}
-                        onChange={(e) =>
-                          setEditedSettings({ ...editedSettings, vipThreshold: e.target.value })
-                        }
-                        className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">High-Value Threshold</label>
-                    <input
-                      type="number"
-                      value={editedSettings.highValueThreshold}
-                      onChange={(e) =>
-                        setEditedSettings({ ...editedSettings, highValueThreshold: e.target.value })
-                      }
-                      className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">New Customer (days)</label>
-                      <input
-                        type="number"
-                        value={editedSettings.newCustomerDays}
-                        onChange={(e) =>
-                          setEditedSettings({ ...editedSettings, newCustomerDays: e.target.value })
-                        }
-                        className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Lapsed (days)</label>
-                      <input
-                        type="number"
-                        value={editedSettings.lapsedDays}
-                        onChange={(e) =>
-                          setEditedSettings({ ...editedSettings, lapsedDays: e.target.value })
-                        }
-                        className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Churned (days)</label>
-                      <input
-                        type="number"
-                        value={editedSettings.churnedDays}
-                        onChange={(e) =>
-                          setEditedSettings({ ...editedSettings, churnedDays: e.target.value })
-                        }
-                        className="w-full px-4 py-2 rounded-lg border border-input bg-background"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {settingsTab === "api" && (
-                <div className="space-y-6">
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium mb-1">Security Notice</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Your API keys are stored securely and encrypted. Never share them with anyone.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Klaviyo API Key</label>
-                    <input
-                      type="password"
-                      value="••••••••••••••••••••"
-                      disabled
-                      className="w-full px-4 py-2 rounded-lg border border-input bg-muted"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Contact support to update your API key
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-8 flex items-center justify-between">
-                {settingsSaved && (
-                  <div className="flex items-center gap-2 text-green-500">
-                    <CheckCircle className="w-5 h-5" />
-                    <span className="text-sm font-medium">Settings saved successfully!</span>
-                  </div>
-                )}
-                <button
-                  onClick={saveSettings}
-                  className="ml-auto bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    // Navigate to the dedicated settings page component
+    window.location.href = "/app/settings";
+    return null;
   }
 
   return null;
