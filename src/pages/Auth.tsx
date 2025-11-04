@@ -4,10 +4,11 @@ import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface AuthProps {
   onComplete: (user: any) => void;
-  initialView?: "choice" | "brand-signup" | "agency-signup" | "brand-login" | "agency-login";
+  initialView?: "choice" | "brand-signup" | "agency-signup";
 }
 
 export default function Auth({ onComplete, initialView = "choice" }: AuthProps) {
@@ -19,6 +20,7 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
   const [error, setError] = useState("");
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Capture referral code from URL on mount
   useEffect(() => {
@@ -92,98 +94,74 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
     setError("");
     
     try {
-      if (authView.includes("signup")) {
-        // Check if user already exists first
-        const { data: existingUser } = await supabase
-          .from('users')
-          .select('email')
-          .eq('email', email.toLowerCase())
-          .maybeSingle();
+      // Check if user already exists first
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', email.toLowerCase())
+        .maybeSingle();
 
-        if (existingUser) {
-          setError("An account with this email already exists. Please sign in instead.");
-          setLoading(false);
-          return;
-        }
+      if (existingUser) {
+        setError("An account with this email already exists. Please sign in instead.");
+        setLoading(false);
+        return;
+      }
 
-        // Sign up
-        const { data: authData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/app`,
-            data: {
-              account_name: accountName,
-              account_type: authView.includes("agency") ? "agency" : "brand",
-              referred_by: referralCode || null,
-            },
+      // Sign up
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/app`,
+          data: {
+            account_name: accountName,
+            account_type: authView.includes("agency") ? "agency" : "brand",
+            referred_by: referralCode || null,
           },
-        });
+        },
+      });
 
-        if (signUpError) {
-          // Handle specific error cases
-          if (signUpError.message.includes("already registered")) {
-            setError("An account with this email already exists. Please sign in instead.");
-          } else {
-            setError(signUpError.message);
-          }
-          setLoading(false);
-          return;
+      if (signUpError) {
+        // Handle specific error cases
+        if (signUpError.message.includes("already registered")) {
+          setError("An account with this email already exists. Please sign in instead.");
+        } else {
+          setError(signUpError.message);
         }
+        setLoading(false);
+        return;
+      }
 
-        if (authData.user) {
-          // Insert user into users table with referral code
-          const { error: insertError } = await supabase
-            .from('users')
-            .insert({
-              id: authData.user.id,
-              email: authData.user.email!,
-              password_hash: 'handled_by_auth',
-              account_name: accountName,
-              account_type: authView.includes("agency") ? "agency" : "brand",
-              referred_by: referralCode || null,
-              email_verified: false,
-            });
-
-          if (insertError) {
-            console.error('Error inserting user:', insertError);
-            // Don't block signup if user insert fails, auth user is already created
-          }
-
-          // Clear stored referral code
-          localStorage.removeItem('aderai_ref');
-
-          toast({
-            title: "Account created!",
-            description: "Check your email to confirm your account. You can still continue with onboarding.",
+      if (authData.user) {
+        // Insert user into users table with referral code
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert({
+            id: authData.user.id,
+            email: authData.user.email!,
+            password_hash: 'handled_by_auth',
+            account_name: accountName,
+            account_type: authView.includes("agency") ? "agency" : "brand",
+            referred_by: referralCode || null,
+            email_verified: false,
           });
-          
-          // Redirect to appropriate onboarding
-          const accountType = authView.includes("agency") ? "agency" : "brand";
-          window.location.href = `/onboarding/${accountType}`;
+
+        if (insertError) {
+          console.error('Error inserting user:', insertError);
+          // Don't block signup if user insert fails, auth user is already created
         }
-      } else {
-        // Sign in
-        const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+
+        // Clear stored referral code
+        localStorage.removeItem('aderai_ref');
+
+        toast({
+          title: "Account created!",
+          description: "Check your email to confirm your account. You can still continue with onboarding.",
         });
-
-        if (signInError) {
-          setError(signInError.message);
-          setLoading(false);
-          return;
-        }
-
-        if (authData.user) {
-          toast({
-            title: "Welcome back!",
-            description: "You've successfully signed in.",
-          });
-          
-          // Redirect directly to app for existing users
-          window.location.href = "/app";
-        }
+        
+        // Redirect to appropriate onboarding
+        const accountType = authView.includes("agency") ? "agency" : "brand";
+        window.location.href = `/onboarding/${accountType}`;
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
@@ -318,13 +296,13 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
               <p className="text-muted-foreground mb-4">Already have an account?</p>
               <div className="flex gap-4 justify-center">
                 <button
-                  onClick={() => setAuthView("brand-login")}
+                  onClick={() => navigate("/brand-login")}
                   className="px-6 py-2 rounded-full border border-primary/20 hover:border-primary hover:bg-primary/5 transition-all text-primary font-medium"
                 >
                   Brand Sign In
                 </button>
                 <button
-                  onClick={() => setAuthView("agency-login")}
+                  onClick={() => navigate("/agency-login")}
                   className="px-6 py-2 rounded-full border border-accent/20 hover:border-accent hover:bg-accent/5 transition-all text-accent font-medium"
                 >
                   Agency Sign In
@@ -346,7 +324,7 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
     );
   }
 
-  // Login/Signup Forms
+  // Signup Forms Only
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
@@ -367,9 +345,7 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
               <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-primary to-transparent mt-1 opacity-30" />
             </div>
 
-            <h2 className="text-2xl font-bold mb-2">
-              {authView.includes("signup") ? "Create your account" : "Welcome back"}
-            </h2>
+            <h2 className="text-2xl font-bold mb-2">Create your account</h2>
             <p className="text-muted-foreground text-sm">
               {authView.includes("brand") ? "Brand Account" : "Agency Account"}
             </p>
@@ -424,7 +400,7 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
               disabled={loading}
               className="w-full bg-primary text-primary-foreground py-3.5 rounded-full font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
             >
-              {loading ? "Please wait..." : authView.includes("signup") ? "Create Account" : "Sign In"}
+              {loading ? "Please wait..." : "Create Account"}
             </button>
           </div>
 
@@ -433,16 +409,14 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
             <div className="text-center">
               <button
                 onClick={() => {
-                  if (authView === "brand-signup") setAuthView("brand-login");
-                  else if (authView === "brand-login") setAuthView("brand-signup");
-                  else if (authView === "agency-signup") setAuthView("agency-login");
-                  else if (authView === "agency-login") setAuthView("agency-signup");
+                  if (authView === "brand-signup") navigate("/brand-login");
+                  else if (authView === "agency-signup") navigate("/agency-login");
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {authView.includes("signup") ? "Already have an account? " : "Need an account? "}
+                Already have an account?{" "}
                 <span className={authView.includes("brand") ? "text-primary font-semibold" : "text-accent font-semibold"}>
-                  {authView.includes("signup") ? "Sign in" : "Sign up"}
+                  Sign in
                 </span>
               </button>
             </div>
@@ -450,9 +424,9 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
               <button
                 onClick={() => {
                   if (authView.includes("brand")) {
-                    setAuthView(authView.includes("signup") ? "agency-signup" : "agency-login");
+                    setAuthView("agency-signup");
                   } else {
-                    setAuthView(authView.includes("signup") ? "brand-signup" : "brand-login");
+                    setAuthView("brand-signup");
                   }
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"

@@ -12,18 +12,21 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
+import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [pricingView, setPricingView] = useState<"brands" | "agencies">("brands");
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  
   const handleGetStarted = () => {
-    window.location.href = "/signup";
+    navigate("/signup");
   };
   return <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
