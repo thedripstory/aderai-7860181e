@@ -10,6 +10,7 @@ import BrandLogin from "./pages/BrandLogin";
 import AgencyLogin from "./pages/AgencyLogin";
 import BrandOnboarding from "./pages/BrandOnboarding";
 import AgencyOnboarding from "./pages/AgencyOnboarding";
+import KlaviyoSetup from "./pages/KlaviyoSetup";
 import AffiliatePage from "./pages/AffiliatePage";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
           />
           <Route path="/onboarding/brand" element={<BrandOnboarding />} />
           <Route path="/onboarding/agency" element={<AgencyOnboarding />} />
+          <Route path="/app/klaviyo-setup" element={<KlaviyoSetup />} />
           <Route path="/affiliate" element={<AffiliatePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

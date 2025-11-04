@@ -252,9 +252,16 @@ export type Database = {
           account_type: string
           affiliate_code: string | null
           created_at: string | null
+          current_challenges: string | null
           email: string
+          email_list_size_range: string | null
           email_verified: boolean | null
           id: string
+          industry: string | null
+          klaviyo_setup_completed: boolean | null
+          marketing_goals: string | null
+          monthly_revenue_range: string | null
+          onboarding_completed: boolean | null
           password_hash: string
           referred_by: string | null
           stripe_customer_id: string | null
@@ -268,9 +275,16 @@ export type Database = {
           account_type: string
           affiliate_code?: string | null
           created_at?: string | null
+          current_challenges?: string | null
           email: string
+          email_list_size_range?: string | null
           email_verified?: boolean | null
           id?: string
+          industry?: string | null
+          klaviyo_setup_completed?: boolean | null
+          marketing_goals?: string | null
+          monthly_revenue_range?: string | null
+          onboarding_completed?: boolean | null
           password_hash: string
           referred_by?: string | null
           stripe_customer_id?: string | null
@@ -284,9 +298,16 @@ export type Database = {
           account_type?: string
           affiliate_code?: string | null
           created_at?: string | null
+          current_challenges?: string | null
           email?: string
+          email_list_size_range?: string | null
           email_verified?: boolean | null
           id?: string
+          industry?: string | null
+          klaviyo_setup_completed?: boolean | null
+          marketing_goals?: string | null
+          monthly_revenue_range?: string | null
+          onboarding_completed?: boolean | null
           password_hash?: string
           referred_by?: string | null
           stripe_customer_id?: string | null

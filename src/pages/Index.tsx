@@ -452,13 +452,24 @@ export default function AderaiApp() {
 
       const { data: userData, error } = await supabase
         .from('users')
-        .select('account_name, account_type, email')
+        .select('account_name, account_type, email, onboarding_completed, klaviyo_setup_completed')
         .eq('id', session.user.id)
         .single();
 
       if (error || !userData) {
         console.error('Error loading user:', error);
         window.location.href = "/login";
+        return;
+      }
+
+      // Check onboarding status
+      if (!userData.onboarding_completed) {
+        window.location.href = "/onboarding/brand";
+        return;
+      }
+
+      if (!userData.klaviyo_setup_completed) {
+        window.location.href = "/app/klaviyo-setup";
         return;
       }
 

@@ -7,13 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
-import { 
-  Building2, 
-  Target, 
-  TrendingUp, 
-  CheckCircle2, 
+import {
+  Building2,
+  Target,
+  TrendingUp,
+  CheckCircle2,
   ArrowRight,
-  Sparkles 
+  Sparkles,
 } from "lucide-react";
 
 export default function BrandOnboarding() {
@@ -46,27 +46,46 @@ export default function BrandOnboarding() {
   const handleComplete = async () => {
     setLoading(true);
     try {
-      // Store onboarding data
-      const { error } = await supabase
-        .from('users')
-        .update({
-          // You can add additional fields to the users table to store this data
-          // For now, we'll just mark onboarding as complete
-        })
-        .eq('id', user.id);
+      if (!user) {
+        navigate("/signup");
+        return;
+      }
 
-      if (error) throw error;
+      // Save onboarding data to users table
+      const { error } = await supabase
+        .from("users")
+        .update({
+          industry,
+          monthly_revenue_range: monthlyRevenue,
+          email_list_size_range: emailListSize,
+          marketing_goals: goals,
+          current_challenges: currentChallenges,
+          onboarding_completed: true,
+        })
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Error saving onboarding data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to save onboarding data. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       toast({
-        title: "Welcome to Aderai!",
-        description: "Your account is all set up.",
+        title: "Welcome!",
+        description: "Let's set up your Klaviyo integration.",
       });
 
-      navigate("/app");
-    } catch (error: any) {
+      // Navigate to Klaviyo setup
+      navigate("/app/klaviyo-setup");
+    } catch (error) {
+      console.error("Error completing onboarding:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
