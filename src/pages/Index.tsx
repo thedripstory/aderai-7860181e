@@ -528,6 +528,8 @@ export default function AderaiApp() {
   const [settingsTab, setSettingsTab] = useState<"general" | "thresholds" | "api">("general");
   const [editedSettings, setEditedSettings] = useState<UserData | null>(null);
   const [settingsSaved, setSettingsSaved] = useState(false);
+  const [addingClient, setAddingClient] = useState(false);
+  const [showEmailVerificationBanner, setShowEmailVerificationBanner] = useState(true);
 
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
@@ -536,6 +538,72 @@ export default function AderaiApp() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.href = "/login";
+  };
+
+  const handleAddClient = async () => {
+    if (!newClientName.trim() || !newClientApiKey.trim()) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    if (!currentUser) {
+      alert("User not found");
+      return;
+    }
+
+    setAddingClient(true);
+
+    try {
+      // Validate API key first
+      const { data: validationData, error: validationError } = await supabase.functions.invoke(
+        "klaviyo-validate-key",
+        {
+          body: { apiKey: newClientApiKey },
+        }
+      );
+
+      if (validationError || !validationData?.valid) {
+        alert(validationData?.error || "Invalid API key. Please check and try again.");
+        setAddingClient(false);
+        return;
+      }
+
+      // Add new client
+      const { error: insertError } = await supabase
+        .from("klaviyo_keys")
+        .insert({
+          user_id: currentUser.id,
+          klaviyo_api_key_hash: newClientApiKey,
+          client_name: newClientName,
+          currency: "USD",
+          currency_symbol: "$",
+          aov: 100,
+          vip_threshold: 1000,
+          high_value_threshold: 500,
+          new_customer_days: 60,
+          lapsed_days: 90,
+          churned_days: 180,
+          is_active: true,
+        });
+
+      if (insertError) {
+        alert("Failed to add client. Please try again.");
+        setAddingClient(false);
+        return;
+      }
+
+      // Reload clients
+      await loadKlaviyoKeys(currentUser.id);
+      setShowAddClientModal(false);
+      setNewClientName("");
+      setNewClientApiKey("");
+      alert("Client added successfully!");
+    } catch (error) {
+      console.error("Error adding client:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setAddingClient(false);
+    }
   };
 
   const handleOnboarding = async () => {
@@ -1157,15 +1225,77 @@ export default function AderaiApp() {
   if (view === "dashboard") {
     return (
       <div className="min-h-screen bg-background">
+        {/* Email Verification Banner */}
+        {showEmailVerificationBanner && currentUser && (
+          <div className="bg-yellow-500/10 border-b border-yellow-500/20">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  Please verify your email address. Check your inbox for a confirmation link.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowEmailVerificationBanner(false)}
+                className="text-yellow-600 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="border-b border-border bg-card">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <Shield className="w-8 h-8 text-primary" />
                 <div>
                   <h1 className="text-2xl font-bold">Aderai</h1>
                   <p className="text-sm text-muted-foreground">{userData?.accountName}</p>
                 </div>
+                
+                {/* Multi-Client Switcher */}
+                {klaviyoKeys.length > 0 && (
+                  <div className="flex items-center gap-2 ml-6 pl-6 border-l border-border">
+                    <Building2 className="w-4 h-4 text-muted-foreground" />
+                    <select
+                      value={activeKeyIndex}
+                      onChange={(e) => {
+                        const newIndex = parseInt(e.target.value);
+                        setActiveKeyIndex(newIndex);
+                        const selectedKey = klaviyoKeys[newIndex];
+                        if (selectedKey && userData) {
+                          setUserData({
+                            ...userData,
+                            accountName: selectedKey.client_name,
+                            currency: selectedKey.currency,
+                            aov: selectedKey.aov.toString(),
+                            vipThreshold: selectedKey.vip_threshold.toString(),
+                            highValueThreshold: selectedKey.high_value_threshold.toString(),
+                            newCustomerDays: selectedKey.new_customer_days.toString(),
+                            lapsedDays: selectedKey.lapsed_days.toString(),
+                            churnedDays: selectedKey.churned_days.toString(),
+                          });
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-lg border border-border bg-background text-sm min-w-[150px]"
+                    >
+                      {klaviyoKeys.map((key, index) => (
+                        <option key={key.id} value={index}>
+                          {key.client_name || `Client ${index + 1}`}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => setShowAddClientModal(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Client
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-4">
                 <button
@@ -1206,7 +1336,75 @@ export default function AderaiApp() {
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Add Client Modal */}
+          {showAddClientModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-lg max-w-md w-full p-6 border border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold">Add New Client</h2>
+                  <button
+                    onClick={() => {
+                      setShowAddClientModal(false);
+                      setNewClientName("");
+                      setNewClientApiKey("");
+                    }}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Client Name</label>
+                    <input
+                      type="text"
+                      value={newClientName}
+                      onChange={(e) => setNewClientName(e.target.value)}
+                      placeholder="e.g., ACME Corp"
+                      className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Klaviyo API Key</label>
+                    <input
+                      type="password"
+                      value={newClientApiKey}
+                      onChange={(e) => setNewClientApiKey(e.target.value)}
+                      placeholder="pk_..."
+                      className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Find in Klaviyo → Settings → API Keys
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={() => {
+                        setShowAddClientModal(false);
+                        setNewClientName("");
+                        setNewClientApiKey("");
+                      }}
+                      className="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted"
+                      disabled={addingClient}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAddClient}
+                      disabled={addingClient || !newClientName.trim() || !newClientApiKey.trim()}
+                      className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {addingClient ? "Adding..." : "Add Client"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-8">
