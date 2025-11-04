@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import Auth from "./pages/Auth";
+import BrandLogin from "./pages/BrandLogin";
+import AgencyLogin from "./pages/AgencyLogin";
 import BrandOnboarding from "./pages/BrandOnboarding";
 import AgencyOnboarding from "./pages/AgencyOnboarding";
 import AffiliatePage from "./pages/AffiliatePage";
@@ -29,9 +31,11 @@ const App = () => (
             path="/signup" 
             element={<Auth initialView="choice" onComplete={() => {}} />} 
           />
+          <Route path="/brand-login" element={<BrandLogin />} />
+          <Route path="/agency-login" element={<AgencyLogin />} />
           <Route 
             path="/login" 
-            element={<Auth initialView="brand-login" onComplete={() => {}} />} 
+            element={<BrandLogin />} 
           />
           <Route path="/onboarding/brand" element={<BrandOnboarding />} />
           <Route path="/onboarding/agency" element={<AgencyOnboarding />} />

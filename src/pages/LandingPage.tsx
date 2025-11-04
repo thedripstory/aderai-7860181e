@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Building2, Users, BarChart3 } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Building2, Users, BarChart3, ChevronDown } from "lucide-react";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -15,6 +15,7 @@ import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [pricingView, setPricingView] = useState<"brands" | "agencies">("brands");
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -53,9 +54,41 @@ export default function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-4">
-            <a href="/login" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium hidden sm:block">
-              Log in
-            </a>
+            {/* Login Dropdown */}
+            <div className="relative hidden sm:block">
+              <button
+                onMouseEnter={() => setLoginDropdownOpen(true)}
+                onMouseLeave={() => setLoginDropdownOpen(false)}
+                className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1"
+              >
+                Log in
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              
+              {loginDropdownOpen && (
+                <div
+                  onMouseEnter={() => setLoginDropdownOpen(true)}
+                  onMouseLeave={() => setLoginDropdownOpen(false)}
+                  className="absolute top-full right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-xl z-50 py-2 animate-fade-in"
+                >
+                  <a
+                    href="/brand-login"
+                    className="block px-4 py-3 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center gap-2"
+                  >
+                    <Building2 className="w-4 h-4 text-primary" />
+                    Brand Login
+                  </a>
+                  <a
+                    href="/agency-login"
+                    className="block px-4 py-3 text-sm text-foreground hover:bg-accent/5 transition-colors flex items-center gap-2"
+                  >
+                    <Users className="w-4 h-4 text-accent" />
+                    Agency Login
+                  </a>
+                </div>
+              )}
+            </div>
+
             <button 
               onClick={handleGetStarted} 
               className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-base font-semibold hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary/30"
