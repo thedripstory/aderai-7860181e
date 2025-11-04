@@ -293,14 +293,24 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
           </div>
 
           {/* Footer Links */}
-          <div className="text-center space-y-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <button
-              onClick={() => setAuthView("brand-login")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Already have an account? <span className="text-primary font-semibold">Sign in</span>
-            </button>
-            <br />
+          <div className="text-center space-y-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div>
+              <p className="text-muted-foreground mb-4">Already have an account?</p>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => setAuthView("brand-login")}
+                  className="px-6 py-2 rounded-full border border-primary/20 hover:border-primary hover:bg-primary/5 transition-all text-primary font-medium"
+                >
+                  Brand Sign In
+                </button>
+                <button
+                  onClick={() => setAuthView("agency-login")}
+                  className="px-6 py-2 rounded-full border border-accent/20 hover:border-accent hover:bg-accent/5 transition-all text-accent font-medium"
+                >
+                  Agency Sign In
+                </button>
+              </div>
+            </div>
             <a 
               href="/" 
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -399,7 +409,7 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
           </div>
 
           {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-border">
+          <div className="mt-6 pt-6 border-t border-border space-y-4">
             <div className="text-center">
               <button
                 onClick={() => {
@@ -411,12 +421,26 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {authView.includes("signup") ? "Already have an account? " : "Need an account? "}
-                <span className="text-primary font-semibold">
+                <span className={authView.includes("brand") ? "text-primary font-semibold" : "text-accent font-semibold"}>
                   {authView.includes("signup") ? "Sign in" : "Sign up"}
                 </span>
               </button>
             </div>
-            <div className="mt-6 flex justify-center">
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  if (authView.includes("brand")) {
+                    setAuthView(authView.includes("signup") ? "agency-signup" : "agency-login");
+                  } else {
+                    setAuthView(authView.includes("signup") ? "brand-signup" : "brand-login");
+                  }
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Looking for {authView.includes("brand") ? "Agency" : "Brand"} account? <span className={authView.includes("brand") ? "text-accent font-semibold" : "text-primary font-semibold"}>Switch here</span>
+              </button>
+            </div>
+            <div className="flex justify-center">
               <PoweredByBadge />
             </div>
           </div>
