@@ -136,11 +136,12 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
           toast({
             title: "Account created!",
-            description: "Welcome to Aderai. Check your email to verify your account.",
+            description: "Welcome to Aderai. Let's get you set up.",
           });
           
-          // User is now authenticated via Supabase - no localStorage needed
-          onComplete(authData.user);
+          // Redirect to appropriate onboarding
+          const accountType = authView.includes("agency") ? "agency" : "brand";
+          window.location.href = `/onboarding/${accountType}`;
         }
       } else {
         // Sign in
@@ -161,8 +162,8 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
             description: "You've successfully signed in.",
           });
           
-          // User is now authenticated via Supabase - no localStorage needed
-          onComplete(authData.user);
+          // Redirect directly to app for existing users
+          window.location.href = "/app";
         }
       }
     } catch (err: any) {
