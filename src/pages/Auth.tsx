@@ -93,6 +93,19 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
     
     try {
       if (authView.includes("signup")) {
+        // Check if user already exists first
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('email')
+          .eq('email', email.toLowerCase())
+          .maybeSingle();
+
+        if (existingUser) {
+          setError("An account with this email already exists. Please sign in instead.");
+          setLoading(false);
+          return;
+        }
+
         // Sign up
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -108,7 +121,12 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
         });
 
         if (signUpError) {
-          setError(signUpError.message);
+          // Handle specific error cases
+          if (signUpError.message.includes("already registered")) {
+            setError("An account with this email already exists. Please sign in instead.");
+          } else {
+            setError(signUpError.message);
+          }
           setLoading(false);
           return;
         }
@@ -129,6 +147,7 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
           if (insertError) {
             console.error('Error inserting user:', insertError);
+            // Don't block signup if user insert fails, auth user is already created
           }
 
           // Clear stored referral code

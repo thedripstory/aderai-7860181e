@@ -251,6 +251,9 @@ export type Database = {
           account_name: string
           account_type: string
           affiliate_code: string | null
+          agency_size: string | null
+          agency_specialization: string | null
+          client_management_needs: string | null
           created_at: string | null
           current_challenges: string | null
           email: string
@@ -261,9 +264,13 @@ export type Database = {
           klaviyo_setup_completed: boolean | null
           marketing_goals: string | null
           monthly_revenue_range: string | null
+          number_of_clients: string | null
           onboarding_completed: boolean | null
           password_hash: string
+          password_reset_expires: string | null
+          password_reset_token: string | null
           referred_by: string | null
+          service_offerings: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_status: string | null
@@ -274,6 +281,9 @@ export type Database = {
           account_name: string
           account_type: string
           affiliate_code?: string | null
+          agency_size?: string | null
+          agency_specialization?: string | null
+          client_management_needs?: string | null
           created_at?: string | null
           current_challenges?: string | null
           email: string
@@ -284,9 +294,13 @@ export type Database = {
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
           monthly_revenue_range?: string | null
+          number_of_clients?: string | null
           onboarding_completed?: boolean | null
           password_hash: string
+          password_reset_expires?: string | null
+          password_reset_token?: string | null
           referred_by?: string | null
+          service_offerings?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string | null
@@ -297,6 +311,9 @@ export type Database = {
           account_name?: string
           account_type?: string
           affiliate_code?: string | null
+          agency_size?: string | null
+          agency_specialization?: string | null
+          client_management_needs?: string | null
           created_at?: string | null
           current_challenges?: string | null
           email?: string
@@ -307,9 +324,13 @@ export type Database = {
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
           monthly_revenue_range?: string | null
+          number_of_clients?: string | null
           onboarding_completed?: boolean | null
           password_hash?: string
+          password_reset_expires?: string | null
+          password_reset_token?: string | null
           referred_by?: string | null
+          service_offerings?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string | null

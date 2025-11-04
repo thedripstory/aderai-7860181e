@@ -91,6 +91,40 @@ const KlaviyoSetup = () => {
         return;
       }
 
+      // Validate the Klaviyo API key first
+      toast({
+        title: "Validating API key...",
+        description: "Please wait while we verify your Klaviyo credentials.",
+      });
+
+      const { data: validationData, error: validationError } = await supabase.functions.invoke(
+        "klaviyo-validate-key",
+        {
+          body: { apiKey },
+        }
+      );
+
+      if (validationError) {
+        console.error("Validation error:", validationError);
+        toast({
+          title: "Validation Failed",
+          description: "Unable to validate API key. Please check your internet connection and try again.",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      if (!validationData?.valid) {
+        toast({
+          title: "Invalid API Key",
+          description: validationData?.error || "The API key you entered is not valid. Please check and try again.",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
       // Save Klaviyo configuration
       const { error: klaviyoError } = await supabase
         .from("klaviyo_keys")
