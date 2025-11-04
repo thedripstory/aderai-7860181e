@@ -8,15 +8,11 @@ const corsHeaders = {
 };
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const url = new URL(req.url);
-
-    // Only allow POST to avoid leaking API keys in query params
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
@@ -33,22 +29,20 @@ serve(async (req: Request) => {
       });
     }
 
-    // Forward request to existing Worker endpoint with proper header
-    const upstream = await fetch(
-      "https://aderai-worker.akshat-619.workers.dev/performance/metrics",
-      {
-        method: "GET",
-        headers: {
-          "X-API-Key": apiKey,
-        },
-      }
-    );
+    // Call Klaviyo API directly for metrics
+    const response = await fetch("https://a.klaviyo.com/api/metrics/", {
+      method: "GET",
+      headers: {
+        "Authorization": `Klaviyo-API-Key ${apiKey}`,
+        "revision": "2024-10-15",
+        "Accept": "application/json",
+      },
+    });
 
-    const text = await upstream.text();
+    const data = await response.json();
 
-    // Pass-through status but always include CORS + JSON content-type
-    return new Response(text, {
-      status: upstream.status,
+    return new Response(JSON.stringify(data), {
+      status: response.status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {

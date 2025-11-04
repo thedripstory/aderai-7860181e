@@ -689,34 +689,104 @@ export default function AderaiApp() {
     setLoading(true);
     setResults([]);
 
-    const newResults: SegmentResult[] = [];
+    try {
+      const activeKey = klaviyoKeys[activeKeyIndex];
+      const currencySymbol = activeKey.currency_symbol;
+      
+      const settings = {
+        highValue: activeKey.vip_threshold,
+        mediumValue: activeKey.high_value_threshold,
+        lowValue: activeKey.aov,
+        atRiskDays: activeKey.lapsed_days,
+        lostDays: activeKey.churned_days,
+        recentDays: activeKey.new_customer_days,
+        activeDays: 90, // Default active days
+      };
 
-    for (const segmentId of selectedSegments) {
-      const segment = SEGMENTS.find((s) => s.id === segmentId);
-      if (!segment) continue;
+      // Map frontend segment IDs to backend segment IDs
+      const segmentIdMapping: Record<string, string> = {
+        'vip': 'vip-customers',
+        'high-value': 'high-value-customers',
+        'new-customers': 'recent-customers',
+        'repeat-customers': 'repeat-customers',
+        'one-time-buyers': 'browsers',
+        'active-customers': 'active-customers',
+        'lapsed-customers': 'at-risk-customers',
+        'churned-customers': 'lost-customers',
+        'high-frequency': 'loyal-customers',
+        'engaged-subscribers': 'engaged-subscribers',
+        'unengaged-subscribers': 'highly-engaged',
+        'cart-abandoners': 'cart-abandoners',
+        'browse-abandoners': 'checkout-abandoners',
+      };
 
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+      const mappedSegmentIds = selectedSegments
+        .map(id => segmentIdMapping[id])
+        .filter(Boolean);
 
-        newResults.push({
-          segmentId,
-          status: "success",
-          message: `Successfully created "${segment.name}"`,
-          klaviyoId: `seg_${Math.random().toString(36).substr(2, 9)}`,
-        });
-      } catch (error) {
-        newResults.push({
-          segmentId,
-          status: "error",
-          message: `Failed to create "${segment.name}": ${error}`,
-        });
+      const { data: response, error } = await supabase.functions.invoke('klaviyo-create-segments', {
+        body: {
+          apiKey: activeKey.klaviyo_api_key_hash,
+          segmentIds: mappedSegmentIds,
+          currencySymbol,
+          settings,
+        },
+      });
+
+      if (error) {
+        throw error;
       }
 
-      setResults([...newResults]);
-    }
+      const newResults: SegmentResult[] = selectedSegments.map((segmentId, index) => {
+        const segment = SEGMENTS.find((s) => s.id === segmentId);
+        const result = response.results[index];
 
-    setLoading(false);
-    setView("results");
+        if (result.status === 'created') {
+          return {
+            segmentId,
+            status: "success",
+            message: `Successfully created "${segment?.name}"`,
+            klaviyoId: result.data?.data?.id,
+          };
+        } else if (result.status === 'exists') {
+          return {
+            segmentId,
+            status: "skipped",
+            message: `"${segment?.name}" already exists`,
+          };
+        } else if (result.status === 'missing_metrics') {
+          return {
+            segmentId,
+            status: "error",
+            message: `Cannot create "${segment?.name}": Required metrics not available in your Klaviyo account`,
+          };
+        } else {
+          return {
+            segmentId,
+            status: "error",
+            message: `Failed to create "${segment?.name}": ${result.error || 'Unknown error'}`,
+          };
+        }
+      });
+
+      setResults(newResults);
+    } catch (error: any) {
+      console.error('Segment creation error:', error);
+      
+      const errorResults: SegmentResult[] = selectedSegments.map((segmentId) => {
+        const segment = SEGMENTS.find((s) => s.id === segmentId);
+        return {
+          segmentId,
+          status: "error",
+          message: `Failed to create "${segment?.name}": ${error.message || 'Unknown error'}`,
+        };
+      });
+      
+      setResults(errorResults);
+    } finally {
+      setLoading(false);
+      setView("results");
+    }
   };
 
   const loadCachedAnalytics = (): AnalyticsCache | null => {
@@ -941,42 +1011,75 @@ export default function AderaiApp() {
       return;
     }
 
+    if (klaviyoKeys.length === 0 || !klaviyoKeys[activeKeyIndex]) {
+      alert("Klaviyo API key not found. Please complete onboarding first.");
+      return;
+    }
+
     setAiLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const activeKey = klaviyoKeys[activeKeyIndex];
 
-      const suggestions = [
-        {
-          name: "High-Intent Browsers",
-          description: "Customers who viewed products 3+ times but haven't purchased",
-          definition: "Viewed product >= 3 times AND Order count = 0 in last 30 days",
-          estimatedSize: "~2,500 profiles",
-          potentialRevenue: "$125,000",
-          confidence: 0.92,
+      const { data: response, error } = await supabase.functions.invoke('klaviyo-suggest-segments', {
+        body: {
+          apiKey: activeKey.klaviyo_api_key_hash,
+          answers: {
+            businessGoal: aiPrompt,
+            currency: activeKey.currency,
+            aov: activeKey.aov,
+            vipThreshold: activeKey.vip_threshold,
+            highValueThreshold: activeKey.high_value_threshold,
+          },
         },
-        {
-          name: "Cart Abandoners - High Value",
-          description: "Customers who abandoned carts with items worth over $200",
-          definition: "Started checkout AND Cart value > $200 AND No order in last 7 days",
-          estimatedSize: "~800 profiles",
-          potentialRevenue: "$160,000",
-          confidence: 0.88,
-        },
-        {
-          name: "Seasonal Shoppers",
-          description: "Customers who only purchase during sale periods",
-          definition: "All orders during promotional periods AND No full-price purchases",
-          estimatedSize: "~1,200 profiles",
-          potentialRevenue: "$90,000",
-          confidence: 0.85,
-        },
-      ];
+      });
 
-      setAiSuggestions(suggestions);
-    } catch (error) {
+      if (error) {
+        throw error;
+      }
+
+      setAiSuggestions(response.segments || []);
+    } catch (error: any) {
       console.error("AI generation error:", error);
-      alert("Failed to generate suggestions. Please try again.");
+      alert(`Failed to generate suggestions: ${error.message || 'Unknown error'}`);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const createAiSegment = async (suggestion: any) => {
+    if (klaviyoKeys.length === 0 || !klaviyoKeys[activeKeyIndex]) {
+      alert("Klaviyo API key not found. Please complete onboarding first.");
+      return;
+    }
+
+    setAiLoading(true);
+
+    try {
+      const activeKey = klaviyoKeys[activeKeyIndex];
+
+      const { data: response, error } = await supabase.functions.invoke('klaviyo-create-custom-segment', {
+        body: {
+          apiKey: activeKey.klaviyo_api_key_hash,
+          segmentName: suggestion.name,
+          segmentDescription: suggestion.description,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (response.status === 'exists') {
+        alert(`Segment "${suggestion.name}" already exists in your Klaviyo account`);
+      } else if (response.status === 'created') {
+        alert(`Successfully created segment "${suggestion.name}"!`);
+        // Remove the created suggestion from the list
+        setAiSuggestions(prev => prev.filter(s => s.name !== suggestion.name));
+      }
+    } catch (error: any) {
+      console.error("Segment creation error:", error);
+      alert(`Failed to create segment: ${error.message || 'Unknown error'}`);
     } finally {
       setAiLoading(false);
     }
@@ -1840,8 +1943,19 @@ export default function AderaiApp() {
                     </div>
                   </div>
 
-                  <button className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90">
-                    Create This Segment
+                  <button 
+                    onClick={() => createAiSegment(suggestion)}
+                    disabled={aiLoading}
+                    className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      'Create This Segment'
+                    )}
                   </button>
                 </div>
               ))}

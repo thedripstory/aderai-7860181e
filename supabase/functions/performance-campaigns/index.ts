@@ -8,7 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -30,21 +29,20 @@ serve(async (req: Request) => {
       });
     }
 
-    // Forward request to Worker endpoint
-    const upstream = await fetch(
-      "https://aderai-worker.akshat-619.workers.dev/performance/campaigns",
-      {
-        method: "GET",
-        headers: {
-          "X-API-Key": apiKey,
-        },
-      }
-    );
+    // Call Klaviyo API directly for campaigns
+    const response = await fetch("https://a.klaviyo.com/api/campaigns/", {
+      method: "GET",
+      headers: {
+        "Authorization": `Klaviyo-API-Key ${apiKey}`,
+        "revision": "2024-10-15",
+        "Accept": "application/json",
+      },
+    });
 
-    const text = await upstream.text();
+    const data = await response.json();
 
-    return new Response(text, {
-      status: upstream.status,
+    return new Response(JSON.stringify(data), {
+      status: response.status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
