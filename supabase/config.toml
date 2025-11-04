@@ -29,3 +29,12 @@ verify_jwt = true
 
 [functions.klaviyo-create-segments]
 verify_jwt = true
+
+[functions.send-password-reset]
+verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = true

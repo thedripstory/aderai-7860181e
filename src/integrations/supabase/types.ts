@@ -95,6 +95,39 @@ export type Database = {
           },
         ]
       }
+      agency_clients: {
+        Row: {
+          agency_user_id: string
+          brand_user_id: string
+          client_name: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agency_user_id: string
+          brand_user_id: string
+          client_name: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agency_user_id?: string
+          brand_user_id?: string
+          client_name?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ai_suggestions: {
         Row: {
           challenge: string | null
@@ -145,6 +178,47 @@ export type Database = {
           },
           {
             foreignKeyName: "ai_suggestions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_audit_log: {
+        Row: {
+          email_type: string
+          error_message: string | null
+          id: string
+          recipient_email: string
+          sent_at: string | null
+          status: string | null
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          email_type: string
+          error_message?: string | null
+          id?: string
+          recipient_email: string
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          user_id: string
+        }
+        Update: {
+          email_type?: string
+          error_message?: string | null
+          id?: string
+          recipient_email?: string
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_audit_log_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -217,6 +291,54 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          email_marketing: boolean | null
+          email_on_api_key_added: boolean | null
+          email_on_api_key_changes: boolean | null
+          email_on_client_added: boolean | null
+          email_on_client_invitation: boolean | null
+          email_on_password_reset: boolean | null
+          email_on_segment_creation: boolean | null
+          email_on_settings_updated: boolean | null
+          email_weekly_summary: boolean | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email_marketing?: boolean | null
+          email_on_api_key_added?: boolean | null
+          email_on_api_key_changes?: boolean | null
+          email_on_client_added?: boolean | null
+          email_on_client_invitation?: boolean | null
+          email_on_password_reset?: boolean | null
+          email_on_segment_creation?: boolean | null
+          email_on_settings_updated?: boolean | null
+          email_weekly_summary?: boolean | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email_marketing?: boolean | null
+          email_on_api_key_added?: boolean | null
+          email_on_api_key_changes?: boolean | null
+          email_on_client_added?: boolean | null
+          email_on_client_invitation?: boolean | null
+          email_on_password_reset?: boolean | null
+          email_on_segment_creation?: boolean | null
+          email_on_settings_updated?: boolean | null
+          email_weekly_summary?: boolean | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       segment_analytics_cache: {
         Row: {
           cached_at: string | null
@@ -245,6 +367,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      two_factor_auth: {
+        Row: {
+          backup_codes: string[] | null
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          last_used_at: string | null
+          secret: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_used_at?: string | null
+          secret: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_used_at?: string | null
+          secret?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       users: {
         Row: {
@@ -275,6 +430,9 @@ export type Database = {
           stripe_subscription_id: string | null
           subscription_status: string | null
           subscription_tier: string | null
+          two_factor_backup_codes: Json | null
+          two_factor_enabled: boolean | null
+          two_factor_secret: string | null
           updated_at: string | null
         }
         Insert: {
@@ -305,6 +463,9 @@ export type Database = {
           stripe_subscription_id?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          two_factor_backup_codes?: Json | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -335,6 +496,9 @@ export type Database = {
           stripe_subscription_id?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          two_factor_backup_codes?: Json | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string | null
         }
         Relationships: []

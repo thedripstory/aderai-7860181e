@@ -15,12 +15,18 @@ const CURRENCIES = [
 ];
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security">("account");
+  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications">("account");
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeKey, setActiveKey] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Notification preferences
+  const [emailOnSegmentCreation, setEmailOnSegmentCreation] = useState(true);
+  const [emailOnClientAdded, setEmailOnClientAdded] = useState(true);
+  const [emailOnApiKeyAdded, setEmailOnApiKeyAdded] = useState(true);
+  const [emailOnSettingsUpdated, setEmailOnSettingsUpdated] = useState(false);
 
   // Account settings
   const [accountName, setAccountName] = useState("");
@@ -79,6 +85,20 @@ export default function Settings() {
         setNewCustomerDays(keyData.new_customer_days.toString());
         setLapsedDays(keyData.lapsed_days.toString());
         setChurnedDays(keyData.churned_days.toString());
+      }
+
+      // Load notification preferences
+      const { data: notifPrefs } = await supabase
+        .from("notification_preferences")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (notifPrefs) {
+        setEmailOnSegmentCreation(notifPrefs.email_on_segment_creation ?? true);
+        setEmailOnClientAdded(notifPrefs.email_on_client_added ?? true);
+        setEmailOnApiKeyAdded(notifPrefs.email_on_api_key_added ?? true);
+        setEmailOnSettingsUpdated(notifPrefs.email_on_settings_updated ?? false);
       }
     };
 
@@ -229,6 +249,37 @@ export default function Settings() {
     }
   };
 
+  const handleSaveNotifications = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from("notification_preferences")
+        .update({
+          email_on_segment_creation: emailOnSegmentCreation,
+          email_on_client_added: emailOnClientAdded,
+          email_on_api_key_added: emailOnApiKeyAdded,
+          email_on_settings_updated: emailOnSettingsUpdated,
+        })
+        .eq("user_id", currentUser.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Preferences updated",
+        description: "Your notification settings have been saved.",
+      });
+    } catch (error) {
+      console.error("Error updating notifications:", error);
+      toast({
+        title: "Update failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
@@ -296,6 +347,17 @@ export default function Settings() {
             >
               <Lock className="w-5 h-5 inline mr-2" />
               Security
+            </button>
+            <button
+              onClick={() => setActiveTab("notifications")}
+              className={`flex-1 px-6 py-4 font-medium transition-colors ${
+                activeTab === "notifications"
+                  ? "bg-primary/10 text-primary border-b-2 border-primary"
+                  : "text-muted-foreground hover:bg-muted"
+              }`}
+            >
+              <AlertCircle className="w-5 h-5 inline mr-2" />
+              Notifications
             </button>
           </div>
 
@@ -470,6 +532,93 @@ export default function Settings() {
                     <p className="text-sm text-muted-foreground">
                       Your Klaviyo API keys are encrypted and stored securely. They are never exposed in the client-side code.
                     </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "notifications" && (
+              <div className="space-y-6 max-w-xl">
+                <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4 mb-6">
+                  <h4 className="font-medium mb-2">Email Notification Preferences</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Choose which email notifications you'd like to receive. You can update these preferences at any time.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">Segment Creation</div>
+                      <div className="text-sm text-muted-foreground">Get notified when segments are successfully created in Klaviyo</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailOnSegmentCreation}
+                      onChange={(e) => setEmailOnSegmentCreation(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">Client Management</div>
+                      <div className="text-sm text-muted-foreground">Receive notifications when new clients are added (agencies only)</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailOnClientAdded}
+                      onChange={(e) => setEmailOnClientAdded(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">API Key Changes</div>
+                      <div className="text-sm text-muted-foreground">Get notified when Klaviyo API keys are added or updated</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailOnApiKeyAdded}
+                      onChange={(e) => setEmailOnApiKeyAdded(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">Settings Updates</div>
+                      <div className="text-sm text-muted-foreground">Receive confirmations when account or threshold settings are updated</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailOnSettingsUpdated}
+                      onChange={(e) => setEmailOnSettingsUpdated(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+                </div>
+
+                <button
+                  onClick={handleSaveNotifications}
+                  disabled={loading}
+                  className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? "Saving..." : "Save Preferences"}
+                </button>
+
+                <div className="pt-6 border-t-2 border-border">
+                  <div className="bg-blue-500/10 border-2 border-blue-500/20 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-medium mb-1">Email Delivery</h4>
+                        <p className="text-sm text-muted-foreground">
+                          All emails are sent from <strong>onboarding@resend.dev</strong>. Make sure to whitelist this sender to ensure you receive notifications.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

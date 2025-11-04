@@ -154,9 +154,24 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
         // Clear stored referral code
         localStorage.removeItem('aderai_ref');
 
+        // Send welcome email
+        try {
+          await supabase.functions.invoke('send-welcome-email', {
+            body: {
+              email: authData.user.email,
+              userName: accountName,
+              accountType: authView.includes("agency") ? "agency" : "brand",
+              userId: authData.user.id
+            }
+          });
+        } catch (emailError) {
+          console.error("Welcome email error:", emailError);
+          // Don't block signup if email fails
+        }
+
         toast({
           title: "Account created!",
-          description: "Check your email to confirm your account. You can still continue with onboarding.",
+          description: "Check your email for a welcome message and to confirm your account.",
         });
         
         // Redirect to appropriate onboarding
