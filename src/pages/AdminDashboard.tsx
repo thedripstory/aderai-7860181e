@@ -23,6 +23,8 @@ import { AdminUserSessions } from "@/components/AdminUserSessions";
 import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
 import { AdminErrorTracking } from "@/components/AdminErrorTracking";
 import { AdminRevenueTracking } from "@/components/AdminRevenueTracking";
+import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
+import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -43,6 +45,9 @@ const AdminDashboard = () => {
   const [emailLogs, setEmailLogs] = useState<any[]>([]);
   const [segmentErrors, setSegmentErrors] = useState<any[]>([]);
   const [userRoles, setUserRoles] = useState<any[]>([]);
+
+  // Enable system health monitoring
+  useSystemHealthMonitor();
 
   useEffect(() => {
     checkAdminAccess();
@@ -317,10 +322,12 @@ const AdminDashboard = () => {
                 <p className="text-sm text-muted-foreground">System Management & Analytics</p>
               </div>
             </div>
-            <Button variant="outline" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="icon" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+              <AdminNotificationCenter />
+            </div>
           </div>
         </div>
       </div>

@@ -53,6 +53,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notifications: {
+        Row: {
+          admin_user_id: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          notification_type: string
+          read: boolean | null
+          severity: string
+          title: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          notification_type: string
+          read?: boolean | null
+          severity: string
+          title: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          notification_type?: string
+          read?: boolean | null
+          severity?: string
+          title?: string
+        }
+        Relationships: []
+      }
       affiliate_clicks: {
         Row: {
           affiliate_code: string
