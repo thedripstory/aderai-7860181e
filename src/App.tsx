@@ -16,6 +16,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import BrandDashboard from "./pages/BrandDashboard";
 import AgencyDashboard from "./pages/AgencyDashboard";
+import UnifiedDashboard from "./pages/UnifiedDashboard";
 
 const queryClient = new QueryClient();
 
@@ -27,8 +28,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/brand-dashboard" element={<BrandDashboard />} />
+          <Route path="/brand-dashboard" element={<UnifiedDashboard />} />
           <Route path="/agency-dashboard" element={<AgencyDashboard />} />
+          <Route path="/dashboard" element={<UnifiedDashboard />} />
           <Route 
             path="/app" 
             element={<Index />} 

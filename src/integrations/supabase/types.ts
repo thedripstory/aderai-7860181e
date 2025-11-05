@@ -368,6 +368,51 @@ export type Database = {
           },
         ]
       }
+      segment_creation_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_count: number | null
+          error_message: string | null
+          id: string
+          klaviyo_key_id: string
+          segments_processed: number | null
+          segments_to_create: Json
+          status: string
+          success_count: number | null
+          total_segments: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_count?: number | null
+          error_message?: string | null
+          id?: string
+          klaviyo_key_id: string
+          segments_processed?: number | null
+          segments_to_create: Json
+          status?: string
+          success_count?: number | null
+          total_segments: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_count?: number | null
+          error_message?: string | null
+          id?: string
+          klaviyo_key_id?: string
+          segments_processed?: number | null
+          segments_to_create?: Json
+          status?: string
+          success_count?: number | null
+          total_segments?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       two_factor_auth: {
         Row: {
           backup_codes: string[] | null
