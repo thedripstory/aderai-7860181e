@@ -83,6 +83,25 @@ const KlaviyoSetup = () => {
       return;
     }
 
+    // Validate API key format (Klaviyo private keys start with "pk_")
+    if (!apiKey.startsWith("pk_")) {
+      toast({
+        title: "Invalid API Key Format",
+        description: "Klaviyo Private API keys should start with 'pk_'. Please check your key.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (apiKey.length < 20) {
+      toast({
+        title: "Invalid API Key",
+        description: "The API key appears to be too short. Please verify you copied the complete key.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
 
     try {

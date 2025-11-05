@@ -128,6 +128,45 @@ export type Database = {
         }
         Relationships: []
       }
+      agency_team_invitations: {
+        Row: {
+          agency_user_id: string
+          created_at: string | null
+          id: string
+          invitation_token: string
+          invited_user_id: string | null
+          member_email: string
+          member_role: string
+          status: string
+          token_expires_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          agency_user_id: string
+          created_at?: string | null
+          id?: string
+          invitation_token: string
+          invited_user_id?: string | null
+          member_email: string
+          member_role?: string
+          status?: string
+          token_expires_at: string
+          updated_at?: string | null
+        }
+        Update: {
+          agency_user_id?: string
+          created_at?: string | null
+          id?: string
+          invitation_token?: string
+          invited_user_id?: string | null
+          member_email?: string
+          member_role?: string
+          status?: string
+          token_expires_at?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ai_suggestions: {
         Row: {
           challenge: string | null

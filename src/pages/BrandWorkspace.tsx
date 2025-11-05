@@ -26,14 +26,14 @@ export default function BrandWorkspace() {
         return;
       }
 
-      // Get user account type first
-      const { data: agencyUserData } = await supabase
+      // CRITICAL: Get user account type first and verify agency
+      const { data: agencyUserData, error: userError } = await supabase
         .from("users")
         .select("account_type")
         .eq("id", user.id)
         .single();
 
-      if (agencyUserData?.account_type !== "agency") {
+      if (userError || agencyUserData?.account_type !== "agency") {
         toast({
           title: "Access Denied",
           description: "Only agency accounts can access client workspaces.",

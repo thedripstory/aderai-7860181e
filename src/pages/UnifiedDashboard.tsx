@@ -23,7 +23,9 @@ import { toast } from 'sonner';
 export default function UnifiedDashboard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('clientId'); // For agencies accessing client dashboards
+  const urlClientId = searchParams.get('clientId'); // For agencies accessing client dashboards
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [klaviyoKeys, setKlaviyoKeys] = useState<KlaviyoKey[]>([]);
@@ -77,9 +79,33 @@ export default function UnifiedDashboard() {
       setAccountType(userData.account_type);
       setCurrentUser(session.user);
       
-      // If clientId is provided, verify agency access and load client's keys
-      if (clientId) {
-        await loadClientKeys(session.user.id, clientId);
+      // Verify clientId if provided in URL (SECURITY CHECK)
+      if (urlClientId) {
+        // Only agencies can access client data
+        if (userData.account_type !== "agency") {
+          toast.error("You don't have permission to access client data");
+          navigate("/dashboard");
+          return;
+        }
+        
+        // Verify agency owns this client
+        const { data: clientRelation, error: clientError } = await supabase
+          .from("agency_clients")
+          .select("id")
+          .eq("agency_user_id", session.user.id)
+          .eq("brand_user_id", urlClientId)
+          .maybeSingle();
+
+        if (clientError || !clientRelation) {
+          toast.error("You don't have access to this client");
+          navigate("/agency-dashboard");
+          return;
+        }
+        
+        // Valid client access
+        setClientId(urlClientId);
+        setSelectedClientId(urlClientId);
+        await loadClientKeys(session.user.id, urlClientId);
       } else {
         await loadKlaviyoKeys(session.user.id);
       }
@@ -173,14 +199,16 @@ export default function UnifiedDashboard() {
     setSelectedSegments([]);
   };
 
-  const handleCreateSegments = async () => {
+  const handleCreateSegments = async (segmentIds?: string[]) => {
     // Check email verification
     if (!emailVerified) {
       toast.error("Please verify your email before creating segments");
       return;
     }
 
-    if (selectedSegments.length === 0 || klaviyoKeys.length === 0) {
+    const segmentsToCreate = segmentIds || selectedSegments;
+
+    if (segmentsToCreate.length === 0 || klaviyoKeys.length === 0) {
       return;
     }
 
@@ -189,12 +217,17 @@ export default function UnifiedDashboard() {
     const { SEGMENTS } = await import('@/components/SegmentDashboard');
     
     await createSegments(
-      selectedSegments,
+      segmentsToCreate,
       klaviyoKeys[activeKeyIndex],
       SEGMENTS
     );
 
     setView('results');
+  };
+
+  const handleRetryFailed = async (failedSegmentIds: string[]) => {
+    setResults([]); // Clear previous results
+    await handleCreateSegments(failedSegmentIds);
   };
 
   const fetchAllSegments = async () => {
@@ -287,6 +320,7 @@ export default function UnifiedDashboard() {
         loading={creatingSegments}
         results={results}
         onViewResults={() => setView(null)}
+        onRetryFailed={handleRetryFailed}
       />
     );
   }
@@ -347,7 +381,7 @@ export default function UnifiedDashboard() {
         <Tabs defaultValue="segments" className="w-full">
           <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="segments">Segments</TabsTrigger>
-            <TabsTrigger value="analytics" onClick={fetchAllSegments}>Analytics</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="ai">AI</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
@@ -373,7 +407,7 @@ export default function UnifiedDashboard() {
                     <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
                   </div>
                   <Button
-                    onClick={handleCreateSegments}
+                    onClick={() => handleCreateSegments()}
                     disabled={creatingSegments || !emailVerified}
                     size="lg"
                   >

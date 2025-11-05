@@ -7,13 +7,17 @@ interface SegmentCreationFlowProps {
   loading: boolean;
   results: SegmentResult[];
   onViewResults: () => void;
+  onRetryFailed?: (failedSegmentIds: string[]) => void;
 }
 
 export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   loading,
   results,
   onViewResults,
+  onRetryFailed,
 }) => {
+  const failedResults = results.filter(r => r.status === 'error');
+  const hasFailures = failedResults.length > 0;
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
@@ -78,12 +82,22 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
           </div>
 
           {!loading && (
-            <button
-              onClick={onViewResults}
-              className="w-full mt-6 bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90"
-            >
-              View Results
-            </button>
+            <div className="space-y-3 mt-6">
+              {hasFailures && onRetryFailed && (
+                <button
+                  onClick={() => onRetryFailed(failedResults.map(r => r.segmentId))}
+                  className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+                >
+                  Retry Failed Segments ({failedResults.length})
+                </button>
+              )}
+              <button
+                onClick={onViewResults}
+                className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90"
+              >
+                {hasFailures ? 'Continue with Successful Segments' : 'View Results'}
+              </button>
+            </div>
           )}
         </div>
       </div>

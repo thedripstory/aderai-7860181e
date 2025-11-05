@@ -44,20 +44,19 @@ export default function BrandDashboard() {
         .eq("id", user.id)
         .single();
 
+      // Soft check for email verification (warn but allow access)
+      if (!userData?.email_verified) {
+        toast({
+          title: "Email Not Verified",
+          description: "Please verify your email to unlock all features",
+          variant: "default",
+        });
+      }
+
       // Verify onboarding and klaviyo setup completion
       if (!userData?.onboarding_completed) {
         navigate("/onboarding/brand");
         return;
-      }
-      
-      // Check email verification
-      if (!userData?.email_verified) {
-        toast({
-          title: "Email Verification Required",
-          description: "Please verify your email before accessing the dashboard",
-          variant: "destructive",
-        });
-        // Still allow access but show warning
       }
       
       if (!userData?.klaviyo_setup_completed) {

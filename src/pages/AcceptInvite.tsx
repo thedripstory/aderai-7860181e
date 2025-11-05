@@ -38,11 +38,32 @@ export default function AcceptInvite() {
         return;
       }
 
-      // Call edge function which will verify email matches invitation
+      // Query invitation to verify email matches BEFORE accepting
+      const { data: invitation, error: inviteError } = await supabase
+        .from("agency_team_invitations")
+        .select("*")
+        .eq("invitation_token", token)
+        .maybeSingle();
+
+      if (inviteError || !invitation) {
+        setStatus("error");
+        setMessage("Invalid or expired invitation");
+        return;
+      }
+
+      // Critical security check: verify email matches
+      if (invitation.member_email.toLowerCase() !== user.email?.toLowerCase()) {
+        setStatus("error");
+        setMessage("This invitation was sent to a different email address");
+        toast.error("Email mismatch: This invitation is not for your account");
+        return;
+      }
+
+      // Call edge function to complete acceptance
       const { data, error } = await supabase.functions.invoke("agency-accept-invite", {
         body: { 
           invitationToken: token,
-          userEmail: user.email // Send email for verification
+          userEmail: user.email
         },
       });
 
