@@ -19,6 +19,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import OnboardingProgressBar from "@/components/OnboardingProgressBar";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
+import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import { ProductTourModal } from "@/components/ProductTourModal";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import { useAnalyticsTracking } from "@/hooks/useAnalyticsTracking";
+import { useProductTour } from "@/hooks/useProductTour";
+import { ErrorLogger } from "@/lib/errorLogger";
 
 export default function BrandDashboard() {
   const [loading, setLoading] = useState(true);
@@ -27,6 +33,15 @@ export default function BrandDashboard() {
   const [segmentsCreated, setSegmentsCreated] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Session timeout monitoring
+  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
+  
+  // Analytics tracking
+  const { trackEvent } = useAnalyticsTracking();
+  
+  // Product tour
+  const { showTour, closeTour, dontShowAgain } = useProductTour();
 
   useEffect(() => {
     loadDashboardData();
@@ -84,8 +99,17 @@ export default function BrandDashboard() {
         .eq("user_id", user.id);
 
       setSegmentsCreated(suggestionsData?.length || 0);
+      
+      // Track dashboard view
+      trackEvent('brand_dashboard_view', {
+        klaviyo_keys: keysData?.length || 0,
+        segments_created: suggestionsData?.length || 0,
+      });
     } catch (error) {
       console.error("Error loading dashboard:", error);
+      ErrorLogger.logError(error as Error, {
+        context: 'BrandDashboard.loadDashboardData',
+      });
       toast({
         title: "Error loading dashboard",
         description: "Please try refreshing the page",
@@ -115,6 +139,23 @@ export default function BrandDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      {/* Session Timeout Warning */}
+      {showWarning && (
+        <SessionTimeoutWarning
+          onRefresh={refreshSession}
+          onDismiss={dismissWarning}
+          expiresAt={sessionExpiresAt}
+        />
+      )}
+      
+      {/* Product Tour Modal */}
+      {showTour && (
+        <ProductTourModal
+          onClose={closeTour}
+          onDontShowAgain={dontShowAgain}
+        />
+      )}
+      
       {/* Header */}
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">

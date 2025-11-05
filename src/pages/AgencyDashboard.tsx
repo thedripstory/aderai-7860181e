@@ -29,6 +29,10 @@ import { AgencyTeamManager } from "@/components/AgencyTeamManager";
 import AgencyTeamDashboard from "@/components/AgencyTeamDashboard";
 import OnboardingProgressBar from "@/components/OnboardingProgressBar";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
+import { AgencyEmptyState } from "@/components/AgencyEmptyState";
+import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import { useAnalyticsTracking } from "@/hooks/useAnalyticsTracking";
 
 interface Client {
   id: string;
@@ -53,6 +57,9 @@ export default function AgencyDashboard() {
   const [segmentsCreated, setSegmentsCreated] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
+  const { trackEvent } = useAnalyticsTracking();
 
   useEffect(() => {
     loadClients();
@@ -204,6 +211,14 @@ export default function AgencyDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent/5 via-background to-primary/5">
+      {showWarning && (
+        <SessionTimeoutWarning
+          onRefresh={refreshSession}
+          onDismiss={dismissWarning}
+          expiresAt={sessionExpiresAt}
+        />
+      )}
+      
       {/* Header */}
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -335,21 +350,19 @@ export default function AgencyDashboard() {
 
         {/* Clients List */}
         {filteredClients.length === 0 ? (
-          <div className="bg-card rounded-lg border-2 border-border p-12 text-center">
-            <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No clients found</h3>
-            <p className="text-muted-foreground mb-6">
-              {searchTerm || statusFilter !== "all"
-                ? "Try adjusting your filters"
-                : "Start by adding your first client"}
-            </p>
-            {!searchTerm && statusFilter === "all" && (
-              <Button onClick={handleAddClient}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Your First Client
-              </Button>
+          <>
+            {!searchTerm && statusFilter === "all" && clients.length === 0 ? (
+              <AgencyEmptyState onAddClient={handleAddClient} />
+            ) : (
+              <div className="bg-card rounded-lg border-2 border-border p-12 text-center">
+                <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No clients found</h3>
+                <p className="text-muted-foreground mb-6">
+                  Try adjusting your filters
+                </p>
+              </div>
             )}
-          </div>
+          </>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredClients.map((client) => (

@@ -143,18 +143,22 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
             account_name: accountName,
             account_type: authView.includes("agency") ? "agency" : "brand",
             referred_by: referralCode || null,
-            email_verified: false,
+            email_verified: true, // Auto-confirmed now
           });
 
         if (insertError) {
           console.error('Error inserting user:', insertError);
-          // Don't block signup if user insert fails, auth user is already created
+          toast({
+            title: "Warning",
+            description: "Account created but profile setup had issues. Please contact support if problems persist.",
+            variant: "default",
+          });
         }
 
         // Clear stored referral code
         localStorage.removeItem('aderai_ref');
 
-        // Send welcome email
+        // Send welcome email (non-blocking)
         try {
           await supabase.functions.invoke('send-welcome-email', {
             body: {
@@ -171,12 +175,16 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
         toast({
           title: "Account created!",
-          description: "Check your email for a welcome message and to confirm your account.",
+          description: "Welcome to aderai! Let's get you set up.",
         });
         
         // Navigate to onboarding - new users always need onboarding
         const accountType = authView.includes("agency") ? "agency" : "brand";
-        navigate(`/onboarding/${accountType}`);
+        
+        // Small delay to ensure database consistency
+        setTimeout(() => {
+          navigate(`/onboarding/${accountType}`);
+        }, 500);
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
