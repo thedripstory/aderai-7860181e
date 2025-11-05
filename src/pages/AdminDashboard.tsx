@@ -24,6 +24,7 @@ import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
 import { AdminErrorTracking } from "@/components/AdminErrorTracking";
 import { AdminRevenueTracking } from "@/components/AdminRevenueTracking";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
+import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 
 const AdminDashboard = () => {
@@ -334,8 +335,9 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-12 w-full mb-8">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-13 w-full mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="journey">User Journey</TabsTrigger>
             <TabsTrigger value="health">System Health</TabsTrigger>
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
             <TabsTrigger value="api">API Monitor</TabsTrigger>
@@ -417,6 +419,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* User Journey Tab */}
+          <TabsContent value="journey">
+            <AdminUserJourneyAnalytics />
           </TabsContent>
 
           {/* System Health Tab */}

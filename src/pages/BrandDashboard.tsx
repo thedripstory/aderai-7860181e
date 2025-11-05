@@ -12,6 +12,7 @@ import {
   CheckCircle,
   ArrowRight,
   Zap,
+  HelpCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -24,7 +25,10 @@ import { ProductTourModal } from "@/components/ProductTourModal";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { useAnalyticsTracking } from "@/hooks/useAnalyticsTracking";
 import { useProductTour } from "@/hooks/useProductTour";
+import { useGuidedTour, TourStep } from "@/hooks/useGuidedTour";
 import { ErrorLogger } from "@/lib/errorLogger";
+import { Steps } from 'intro.js-react';
+import 'intro.js/introjs.css';
 
 export default function BrandDashboard() {
   const [loading, setLoading] = useState(true);
@@ -42,6 +46,45 @@ export default function BrandDashboard() {
   
   // Product tour
   const { showTour, closeTour, dontShowAgain } = useProductTour();
+  
+  // Guided tour steps
+  const tourSteps: TourStep[] = [
+    {
+      intro: '<h3>Welcome to aderai! 🎉</h3><p>Let\'s take a quick tour of your brand dashboard and show you the key features.</p>',
+      title: 'Welcome',
+    },
+    {
+      element: '.ai-segment-card',
+      intro: '<h4>AI Segment Suggester</h4><p>This powerful feature analyzes your business and automatically suggests the perfect customer segments tailored to your goals. Click here to start creating segments in seconds!</p>',
+      position: 'bottom',
+      title: 'AI Segment Suggester',
+    },
+    {
+      element: '.analytics-card',
+      intro: '<h4>Analytics Dashboard</h4><p>Track your segment performance with real-time analytics. Monitor growth metrics, engagement rates, and revenue impact all in one place.</p>',
+      position: 'bottom',
+      title: 'Analytics',
+    },
+    {
+      element: '[data-tour="quick-stats"]',
+      intro: '<h4>Quick Stats</h4><p>Get a snapshot of your account status: active Klaviyo integrations, total segments created, and overall account health.</p>',
+      position: 'bottom',
+      title: 'Dashboard Stats',
+    },
+    {
+      intro: '<h3>You\'re all set! 🚀</h3><p>Start by connecting your Klaviyo account, then let our AI suggest segments tailored to your business. Need help? Click the settings button anytime.</p>',
+      title: 'Ready to Go!',
+    },
+  ];
+
+  const {
+    tourEnabled,
+    tourCompleted,
+    setTourEnabled,
+    completeTour,
+    skipTour,
+    restartTour,
+  } = useGuidedTour(tourSteps, 'brand_dashboard');
 
   useEffect(() => {
     loadDashboardData();
@@ -170,6 +213,12 @@ export default function BrandDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              {tourCompleted && (
+                <Button variant="outline" size="sm" onClick={restartTour}>
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Restart Tour
+                </Button>
+              )}
               <Button variant="outline" onClick={() => navigate("/settings")}>
                 <SettingsIcon className="w-4 h-4 mr-2" />
                 Settings
@@ -206,8 +255,26 @@ export default function BrandDashboard() {
           hasCreatedSegments={segmentsCreated > 0}
         />
 
+        {/* Intro.js Tour */}
+        <Steps
+          enabled={tourEnabled}
+          steps={tourSteps}
+          initialStep={0}
+          onExit={skipTour}
+          onComplete={completeTour}
+          options={{
+            showProgress: true,
+            showBullets: true,
+            exitOnOverlayClick: false,
+            doneLabel: 'Get Started!',
+            nextLabel: 'Next →',
+            prevLabel: '← Back',
+            skipLabel: 'Skip Tour',
+          }}
+        />
+
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" data-tour="quick-stats">
           <div className="bg-card rounded-lg border-2 border-border p-6">
             <div className="flex items-center justify-between mb-2">
               <Key className="w-5 h-5 text-primary" />
@@ -257,7 +324,7 @@ export default function BrandDashboard() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-card rounded-lg border-2 border-primary/20 p-6 hover:border-primary transition-colors group cursor-pointer">
+          <div className="ai-segment-card bg-card rounded-lg border-2 border-primary/20 p-6 hover:border-primary transition-colors group cursor-pointer">
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Sparkles className="w-6 h-6 text-primary" />
@@ -277,7 +344,7 @@ export default function BrandDashboard() {
             </Button>
           </div>
 
-          <div className="bg-card rounded-lg border-2 border-accent/20 p-6 hover:border-accent transition-colors group cursor-pointer">
+          <div className="analytics-card bg-card rounded-lg border-2 border-accent/20 p-6 hover:border-accent transition-colors group cursor-pointer">
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
                 <BarChart3 className="w-6 h-6 text-accent" />
