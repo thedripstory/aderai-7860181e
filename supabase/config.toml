@@ -38,3 +38,15 @@ verify_jwt = false
 
 [functions.send-notification-email]
 verify_jwt = true
+
+[functions.agency-invite-team]
+verify_jwt = true
+
+[functions.agency-accept-invite]
+verify_jwt = true
+
+[functions.klaviyo-webhook-handler]
+verify_jwt = false
+
+[functions.calculate-segment-performance]
+verify_jwt = true
