@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocation } from "react-router-dom";
 
 interface NavItem {
   name: string;
@@ -15,8 +16,25 @@ interface NavBarProps {
 }
 
 export function TubelightNavbar({ items, className }: NavBarProps) {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState(items[0].name);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Set active tab based on current route
+  useEffect(() => {
+    const currentPath = location.pathname + location.hash;
+    const activeItem = items.find(item => {
+      // Exact match for full path
+      if (item.url === currentPath) return true;
+      // Match for pathname only (without hash)
+      if (item.url === location.pathname) return true;
+      return false;
+    });
+    
+    if (activeItem) {
+      setActiveTab(activeItem.name);
+    }
+  }, [location, items]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -26,6 +44,14 @@ export function TubelightNavbar({ items, className }: NavBarProps) {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Enable smooth scrolling globally
+  useEffect(() => {
+    document.documentElement.style.scrollBehavior = 'smooth';
+    return () => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    };
   }, []);
 
   const handleClick = (item: NavItem) => {
