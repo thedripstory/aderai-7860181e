@@ -409,15 +409,10 @@ const KlaviyoSetup = () => {
                     onClick={async () => {
                       if (!user) return;
                       
-                      // Mark setup as skipped but allow access
-                      await supabase
-                        .from("users")
-                        .update({ klaviyo_setup_completed: true })
-                        .eq("id", user.id);
-                      
+                      // Don't mark as completed - just navigate
                       toast({
                         title: "Skipped for now",
-                        description: "You can add your Klaviyo account later in settings.",
+                        description: "You'll see a reminder to connect Klaviyo on your dashboard.",
                       });
                       
                       navigate("/app");

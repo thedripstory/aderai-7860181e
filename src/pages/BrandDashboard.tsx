@@ -44,6 +44,17 @@ export default function BrandDashboard() {
         .eq("id", user.id)
         .single();
 
+      // Verify onboarding and klaviyo setup completion
+      if (!userData?.onboarding_completed) {
+        navigate("/onboarding/brand");
+        return;
+      }
+      
+      if (!userData?.klaviyo_setup_completed) {
+        navigate("/klaviyo-setup");
+        return;
+      }
+
       setCurrentUser(userData);
 
       // Load Klaviyo keys count
@@ -78,14 +89,14 @@ export default function BrandDashboard() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center">
         <div className="text-center">
-          <div className="relative w-16 h-16 mx-auto mb-4">
+          <div className="relative w-16 h-16 mx-auto mb-4 animate-fade-in">
             <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
             <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
             </div>
           </div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
+          <p className="text-muted-foreground animate-fade-in">Loading dashboard...</p>
         </div>
       </div>
     );

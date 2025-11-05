@@ -26,6 +26,18 @@ export default function AcceptInvite() {
     }
 
     try {
+      // Check if user is authenticated first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setStatus("error");
+        setMessage("You must be logged in to accept an invitation. Please log in first.");
+        toast.error("Please log in to accept the invitation");
+        setTimeout(() => {
+          navigate("/agency-login");
+        }, 2000);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("agency-accept-invite", {
         body: { invitationToken: token },
       });

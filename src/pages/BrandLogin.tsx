@@ -99,18 +99,26 @@ export default function BrandLogin() {
           localStorage.setItem('aderai_remember', 'true');
         }
 
-        // Show loading state while checking user status
-        toast({
-          title: "Signing in...",
-          description: "Please wait while we load your account.",
-        });
+        // Check user completion status
+        const { data: userData } = await supabase
+          .from("users")
+          .select("onboarding_completed, klaviyo_setup_completed, account_type")
+          .eq("id", authData.user.id)
+          .single();
 
         toast({
           title: "Welcome back!",
           description: "You've successfully signed in.",
         });
-        
-        navigate("/app");
+
+        // Route based on completion status
+        if (!userData?.onboarding_completed) {
+          navigate("/onboarding/brand");
+        } else if (!userData?.klaviyo_setup_completed) {
+          navigate("/klaviyo-setup");
+        } else {
+          navigate("/app");
+        }
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");

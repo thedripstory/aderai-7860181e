@@ -23,6 +23,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AgencyTeamManager } from "@/components/AgencyTeamManager";
 
 interface Client {
   id: string;
@@ -211,6 +213,13 @@ export default function AgencyDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <Tabs defaultValue="clients" className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="clients">Clients</TabsTrigger>
+            <TabsTrigger value="team">Team</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="clients" className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-card rounded-lg border-2 border-border p-6">
@@ -365,6 +374,12 @@ export default function AgencyDashboard() {
             ))}
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="team">
+            <AgencyTeamManager />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Add/Edit Client Modal */}

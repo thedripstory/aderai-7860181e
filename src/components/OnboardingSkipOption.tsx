@@ -12,14 +12,17 @@ export const OnboardingSkipOption = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Mark onboarding as completed
+      // Mark both onboarding AND klaviyo setup as completed
       await supabase
         .from("users")
-        .update({ onboarding_completed: true })
+        .update({ 
+          onboarding_completed: true,
+          klaviyo_setup_completed: true 
+        })
         .eq("id", user.id);
 
       toast.success("You can complete your profile later in settings");
-      navigate("/brand-dashboard");
+      navigate("/app");
     } catch (error) {
       console.error("Error skipping onboarding:", error);
       toast.error("Failed to skip onboarding");

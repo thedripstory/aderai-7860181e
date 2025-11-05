@@ -1,5 +1,6 @@
 import { ArrowRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TimeBasedPopupProps {
   onGetStarted: () => void;
@@ -9,23 +10,57 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if popup was already closed in this session
-    const hasClosedPopup = sessionStorage.getItem("aderai-popup-closed");
-
-    if (hasClosedPopup) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 30000); // 30 seconds
-
-    return () => clearTimeout(timer);
+    checkAndShowPopup();
   }, []);
 
-  const handleClose = () => {
+  const checkAndShowPopup = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get user data to check 2FA prompt timing
+      const { data: userData } = await supabase
+        .from("users")
+        .select("created_at, two_factor_prompt_shown_at, account_type")
+        .eq("id", user.id)
+        .single();
+
+      if (!userData || userData.account_type !== "agency") return;
+
+      // Check if it's been 3 days since signup and popup hasn't been shown
+      const signupDate = new Date(userData.created_at);
+      const now = new Date();
+      const daysSinceSignup = Math.floor((now.getTime() - signupDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      const hasShownBefore = userData.two_factor_prompt_shown_at;
+
+      if (daysSinceSignup >= 3 && !hasShownBefore) {
+        const timer = setTimeout(() => {
+          setIsVisible(true);
+        }, 30000); // 30 seconds
+
+        return () => clearTimeout(timer);
+      }
+    } catch (error) {
+      console.error("Error checking popup status:", error);
+    }
+  };
+
+  const handleClose = async () => {
     setIsVisible(false);
-    sessionStorage.setItem("aderai-popup-closed", "true");
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Mark prompt as shown
+        await supabase
+          .from("users")
+          .update({ two_factor_prompt_shown_at: new Date().toISOString() })
+          .eq("id", user.id);
+      }
+    } catch (error) {
+      console.error("Error updating popup status:", error);
+    }
   };
 
   if (!isVisible) return null;

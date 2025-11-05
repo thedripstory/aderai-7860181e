@@ -99,12 +99,24 @@ export default function AgencyLogin() {
           localStorage.setItem('aderai_remember', 'true');
         }
 
+        // Check user completion status
+        const { data: userData } = await supabase
+          .from("users")
+          .select("onboarding_completed, account_type")
+          .eq("id", authData.user.id)
+          .single();
+
         toast({
           title: "Welcome back!",
           description: "You've successfully signed in.",
         });
-        
-        navigate("/app");
+
+        // Route based on completion status
+        if (!userData?.onboarding_completed) {
+          navigate("/onboarding/agency");
+        } else {
+          navigate("/app");
+        }
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");

@@ -477,6 +477,7 @@ export type Database = {
           subscription_tier: string | null
           two_factor_backup_codes: Json | null
           two_factor_enabled: boolean | null
+          two_factor_prompt_shown_at: string | null
           two_factor_secret: string | null
           updated_at: string | null
         }
@@ -510,6 +511,7 @@ export type Database = {
           subscription_tier?: string | null
           two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
+          two_factor_prompt_shown_at?: string | null
           two_factor_secret?: string | null
           updated_at?: string | null
         }
@@ -543,6 +545,7 @@ export type Database = {
           subscription_tier?: string | null
           two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
+          two_factor_prompt_shown_at?: string | null
           two_factor_secret?: string | null
           updated_at?: string | null
         }
