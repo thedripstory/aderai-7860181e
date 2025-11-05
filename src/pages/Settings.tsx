@@ -30,7 +30,12 @@ export default function Settings() {
   const [emailOnSegmentCreation, setEmailOnSegmentCreation] = useState(true);
   const [emailOnClientAdded, setEmailOnClientAdded] = useState(true);
   const [emailOnApiKeyAdded, setEmailOnApiKeyAdded] = useState(true);
+  const [emailOnApiKeyChanges, setEmailOnApiKeyChanges] = useState(true);
   const [emailOnSettingsUpdated, setEmailOnSettingsUpdated] = useState(false);
+  const [emailOnPasswordReset, setEmailOnPasswordReset] = useState(true);
+  const [emailOnClientInvitation, setEmailOnClientInvitation] = useState(true);
+  const [emailWeeklySummary, setEmailWeeklySummary] = useState(true);
+  const [emailMarketing, setEmailMarketing] = useState(false);
 
   // Account settings
   const [accountName, setAccountName] = useState("");
@@ -102,7 +107,12 @@ export default function Settings() {
         setEmailOnSegmentCreation(notifPrefs.email_on_segment_creation ?? true);
         setEmailOnClientAdded(notifPrefs.email_on_client_added ?? true);
         setEmailOnApiKeyAdded(notifPrefs.email_on_api_key_added ?? true);
+        setEmailOnApiKeyChanges(notifPrefs.email_on_api_key_changes ?? true);
         setEmailOnSettingsUpdated(notifPrefs.email_on_settings_updated ?? false);
+        setEmailOnPasswordReset(notifPrefs.email_on_password_reset ?? true);
+        setEmailOnClientInvitation(notifPrefs.email_on_client_invitation ?? true);
+        setEmailWeeklySummary(notifPrefs.email_weekly_summary ?? true);
+        setEmailMarketing(notifPrefs.email_marketing ?? false);
       }
 
       // Load 2FA status
@@ -271,7 +281,12 @@ export default function Settings() {
           email_on_segment_creation: emailOnSegmentCreation,
           email_on_client_added: emailOnClientAdded,
           email_on_api_key_added: emailOnApiKeyAdded,
+          email_on_api_key_changes: emailOnApiKeyChanges,
           email_on_settings_updated: emailOnSettingsUpdated,
+          email_on_password_reset: emailOnPasswordReset,
+          email_on_client_invitation: emailOnClientInvitation,
+          email_weekly_summary: emailWeeklySummary,
+          email_marketing: emailMarketing,
         })
         .eq("user_id", currentUser.id);
 
@@ -601,6 +616,19 @@ export default function Settings() {
 
                   <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
                     <div className="flex-1">
+                      <div className="font-medium">API Key Changes</div>
+                      <div className="text-sm text-muted-foreground">Get notified about Klaviyo API key modifications and updates</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailOnApiKeyChanges}
+                      onChange={(e) => setEmailOnApiKeyChanges(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
                       <div className="font-medium">Settings Updates</div>
                       <div className="text-sm text-muted-foreground">Receive confirmations when account or threshold settings are updated</div>
                     </div>
@@ -608,6 +636,58 @@ export default function Settings() {
                       type="checkbox"
                       checked={emailOnSettingsUpdated}
                       onChange={(e) => setEmailOnSettingsUpdated(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">Password Reset</div>
+                      <div className="text-sm text-muted-foreground">Receive notifications for password reset requests and confirmations</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailOnPasswordReset}
+                      onChange={(e) => setEmailOnPasswordReset(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">Client Invitations</div>
+                      <div className="text-sm text-muted-foreground">Get notified when you're invited to join a client account</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailOnClientInvitation}
+                      onChange={(e) => setEmailOnClientInvitation(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">Weekly Summary</div>
+                      <div className="text-sm text-muted-foreground">Receive weekly performance summaries and insights</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailWeeklySummary}
+                      onChange={(e) => setEmailWeeklySummary(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="font-medium">Marketing Emails</div>
+                      <div className="text-sm text-muted-foreground">Opt-in to receive product updates, tips, and promotional content</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={emailMarketing}
+                      onChange={(e) => setEmailMarketing(e.target.checked)}
                       className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     />
                   </label>

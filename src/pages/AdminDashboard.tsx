@@ -25,6 +25,7 @@ import { AdminErrorTracking } from "@/components/AdminErrorTracking";
 import { AdminRevenueTracking } from "@/components/AdminRevenueTracking";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
 import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
+import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 
 const AdminDashboard = () => {
@@ -449,6 +450,11 @@ const AdminDashboard = () => {
           {/* Revenue Tracking Tab */}
           <TabsContent value="revenue">
             <AdminRevenueTracking />
+          </TabsContent>
+
+          {/* Email Monitoring Tab */}
+          <TabsContent value="emails">
+            <AdminEmailMonitoring />
           </TabsContent>
 
           {/* Analytics Tab */}
