@@ -8,11 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { 
   Users, Shield, Key, Building2, Mail, AlertCircle, 
-  TrendingUp, LogOut, Search, RefreshCw, UserCog 
+  TrendingUp, LogOut, Search, RefreshCw, UserCog, FileText 
 } from "lucide-react";
+import { AdminBulkActions } from "@/components/AdminBulkActions";
+import { AdminAnalyticsCharts } from "@/components/AdminAnalyticsCharts";
+import { AdminTableFilters } from "@/components/AdminTableFilters";
+import { AdminAuditTab } from "./AdminDashboard_AuditTab";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -20,6 +25,10 @@ const AdminDashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [filters, setFilters] = useState<any>({});
 
   // Data states
   const [users, setUsers] = useState<any[]>([]);
@@ -38,7 +47,7 @@ const AdminDashboard = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/brand-login");
+        navigate("/admin-login");
         return;
       }
 
@@ -52,7 +61,7 @@ const AdminDashboard = () => {
 
       if (roleError || !roleData) {
         toast.error("Access denied. Admin privileges required.");
-        navigate("/dashboard");
+        navigate("/admin-login");
         return;
       }
 
@@ -60,7 +69,7 @@ const AdminDashboard = () => {
       loadAllData();
     } catch (error) {
       console.error("Error checking admin access:", error);
-      navigate("/brand-login");
+      navigate("/admin-login");
     } finally {
       setLoading(false);
     }
@@ -74,7 +83,8 @@ const AdminDashboard = () => {
       loadAffiliateStats(),
       loadEmailLogs(),
       loadSegmentErrors(),
-      loadUserRoles()
+      loadUserRoles(),
+      loadAuditLogs()
     ]);
   };
 
@@ -143,9 +153,35 @@ const AdminDashboard = () => {
     if (!error && data) setUserRoles(data);
   };
 
+  const loadAuditLogs = async () => {
+    const { data, error } = await supabase
+      .from("admin_audit_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    
+    if (!error && data) setAuditLogs(data);
+  };
+
+  const logAuditAction = async (actionType: string, targetTable?: string, targetId?: string, oldValues?: any, newValues?: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from("admin_audit_log").insert([{
+        admin_user_id: user?.id,
+        action_type: actionType,
+        target_table: targetTable,
+        target_id: targetId,
+        old_values: oldValues,
+        new_values: newValues
+      }]);
+    } catch (error) {
+      console.error("Failed to log audit action:", error);
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/brand-login");
+    navigate("/admin-login");
   };
 
   const updateUserRole = async (userId: string, role: "admin" | "user") => {
@@ -157,6 +193,8 @@ const AdminDashboard = () => {
         .eq("user_id", userId)
         .single();
 
+      const oldRole = existingRole?.role;
+      
       if (existingRole) {
         // Update existing role
         const { error } = await supabase
@@ -175,8 +213,12 @@ const AdminDashboard = () => {
         if (error) throw error;
       }
 
+      // Log audit action
+      await logAuditAction("role_update", "user_roles", userId, { role: oldRole }, { role });
+
       toast.success("Role updated successfully");
       loadUserRoles();
+      loadAuditLogs();
     } catch (error: any) {
       toast.error("Failed to update role: " + error.message);
     }
@@ -189,11 +231,16 @@ const AdminDashboard = () => {
       .update({ subscription_status: newStatus })
       .eq("id", userId);
 
+    if (!error) {
+      await logAuditAction("user_status_update", "users", userId, { status: currentStatus }, { status: newStatus });
+    }
+
     if (error) {
       toast.error("Failed to update user status");
     } else {
       toast.success("User status updated");
       loadUsers();
+      loadAuditLogs();
     }
   };
 
@@ -210,7 +257,44 @@ const AdminDashboard = () => {
 
   if (!isAdmin) return null;
 
-  const filteredUsers = users.filter(user => 
+  const applyFilters = (data: any[], filterConfig: any) => {
+    let filtered = [...data];
+
+    if (filterConfig.search) {
+      const term = filterConfig.search.toLowerCase();
+      filtered = filtered.filter((item: any) => 
+        JSON.stringify(item).toLowerCase().includes(term)
+      );
+    }
+
+    if (filterConfig.dateFrom) {
+      filtered = filtered.filter((item: any) => 
+        new Date(item.created_at || item.sent_at) >= filterConfig.dateFrom
+      );
+    }
+
+    if (filterConfig.dateTo) {
+      filtered = filtered.filter((item: any) => 
+        new Date(item.created_at || item.sent_at) <= filterConfig.dateTo
+      );
+    }
+
+    if (filterConfig.status && filterConfig.status.length > 0) {
+      filtered = filtered.filter((item: any) => 
+        filterConfig.status.includes(item.status || item.subscription_status)
+      );
+    }
+
+    if (filterConfig.accountType && filterConfig.accountType.length > 0) {
+      filtered = filtered.filter((item: any) => 
+        filterConfig.accountType.includes(item.account_type)
+      );
+    }
+
+    return filtered;
+  };
+
+  const filteredUsers = applyFilters(users, filters).filter(user => 
     user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.account_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -238,14 +322,15 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-7 w-full mb-8">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="roles">Roles</TabsTrigger>
-            <TabsTrigger value="klaviyo">Klaviyo Keys</TabsTrigger>
+            <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
             <TabsTrigger value="agencies">Agencies</TabsTrigger>
-            <TabsTrigger value="emails">Email Logs</TabsTrigger>
-            <TabsTrigger value="errors">Errors</TabsTrigger>
+            <TabsTrigger value="emails">Emails</TabsTrigger>
+            <TabsTrigger value="audit">Audit Trail</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -302,38 +387,91 @@ const AdminDashboard = () => {
                   </p>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Audit Events</CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{auditLogs.length}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Last 100 actions
+                  </p>
+                </CardContent>
+              </Card>
             </div>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <AdminAnalyticsCharts />
           </TabsContent>
 
           {/* Users Tab */}
           <TabsContent value="users">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>All Users</CardTitle>
-                    <CardDescription>Manage user accounts and permissions</CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 w-64"
-                      />
+            <div className="space-y-6">
+              <AdminTableFilters
+                config={{
+                  search: true,
+                  dateRange: true,
+                  status: ["active", "inactive"],
+                  accountType: ["brand", "agency"]
+                }}
+                onFilterChange={setFilters}
+              />
+              
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>All Users</CardTitle>
+                      <CardDescription>Manage user accounts and permissions</CardDescription>
                     </div>
-                    <Button variant="outline" size="icon" onClick={loadUsers}>
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-9 w-64"
+                        />
+                      </div>
+                      <Button variant="outline" size="icon" onClick={loadUsers}>
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
+                  <div className="mt-4">
+                    <AdminBulkActions
+                      selectedIds={selectedUserIds}
+                      onSelectionChange={setSelectedUserIds}
+                      items={users}
+                      type="users"
+                      onActionComplete={() => {
+                        loadUsers();
+                        loadAuditLogs();
+                      }}
+                    />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12">
+                          <Checkbox
+                            checked={selectedUserIds.length === filteredUsers.length && filteredUsers.length > 0}
+                            onCheckedChange={() => {
+                              if (selectedUserIds.length === filteredUsers.length) {
+                                setSelectedUserIds([]);
+                              } else {
+                                setSelectedUserIds(filteredUsers.map(u => u.id));
+                              }
+                            }}
+                          />
+                        </TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Type</TableHead>
@@ -343,11 +481,23 @@ const AdminDashboard = () => {
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
-                    {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.email}</TableCell>
-                        <TableCell>{user.account_name}</TableCell>
+                    <TableBody>
+                      {filteredUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedUserIds.includes(user.id)}
+                              onCheckedChange={() => {
+                                if (selectedUserIds.includes(user.id)) {
+                                  setSelectedUserIds(selectedUserIds.filter(id => id !== user.id));
+                                } else {
+                                  setSelectedUserIds([...selectedUserIds, user.id]);
+                                }
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">{user.email}</TableCell>
+                          <TableCell>{user.account_name}</TableCell>
                         <TableCell>
                           <Badge variant={user.account_type === 'agency' ? 'default' : 'secondary'}>
                             {user.account_type}
@@ -380,9 +530,10 @@ const AdminDashboard = () => {
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Roles Tab */}
@@ -391,11 +542,35 @@ const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle>User Roles Management</CardTitle>
                 <CardDescription>Assign and manage admin privileges</CardDescription>
+                <div className="mt-4">
+                  <AdminBulkActions
+                    selectedIds={selectedRoleIds}
+                    onSelectionChange={setSelectedRoleIds}
+                    items={users}
+                    type="roles"
+                    onActionComplete={() => {
+                      loadUserRoles();
+                      loadAuditLogs();
+                    }}
+                  />
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedRoleIds.length === users.length && users.length > 0}
+                          onCheckedChange={() => {
+                            if (selectedRoleIds.length === users.length) {
+                              setSelectedRoleIds([]);
+                            } else {
+                              setSelectedRoleIds(users.map(u => u.id));
+                            }
+                          }}
+                        />
+                      </TableHead>
                       <TableHead>User Email</TableHead>
                       <TableHead>Account Name</TableHead>
                       <TableHead>Current Role</TableHead>
@@ -403,12 +578,24 @@ const AdminDashboard = () => {
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
-                    {users.map((user) => {
-                      const userRole = userRoles.find(r => r.user_id === user.id);
-                      return (
-                        <TableRow key={user.id}>
-                          <TableCell>{user.email}</TableCell>
+                    <TableBody>
+                      {users.map((user) => {
+                        const userRole = userRoles.find(r => r.user_id === user.id);
+                        return (
+                          <TableRow key={user.id}>
+                            <TableCell>
+                              <Checkbox
+                                checked={selectedRoleIds.includes(user.id)}
+                                onCheckedChange={() => {
+                                  if (selectedRoleIds.includes(user.id)) {
+                                    setSelectedRoleIds(selectedRoleIds.filter(id => id !== user.id));
+                                  } else {
+                                    setSelectedRoleIds([...selectedRoleIds, user.id]);
+                                  }
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell>{user.email}</TableCell>
                           <TableCell>{user.account_name}</TableCell>
                           <TableCell>
                             {userRole ? (
@@ -603,6 +790,11 @@ const AdminDashboard = () => {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Audit Trail Tab */}
+          <TabsContent value="audit">
+            <AdminAuditTab auditLogs={auditLogs} />
           </TabsContent>
         </Tabs>
       </div>

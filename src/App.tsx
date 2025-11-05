@@ -21,6 +21,7 @@ import AgencyDashboard from "./pages/AgencyDashboard";
 import UnifiedDashboard from "./pages/UnifiedDashboard";
 import BrandWorkspace from "./pages/BrandWorkspace";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/brand-dashboard" element={<BrandDashboard />} />
             <Route path="/agency-dashboard" element={<AgencyDashboard />} />
             <Route path="/dashboard" element={<UnifiedDashboard />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route 
               path="/app" 

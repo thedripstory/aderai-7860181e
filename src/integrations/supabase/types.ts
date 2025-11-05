@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action_type: string
+          admin_user_id: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          target_id: string | null
+          target_table: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_user_id: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          target_id?: string | null
+          target_table?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_user_id?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          target_id?: string | null
+          target_table?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       affiliate_clicks: {
         Row: {
           affiliate_code: string
@@ -679,7 +718,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      email_delivery_analytics: {
+        Row: {
+          date: string | null
+          email_type: string | null
+          failed: number | null
+          successful: number | null
+          total_emails: number | null
+        }
+        Relationships: []
+      }
+      segment_error_analytics: {
+        Row: {
+          date: string | null
+          resolved_errors: number | null
+          total_errors: number | null
+          unresolved_errors: number | null
+        }
+        Relationships: []
+      }
+      user_growth_analytics: {
+        Row: {
+          date: string | null
+          new_users: number | null
+          total_users: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_affiliate_code: { Args: never; Returns: string }
