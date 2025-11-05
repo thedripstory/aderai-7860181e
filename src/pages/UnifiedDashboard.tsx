@@ -148,9 +148,12 @@ export default function UnifiedDashboard() {
 
     setView('creating');
     
+    const { SEGMENTS } = await import('@/components/SegmentDashboard');
+    
     await createSegments(
       selectedSegments,
-      klaviyoKeys[activeKeyIndex]
+      klaviyoKeys[activeKeyIndex],
+      SEGMENTS
     );
 
     setView('results');
