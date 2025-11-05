@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, LogOut, Gift, Settings as SettingsIcon, Loader } from 'lucide-react';
+import { Building2, LogOut, Gift, Settings as SettingsIcon, Loader } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { ClientSwitcher, AddClientModal } from '@/components/ClientSwitcher';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
+import { TimeBasedPopup } from '@/components/TimeBasedPopup';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { AISegmentSuggester } from '@/components/AISegmentSuggester';
 import { KlaviyoSyncIndicator } from '@/components/KlaviyoSyncIndicator';
+import { AgencyTeamManager } from '@/components/AgencyTeamManager';
+import { SegmentPerformance } from '@/components/SegmentPerformance';
+import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
+import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
+import { SegmentCloner } from '@/components/SegmentCloner';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { toast } from 'sonner';
 
@@ -22,6 +29,8 @@ export default function UnifiedDashboard() {
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [view, setView] = useState<'creating' | 'results' | null>(null);
+  const [emailVerified, setEmailVerified] = useState(true);
+  const [accountType, setAccountType] = useState("");
 
   // Analytics state
   const [allSegments, setAllSegments] = useState<any[]>([]);
@@ -62,6 +71,8 @@ export default function UnifiedDashboard() {
         return;
       }
 
+      setEmailVerified(userData.email_verified || false);
+      setAccountType(userData.account_type);
       setCurrentUser(session.user);
       await loadKlaviyoKeys(session.user.id);
       setLoading(false);
@@ -99,22 +110,19 @@ export default function UnifiedDashboard() {
   };
 
   const toggleSegment = (segmentId: string) => {
-    setSelectedSegments((prev) =>
-      prev.includes(segmentId) ? prev.filter((id) => id !== segmentId) : [...prev, segmentId]
+    setSelectedSegments(prev =>
+      prev.includes(segmentId)
+        ? prev.filter(id => id !== segmentId)
+        : [...prev, segmentId]
     );
   };
 
   const selectBundle = (bundleId: string) => {
-    const bundle = BUNDLES.find((b) => b.id === bundleId);
+    const bundle = BUNDLES.find(b => b.id === bundleId);
     if (bundle) {
-      setSelectedSegments((prev) => {
-        const newSegments = [...prev];
-        bundle.segments.forEach((segId) => {
-          if (!newSegments.includes(segId)) {
-            newSegments.push(segId);
-          }
-        });
-        return newSegments;
+      setSelectedSegments(prev => {
+        const allSegmentIds = [...prev, ...bundle.segments];
+        return Array.from(new Set(allSegmentIds));
       });
     }
   };
@@ -128,62 +136,76 @@ export default function UnifiedDashboard() {
   };
 
   const handleCreateSegments = async () => {
-    if (selectedSegments.length === 0) {
-      toast.error('Please select at least one segment to create');
+    // Check email verification
+    if (!emailVerified) {
+      toast.error("Please verify your email before creating segments");
       return;
     }
 
-    if (klaviyoKeys.length === 0) {
-      toast.error('No Klaviyo API key found');
+    if (selectedSegments.length === 0 || klaviyoKeys.length === 0) {
       return;
     }
 
     setView('creating');
+    
+    await createSegments(
+      selectedSegments,
+      klaviyoKeys[activeKeyIndex]
+    );
 
-    try {
-      await createSegments(selectedSegments, klaviyoKeys[activeKeyIndex], SEGMENTS);
-      setView('results');
-      toast.success('Segments created successfully!');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create segments');
-      setView('results');
-    }
+    setView('results');
   };
 
   const fetchAllSegments = async () => {
     if (klaviyoKeys.length === 0) return;
 
     setLoadingAnalytics(true);
+    setAnalyticsProgress({ current: 0, total: 0 });
 
     try {
-      const { data: segmentsResponse } = await supabase.functions.invoke('klaviyo-proxy', {
+      const activeKey = klaviyoKeys[activeKeyIndex];
+      
+      const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
         body: {
-          keyId: klaviyoKeys[activeKeyIndex].id,
-          endpoint: 'https://a.klaviyo.com/api/segments/',
+          klaviyoKeyId: activeKey.id,
+          apiKey: activeKey.klaviyo_api_key_hash,
+          endpoint: 'segments',
           method: 'GET',
         },
       });
 
-      const segments = segmentsResponse?.data || [];
-      setAllSegments(segments);
-      
-      // Fetch stats for each segment
-      const stats: Record<string, any> = {};
-      for (const segment of segments) {
-        const { data: profilesResponse } = await supabase.functions.invoke('klaviyo-proxy', {
-          body: {
-            keyId: klaviyoKeys[activeKeyIndex].id,
-            endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/profiles/`,
-            method: 'GET',
-          },
-        });
+      if (error) throw error;
 
-        stats[segment.id] = {
-          profileCount: profilesResponse?.data?.length || 0,
-          name: segment.attributes?.name || 'Unknown',
-          created: segment.attributes?.created,
-          updated: segment.attributes?.updated,
-        };
+      const segments = data?.data || [];
+      setAllSegments(segments);
+      setAnalyticsProgress({ current: 0, total: segments.length });
+
+      // Fetch profile counts
+      const stats: Record<string, any> = {};
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
+        
+        try {
+          const { data: profileData, error: profileError } = await supabase.functions.invoke('klaviyo-proxy', {
+            body: {
+              klaviyoKeyId: activeKey.id,
+              apiKey: activeKey.klaviyo_api_key_hash,
+              endpoint: `segments/${segment.id}/profiles`,
+              method: 'GET',
+            },
+          });
+
+          if (!profileError && profileData) {
+            stats[segment.id] = {
+              profileCount: profileData.data?.length || 0,
+              name: segment.attributes?.name || 'Unnamed Segment',
+            };
+          }
+        } catch (err) {
+          console.error(`Error fetching segment ${segment.id}:`, err);
+        }
+
+        setAnalyticsProgress({ current: i + 1, total: segments.length });
       }
 
       setSegmentStats(stats);
@@ -195,7 +217,7 @@ export default function UnifiedDashboard() {
     }
   };
 
-  const calculateHealthScore = (): number => {
+  const calculateHealthScore = () => {
     const totalSegments = allSegments.length;
     const activeSegments = Object.values(segmentStats).filter((s: any) => s.profileCount > 0).length;
 
@@ -230,13 +252,14 @@ export default function UnifiedDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <EmailVerificationBanner />
+      {!emailVerified && <EmailVerificationBanner />}
+      {accountType === "agency" && <TimeBasedPopup onGetStarted={() => navigate("/settings")} />}
       
       <div className="border-b-2 border-border bg-card">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Shield className="w-8 h-8 text-primary" />
+              <Building2 className="w-8 h-8 text-primary" />
               <div>
                 <h1 className="text-2xl font-bold">Aderai</h1>
                 <p className="text-sm text-muted-foreground">AI-Powered Segmentation</p>
@@ -255,27 +278,18 @@ export default function UnifiedDashboard() {
                 onSelectClient={handleSelectClient}
                 onAddClient={handleAddClient}
               />
-              <button
-                onClick={() => navigate('/affiliate')}
-                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted rounded-lg"
-              >
-                <Gift className="w-4 h-4" />
+              <Button variant="outline" onClick={() => navigate('/affiliate')}>
+                <Gift className="w-4 h-4 mr-2" />
                 Affiliate
-              </button>
-              <button
-                onClick={() => navigate('/settings')}
-                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted rounded-lg"
-              >
-                <SettingsIcon className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/settings')}>
+                <SettingsIcon className="w-4 h-4 mr-2" />
                 Settings
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -290,10 +304,13 @@ export default function UnifiedDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs defaultValue="segments" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="segments">Create Segments</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-6 mb-8">
+            <TabsTrigger value="segments">Segments</TabsTrigger>
             <TabsTrigger value="analytics" onClick={fetchAllSegments}>Analytics</TabsTrigger>
-            <TabsTrigger value="ai">AI Suggester</TabsTrigger>
+            <TabsTrigger value="ai">AI</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            {accountType === "agency" && <TabsTrigger value="team">Team</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="segments">
@@ -314,13 +331,13 @@ export default function UnifiedDashboard() {
                     </p>
                     <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
                   </div>
-                  <button
+                  <Button
                     onClick={handleCreateSegments}
-                    disabled={creatingSegments}
-                    className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50"
+                    disabled={creatingSegments || !emailVerified}
+                    size="lg"
                   >
                     {creatingSegments ? 'Creating...' : 'Create Segments'}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -339,9 +356,44 @@ export default function UnifiedDashboard() {
 
           <TabsContent value="ai">
             {klaviyoKeys.length > 0 && (
-              <AISegmentSuggester activeKey={klaviyoKeys[activeKeyIndex]} />
+              <AISegmentSuggester
+                activeKey={klaviyoKeys[activeKeyIndex]}
+              />
             )}
           </TabsContent>
+
+          <TabsContent value="performance">
+            {klaviyoKeys.length > 0 && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <SegmentPerformance
+                  klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
+                  apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
+                />
+                <SegmentCloner
+                  currentKeyId={klaviyoKeys[activeKeyIndex].id}
+                  segments={allSegments}
+                />
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SegmentTemplateManager
+                currentSegment={selectedSegments.length > 0 ? {
+                  name: `${selectedSegments.length} selected segments`,
+                  conditions: []
+                } : undefined}
+              />
+              <AutomationPlaybooks />
+            </div>
+          </TabsContent>
+
+          {accountType === "agency" && (
+            <TabsContent value="team">
+              <AgencyTeamManager />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>

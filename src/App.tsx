@@ -14,6 +14,7 @@ import KlaviyoSetup from "./pages/KlaviyoSetup";
 import AffiliatePage from "./pages/AffiliatePage";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import AcceptInvite from "./pages/AcceptInvite";
 import BrandDashboard from "./pages/BrandDashboard";
 import AgencyDashboard from "./pages/AgencyDashboard";
 import UnifiedDashboard from "./pages/UnifiedDashboard";
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/klaviyo-setup" element={<KlaviyoSetup />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/affiliate" element={<AffiliatePage />} />
+          <Route path="/accept-invite" element={<AcceptInvite />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

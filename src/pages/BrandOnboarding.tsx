@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
+import { OnboardingSkipOption } from "@/components/OnboardingSkipOption";
 import {
   Building2,
   Target,
@@ -293,7 +294,9 @@ export default function BrandOnboarding() {
                 Back
               </Button>
             ) : (
-              <div />
+              <div className="flex items-center">
+                <OnboardingSkipOption />
+              </div>
             )}
 
             {currentStep < 3 ? (
