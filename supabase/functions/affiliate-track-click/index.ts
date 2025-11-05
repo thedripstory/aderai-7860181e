@@ -19,11 +19,38 @@ Deno.serve(async (req) => {
 
     const { affiliateCode, referrer } = await req.json();
 
-    if (!affiliateCode) {
-      console.log('Missing affiliate code');
+    // Validate input
+    if (!affiliateCode || typeof affiliateCode !== 'string' || affiliateCode.length > 50) {
       return new Response(
-        JSON.stringify({ error: 'Affiliate code is required' }),
+        JSON.stringify({ error: 'Invalid request' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (referrer && (typeof referrer !== 'string' || referrer.length > 500)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Rate limiting: check recent clicks from same IP
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+                      req.headers.get('x-real-ip') || 
+                      'unknown';
+    
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    
+    const { data: recentClicks } = await supabase
+      .from('affiliate_clicks')
+      .select('id')
+      .eq('ip_address', ipAddress)
+      .gte('created_at', fiveMinutesAgo);
+    
+    if (recentClicks && recentClicks.length > 10) {
+      return new Response(
+        JSON.stringify({ error: 'Too many requests' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -35,17 +62,12 @@ Deno.serve(async (req) => {
       .single();
 
     if (affiliateError || !affiliateUser) {
-      console.log('Invalid affiliate code attempt');
       return new Response(
         JSON.stringify({ error: 'Invalid request' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get request metadata
-    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0] || 
-                      req.headers.get('x-real-ip') || 
-                      'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
     // Track the click

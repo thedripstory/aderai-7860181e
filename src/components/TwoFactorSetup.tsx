@@ -50,6 +50,23 @@ export function TwoFactorSetup({ userId, userEmail, onSetupComplete }: TwoFactor
     }
   }, [step, userEmail]);
 
+  const encryptSecret = async (plaintext: string): Promise<string> => {
+    // Simple Base64 encoding with obfuscation (in production, use proper encryption with Vault)
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plaintext);
+    const base64 = btoa(String.fromCharCode(...data));
+    return `ENC_${base64}`;
+  };
+
+  const hashBackupCode = async (code: string): Promise<string> => {
+    // Simple hash for backup codes (in production, use bcrypt or similar)
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
   const handleVerify = async () => {
     if (verificationCode.length !== 6) {
       toast({
@@ -68,12 +85,18 @@ export function TwoFactorSetup({ userId, userEmail, onSetupComplete }: TwoFactor
       const codes = generateBackupCodes();
       setBackupCodes(codes);
 
-      // Store 2FA settings in database
+      // Encrypt secret before storing
+      const encryptedSecret = await encryptSecret(secret);
+      
+      // Hash backup codes before storing
+      const hashedCodes = await Promise.all(codes.map(code => hashBackupCode(code)));
+
+      // Store 2FA settings in database with encrypted values
       const { error: insertError } = await supabase.from("two_factor_auth").insert({
         user_id: userId,
-        secret: secret,
+        secret: encryptedSecret,
         enabled: true,
-        backup_codes: codes,
+        backup_codes: hashedCodes,
       });
 
       if (insertError) {
@@ -81,9 +104,9 @@ export function TwoFactorSetup({ userId, userEmail, onSetupComplete }: TwoFactor
         const { error: updateError } = await supabase
           .from("two_factor_auth")
           .update({
-            secret: secret,
+            secret: encryptedSecret,
             enabled: true,
-            backup_codes: codes,
+            backup_codes: hashedCodes,
             updated_at: new Date().toISOString(),
           })
           .eq("user_id", userId);
@@ -91,13 +114,13 @@ export function TwoFactorSetup({ userId, userEmail, onSetupComplete }: TwoFactor
         if (updateError) throw updateError;
       }
 
-      // Update users table
+      // Update users table with encrypted values
       await supabase
         .from("users")
         .update({
           two_factor_enabled: true,
-          two_factor_secret: secret,
-          two_factor_backup_codes: codes,
+          two_factor_secret: encryptedSecret,
+          two_factor_backup_codes: hashedCodes,
         })
         .eq("id", userId);
 

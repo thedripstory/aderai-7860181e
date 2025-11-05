@@ -21,7 +21,33 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Verify service role key - only backend can send password reset emails
+    const authHeader = req.headers.get('Authorization');
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!authHeader || !authHeader.includes(serviceKey || '')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { email, resetLink, userName }: PasswordResetRequest = await req.json();
+    
+    // Validate inputs
+    if (!email || typeof email !== 'string' || email.length > 255 || !email.includes('@')) {
+      return new Response(JSON.stringify({ error: 'Invalid email' }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    
+    if (!resetLink || typeof resetLink !== 'string' || resetLink.length > 500) {
+      return new Response(JSON.stringify({ error: 'Invalid reset link' }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Initialize Supabase client for audit logging
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -100,8 +126,8 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error sending password reset email:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Password reset error");
+    return new Response(JSON.stringify({ error: "Operation failed" }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

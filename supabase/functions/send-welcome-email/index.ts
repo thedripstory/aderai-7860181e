@@ -22,7 +22,33 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Verify JWT token - only service role can send welcome emails
+    const authHeader = req.headers.get('Authorization');
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!authHeader || !authHeader.includes(serviceKey || '')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { email, userName, accountType, userId }: WelcomeEmailRequest = await req.json();
+    
+    // Validate inputs
+    if (!email || typeof email !== 'string' || email.length > 255 || !email.includes('@')) {
+      return new Response(JSON.stringify({ error: 'Invalid email' }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    
+    if (!userId || typeof userId !== 'string') {
+      return new Response(JSON.stringify({ error: 'Invalid userId' }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -113,8 +139,8 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error sending welcome email:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Welcome email error");
+    return new Response(JSON.stringify({ error: "Operation failed" }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

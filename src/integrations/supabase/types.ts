@@ -465,6 +465,30 @@ export type Database = {
           },
         ]
       }
+      klaviyo_webhook_events: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          payload: Json
+          processed: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          processed?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed?: boolean | null
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           created_at: string | null

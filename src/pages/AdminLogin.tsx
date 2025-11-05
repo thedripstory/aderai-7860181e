@@ -8,7 +8,6 @@ import { toast } from "sonner";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const ALLOWED_ADMIN_EMAIL = "akshat@aderai.io";
 
   useEffect(() => {
     checkExistingSession();
@@ -18,38 +17,28 @@ const AdminLogin = () => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (user) {
-      // Check if user is allowed admin
-      if (user.email?.toLowerCase() === ALLOWED_ADMIN_EMAIL.toLowerCase()) {
-        // Check if user has admin role
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .single();
+      // Check admin role in database (server-side check only)
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
 
-        if (roleData) {
-          navigate("/admin");
-        } else {
-          // User is allowed but doesn't have admin role yet - auto-assign
-          await assignAdminRole(user.id);
-          navigate("/admin");
-        }
+      if (roleError) {
+        console.error("Error checking admin role");
+        await supabase.auth.signOut();
+        toast.error("Access denied. Admin privileges required.");
+        return;
+      }
+
+      if (roleData) {
+        navigate("/admin");
       } else {
-        // Not allowed admin email
+        // No admin role found
         await supabase.auth.signOut();
         toast.error("Access denied. Admin privileges required.");
       }
-    }
-  };
-
-  const assignAdminRole = async (userId: string) => {
-    try {
-      await supabase
-        .from("user_roles")
-        .insert([{ user_id: userId, role: "admin", created_by: userId }]);
-    } catch (error) {
-      console.error("Error assigning admin role:", error);
     }
   };
 
@@ -81,29 +70,29 @@ const AdminLogin = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        const userEmail = session.user.email?.toLowerCase();
+        console.log('Admin login attempt');
         
-        console.log('Admin login attempt:', userEmail);
-        
-        if (userEmail === ALLOWED_ADMIN_EMAIL.toLowerCase()) {
-          // Check if user has admin role
-          const { data: roleData } = await supabase
-            .from("user_roles")
-            .select("*")
-            .eq("user_id", session.user.id)
-            .eq("role", "admin")
-            .single();
+        // Check admin role in database (server-side check only)
+        const { data: roleData, error: roleError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
 
-          if (!roleData) {
-            // Auto-assign admin role
-            await assignAdminRole(session.user.id);
-          }
-          
+        if (roleError) {
+          console.error("Error checking admin role");
+          await supabase.auth.signOut();
+          toast.error("Access denied. Admin privileges required.");
+          return;
+        }
+
+        if (roleData) {
           navigate("/admin");
         } else {
-          // Not authorized
+          // No admin role found
           await supabase.auth.signOut();
-          toast.error(`Access denied. Only ${ALLOWED_ADMIN_EMAIL} is authorized.`);
+          toast.error("Access denied. Admin privileges required.");
         }
       }
     });
@@ -154,7 +143,6 @@ const AdminLogin = () => {
 
           <div className="text-center text-sm text-muted-foreground">
             <p>Only authorized administrators can access this area</p>
-            <p className="mt-1 font-mono text-xs">{ALLOWED_ADMIN_EMAIL}</p>
           </div>
         </CardContent>
       </Card>
