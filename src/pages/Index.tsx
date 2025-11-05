@@ -40,13 +40,13 @@ export default function Index() {
         return;
       }
 
-      // For brands, check klaviyo setup
+      // For brands, check klaviyo setup (only if not already on dashboard)
       if (userData.account_type === 'brand' && !userData.klaviyo_setup_completed) {
         navigate('/klaviyo-setup');
         return;
       }
 
-      // Redirect to appropriate dashboard
+      // Redirect to appropriate dashboard - consistent routing
       if (userData.account_type === 'agency') {
         navigate('/agency-dashboard');
       } else {

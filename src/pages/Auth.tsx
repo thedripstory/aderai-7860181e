@@ -174,22 +174,9 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
           description: "Check your email for a welcome message and to confirm your account.",
         });
         
-        // Verify onboarding_completed before redirecting
-        const { data: userData } = await supabase
-          .from('users')
-          .select('onboarding_completed')
-          .eq('id', authData.user.id)
-          .single();
-
-        if (userData?.onboarding_completed) {
-          // Already onboarded, go to dashboard
-          const accountType = authView.includes("agency") ? "agency" : "brand";
-          navigate(accountType === "agency" ? "/agency-dashboard" : "/dashboard");
-        } else {
-          // Need onboarding
-          const accountType = authView.includes("agency") ? "agency" : "brand";
-          navigate(`/onboarding/${accountType}`);
-        }
+        // Navigate to onboarding - new users always need onboarding
+        const accountType = authView.includes("agency") ? "agency" : "brand";
+        navigate(`/onboarding/${accountType}`);
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");

@@ -12,16 +12,16 @@ export const OnboardingSkipOption = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Mark both onboarding AND klaviyo setup as completed
+      // Only mark onboarding as completed, NOT Klaviyo setup
+      // This ensures users will see the Klaviyo setup reminder on their dashboard
       await supabase
         .from("users")
         .update({ 
-          onboarding_completed: true,
-          klaviyo_setup_completed: true 
+          onboarding_completed: true
         })
         .eq("id", user.id);
 
-      toast.success("You can complete your profile later in settings");
+      toast.success("Onboarding skipped. You'll be reminded to connect Klaviyo on your dashboard.");
       navigate("/app");
     } catch (error) {
       console.error("Error skipping onboarding:", error);
