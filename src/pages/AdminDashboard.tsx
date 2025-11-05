@@ -18,6 +18,11 @@ import { AdminBulkActions } from "@/components/AdminBulkActions";
 import { AdminAnalyticsCharts } from "@/components/AdminAnalyticsCharts";
 import { AdminTableFilters } from "@/components/AdminTableFilters";
 import { AdminAuditTab } from "./AdminDashboard_AuditTab";
+import { AdminSystemHealth } from "@/components/AdminSystemHealth";
+import { AdminUserSessions } from "@/components/AdminUserSessions";
+import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
+import { AdminErrorTracking } from "@/components/AdminErrorTracking";
+import { AdminRevenueTracking } from "@/components/AdminRevenueTracking";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -322,19 +327,23 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full mb-8">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-12 w-full mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="health">System Health</TabsTrigger>
+            <TabsTrigger value="sessions">Sessions</TabsTrigger>
+            <TabsTrigger value="api">API Monitor</TabsTrigger>
+            <TabsTrigger value="errors">Errors</TabsTrigger>
+            <TabsTrigger value="revenue">Revenue</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
-            <TabsTrigger value="agencies">Agencies</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
-            <TabsTrigger value="audit">Audit Trail</TabsTrigger>
+            <TabsTrigger value="audit">Audit</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
-          <TabsContent value="overview">
+          <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -401,6 +410,31 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* System Health Tab */}
+          <TabsContent value="health">
+            <AdminSystemHealth />
+          </TabsContent>
+
+          {/* User Sessions Tab */}
+          <TabsContent value="sessions">
+            <AdminUserSessions />
+          </TabsContent>
+
+          {/* API Monitoring Tab */}
+          <TabsContent value="api">
+            <AdminAPIMonitoring />
+          </TabsContent>
+
+          {/* Error Tracking Tab */}
+          <TabsContent value="errors">
+            <AdminErrorTracking />
+          </TabsContent>
+
+          {/* Revenue Tracking Tab */}
+          <TabsContent value="revenue">
+            <AdminRevenueTracking />
           </TabsContent>
 
           {/* Analytics Tab */}
