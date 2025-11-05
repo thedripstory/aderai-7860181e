@@ -27,7 +27,7 @@ serve(async (req) => {
       throw new Error("Unauthorized");
     }
 
-    const { invitationToken } = await req.json();
+    const { invitationToken, userEmail } = await req.json();
 
     // Find invitation
     const { data: invitation, error: findError } = await supabaseClient
@@ -38,6 +38,11 @@ serve(async (req) => {
 
     if (findError || !invitation) {
       throw new Error("Invalid invitation token");
+    }
+
+    // Verify email matches invitation
+    if (invitation.member_email !== user.email) {
+      throw new Error("This invitation was sent to a different email address");
     }
 
     // Check expiration

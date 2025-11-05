@@ -38,8 +38,12 @@ export default function AcceptInvite() {
         return;
       }
 
+      // Call edge function which will verify email matches invitation
       const { data, error } = await supabase.functions.invoke("agency-accept-invite", {
-        body: { invitationToken: token },
+        body: { 
+          invitationToken: token,
+          userEmail: user.email // Send email for verification
+        },
       });
 
       if (error) throw error;

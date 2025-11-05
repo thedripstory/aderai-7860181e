@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, LogOut, Gift, Settings as SettingsIcon, Loader } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ClientSwitcher, AddClientModal } from '@/components/ClientSwitcher';
@@ -22,6 +22,8 @@ import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const clientId = searchParams.get('clientId'); // For agencies accessing client dashboards
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [klaviyoKeys, setKlaviyoKeys] = useState<KlaviyoKey[]>([]);
@@ -74,7 +76,14 @@ export default function UnifiedDashboard() {
       setEmailVerified(userData.email_verified || false);
       setAccountType(userData.account_type);
       setCurrentUser(session.user);
-      await loadKlaviyoKeys(session.user.id);
+      
+      // If clientId is provided, verify agency access and load client's keys
+      if (clientId) {
+        await loadClientKeys(session.user.id, clientId);
+      } else {
+        await loadKlaviyoKeys(session.user.id);
+      }
+      
       setLoading(false);
     };
 
@@ -86,6 +95,35 @@ export default function UnifiedDashboard() {
       .from('klaviyo_keys')
       .select('*')
       .eq('user_id', userId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (data && data.length > 0) {
+      setKlaviyoKeys(data);
+      setActiveKeyIndex(0);
+    }
+  };
+
+  const loadClientKeys = async (agencyUserId: string, clientUserId: string) => {
+    // Verify agency manages this client
+    const { data: clientData, error: verifyError } = await supabase
+      .from('agency_clients')
+      .select('id')
+      .eq('agency_user_id', agencyUserId)
+      .eq('brand_user_id', clientUserId)
+      .single();
+
+    if (verifyError || !clientData) {
+      toast.error("You don't have permission to access this client's dashboard");
+      navigate('/agency-dashboard');
+      return;
+    }
+
+    // Load client's Klaviyo keys
+    const { data } = await supabase
+      .from('klaviyo_keys')
+      .select('*')
+      .eq('user_id', clientUserId)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 

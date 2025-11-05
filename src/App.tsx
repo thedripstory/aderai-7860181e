@@ -32,7 +32,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/brand-dashboard" element={<UnifiedDashboard />} />
+            <Route path="/brand-dashboard" element={<BrandDashboard />} />
             <Route path="/agency-dashboard" element={<AgencyDashboard />} />
             <Route path="/dashboard" element={<UnifiedDashboard />} />
             <Route 

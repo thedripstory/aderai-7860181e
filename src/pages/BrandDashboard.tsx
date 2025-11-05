@@ -50,6 +50,16 @@ export default function BrandDashboard() {
         return;
       }
       
+      // Check email verification
+      if (!userData?.email_verified) {
+        toast({
+          title: "Email Verification Required",
+          description: "Please verify your email before accessing the dashboard",
+          variant: "destructive",
+        });
+        // Still allow access but show warning
+      }
+      
       if (!userData?.klaviyo_setup_completed) {
         navigate("/klaviyo-setup");
         return;
@@ -201,7 +211,7 @@ export default function BrandDashboard() {
               Let AI analyze your business and suggest the perfect customer segments for your goals.
             </p>
             <Button
-              onClick={() => navigate("/app")}
+              onClick={() => navigate("/dashboard")}
               variant="outline"
               className="w-full"
             >
@@ -221,7 +231,7 @@ export default function BrandDashboard() {
               View detailed analytics and performance metrics for your customer segments.
             </p>
             <Button
-              onClick={() => navigate("/app")}
+              onClick={() => navigate("/dashboard")}
               variant="outline"
               className="w-full"
             >

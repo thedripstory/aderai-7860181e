@@ -21,7 +21,7 @@ export default function Index() {
 
       const { data: userData } = await supabase
         .from('users')
-        .select('account_type, onboarding_completed')
+        .select('account_type, onboarding_completed, klaviyo_setup_completed')
         .eq('id', session.user.id)
         .single();
 
@@ -37,6 +37,12 @@ export default function Index() {
         } else {
           navigate('/onboarding/agency');
         }
+        return;
+      }
+
+      // For brands, check klaviyo setup
+      if (userData.account_type === 'brand' && !userData.klaviyo_setup_completed) {
+        navigate('/klaviyo-setup');
         return;
       }
 

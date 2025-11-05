@@ -56,7 +56,19 @@ export default function AgencyDashboard() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/login");
+        navigate("/agency-login");
+        return;
+      }
+
+      // Verify onboarding completion
+      const { data: userData } = await supabase
+        .from("users")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .single();
+
+      if (!userData?.onboarding_completed) {
+        navigate("/onboarding/agency");
         return;
       }
 

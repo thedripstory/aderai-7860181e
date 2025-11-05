@@ -26,7 +26,24 @@ export default function BrandWorkspace() {
         return;
       }
 
-      // Verify this agency manages this client
+      // Get user account type first
+      const { data: agencyUserData } = await supabase
+        .from("users")
+        .select("account_type")
+        .eq("id", user.id)
+        .single();
+
+      if (agencyUserData?.account_type !== "agency") {
+        toast({
+          title: "Access Denied",
+          description: "Only agency accounts can access client workspaces.",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
+
+      // Verify this agency manages this client via RLS policy
       const { data: clientData, error: clientError } = await supabase
         .from("agency_clients")
         .select(`
@@ -135,7 +152,7 @@ export default function BrandWorkspace() {
         </div>
 
         {/* Klaviyo Keys */}
-        <div className="bg-card rounded-lg border-2 border-border p-6">
+        <div className="bg-card rounded-lg border-2 border-border p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Key className="w-5 h-5 text-primary" />
@@ -197,6 +214,22 @@ export default function BrandWorkspace() {
             </div>
           )}
         </div>
+
+        {/* Segment Management Access */}
+        {klaviyoKeys.length > 0 && (
+          <div className="bg-card rounded-lg border-2 border-border p-6">
+            <h2 className="text-xl font-semibold mb-4">Segment Management</h2>
+            <p className="text-muted-foreground mb-4">
+              Access this client's segment dashboard to create and manage their Klaviyo segments.
+            </p>
+            <Button
+              onClick={() => navigate(`/dashboard?clientId=${clientId}`)}
+              className="w-full"
+            >
+              Open Segment Dashboard
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
