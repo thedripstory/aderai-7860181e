@@ -20,6 +20,7 @@ import BrandDashboard from "./pages/BrandDashboard";
 import AgencyDashboard from "./pages/AgencyDashboard";
 import UnifiedDashboard from "./pages/UnifiedDashboard";
 import BrandWorkspace from "./pages/BrandWorkspace";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/brand-dashboard" element={<BrandDashboard />} />
             <Route path="/agency-dashboard" element={<AgencyDashboard />} />
             <Route path="/dashboard" element={<UnifiedDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route 
               path="/app" 
               element={<Index />} 
@@ -45,10 +47,6 @@ const App = () => (
             />
             <Route path="/brand-login" element={<BrandLogin />} />
             <Route path="/agency-login" element={<AgencyLogin />} />
-            <Route 
-              path="/login" 
-              element={<BrandLogin />} 
-            />
             <Route path="/onboarding/brand" element={<BrandOnboarding />} />
             <Route path="/onboarding/agency" element={<AgencyOnboarding />} />
             <Route path="/klaviyo-setup" element={<KlaviyoSetup />} />
