@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Building2, Users, BarChart3, ChevronDown } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Building2, Users, BarChart3, ChevronDown, Wand2, DollarSign, UserPlus } from "lucide-react";
+import { TubelightNavbar } from "@/components/TubelightNavbar";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -28,9 +29,19 @@ export default function LandingPage() {
   const handleGetStarted = () => {
     navigate("/signup");
   };
+
+  const navItems = [
+    { name: "How it works", url: "#how-it-works", icon: Wand2 },
+    { name: "Pricing", url: "#pricing", icon: DollarSign },
+    { name: "Affiliate", url: "/affiliate", icon: UserPlus },
+  ];
+
   return <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Tubelight Navbar */}
+      <TubelightNavbar items={navItems} />
+
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
+      <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           {/* Logo */}
           <a href="/" className="group flex items-center">
@@ -38,22 +49,6 @@ export default function LandingPage() {
               aderai<span className="text-accent group-hover:animate-pulse">.</span>
             </div>
           </a>
-
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-10">
-            <a href="#how-it-works" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
-              How it works
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="#pricing" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
-              Pricing
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/affiliate" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
-              Become an Affiliate
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-            </a>
-          </nav>
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-4">
