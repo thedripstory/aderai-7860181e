@@ -24,14 +24,19 @@ const validatePayload = (payload: any): payload is WebhookPayload => {
   return true;
 };
 
-// Verify webhook signature
+// Verify webhook signature (optional - skips verification if secret not configured)
 const verifyWebhookSignature = async (req: Request, body: string): Promise<boolean> => {
-  const signature = req.headers.get('x-klaviyo-signature');
-  if (!signature) return false;
-  
   const webhookSecret = Deno.env.get('KLAVIYO_WEBHOOK_SECRET');
+  
+  // If no webhook secret is configured, skip verification
   if (!webhookSecret) {
-    console.error('Webhook secret not configured');
+    console.warn('KLAVIYO_WEBHOOK_SECRET not configured - skipping signature verification');
+    return true;
+  }
+  
+  const signature = req.headers.get('x-klaviyo-signature');
+  if (!signature) {
+    console.error('No signature provided but webhook secret is configured');
     return false;
   }
   
