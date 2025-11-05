@@ -795,14 +795,8 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm flex items-end gap-1">
-                          2{" "}
-                          <img
-                            src={klaviyoLogo}
-                            alt="Klaviyo"
-                            className="h-[0.95em] inline-block align-text-bottom"
-                          />{" "}
-                          accounts
+                        <span className="text-sm">
+                          2 Klaviyo accounts
                         </span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
@@ -856,14 +850,8 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm flex items-end gap-1">
-                          5{" "}
-                          <img
-                            src={klaviyoLogo}
-                            alt="Klaviyo"
-                            className="h-[0.95em] inline-block align-text-bottom"
-                          />{" "}
-                          accounts
+                        <span className="text-sm">
+                          5 Klaviyo accounts
                         </span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
@@ -910,14 +898,8 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm flex items-end gap-1">
-                          10+{" "}
-                          <img
-                            src={klaviyoLogo}
-                            alt="Klaviyo"
-                            className="h-[0.95em] inline-block align-text-bottom"
-                          />{" "}
-                          accounts
+                        <span className="text-sm">
+                          10+ Klaviyo accounts
                         </span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
