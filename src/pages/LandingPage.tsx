@@ -800,7 +800,7 @@ export default function LandingPage() {
                           <img
                             src={klaviyoLogo}
                             alt="Klaviyo"
-                            className="h-[0.95em] inline-block"
+                            className="h-[0.95em] inline-block align-text-bottom"
                           />{" "}
                           accounts
                         </span>
@@ -861,7 +861,7 @@ export default function LandingPage() {
                           <img
                             src={klaviyoLogo}
                             alt="Klaviyo"
-                            className="h-[0.95em] inline-block"
+                            className="h-[0.95em] inline-block align-text-bottom"
                           />{" "}
                           accounts
                         </span>
@@ -915,7 +915,7 @@ export default function LandingPage() {
                           <img
                             src={klaviyoLogo}
                             alt="Klaviyo"
-                            className="h-[0.95em] inline-block"
+                            className="h-[0.95em] inline-block align-text-bottom"
                           />{" "}
                           accounts
                         </span>
