@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, ArrowRight, Gift, DollarSign, Users, TrendingUp, Copy, Star } from "lucide-react";
+import { CheckCircle2, ArrowRight, Gift, DollarSign, Users, TrendingUp, Copy, Star, Wand2, UserPlus } from "lucide-react";
+import { TubelightNavbar } from "@/components/TubelightNavbar";
+import { useNavigate } from "react-router-dom";
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
 export default function AffiliatePage() {
   const [scrolled, setScrolled] = useState(false);
   const [copied, setCopied] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -14,8 +17,14 @@ export default function AffiliatePage() {
   }, []);
 
   const handleGetStarted = () => {
-    window.location.href = "/signup";
+    navigate("/signup");
   };
+
+  const navItems = [
+    { name: "How it works", url: "/#how-it-works", icon: Wand2 },
+    { name: "Pricing", url: "/#pricing", icon: DollarSign },
+    { name: "Affiliate", url: "/affiliate", icon: UserPlus },
+  ];
 
   const copyExampleLink = () => {
     navigator.clipboard.writeText("https://aderai.com?ref=YOURCODE");
@@ -25,29 +34,17 @@ export default function AffiliatePage() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Tubelight Navbar */}
+      <TubelightNavbar items={navItems} />
+
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
+      <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <a href="/" className="group flex items-center">
             <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
               aderai<span className="text-accent group-hover:animate-pulse">.</span>
             </div>
           </a>
-
-          <nav className="hidden md:flex items-center gap-10">
-            <a href="/#how-it-works" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
-              How it works
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/#pricing" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium relative group">
-              Pricing
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/affiliate" className="text-base text-primary hover:text-primary/80 transition-colors font-medium relative group">
-              Become an Affiliate
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary"></span>
-            </a>
-          </nav>
 
           <div className="flex items-center gap-4">
             <a href="/login" className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium hidden sm:block">
@@ -64,7 +61,7 @@ export default function AffiliatePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-32 pb-20 px-6 overflow-visible">
+      <section className="relative z-10 pt-40 pb-20 px-6 overflow-visible">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />

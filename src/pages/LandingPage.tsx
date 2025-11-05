@@ -100,7 +100,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-24 pb-12 px-6 overflow-visible">
+      <section className="relative z-10 pt-40 pb-12 px-6 overflow-visible">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
