@@ -17,6 +17,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import OnboardingProgressBar from "@/components/OnboardingProgressBar";
+import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 
 export default function BrandDashboard() {
   const [loading, setLoading] = useState(true);
@@ -147,6 +149,22 @@ export default function BrandDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Email Verification Banner */}
+        {currentUser && (
+          <EmailVerificationBanner
+            userEmail={currentUser.email}
+            emailVerified={currentUser.email_verified}
+            userId={currentUser.id}
+          />
+        )}
+
+        {/* Onboarding Progress Bar */}
+        <OnboardingProgressBar
+          emailVerified={currentUser?.email_verified || false}
+          klaviyoSetupCompleted={currentUser?.klaviyo_setup_completed || false}
+          hasCreatedSegments={segmentsCreated > 0}
+        />
+
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-card rounded-lg border-2 border-border p-6">

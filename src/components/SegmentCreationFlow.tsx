@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { SegmentResult } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS } from './SegmentDashboard';
+import { supabase } from "@/integrations/supabase/client";
 
 interface SegmentCreationFlowProps {
   loading: boolean;

@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ClientSwitcher, AddClientModal } from '@/components/ClientSwitcher';
-import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
+import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { TimeBasedPopup } from '@/components/TimeBasedPopup';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
@@ -327,7 +327,13 @@ export default function UnifiedDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      {!emailVerified && <EmailVerificationBanner />}
+      {currentUser && !emailVerified && (
+        <EmailVerificationBanner 
+          userEmail={currentUser.email}
+          emailVerified={emailVerified}
+          userId={currentUser.id}
+        />
+      )}
       {accountType === "agency" && <TimeBasedPopup onGetStarted={() => navigate("/settings")} />}
       
       <div className="border-b-2 border-border bg-card">

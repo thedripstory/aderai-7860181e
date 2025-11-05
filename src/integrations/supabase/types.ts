@@ -265,6 +265,30 @@ export type Database = {
           },
         ]
       }
+      email_verification_reminders: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_reminder_sent_at: string | null
+          reminder_count: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_reminder_sent_at?: string | null
+          reminder_count?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_reminder_sent_at?: string | null
+          reminder_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       klaviyo_keys: {
         Row: {
           aov: number | null
@@ -406,6 +430,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      segment_creation_errors: {
+        Row: {
+          created_at: string | null
+          error_code: string | null
+          error_message: string
+          id: string
+          klaviyo_key_id: string
+          resolved_at: string | null
+          retry_count: number | null
+          segment_definition: Json
+          segment_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message: string
+          id?: string
+          klaviyo_key_id: string
+          resolved_at?: string | null
+          retry_count?: number | null
+          segment_definition: Json
+          segment_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string
+          id?: string
+          klaviyo_key_id?: string
+          resolved_at?: string | null
+          retry_count?: number | null
+          segment_definition?: Json
+          segment_name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       segment_creation_jobs: {
         Row: {

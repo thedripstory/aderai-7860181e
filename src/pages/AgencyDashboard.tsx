@@ -18,6 +18,7 @@ import {
   Eye,
   Key,
   LogOut,
+  Shield,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +26,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgencyTeamManager } from "@/components/AgencyTeamManager";
+import AgencyTeamDashboard from "@/components/AgencyTeamDashboard";
+import OnboardingProgressBar from "@/components/OnboardingProgressBar";
+import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 
 interface Client {
   id: string;
@@ -45,6 +49,8 @@ export default function AgencyDashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [showTeamDashboard, setShowTeamDashboard] = useState(false);
+  const [segmentsCreated, setSegmentsCreated] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -100,6 +106,14 @@ export default function AgencyDashboard() {
         );
         setClients(clientsWithKeys);
       }
+
+      // Load AI suggestions count as proxy for segments created
+      const { data: suggestionsData } = await supabase
+        .from("ai_suggestions")
+        .select("id")
+        .eq("user_id", user.id);
+
+      setSegmentsCreated(suggestionsData?.length || 0);
     } catch (error) {
       console.error("Error loading clients:", error);
       toast({
@@ -225,6 +239,22 @@ export default function AgencyDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Email Verification Banner */}
+        {currentUser && (
+          <EmailVerificationBanner
+            userEmail={currentUser.email}
+            emailVerified={currentUser.email_confirmed_at !== null}
+            userId={currentUser.id}
+          />
+        )}
+
+        {/* Onboarding Progress Bar */}
+        <OnboardingProgressBar
+          emailVerified={currentUser?.email_confirmed_at !== null}
+          klaviyoSetupCompleted={false}
+          hasCreatedSegments={segmentsCreated > 0}
+        />
+
         <Tabs defaultValue="clients" className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="clients">Clients</TabsTrigger>
@@ -388,11 +418,50 @@ export default function AgencyDashboard() {
         )}
           </TabsContent>
 
-          <TabsContent value="team">
-            <AgencyTeamManager />
+          <TabsContent value="team" className="space-y-6">
+            <div className="bg-card rounded-lg border-2 border-border p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold">Invite New Team Members</h2>
+              </div>
+              <AgencyTeamManager />
+            </div>
+
+            <div className="bg-card rounded-lg border-2 border-border p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold">Team Management</h2>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTeamDashboard(true)}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  View Full Dashboard
+                </Button>
+              </div>
+              <AgencyTeamDashboard />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Team Dashboard Modal */}
+      {showTeamDashboard && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card rounded-lg border-2 border-border max-w-6xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
+              <h2 className="text-xl font-bold">Team Management Dashboard</h2>
+              <Button
+                variant="ghost"
+                onClick={() => setShowTeamDashboard(false)}
+              >
+                ✕
+              </Button>
+            </div>
+            <div className="p-6">
+              <AgencyTeamDashboard />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Client Modal */}
       {showAddModal && (
