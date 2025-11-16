@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, LogOut, Gift, Settings as SettingsIcon, Loader } from 'lucide-react';
+import { Building2, LogOut, Gift, Settings as SettingsIcon, Loader, TrendingUp, DollarSign, Activity, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,6 +19,7 @@ import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { toast } from 'sonner';
+import { FeatureTourModal } from '@/components/FeatureTourModal';
 
 export default function UnifiedDashboard() {
   const navigate = useNavigate();
@@ -327,6 +328,7 @@ export default function UnifiedDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <FeatureTourModal />
       {currentUser && !emailVerified && (
         <EmailVerificationBanner 
           userEmail={currentUser.email}
@@ -385,13 +387,14 @@ export default function UnifiedDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs defaultValue="segments" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-7 mb-8">
             <TabsTrigger value="segments">Segments</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="ai">AI</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
             {accountType === "agency" && <TabsTrigger value="team">Team</TabsTrigger>}
+            <TabsTrigger value="more">More</TabsTrigger>
           </TabsList>
 
           <TabsContent value="segments">
@@ -475,6 +478,99 @@ export default function UnifiedDashboard() {
               <AgencyTeamManager />
             </TabsContent>
           )}
+
+          <TabsContent value="more">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <button
+                onClick={() => navigate('/features')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+                data-tour="feature-showcase"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <TrendingUp className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">Feature Showcase</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Explore ROI calculators, comparisons, and success stories</p>
+              </button>
+
+              <button
+                onClick={() => navigate('/roi-dashboard')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+                data-tour="roi-tracker"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                    <DollarSign className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <h3 className="text-lg font-bold">ROI Tracker</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Track campaign performance and revenue metrics</p>
+              </button>
+
+              <button
+                onClick={() => navigate('/segment-health')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+                data-tour="segment-health"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                    <Activity className="w-6 h-6 text-accent" />
+                  </div>
+                  <h3 className="text-lg font-bold">Segment Health</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Monitor segment health status and trends</p>
+              </button>
+
+              {accountType === "agency" && (
+                <>
+                  <button
+                    onClick={() => navigate('/agency-tools')}
+                    className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+                    data-tour="agency-tools"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <Building2 className="w-6 h-6 text-primary" />
+                      </div>
+                      <h3 className="text-lg font-bold">Agency Tools</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Client scorecards, team management, and proposals</p>
+                  </button>
+
+                  <button
+                    onClick={() => navigate('/ai-features')}
+                    className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+                    data-tour="ai-features"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                        <Sparkles className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <h3 className="text-lg font-bold">AI Features</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Predictive analytics and churn prediction</p>
+                  </button>
+                </>
+              )}
+
+              {accountType === "brand" && (
+                <button
+                  onClick={() => navigate('/ai-features')}
+                  className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                      <Sparkles className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <h3 className="text-lg font-bold">AI Features</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Predictive analytics and churn prediction</p>
+                </button>
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
