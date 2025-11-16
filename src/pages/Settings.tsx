@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, User, Lock, AlertCircle, CheckCircle, ArrowLeft, LogOut, Bell, Shield } from "lucide-react";
+import { Settings as SettingsIcon, User, Lock, AlertCircle, CheckCircle, ArrowLeft, LogOut, Bell, Shield, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -412,6 +412,22 @@ export default function Settings() {
                     className="w-full px-4 py-3 rounded-lg border-2 border-input bg-muted text-muted-foreground cursor-not-allowed"
                   />
                   <p className="text-xs text-muted-foreground mt-1">Contact support to change your email</p>
+                </div>
+
+                <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4" />
+                    Subscription & Billing
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Manage your subscription plan, view billing history, and update payment methods.
+                  </p>
+                  <button
+                    onClick={() => navigate('/subscription-management')}
+                    className="w-full bg-background hover:bg-accent px-4 py-2 rounded-lg font-medium transition-colors border border-border"
+                  >
+                    Manage Subscription
+                  </button>
                 </div>
 
                 <button
