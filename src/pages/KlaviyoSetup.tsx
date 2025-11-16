@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Key, DollarSign, Users, TrendingUp, Loader2 } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { supabase } from "@/lib/supabase";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 const KlaviyoSetup = () => {
   const navigate = useNavigate();
@@ -222,6 +223,7 @@ const KlaviyoSetup = () => {
   }
 
   return (
+    <SubscriptionGate>
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -465,6 +467,7 @@ const KlaviyoSetup = () => {
 
       <PoweredByBadge />
     </div>
+    </SubscriptionGate>
   );
 };
 

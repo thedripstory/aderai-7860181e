@@ -175,44 +175,22 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
         toast({
           title: "Account created!",
-          description: "Redirecting you to complete payment...",
+          description: "Choose your plan to continue...",
         });
         
-        // Redirect to Stripe checkout for payment (brand accounts only)
+        // Redirect to pricing choice for brand accounts
         const accountType = authView.includes("agency") ? "agency" : "brand";
         
         if (accountType === "brand") {
-          try {
-            const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
-              'create-checkout',
-              {
-                headers: {
-                  Authorization: `Bearer ${authData.session?.access_token}`,
-                },
-              }
-            );
-
-            if (checkoutError) throw checkoutError;
-            
-            if (checkoutData?.url) {
-              // Redirect to Stripe checkout
-              window.location.href = checkoutData.url;
-              return;
-            }
-          } catch (checkoutError) {
-            console.error("Failed to create checkout session:", checkoutError);
-            toast({
-              title: "Payment Setup Failed",
-              description: "We'll help you set up payment later. Continuing with onboarding...",
-              variant: "destructive",
-            });
-          }
+          setTimeout(() => {
+            navigate('/pricing-choice');
+          }, 500);
+        } else {
+          // Agency accounts skip payment
+          setTimeout(() => {
+            navigate('/onboarding/agency');
+          }, 500);
         }
-        
-        // Fallback navigation or for agency accounts
-        setTimeout(() => {
-          navigate(`/onboarding/${accountType}`);
-        }, 500);
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");

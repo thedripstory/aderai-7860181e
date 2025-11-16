@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
 export default function BrandOnboarding() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [user, setUser] = useState<any>(null);
@@ -33,6 +34,15 @@ export default function BrandOnboarding() {
 
   useEffect(() => {
     checkAuth();
+    
+    // Check for payment success
+    const paymentStatus = searchParams.get('payment');
+    if (paymentStatus === 'success') {
+      toast({
+        title: "Payment Successful! 🎉",
+        description: "Your subscription is now active. Let's complete your setup.",
+      });
+    }
   }, []);
 
   const checkAuth = async () => {

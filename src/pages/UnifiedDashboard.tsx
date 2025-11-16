@@ -19,6 +19,7 @@ import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { toast } from 'sonner';
+import { SubscriptionGate } from '@/components/SubscriptionGate';
 
 export default function UnifiedDashboard() {
   const navigate = useNavigate();
@@ -326,6 +327,7 @@ export default function UnifiedDashboard() {
   }
 
   return (
+    <SubscriptionGate showToast={false}>
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {currentUser && !emailVerified && (
         <EmailVerificationBanner 
@@ -572,5 +574,6 @@ export default function UnifiedDashboard() {
         </Tabs>
       </div>
     </div>
+    </SubscriptionGate>
   );
 }

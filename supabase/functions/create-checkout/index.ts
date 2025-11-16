@@ -32,6 +32,11 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Parse request body to get priceId
+    const body = await req.json();
+    const priceId = body.priceId || "price_1SU61e0lE1soQQfxwKcXj7M5"; // Default to monthly
+    logStep("Using price", { priceId });
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
       apiVersion: "2025-08-27.basil" 
     });
@@ -50,13 +55,13 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price: "price_1SU61e0lE1soQQfxwKcXj7M5",
+          price: priceId,
           quantity: 1,
         },
       ],
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/onboarding/brand?payment=success`,
-      cancel_url: `${req.headers.get("origin")}/signup?payment=canceled`,
+      cancel_url: `${req.headers.get("origin")}/pricing-choice?payment=canceled`,
     });
 
     logStep("Checkout session created", { sessionId: session.id });
