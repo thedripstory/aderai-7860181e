@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, ArrowRight } from "lucide-react";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,80 @@ export default function AgencyLogin() {
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [isSettingNewPassword, setIsSettingNewPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  useEffect(() => {
+    // Check if this is a password reset callback
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    
+    if (type === 'recovery') {
+      setIsSettingNewPassword(true);
+      toast({
+        title: "Set New Password",
+        description: "Please enter your new password below.",
+      });
+    }
+  }, []);
+
+  const handleSetNewPassword = async () => {
+    if (!newPassword || !confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 8 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password Updated",
+        description: "Your password has been successfully reset. Please sign in.",
+      });
+
+      setIsSettingNewPassword(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      window.history.replaceState({}, document.title, "/agency-login");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePasswordReset = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -214,7 +288,43 @@ export default function AgencyLogin() {
             </div>
           )}
 
-          <div className="space-y-4">
+          {isSettingNewPassword ? (
+            /* Set New Password Form */
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition"
+                  onKeyDown={(e) => e.key === 'Enter' && handleSetNewPassword()}
+                />
+              </div>
+
+              <button
+                onClick={handleSetNewPassword}
+                disabled={loading}
+                className="w-full bg-accent text-accent-foreground font-semibold py-3 rounded-lg hover:bg-accent/90 transition-all disabled:opacity-50 shadow-lg"
+              >
+                {loading ? "Updating..." : "Update Password"}
+              </button>
+            </div>
+          ) : (
+            /* Login Form */
+            <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Email</label>
               <input
@@ -272,6 +382,7 @@ export default function AgencyLogin() {
               {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
           </div>
+          )}
 
           {/* Footer */}
           <div className="mt-6 pt-6 border-t border-border space-y-4">
