@@ -12,6 +12,7 @@ import AgencyLogin from "./pages/AgencyLogin";
 import BrandOnboarding from "./pages/BrandOnboarding";
 import AgencyOnboarding from "./pages/AgencyOnboarding";
 import KlaviyoSetup from "./pages/KlaviyoSetup";
+import PricingChoice from "./pages/PricingChoice";
 import AffiliatePage from "./pages/AffiliatePage";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -55,6 +56,7 @@ const App = () => (
             />
             <Route path="/brand-login" element={<BrandLogin />} />
             <Route path="/agency-login" element={<AgencyLogin />} />
+            <Route path="/pricing-choice" element={<PricingChoice />} />
             <Route path="/onboarding/brand" element={<BrandOnboarding />} />
             <Route path="/onboarding/agency" element={<AgencyOnboarding />} />
             <Route path="/klaviyo-setup" element={<KlaviyoSetup />} />

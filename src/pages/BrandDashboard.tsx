@@ -27,6 +27,7 @@ import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { useAnalyticsTracking } from "@/hooks/useAnalyticsTracking";
 import { useProductTour } from "@/hooks/useProductTour";
 import { ErrorLogger } from "@/lib/errorLogger";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 export default function BrandDashboard() {
   const [loading, setLoading] = useState(true);
@@ -140,6 +141,7 @@ export default function BrandDashboard() {
   }
 
   return (
+    <SubscriptionGate>
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Session Timeout Warning */}
       {showWarning && (
@@ -418,5 +420,6 @@ export default function BrandDashboard() {
         </div>
       </div>
     </div>
+    </SubscriptionGate>
   );
 }
