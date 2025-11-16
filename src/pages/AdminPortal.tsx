@@ -1,0 +1,96 @@
+import { useEffect, useState } from "react";
+import AdminDashboard from "./AdminDashboard";
+import AdminLogin from "./AdminLogin";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+// AdminPortal: Single entry for /admin. Shows login if not signed in, dashboard if admin.
+const AdminPortal = () => {
+  const [loading, setLoading] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  // Check current session and admin role
+  const checkSessionAndRole = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user ?? null;
+    setSignedIn(!!user);
+
+    if (user) {
+      // Use RPC (security definer) to check admin without exposing table policies
+      try {
+        const { data, error } = await supabase.rpc("is_admin");
+        if (error) throw error;
+        setIsAdmin(Boolean(data));
+      } catch (e) {
+        console.error("Admin check failed", e);
+        setIsAdmin(false);
+        toast.error("Access check failed. Please try again.");
+      }
+    } else {
+      setIsAdmin(null);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    // 1) Set up listener first (sync state only inside callback)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(!!session?.user);
+      // Defer any Supabase calls to avoid deadlocks
+      setTimeout(() => {
+        checkSessionAndRole();
+      }, 0);
+    });
+
+    // 2) Then check existing session
+    checkSessionAndRole();
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
+        {/* Aggressive rotating loader */}
+        <div className="relative w-8 h-8" aria-label="Loading">
+          <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+          <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+          </div>
+          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
+          </div>
+          <div className="absolute inset-0 animate-[spin_2s_linear_infinite_reverse]">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-500" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!signedIn) {
+    return <AdminLogin />;
+  }
+
+  if (isAdmin) {
+    return <AdminDashboard />;
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6">
+      <div className="max-w-md w-full text-center space-y-4">
+        <h1 className="text-2xl font-semibold">Access denied</h1>
+        <p className="text-muted-foreground">Admin privileges are required to access this area.</p>
+        <div className="flex items-center justify-center gap-3">
+          <Button variant="default" onClick={() => supabase.auth.signOut()}>Sign out</Button>
+          <Button variant="secondary" onClick={checkSessionAndRole}>Retry</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminPortal;

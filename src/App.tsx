@@ -22,6 +22,7 @@ import UnifiedDashboard from "./pages/UnifiedDashboard";
 import BrandWorkspace from "./pages/BrandWorkspace";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import AdminPortal from "./pages/AdminPortal";
 import FeatureShowcase from "./pages/FeatureShowcase";
 import ROIDashboard from "./pages/ROIDashboard";
 import SegmentHealthDashboard from "./pages/SegmentHealthDashboard";
@@ -42,8 +43,8 @@ const App = () => (
             <Route path="/brand-dashboard" element={<BrandDashboard />} />
             <Route path="/agency-dashboard" element={<AgencyDashboard />} />
             <Route path="/dashboard" element={<UnifiedDashboard />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin-login" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin" element={<AdminPortal />} />
             <Route 
               path="/app" 
               element={<Index />} 
