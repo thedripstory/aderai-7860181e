@@ -244,19 +244,20 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">$49</span>
-                  <span className="text-muted-foreground">/one-time</span>
+                  <span className="text-4xl font-bold">$79</span>
+                  <span className="text-muted-foreground">/month</span>
                 </div>
+                <p className="text-xs text-muted-foreground mt-1">Professional Plan - Most Popular</p>
               </div>
 
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center text-sm text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
-                  70 pre-built segments
+                  70+ pre-built segments
                 </li>
                 <li className="flex items-center text-sm text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
-                  AI segment suggester
+                  Unlimited AI suggestions
                 </li>
                 <li className="flex items-center text-sm text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
@@ -287,19 +288,28 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">$89</span>
+                  <span className="text-4xl font-bold">$399</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
+                <p className="text-xs text-muted-foreground mt-1">Agency Pro - Recommended</p>
               </div>
 
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center text-sm text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
-                  Everything in Brand
+                  Up to 15 client accounts
                 </li>
                 <li className="flex items-center text-sm text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
-                  Multiple client accounts
+                  Team collaboration (10 seats)
+                </li>
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
+                  White-label reporting
+                </li>
+                <li className="flex items-center text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
+                  Dedicated account manager
                 </li>
                 <li className="flex items-center text-sm text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
