@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
-import { OnboardingSkipOption } from "@/components/OnboardingSkipOption";
+
 import {
   Building2,
   Target,
@@ -80,8 +80,8 @@ export default function BrandOnboarding() {
         description: "Let's set up your Klaviyo integration.",
       });
 
-      // Navigate to Brand Dashboard
-      navigate("/brand-dashboard");
+      // Navigate to Klaviyo Setup - mandatory step
+      navigate("/klaviyo-setup");
     } catch (error) {
       console.error("Error completing onboarding:", error);
       toast({
@@ -285,7 +285,7 @@ export default function BrandOnboarding() {
 
           {/* Navigation */}
           <div className="flex justify-between mt-8 pt-6 border-t border-border">
-            {currentStep > 1 ? (
+            {currentStep > 1 && (
               <Button
                 variant="outline"
                 onClick={prevStep}
@@ -293,10 +293,6 @@ export default function BrandOnboarding() {
               >
                 Back
               </Button>
-            ) : (
-              <div className="flex items-center">
-                <OnboardingSkipOption />
-              </div>
             )}
 
             {currentStep < 3 ? (

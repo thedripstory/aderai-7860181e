@@ -175,13 +175,41 @@ export default function Auth({ onComplete, initialView = "choice" }: AuthProps) 
 
         toast({
           title: "Account created!",
-          description: "Welcome to aderai! Let's get you set up.",
+          description: "Redirecting you to complete payment...",
         });
         
-        // Navigate to onboarding - new users always need onboarding
+        // Redirect to Stripe checkout for payment (brand accounts only)
         const accountType = authView.includes("agency") ? "agency" : "brand";
         
-        // Small delay to ensure database consistency
+        if (accountType === "brand") {
+          try {
+            const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
+              'create-checkout',
+              {
+                headers: {
+                  Authorization: `Bearer ${authData.session?.access_token}`,
+                },
+              }
+            );
+
+            if (checkoutError) throw checkoutError;
+            
+            if (checkoutData?.url) {
+              // Redirect to Stripe checkout
+              window.location.href = checkoutData.url;
+              return;
+            }
+          } catch (checkoutError) {
+            console.error("Failed to create checkout session:", checkoutError);
+            toast({
+              title: "Payment Setup Failed",
+              description: "We'll help you set up payment later. Continuing with onboarding...",
+              variant: "destructive",
+            });
+          }
+        }
+        
+        // Fallback navigation or for agency accounts
         setTimeout(() => {
           navigate(`/onboarding/${accountType}`);
         }, 500);
