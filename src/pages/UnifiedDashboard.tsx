@@ -17,9 +17,11 @@ import { SegmentPerformance } from '@/components/SegmentPerformance';
 import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
 import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
+import { APIAccessSection } from '@/components/APIAccessSection';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { toast } from 'sonner';
 import { SubscriptionGate } from '@/components/SubscriptionGate';
+import { useSubscription } from '@/hooks/useSubscription';
 
 export default function UnifiedDashboard() {
   const navigate = useNavigate();
@@ -45,6 +47,23 @@ export default function UnifiedDashboard() {
   const [showHealthScore, setShowHealthScore] = useState(false);
 
   const { loading: creatingSegments, results, createSegments, setResults } = useKlaviyoSegments();
+  const { isStarter, isProfessional, isGrowth, tier } = useSubscription();
+
+  // Tier limits
+  const SEGMENT_LIMITS = {
+    starter: 50,
+    professional: 999, // Unlimited
+    growth: 999, // Unlimited
+  };
+
+  const KLAVIYO_ACCOUNT_LIMITS = {
+    starter: 1,
+    professional: 1,
+    growth: 2,
+  };
+
+  const getSegmentLimit = () => SEGMENT_LIMITS[tier as keyof typeof SEGMENT_LIMITS] || 50;
+  const getAccountLimit = () => KLAVIYO_ACCOUNT_LIMITS[tier as keyof typeof KLAVIYO_ACCOUNT_LIMITS] || 1;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -164,7 +183,21 @@ export default function UnifiedDashboard() {
     setActiveKeyIndex(index);
   };
 
-  const handleAddClient = () => {
+  const handleAddClient = async () => {
+    const limit = getAccountLimit();
+    
+    // Check if user has reached their Klaviyo account limit
+    if (klaviyoKeys.length >= limit) {
+      toast.error(
+        `Your ${tier === 'starter' ? 'Starter' : tier === 'professional' ? 'Professional' : 'Growth'} plan is limited to ${limit} Klaviyo account${limit > 1 ? 's' : ''}. ${
+          tier === 'starter' ? 'Upgrade to Professional for more features, or Growth for 2 accounts.' :
+          tier === 'professional' ? 'Upgrade to Growth for 2 Klaviyo accounts and API access.' :
+          'You have reached your account limit.'
+        }`
+      );
+      return;
+    }
+    
     setShowAddClientModal(true);
   };
 
@@ -175,25 +208,51 @@ export default function UnifiedDashboard() {
   };
 
   const toggleSegment = (segmentId: string) => {
-    setSelectedSegments(prev =>
-      prev.includes(segmentId)
-        ? prev.filter(id => id !== segmentId)
-        : [...prev, segmentId]
-    );
+    setSelectedSegments(prev => {
+      if (prev.includes(segmentId)) {
+        return prev.filter(id => id !== segmentId);
+      }
+      
+      // Check tier limit
+      const limit = getSegmentLimit();
+      if (prev.length >= limit) {
+        toast.error(`${tier === 'starter' ? 'Starter' : tier === 'professional' ? 'Professional' : 'Growth'} tier is limited to ${limit} segments. Upgrade to access more.`);
+        return prev;
+      }
+      
+      return [...prev, segmentId];
+    });
   };
 
   const selectBundle = (bundleId: string) => {
     const bundle = BUNDLES.find(b => b.id === bundleId);
     if (bundle) {
       setSelectedSegments(prev => {
-        const allSegmentIds = [...prev, ...bundle.segments];
-        return Array.from(new Set(allSegmentIds));
+        const newSegments = [...prev, ...bundle.segments];
+        const uniqueSegments = Array.from(new Set(newSegments));
+        const limit = getSegmentLimit();
+        
+        if (uniqueSegments.length > limit) {
+          toast.error(`This bundle would exceed your ${limit}-segment limit. Upgrade to select more segments.`);
+          return prev;
+        }
+        
+        return uniqueSegments;
       });
     }
   };
 
   const handleSelectAll = () => {
-    setSelectedSegments(SEGMENTS.map(s => s.id));
+    const limit = getSegmentLimit();
+    const allSegmentIds = SEGMENTS.map(s => s.id);
+    
+    if (allSegmentIds.length > limit) {
+      const limitedSegments = allSegmentIds.slice(0, limit);
+      setSelectedSegments(limitedSegments);
+      toast.warning(`Selected first ${limit} segments (your tier limit). Upgrade for unlimited access.`);
+    } else {
+      setSelectedSegments(allSegmentIds);
+    }
   };
 
   const handleClearAll = () => {
@@ -387,13 +446,14 @@ export default function UnifiedDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs defaultValue="segments" className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-8">
+          <TabsList className="grid w-full grid-cols-8 mb-8">
             <TabsTrigger value="segments">Segments</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="ai">AI</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
             {accountType === "agency" && <TabsTrigger value="team">Team</TabsTrigger>}
+            <TabsTrigger value="api">API</TabsTrigger>
             <TabsTrigger value="more">More</TabsTrigger>
           </TabsList>
 
@@ -404,6 +464,8 @@ export default function UnifiedDashboard() {
               onSelectBundle={selectBundle}
               onSelectAll={handleSelectAll}
               onClearAll={handleClearAll}
+              segmentLimit={getSegmentLimit()}
+              currentTier={tier}
             />
 
             {selectedSegments.length > 0 && (
@@ -412,6 +474,7 @@ export default function UnifiedDashboard() {
                   <div>
                     <p className="font-medium">
                       {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
+                      {tier === 'starter' && <span className="text-sm text-muted-foreground ml-2">(max {getSegmentLimit()})</span>}
                     </p>
                     <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
                   </div>
@@ -478,6 +541,10 @@ export default function UnifiedDashboard() {
               <AgencyTeamManager />
             </TabsContent>
           )}
+
+          <TabsContent value="api">
+            <APIAccessSection />
+          </TabsContent>
 
           <TabsContent value="more">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

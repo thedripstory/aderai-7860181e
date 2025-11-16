@@ -168,6 +168,8 @@ interface SegmentDashboardProps {
   onSelectBundle: (bundleId: string) => void;
   onSelectAll?: () => void;
   onClearAll?: () => void;
+  segmentLimit?: number;
+  currentTier?: string;
 }
 
 export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
@@ -176,6 +178,8 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
   onSelectBundle,
   onSelectAll,
   onClearAll,
+  segmentLimit = 999,
+  currentTier = 'professional',
 }) => {
   const [expandedCategory, setExpandedCategory] = useState<string | null>("Core Essentials");
 
@@ -183,7 +187,14 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
     <div>
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-3xl font-bold">Create Segments</h2>
+          <div>
+            <h2 className="text-3xl font-bold">Create Segments</h2>
+            {segmentLimit < 999 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {currentTier === 'starter' ? 'Starter' : 'Professional'} tier: Up to {segmentLimit} segments
+              </p>
+            )}
+          </div>
           {onSelectAll && onClearAll && (
             <div className="flex gap-2">
               <button
