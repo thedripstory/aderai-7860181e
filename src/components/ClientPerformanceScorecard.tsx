@@ -11,58 +11,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-
-interface ClientMetrics {
-  clientName: string;
-  segments: number;
-  totalRevenue: number;
-  emailsSent: number;
-  engagementRate: number;
-  revenueGrowth: number;
-  activeSegments: number;
-  lastSync: string;
-}
+import { useClientPerformanceMetrics } from "@/hooks/useClientPerformanceMetrics";
 
 export const ClientPerformanceScorecard = () => {
-  const [selectedClient, setSelectedClient] = useState<string>("client1");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [timeframe, setTimeframe] = useState<string>("30days");
   const { toast } = useToast();
+  const { clients, loading } = useClientPerformanceMetrics(timeframe);
 
-  // Mock client data - in production this would come from database
-  const clientsData: Record<string, ClientMetrics> = {
-    client1: {
-      clientName: "Luxe Beauty Co.",
-      segments: 65,
-      totalRevenue: 127500,
-      emailsSent: 45230,
-      engagementRate: 34.5,
-      revenueGrowth: 42,
-      activeSegments: 58,
-      lastSync: new Date().toISOString()
-    },
-    client2: {
-      clientName: "Premium Apparel Brand",
-      segments: 52,
-      totalRevenue: 89400,
-      emailsSent: 32100,
-      engagementRate: 28.3,
-      revenueGrowth: 31,
-      activeSegments: 48,
-      lastSync: new Date().toISOString()
-    },
-    client3: {
-      clientName: "Outdoor Gear Co.",
-      segments: 48,
-      totalRevenue: 73200,
-      emailsSent: 28900,
-      engagementRate: 31.2,
-      revenueGrowth: 25,
-      activeSegments: 44,
-      lastSync: new Date().toISOString()
-    }
-  };
+  // Set first client as selected when data loads
+  if (!selectedClientId && clients.length > 0) {
+    setSelectedClientId(clients[0].clientId);
+  }
 
-  const currentMetrics = clientsData[selectedClient];
+  const currentMetrics = clients.find(c => c.clientId === selectedClientId);
 
   const exportPDF = () => {
     toast({
@@ -74,9 +36,38 @@ export const ClientPerformanceScorecard = () => {
   const scheduleQBR = () => {
     toast({
       title: "QBR Scheduled",
-      description: `Quarterly Business Review scheduled for ${currentMetrics.clientName}`,
+      description: `Quarterly Business Review scheduled for ${currentMetrics?.clientName}`,
     });
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Loading client metrics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (clients.length === 0) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-12 text-center">
+          <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Clients Found</h3>
+          <p className="text-muted-foreground mb-4">
+            Add clients to your agency to start tracking their performance.
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!currentMetrics) {
+    return null;
+  }
 
   return (
     <div className="space-y-6" id="scorecard-content">
@@ -93,14 +84,16 @@ export const ClientPerformanceScorecard = () => {
         </div>
         
         <div className="flex gap-2">
-          <Select value={selectedClient} onValueChange={setSelectedClient}>
+          <Select value={selectedClientId} onValueChange={setSelectedClientId}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select client" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="client1">Luxe Beauty Co.</SelectItem>
-              <SelectItem value="client2">Premium Apparel</SelectItem>
-              <SelectItem value="client3">Outdoor Gear Co.</SelectItem>
+              {clients.map(client => (
+                <SelectItem key={client.clientId} value={client.clientId}>
+                  {client.clientName}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -145,7 +138,7 @@ export const ClientPerformanceScorecard = () => {
           </div>
           <div className="flex items-center gap-1 mt-2 text-sm text-emerald-600">
             <TrendingUp className="w-4 h-4" />
-            +{currentMetrics.revenueGrowth}% growth
+            +{currentMetrics.revenueGrowth.toFixed(1)}% growth
           </div>
         </Card>
 
@@ -163,7 +156,7 @@ export const ClientPerformanceScorecard = () => {
             <span className="text-sm text-muted-foreground">Engagement Rate</span>
             <Users className="w-5 h-5 text-accent" />
           </div>
-          <div className="text-3xl font-bold">{currentMetrics.engagementRate}%</div>
+          <div className="text-3xl font-bold">{currentMetrics.engagementRate.toFixed(1)}%</div>
           <p className="text-xs text-muted-foreground mt-2">Average across campaigns</p>
         </Card>
 
@@ -179,68 +172,72 @@ export const ClientPerformanceScorecard = () => {
 
       {/* Performance Breakdown */}
       <Card className="p-6">
-        <h3 className="text-xl font-bold mb-4">Top Performing Segments</h3>
-        <div className="space-y-3">
-          {[
-            { name: "VIP Customers", revenue: 32400, emails: 1240, rate: 87 },
-            { name: "High-Value Customers", revenue: 28900, emails: 2130, rate: 76 },
-            { name: "Cart Abandoners", revenue: 19800, emails: 8940, rate: 42 },
-            { name: "Recent Customers", revenue: 15600, emails: 3420, rate: 68 },
-            { name: "Engaged Subscribers", revenue: 12300, emails: 5890, rate: 54 }
-          ].map((segment, idx) => (
-            <div key={idx} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                  {idx + 1}
-                </div>
-                <div>
-                  <div className="font-semibold">{segment.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {segment.emails.toLocaleString()} emails sent • {segment.rate}% engagement
+        <h3 className="text-xl font-semibold mb-4">Top Performing Segments</h3>
+        {currentMetrics.topSegments.length === 0 ? (
+          <p className="text-muted-foreground text-center py-4">No segment data available</p>
+        ) : (
+          <div className="space-y-4">
+            {currentMetrics.topSegments.map((segment, index) => (
+              <div key={index} className="border-l-4 border-primary pl-4 py-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="font-medium">{segment.name}</p>
+                      <p className="text-sm text-muted-foreground">{segment.profiles.toLocaleString()} profiles</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-lg">${(segment.revenue / 1000).toFixed(1)}k</p>
+                    <p className="text-sm text-muted-foreground">{segment.engagement.toFixed(1)}% engagement</p>
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="font-bold text-lg">${segment.revenue.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">Revenue generated</div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Card>
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <Button onClick={exportPDF} className="flex-1">
+        <Button size="lg" onClick={exportPDF} className="flex-1">
           <Download className="w-4 h-4 mr-2" />
           Export White-Label PDF
         </Button>
-        <Button onClick={scheduleQBR} variant="outline" className="flex-1">
+        <Button size="lg" variant="outline" onClick={scheduleQBR} className="flex-1">
           <Calendar className="w-4 h-4 mr-2" />
           Schedule QBR
         </Button>
       </div>
 
-      {/* Recommendations */}
-      <Card className="p-6 bg-primary/5 border-primary/20">
-        <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
-          <Target className="w-5 h-5 text-primary" />
-          Recommendations for {currentMetrics.clientName}
+      {/* Recommendations Section */}
+      <Card className="p-6 bg-gradient-to-br from-accent/5 to-background border-accent">
+        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <Target className="w-5 h-5 text-accent" />
+          Recommendations
         </h3>
-        <ul className="space-y-2">
-          <li className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2" />
-            <span>Deploy win-back campaigns to "At-Risk Customers" segment (23% size increase detected)</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2" />
-            <span>VIP segment showing strong performance - consider creating exclusive product launches</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2" />
-            <span>Cart abandonment recovery performing well - increase frequency to 3 emails</span>
-          </li>
-        </ul>
+        <div className="space-y-3">
+          <div className="p-4 bg-background rounded-lg border">
+            <h4 className="font-semibold text-accent mb-2">Optimize High Performers</h4>
+            <p className="text-sm text-muted-foreground">
+              Your top segments are performing well. Consider increasing email frequency by 15% to maximize revenue.
+            </p>
+          </div>
+          <div className="p-4 bg-background rounded-lg border">
+            <h4 className="font-semibold text-accent mb-2">Re-engage Inactive Segments</h4>
+            <p className="text-sm text-muted-foreground">
+              {currentMetrics.segments - currentMetrics.activeSegments} segments are inactive. Review and reactivate potential high-value segments.
+            </p>
+          </div>
+          <div className="p-4 bg-background rounded-lg border">
+            <h4 className="font-semibold text-accent mb-2">Expand VIP Program</h4>
+            <p className="text-sm text-muted-foreground">
+              Your VIP segment shows strong engagement. Consider creating a VIP+ tier for top 10% performers.
+            </p>
+          </div>
+        </div>
       </Card>
     </div>
   );
