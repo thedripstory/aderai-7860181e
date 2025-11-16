@@ -22,6 +22,11 @@ import UnifiedDashboard from "./pages/UnifiedDashboard";
 import BrandWorkspace from "./pages/BrandWorkspace";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import FeatureShowcase from "./pages/FeatureShowcase";
+import ROIDashboard from "./pages/ROIDashboard";
+import SegmentHealthDashboard from "./pages/SegmentHealthDashboard";
+import AgencyToolsDashboard from "./pages/AgencyToolsDashboard";
+import AIFeaturesDashboard from "./pages/AIFeaturesDashboard";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +61,11 @@ const App = () => (
             <Route path="/affiliate" element={<AffiliatePage />} />
             <Route path="/accept-invite" element={<AcceptInvite />} />
             <Route path="/brand-workspace/:clientId" element={<BrandWorkspace />} />
+            <Route path="/features" element={<FeatureShowcase />} />
+            <Route path="/roi-dashboard" element={<ROIDashboard />} />
+            <Route path="/segment-health" element={<SegmentHealthDashboard />} />
+            <Route path="/agency-tools" element={<AgencyToolsDashboard />} />
+            <Route path="/ai-features" element={<AIFeaturesDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
