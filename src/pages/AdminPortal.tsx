@@ -75,22 +75,26 @@ const AdminPortal = () => {
     return <AdminLogin />;
   }
 
+  if (isAdmin === false) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-md w-full text-center space-y-4">
+          <h1 className="text-2xl font-semibold">Access denied</h1>
+          <p className="text-muted-foreground">Admin privileges are required to access this area.</p>
+          <div className="flex items-center justify-center gap-3">
+            <Button variant="default" onClick={() => supabase.auth.signOut()}>Sign out</Button>
+            <Button variant="secondary" onClick={checkSessionAndRole}>Retry</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (isAdmin) {
     return <AdminDashboard />;
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="max-w-md w-full text-center space-y-4">
-        <h1 className="text-2xl font-semibold">Access denied</h1>
-        <p className="text-muted-foreground">Admin privileges are required to access this area.</p>
-        <div className="flex items-center justify-center gap-3">
-          <Button variant="default" onClick={() => supabase.auth.signOut()}>Sign out</Button>
-          <Button variant="secondary" onClick={checkSessionAndRole}>Retry</Button>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export default AdminPortal;
