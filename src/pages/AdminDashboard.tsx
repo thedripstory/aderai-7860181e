@@ -59,21 +59,17 @@ const AdminDashboard = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/admin-login");
+        navigate("/");
         return;
       }
 
-      // Check if user has admin role
-      const { data: roleData, error: roleError } = await supabase
-        .from("user_roles")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .single();
+      // Use RPC function to check admin role (security definer)
+      const { data: isAdminUser, error: roleError } = await supabase.rpc("is_admin");
 
-      if (roleError || !roleData) {
+      if (roleError || !isAdminUser) {
         toast.error("Access denied. Admin privileges required.");
-        navigate("/admin-login");
+        await supabase.auth.signOut();
+        navigate("/");
         return;
       }
 
@@ -81,7 +77,8 @@ const AdminDashboard = () => {
       loadAllData();
     } catch (error) {
       console.error("Error checking admin access:", error);
-      navigate("/admin-login");
+      await supabase.auth.signOut();
+      navigate("/");
     } finally {
       setLoading(false);
     }
@@ -228,11 +225,42 @@ const AdminDashboard = () => {
       // Log audit action
       await logAuditAction("role_update", "user_roles", userId, { role: oldRole }, { role });
 
-      toast.success("Role updated successfully");
+      toast.success(`Role updated to ${role} successfully`);
       loadUserRoles();
       loadAuditLogs();
     } catch (error: any) {
       toast.error("Failed to update role: " + error.message);
+    }
+  };
+
+  const revokeUserRole = async (userId: string) => {
+    try {
+      const { data: existingRole } = await supabase
+        .from("user_roles")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+
+      if (!existingRole) {
+        toast.error("No role to revoke");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      // Log audit action
+      await logAuditAction("role_revoke", "user_roles", userId, { role: existingRole.role }, null);
+
+      toast.success("Role revoked successfully");
+      loadUserRoles();
+      loadAuditLogs();
+    } catch (error: any) {
+      toast.error("Failed to revoke role: " + error.message);
     }
   };
 
@@ -595,7 +623,7 @@ const AdminDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle>User Roles Management</CardTitle>
-                <CardDescription>Assign and manage admin privileges</CardDescription>
+                <CardDescription>Assign and manage admin privileges with full audit trail</CardDescription>
                 <div className="mt-4">
                   <AdminBulkActions
                     selectedIds={selectedRoleIds}
@@ -610,6 +638,17 @@ const AdminDashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-4 p-4 bg-muted/50 rounded-lg border">
+                  <div className="flex items-start gap-2">
+                    <Shield className="h-5 w-5 text-primary mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Role Management</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Use the dropdown to assign roles or click "Revoke" to remove all privileges. All actions are logged in the Audit tab.
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -627,8 +666,9 @@ const AdminDashboard = () => {
                       </TableHead>
                       <TableHead>User Email</TableHead>
                       <TableHead>Account Name</TableHead>
+                      <TableHead>Account Type</TableHead>
                       <TableHead>Current Role</TableHead>
-                      <TableHead>Assigned</TableHead>
+                      <TableHead>Assigned Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -649,8 +689,11 @@ const AdminDashboard = () => {
                                 }}
                               />
                             </TableCell>
-                            <TableCell>{user.email}</TableCell>
-                          <TableCell>{user.account_name}</TableCell>
+                            <TableCell className="font-medium">{user.email}</TableCell>
+                            <TableCell>{user.account_name}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{user.account_type}</Badge>
+                            </TableCell>
                           <TableCell>
                             {userRole ? (
                               <Badge variant={userRole.role === 'admin' ? 'default' : 'secondary'}>
@@ -660,22 +703,37 @@ const AdminDashboard = () => {
                               <Badge variant="outline">No role</Badge>
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
                             {userRole ? new Date(userRole.created_at).toLocaleDateString() : '-'}
                           </TableCell>
                           <TableCell>
-                            <Select
-                              value={userRole?.role || 'user'}
-                              onValueChange={(value) => updateUserRole(user.id, value as "admin" | "user")}
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="user">User</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <div className="flex items-center gap-2">
+                              <Select
+                                value={userRole?.role || 'user'}
+                                onValueChange={(value) => updateUserRole(user.id, value as "admin" | "user")}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user">User</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {userRole && (
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => {
+                                    if (confirm(`Revoke role for ${user.email}?`)) {
+                                      revokeUserRole(user.id);
+                                    }
+                                  }}
+                                >
+                                  Revoke
+                                </Button>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
