@@ -65,7 +65,7 @@ export function useSubscription() {
           variant: "destructive",
         });
       }
-      navigate('/signup');
+      navigate('/pricing-choice');
       return false;
     }
     return true;
