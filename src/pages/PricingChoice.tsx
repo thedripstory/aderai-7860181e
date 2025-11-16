@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, Loader2, Zap } from 'lucide-react';
+import { Check, Loader2, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PoweredByBadge } from '@/components/PoweredByBadge';
@@ -10,10 +10,11 @@ import { PoweredByBadge } from '@/components/PoweredByBadge';
 export default function PricingChoice() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState<'monthly' | 'annual' | null>(null);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
 
-  const handleCheckout = async (priceId: string, plan: 'monthly' | 'annual') => {
-    setLoading(plan);
+  const handleCheckout = async (priceId: string, planName: string) => {
+    setLoading(planName);
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -55,18 +56,59 @@ export default function PricingChoice() {
     }
   };
 
-  const features = [
-    'Access to all 70+ premium Klaviyo segments',
-    'Automated segment creation & setup',
-    'Real-time performance tracking',
-    'Priority customer support',
-    'Regular segment updates & new additions',
-    'Unlimited segment cloning',
-  ];
+  const plans = {
+    starter: {
+      name: 'Starter',
+      monthlyPrice: 29,
+      annualPrice: 290,
+      monthlyPriceId: 'price_1SU6QZ0lE1soQQfxlPVL4Y4o',
+      annualPriceId: 'price_1SU6Qa0lE1soQQfxmnrUkvRq',
+      features: [
+        '1 Klaviyo account',
+        '50 pre-built segments',
+        'Basic analytics',
+        'Email support',
+        '10 AI suggestions/month',
+      ],
+    },
+    professional: {
+      name: 'Professional',
+      monthlyPrice: 79,
+      annualPrice: 790,
+      monthlyPriceId: 'price_1SU6Qc0lE1soQQfxhAc7VuLn',
+      annualPriceId: 'price_1SU6Qd0lE1soQQfxReyLn2ka',
+      popular: true,
+      features: [
+        'Everything in Starter',
+        '70+ pre-built segments',
+        'Advanced analytics',
+        'Priority email support',
+        'Unlimited AI suggestions',
+        'Custom segment creation',
+        'Export capabilities',
+        'Real-time sync',
+      ],
+    },
+    growth: {
+      name: 'Growth',
+      monthlyPrice: 149,
+      annualPrice: 1490,
+      monthlyPriceId: 'price_1SU6Qe0lE1soQQfx0v5Q3jka',
+      annualPriceId: 'price_1SU6Qf0lE1soQQfxhhpZP4nq',
+      features: [
+        'Everything in Professional',
+        '2 Klaviyo accounts',
+        'White-label reports',
+        'API access',
+        'Dedicated success manager',
+        'Custom integrations',
+      ],
+    },
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-6">
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-7xl">
         <button
           onClick={() => navigate('/signup')}
           className="text-muted-foreground hover:text-foreground mb-8 flex items-center gap-2 transition-all hover:gap-3"
@@ -78,28 +120,61 @@ export default function PricingChoice() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Choose Your Plan
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground mb-8">
             Select the billing cycle that works best for you
           </p>
+
+          {/* Billing Toggle */}
+          <div className="inline-flex items-center gap-4 p-2 bg-card rounded-full border-2 border-border">
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-6 py-2 rounded-full font-semibold transition-all ${
+                billingCycle === 'monthly'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle('annual')}
+              className={`px-6 py-2 rounded-full font-semibold transition-all flex items-center gap-2 ${
+                billingCycle === 'annual'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Annual
+              <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">
+                Save 17%
+              </span>
+            </button>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Monthly Plan */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Starter Plan */}
           <Card className="relative border-2 hover:border-primary/50 transition-all">
             <CardContent className="p-8">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold mb-2">Monthly</h3>
+                <h3 className="text-2xl font-bold mb-2">{plans.starter.name}</h3>
                 <div className="mb-4">
-                  <span className="text-5xl font-bold">$49</span>
-                  <span className="text-muted-foreground">/month</span>
+                  <span className="text-5xl font-bold">
+                    ${billingCycle === 'monthly' ? plans.starter.monthlyPrice : plans.starter.annualPrice}
+                  </span>
+                  <span className="text-muted-foreground">
+                    /{billingCycle === 'monthly' ? 'month' : 'year'}
+                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Billed monthly • Cancel anytime
-                </p>
+                {billingCycle === 'annual' && (
+                  <p className="text-sm text-primary font-semibold">
+                    Save ${(plans.starter.monthlyPrice * 12) - plans.starter.annualPrice} per year
+                  </p>
+                )}
               </div>
 
               <ul className="space-y-3 mb-8">
-                {features.map((feature, idx) => (
+                {plans.starter.features.map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <span className="text-sm">{feature}</span>
@@ -108,50 +183,106 @@ export default function PricingChoice() {
               </ul>
 
               <Button
-                onClick={() => handleCheckout('price_1SU61e0lE1soQQfxwKcXj7M5', 'monthly')}
+                onClick={() => handleCheckout(
+                  billingCycle === 'monthly' ? plans.starter.monthlyPriceId : plans.starter.annualPriceId,
+                  'starter'
+                )}
                 disabled={loading !== null}
                 className="w-full"
                 size="lg"
+                variant="outline"
               >
-                {loading === 'monthly' ? (
+                {loading === 'starter' ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Processing...
                   </>
                 ) : (
-                  'Start Monthly Plan'
+                  'Get Started'
                 )}
               </Button>
             </CardContent>
           </Card>
 
-          {/* Annual Plan */}
+          {/* Professional Plan */}
           <Card className="relative border-2 border-primary hover:border-primary/80 transition-all shadow-xl">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <div className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2">
-                <Zap className="w-4 h-4" />
-                Save $98/year
+              <div className="bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 text-white px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2">
+                <Star className="w-4 h-4 fill-white" />
+                MOST POPULAR
               </div>
             </div>
             
             <CardContent className="p-8">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold mb-2">Annual</h3>
-                <div className="mb-2">
-                  <span className="text-5xl font-bold">$490</span>
-                  <span className="text-muted-foreground">/year</span>
+                <h3 className="text-2xl font-bold mb-2">{plans.professional.name}</h3>
+                <div className="mb-4">
+                  <span className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    ${billingCycle === 'monthly' ? plans.professional.monthlyPrice : plans.professional.annualPrice}
+                  </span>
+                  <span className="text-muted-foreground">
+                    /{billingCycle === 'monthly' ? 'month' : 'year'}
+                  </span>
                 </div>
-                <div className="text-sm">
-                  <span className="line-through text-muted-foreground">$588</span>
-                  <span className="text-primary font-semibold ml-2">Save 17%</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Billed annually • Best value
-                </p>
+                {billingCycle === 'annual' && (
+                  <p className="text-sm text-primary font-semibold">
+                    Save ${(plans.professional.monthlyPrice * 12) - plans.professional.annualPrice} per year
+                  </p>
+                )}
               </div>
 
               <ul className="space-y-3 mb-8">
-                {features.map((feature, idx) => (
+                {plans.professional.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm font-medium">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                onClick={() => handleCheckout(
+                  billingCycle === 'monthly' ? plans.professional.monthlyPriceId : plans.professional.annualPriceId,
+                  'professional'
+                )}
+                disabled={loading !== null}
+                className="w-full"
+                size="lg"
+              >
+                {loading === 'professional' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Start Free Trial'
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Growth Plan */}
+          <Card className="relative border-2 hover:border-primary/50 transition-all">
+            <CardContent className="p-8">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold mb-2">{plans.growth.name}</h3>
+                <div className="mb-4">
+                  <span className="text-5xl font-bold">
+                    ${billingCycle === 'monthly' ? plans.growth.monthlyPrice : plans.growth.annualPrice}
+                  </span>
+                  <span className="text-muted-foreground">
+                    /{billingCycle === 'monthly' ? 'month' : 'year'}
+                  </span>
+                </div>
+                {billingCycle === 'annual' && (
+                  <p className="text-sm text-primary font-semibold">
+                    Save ${(plans.growth.monthlyPrice * 12) - plans.growth.annualPrice} per year
+                  </p>
+                )}
+              </div>
+
+              <ul className="space-y-3 mb-8">
+                {plans.growth.features.map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <span className="text-sm">{feature}</span>
@@ -160,19 +291,22 @@ export default function PricingChoice() {
               </ul>
 
               <Button
-                onClick={() => handleCheckout('price_1SU67J0lE1soQQfxEXDs4KYi', 'annual')}
+                onClick={() => handleCheckout(
+                  billingCycle === 'monthly' ? plans.growth.monthlyPriceId : plans.growth.annualPriceId,
+                  'growth'
+                )}
                 disabled={loading !== null}
                 className="w-full"
                 size="lg"
-                variant="default"
+                variant="outline"
               >
-                {loading === 'annual' ? (
+                {loading === 'growth' ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Processing...
                   </>
                 ) : (
-                  'Start Annual Plan'
+                  'Get Started'
                 )}
               </Button>
             </CardContent>
