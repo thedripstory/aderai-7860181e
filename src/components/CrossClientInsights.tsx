@@ -10,119 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface CrossClientMetric {
-  metric: string;
-  bestClient: string;
-  bestValue: number | string;
-  worstClient: string;
-  worstValue: number | string;
-  averageValue: number | string;
-  recommendation: string;
-}
+import { useCrossClientInsights } from "@/hooks/useCrossClientInsights";
 
 export const CrossClientInsights = () => {
   const [timeframe, setTimeframe] = useState("30days");
-
-  const portfolioMetrics = {
-    totalClients: 8,
-    totalRevenue: 645200,
-    avgRevenuePerClient: 80650,
-    totalSegments: 512,
-    activeSegments: 467,
-    avgEngagement: 32.4
-  };
-
-  const crossClientData: CrossClientMetric[] = [
-    {
-      metric: "Email Engagement Rate",
-      bestClient: "Luxe Beauty Co.",
-      bestValue: "34.5%",
-      worstClient: "Fashion Forward",
-      worstValue: "18.2%",
-      averageValue: "28.3%",
-      recommendation: "Deploy Luxe Beauty's engagement tactics to Fashion Forward"
-    },
-    {
-      metric: "Revenue per Email",
-      bestClient: "Premium Apparel",
-      bestValue: "$3.42",
-      worstClient: "Outdoor Gear Co.",
-      worstValue: "$1.89",
-      averageValue: "$2.67",
-      recommendation: "Analyze Premium Apparel's segment strategy for replication"
-    },
-    {
-      metric: "Segment Activation Rate",
-      bestClient: "Wellness Brands Inc.",
-      bestValue: "94%",
-      worstClient: "Home Decor Direct",
-      worstValue: "76%",
-      averageValue: "87%",
-      recommendation: "Audit inactive segments for Home Decor and optimize"
-    },
-    {
-      metric: "VIP Segment Growth",
-      bestClient: "Luxe Beauty Co.",
-      bestValue: "+42%",
-      worstClient: "Fashion Forward",
-      worstValue: "+8%",
-      averageValue: "+23%",
-      recommendation: "Review VIP criteria and campaigns across all clients"
-    },
-    {
-      metric: "Cart Abandonment Recovery",
-      bestClient: "Outdoor Gear Co.",
-      bestValue: "38%",
-      worstClient: "Home Decor Direct",
-      worstValue: "19%",
-      averageValue: "29%",
-      recommendation: "Share Outdoor Gear's recovery email sequence"
-    }
-  ];
-
-  const clientComparison = [
-    {
-      name: "Luxe Beauty Co.",
-      revenue: 127500,
-      engagement: 34.5,
-      segments: 65,
-      growth: 42,
-      status: "excellent"
-    },
-    {
-      name: "Premium Apparel",
-      revenue: 89400,
-      engagement: 28.3,
-      segments: 52,
-      growth: 31,
-      status: "good"
-    },
-    {
-      name: "Wellness Brands Inc.",
-      revenue: 84200,
-      engagement: 31.2,
-      segments: 58,
-      growth: 28,
-      status: "good"
-    },
-    {
-      name: "Outdoor Gear Co.",
-      revenue: 73200,
-      engagement: 27.8,
-      segments: 48,
-      growth: 25,
-      status: "good"
-    },
-    {
-      name: "Fashion Forward",
-      revenue: 67800,
-      engagement: 18.2,
-      segments: 42,
-      growth: 12,
-      status: "needs-attention"
-    }
-  ];
+  const { portfolioMetrics, crossClientData, clientComparison, loading } = useCrossClientInsights(timeframe);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -132,6 +24,31 @@ export const CrossClientInsights = () => {
       default: return "bg-muted text-muted-foreground";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Loading cross-client insights...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (portfolioMetrics.totalClients === 0) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-12 text-center">
+          <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Data Available</h3>
+          <p className="text-muted-foreground mb-4">
+            Add clients and track their performance to see cross-client insights.
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
