@@ -50,3 +50,9 @@ verify_jwt = false
 
 [functions.calculate-segment-performance]
 verify_jwt = true
+
+[functions.predict-segment-performance]
+verify_jwt = true
+
+[functions.predict-churn-risk]
+verify_jwt = true
