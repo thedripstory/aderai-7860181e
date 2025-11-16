@@ -3,8 +3,6 @@ import { TrendingUp, DollarSign, Users, Mail, Target, Download, Calendar } from 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import {
   Select,
   SelectContent,
@@ -66,41 +64,11 @@ export const ClientPerformanceScorecard = () => {
 
   const currentMetrics = clientsData[selectedClient];
 
-  const exportPDF = async () => {
+  const exportPDF = () => {
     toast({
-      title: "Generating White-Label Report",
-      description: `Creating PDF scorecard for ${currentMetrics.clientName}...`,
+      title: "Export Coming Soon",
+      description: "PDF export functionality will be available soon. This feature will generate white-label reports.",
     });
-    
-    try {
-      const element = document.getElementById('scorecard-content');
-      if (!element) return;
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${currentMetrics.clientName}-Performance-Report-${new Date().toISOString().split('T')[0]}.pdf`);
-      
-      toast({
-        title: "Report Ready",
-        description: "White-label PDF has been downloaded successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Export Failed",
-        description: "Unable to generate PDF. Please try again.",
-        variant: "destructive"
-      });
-    }
   };
 
   const scheduleQBR = () => {

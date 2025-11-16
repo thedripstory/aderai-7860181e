@@ -19,7 +19,6 @@ import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { toast } from 'sonner';
-import { FeatureTourModal } from '@/components/FeatureTourModal';
 
 export default function UnifiedDashboard() {
   const navigate = useNavigate();
@@ -328,7 +327,6 @@ export default function UnifiedDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <FeatureTourModal />
       {currentUser && !emailVerified && (
         <EmailVerificationBanner 
           userEmail={currentUser.email}
