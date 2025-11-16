@@ -11,8 +11,21 @@ interface SubscriptionData {
 }
 
 export const PRODUCTS = {
+  // Legacy (keeping for backward compatibility)
   MONTHLY: 'prod_TQxxNSSeWmdV78',
   ANNUAL: 'prod_TQy36zS2cBQfNA',
+  
+  // Starter Tier
+  STARTER_MONTHLY: 'prod_TQyNYayWcak1LD',
+  STARTER_ANNUAL: 'prod_TQyNhOary22G61',
+  
+  // Professional Tier
+  PROFESSIONAL_MONTHLY: 'prod_TQyNqTuT8G0VQQ',
+  PROFESSIONAL_ANNUAL: 'prod_TQyN4QXXAVxorC',
+  
+  // Growth Tier
+  GROWTH_MONTHLY: 'prod_TQyN8YoV6GSIQJ',
+  GROWTH_ANNUAL: 'prod_TQyNcyCFBy9N4I',
 };
 
 export function useSubscription() {
@@ -79,11 +92,23 @@ export function useSubscription() {
     return () => clearInterval(interval);
   }, [checkSubscription]);
 
+  // Determine tier and billing
+  const isStarter = subscription.product_id === PRODUCTS.STARTER_MONTHLY || subscription.product_id === PRODUCTS.STARTER_ANNUAL;
+  const isProfessional = subscription.product_id === PRODUCTS.PROFESSIONAL_MONTHLY || subscription.product_id === PRODUCTS.PROFESSIONAL_ANNUAL || subscription.product_id === PRODUCTS.MONTHLY || subscription.product_id === PRODUCTS.ANNUAL;
+  const isGrowth = subscription.product_id === PRODUCTS.GROWTH_MONTHLY || subscription.product_id === PRODUCTS.GROWTH_ANNUAL;
+  
+  const isMonthly = [PRODUCTS.STARTER_MONTHLY, PRODUCTS.PROFESSIONAL_MONTHLY, PRODUCTS.GROWTH_MONTHLY, PRODUCTS.MONTHLY].includes(subscription.product_id || '');
+  const isAnnual = [PRODUCTS.STARTER_ANNUAL, PRODUCTS.PROFESSIONAL_ANNUAL, PRODUCTS.GROWTH_ANNUAL, PRODUCTS.ANNUAL].includes(subscription.product_id || '');
+
   return {
     ...subscription,
     checkSubscription,
     requireSubscription,
-    isMonthly: subscription.product_id === PRODUCTS.MONTHLY,
-    isAnnual: subscription.product_id === PRODUCTS.ANNUAL,
+    isMonthly,
+    isAnnual,
+    isStarter,
+    isProfessional,
+    isGrowth,
+    tier: isStarter ? 'starter' : isProfessional ? 'professional' : isGrowth ? 'growth' : 'unknown',
   };
 }
