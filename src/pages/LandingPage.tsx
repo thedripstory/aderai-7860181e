@@ -13,6 +13,9 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
+import { ValueCalculator } from "@/components/ValueCalculator";
+import { ComparisonChart } from "@/components/ComparisonChart";
+import { RevenueTestimonials } from "@/components/RevenueTestimonials";
 import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -679,89 +682,178 @@ export default function LandingPage() {
 
           {/* Pricing Cards */}
           <div className="relative">
-            {/* Brands View - Single Card */}
+            {/* Brands View - 3 Tiers */}
             {pricingView === "brands" && (
-              <div className="flex justify-center animate-fade-in">
-                <div className="w-full max-w-4xl group">
-                  <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-500">
-                    
-                    {/* Badge */}
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <div className="px-6 py-1.5 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 rounded-full shadow-lg">
-                        <span className="text-xs font-bold text-white uppercase tracking-wide flex items-center gap-2">
-                          <Star className="w-3.5 h-3.5 fill-white" />
-                          Most Popular
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="relative p-8 pt-10">
-                      <div className="grid md:grid-cols-[1fr,1fr] gap-8 items-start">
-                        {/* Left: Pricing */}
-                        <div className="text-center md:text-left">
-                          <h3 className="text-3xl font-bold mb-4">Brand Plan</h3>
-                          <div className="mb-6">
-                            <div className="flex items-baseline justify-center md:justify-start gap-2">
-                              <span className="text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                                $49
-                              </span>
-                            </div>
-                            <div className="text-muted-foreground mt-2 text-sm font-medium">
-                              One-time payment • Lifetime access
-                            </div>
-                          </div>
-                          
-                          {/* CTA Button */}
-                          <button
-                            onClick={handleGetStarted}
-                            className="group/btn w-full relative bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-3.5 rounded-full font-bold text-base hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/50"
-                          >
-                            <span className="relative z-10 flex items-center justify-center gap-2">
-                              Activate Aderai Now
-                              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                            </span>
-                          </button>
-
-                          {/* Trust Badge */}
-                          <div className="text-center md:text-left text-xs text-muted-foreground mt-4">
-                            <div className="flex items-center justify-center md:justify-start gap-2">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                              <span>24x7 customer support</span>
-                            </div>
-                          </div>
+              <div className="grid md:grid-cols-3 gap-6 animate-fade-in">
+                {/* Starter Plan */}
+                <div className="group relative">
+                  <div className="bg-card rounded-3xl border border-border p-6 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold mb-3">Starter</h3>
+                      <div className="mb-3">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-4xl font-bold">$29</span>
                         </div>
-
-                        {/* Right: Features */}
-                        <div className="pl-0 md:pl-2">
-                          <ul className="grid grid-cols-2 gap-x-8 gap-y-3">
-                            {[
-                              { icon: CheckCircle, text: "70 pre-built segments" },
-                              { icon: Sparkles, text: "AI segment suggester" },
-                              { icon: BarChart3, text: "Advanced analytics" },
-                              { icon: Zap, text: "One-click deployment" },
-                              { icon: Clock, text: "Real-time sync" },
-                              { icon: MousePointerClick, text: "Segment templates" },
-                              { icon: CheckCircle2, text: "Performance tracking" },
-                              { icon: ArrowRight, text: "Export capabilities" },
-                              { icon: Sparkles, text: "Email notifications" },
-                              { icon: CheckCircle, text: "Custom fields" },
-                              { icon: CheckCircle, text: "1 Klaviyo account" },
-                              { icon: Zap, text: "Priority email support" },
-                            ].map((feature, i) => (
-                              <li
-                                key={i}
-                                className="flex items-center gap-3 group/item hover:translate-x-2 transition-transform duration-300"
-                              >
-                                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:scale-110 group-hover/item:bg-primary/20 transition-all duration-300 flex-shrink-0">
-                                  <feature.icon className="w-3.5 h-3.5 text-primary" />
-                                </div>
-                                <span className="text-sm">{feature.text}</span>
-                              </li>
-                            ))}
-                          </ul>
+                        <div className="text-muted-foreground text-xs mt-1">/month</div>
+                        <div className="text-muted-foreground text-xs mt-2">
+                          or $290/year (save 17%)
                         </div>
                       </div>
                     </div>
+
+                    <ul className="space-y-2.5 mb-6 flex-grow">
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">1 Klaviyo account</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">50 pre-built segments</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Basic analytics</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Email support</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">10 AI suggestions/month</span>
+                      </li>
+                    </ul>
+
+                    <button
+                      onClick={handleGetStarted}
+                      className="w-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground py-3 rounded-full font-semibold transition-all duration-300"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                </div>
+
+                {/* Professional Plan - Featured */}
+                <div className="group relative">
+                  {/* Popular Badge */}
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                    <div className="px-4 py-1.5 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 rounded-full shadow-lg">
+                      <span className="text-xs font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                        <Star className="w-3.5 h-3.5 fill-white" />
+                        Most Popular
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-primary/10 via-card to-card rounded-3xl border-2 border-primary p-6 hover:scale-105 transition-all duration-500 hover:shadow-2xl h-full flex flex-col">
+                    <div className="text-center mb-6 pt-2">
+                      <h3 className="text-xl font-bold mb-3">Professional</h3>
+                      <div className="mb-3">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                            $79
+                          </span>
+                        </div>
+                        <div className="text-muted-foreground text-xs mt-1">/month</div>
+                        <div className="text-muted-foreground text-xs mt-2">
+                          or $790/year (save 17%)
+                        </div>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-2.5 mb-6 flex-grow">
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm font-semibold">Everything in Starter</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">70+ pre-built segments</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Advanced analytics</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Priority email support</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Unlimited AI suggestions</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Custom segment creation</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Export capabilities</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Real-time sync</span>
+                      </li>
+                    </ul>
+
+                    <button
+                      onClick={handleGetStarted}
+                      className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      Start Free Trial
+                    </button>
+                  </div>
+                </div>
+
+                {/* Growth Plan */}
+                <div className="group relative">
+                  <div className="bg-card rounded-3xl border border-border p-6 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold mb-3">Growth</h3>
+                      <div className="mb-3">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-4xl font-bold">$149</span>
+                        </div>
+                        <div className="text-muted-foreground text-xs mt-1">/month</div>
+                        <div className="text-muted-foreground text-xs mt-2">
+                          or $1,490/year (save 17%)
+                        </div>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-2.5 mb-6 flex-grow">
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm font-semibold">Everything in Professional</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">2 Klaviyo accounts</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">White-label reports</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">API access</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Dedicated success manager</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Custom integrations</span>
+                      </li>
+                    </ul>
+
+                    <button
+                      onClick={handleGetStarted}
+                      className="w-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground py-3 rounded-full font-semibold transition-all duration-300"
+                    >
+                      Get Started
+                    </button>
                   </div>
                 </div>
               </div>
@@ -770,29 +862,30 @@ export default function LandingPage() {
             {/* Agencies View - Three Cards */}
             {pricingView === "agencies" && (
               <div className="grid md:grid-cols-3 gap-6 animate-fade-in">
-                {/* Starter Agency */}
+                {/* Agency Starter */}
                 <div className="group relative">
                   <div className="bg-card rounded-3xl border border-border p-6 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
                     <div className="text-center mb-6">
-                      <h3 className="text-xl font-bold mb-3">Starter</h3>
+                      <h3 className="text-xl font-bold mb-3">Agency Starter</h3>
                       <div className="mb-3">
                         <div className="flex items-baseline justify-center gap-1">
-                          <span className="text-4xl font-bold">$89</span>
+                          <span className="text-4xl font-bold">$199</span>
                         </div>
                         <div className="text-muted-foreground text-xs mt-1">/month</div>
+                        <div className="text-muted-foreground text-xs mt-2">
+                          or $1,990/year (save 17%)
+                        </div>
                       </div>
                     </div>
 
                     <ul className="space-y-2.5 mb-6 flex-grow">
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Everything in Brand</span>
+                        <span className="text-sm">Up to 5 client accounts</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">
-                          2 Klaviyo accounts
-                        </span>
+                        <span className="text-sm">Team collaboration (3 seats)</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
@@ -800,7 +893,15 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Email support</span>
+                        <span className="text-sm">All Professional features</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Agency dashboard</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Bulk operations</span>
                       </li>
                     </ul>
 
@@ -813,7 +914,7 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Pro Agency - Featured */}
+                {/* Agency Pro - Featured */}
                 <div className="group relative">
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary rounded-3xl blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border-2 border-primary p-6 hover:scale-105 transition-all duration-500 shadow-2xl h-full flex flex-col">
@@ -827,27 +928,40 @@ export default function LandingPage() {
                     </div>
 
                     <div className="text-center mb-6 pt-2">
-                      <h3 className="text-xl font-bold mb-3">Pro</h3>
+                      <h3 className="text-xl font-bold mb-3">Agency Pro</h3>
                       <div className="mb-3">
                         <div className="flex items-baseline justify-center gap-1">
                           <span className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                            $149
+                            $399
                           </span>
                         </div>
                         <div className="text-muted-foreground text-xs mt-1">/month</div>
+                        <div className="text-muted-foreground text-xs mt-2">
+                          or $3,990/year (save 17%)
+                        </div>
                       </div>
                     </div>
 
                     <ul className="space-y-2.5 mb-6 flex-grow">
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Everything in Starter</span>
+                        <span className="text-sm font-semibold">Everything in Starter</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">
-                          5 Klaviyo accounts
-                        </span>
+                        <span className="text-sm">Up to 15 client accounts</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Team collaboration (10 seats)</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">White-label reporting</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Custom branding</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
@@ -855,55 +969,55 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Custom segments</span>
+                        <span className="text-sm">Dedicated account manager</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">White-label reports</span>
+                        <span className="text-sm">Revenue tracking per client</span>
                       </li>
                     </ul>
 
                     <button
                       onClick={handleGetStarted}
-                      className="group/btn w-full relative bg-gradient-to-r from-primary to-accent text-primary-foreground py-2.5 rounded-full text-sm font-bold hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden"
+                      className="w-full bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-2.5 rounded-full text-sm font-bold hover:scale-105 transition-all duration-300 shadow-lg"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
-                      <span className="relative z-10">Get started</span>
+                      Get started
                     </button>
                   </div>
                 </div>
 
-                {/* Enterprise Agency */}
+                {/* Agency Enterprise */}
                 <div className="group relative">
                   <div className="bg-card rounded-3xl border border-border p-6 hover:border-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
                     <div className="text-center mb-6">
-                      <h3 className="text-xl font-bold mb-3">Enterprise</h3>
+                      <h3 className="text-xl font-bold mb-3">Agency Enterprise</h3>
                       <div className="mb-3">
                         <div className="flex items-baseline justify-center gap-1">
-                          <span className="text-4xl font-bold">$299</span>
+                          <span className="text-4xl font-bold">$799</span>
                         </div>
                         <div className="text-muted-foreground text-xs mt-1">/month</div>
+                        <div className="text-muted-foreground text-xs mt-2">
+                          Custom pricing available
+                        </div>
                       </div>
                     </div>
 
                     <ul className="space-y-2.5 mb-6 flex-grow">
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Everything in Pro</span>
+                        <span className="text-sm font-semibold">Everything in Pro</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">
-                          10+ Klaviyo accounts
-                        </span>
+                        <span className="text-sm">Unlimited client accounts</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Dedicated manager</span>
+                        <span className="text-sm">Unlimited team seats</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">24/7 phone support</span>
+                        <span className="text-sm">Custom integrations</span>
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
@@ -911,7 +1025,19 @@ export default function LandingPage() {
                       </li>
                       <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
                         <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Custom integrations</span>
+                        <span className="text-sm">24/7 phone support</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Custom SLA</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Quarterly business reviews</span>
+                      </li>
+                      <li className="flex items-center gap-2.5 hover:translate-x-1 transition-transform duration-200">
+                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm">Custom development hours</span>
                       </li>
                     </ul>
 
@@ -926,8 +1052,20 @@ export default function LandingPage() {
               </div>
             )}
           </div>
+        </div>
+      </section>
 
-          {/* Bottom Trust Section */}
+        {/* Value Calculator Section */}
+        <ValueCalculator />
+
+        {/* Comparison Chart Section */}
+        <ComparisonChart />
+
+        {/* Revenue Testimonials Section */}
+        <RevenueTestimonials />
+
+        {/* Pricing Bottom Trust Section */}
+        <section className="py-20 px-4 bg-background">
           <div className="mt-20 text-center relative">
 
             <div className="max-w-7xl mx-auto mb-10 relative">
@@ -1002,8 +1140,7 @@ export default function LandingPage() {
               <PoweredByBadge />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Footer */}
       <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted overflow-hidden">
