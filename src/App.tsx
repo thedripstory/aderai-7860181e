@@ -29,6 +29,7 @@ import ROIDashboard from "./pages/ROIDashboard";
 import SegmentHealthDashboard from "./pages/SegmentHealthDashboard";
 import AgencyToolsDashboard from "./pages/AgencyToolsDashboard";
 import AIFeaturesDashboard from "./pages/AIFeaturesDashboard";
+import SubscriptionManagement from "./pages/SubscriptionManagement";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/onboarding/agency" element={<AgencyOnboarding />} />
             <Route path="/klaviyo-setup" element={<KlaviyoSetup />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/subscription-management" element={<SubscriptionManagement />} />
             <Route path="/affiliate" element={<AffiliatePage />} />
             <Route path="/accept-invite" element={<AcceptInvite />} />
             <Route path="/brand-workspace/:clientId" element={<BrandWorkspace />} />
