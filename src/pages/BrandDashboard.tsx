@@ -26,10 +26,7 @@ import { ProductTourModal } from "@/components/ProductTourModal";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { useAnalyticsTracking } from "@/hooks/useAnalyticsTracking";
 import { useProductTour } from "@/hooks/useProductTour";
-import { useGuidedTour, TourStep } from "@/hooks/useGuidedTour";
 import { ErrorLogger } from "@/lib/errorLogger";
-import { Steps } from 'intro.js-react';
-import 'intro.js/introjs.css';
 
 export default function BrandDashboard() {
   const [loading, setLoading] = useState(true);
@@ -47,45 +44,6 @@ export default function BrandDashboard() {
   
   // Product tour
   const { showTour, closeTour, dontShowAgain } = useProductTour();
-  
-  // Guided tour steps
-  const tourSteps: TourStep[] = [
-    {
-      intro: '<h3>Welcome to aderai! 🎉</h3><p>Let\'s take a quick tour of your brand dashboard and show you the key features.</p>',
-      title: 'Welcome',
-    },
-    {
-      element: '.ai-segment-card',
-      intro: '<h4>AI Segment Suggester</h4><p>This powerful feature analyzes your business and automatically suggests the perfect customer segments tailored to your goals. Click here to start creating segments in seconds!</p>',
-      position: 'bottom',
-      title: 'AI Segment Suggester',
-    },
-    {
-      element: '.analytics-card',
-      intro: '<h4>Analytics Dashboard</h4><p>Track your segment performance with real-time analytics. Monitor growth metrics, engagement rates, and revenue impact all in one place.</p>',
-      position: 'bottom',
-      title: 'Analytics',
-    },
-    {
-      element: '[data-tour="quick-stats"]',
-      intro: '<h4>Quick Stats</h4><p>Get a snapshot of your account status: active Klaviyo integrations, total segments created, and overall account health.</p>',
-      position: 'bottom',
-      title: 'Dashboard Stats',
-    },
-    {
-      intro: '<h3>You\'re all set! 🚀</h3><p>Start by connecting your Klaviyo account, then let our AI suggest segments tailored to your business. Need help? Click the settings button anytime.</p>',
-      title: 'Ready to Go!',
-    },
-  ];
-
-  const {
-    tourEnabled,
-    tourCompleted,
-    setTourEnabled,
-    completeTour,
-    skipTour,
-    restartTour,
-  } = useGuidedTour(tourSteps, 'brand_dashboard');
 
   useEffect(() => {
     loadDashboardData();
@@ -214,12 +172,6 @@ export default function BrandDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {tourCompleted && (
-                <Button variant="outline" size="sm" onClick={restartTour}>
-                  <HelpCircle className="w-4 h-4 mr-2" />
-                  Restart Tour
-                </Button>
-              )}
               <Button variant="outline" onClick={() => navigate("/settings")}>
                 <SettingsIcon className="w-4 h-4 mr-2" />
                 Settings
@@ -257,22 +209,6 @@ export default function BrandDashboard() {
         />
 
         {/* Intro.js Tour */}
-        <Steps
-          enabled={tourEnabled}
-          steps={tourSteps}
-          initialStep={0}
-          onExit={skipTour}
-          onComplete={completeTour}
-          options={{
-            showProgress: true,
-            showBullets: true,
-            exitOnOverlayClick: false,
-            doneLabel: 'Get Started!',
-            nextLabel: 'Next →',
-            prevLabel: '← Back',
-            skipLabel: 'Skip Tour',
-          }}
-        />
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" data-tour="quick-stats">
