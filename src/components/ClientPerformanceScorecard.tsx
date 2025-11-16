@@ -3,6 +3,8 @@ import { TrendingUp, DollarSign, Users, Mail, Target, Download, Calendar } from 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import {
   Select,
   SelectContent,
@@ -64,19 +66,41 @@ export const ClientPerformanceScorecard = () => {
 
   const currentMetrics = clientsData[selectedClient];
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     toast({
       title: "Generating White-Label Report",
       description: `Creating PDF scorecard for ${currentMetrics.clientName}...`,
     });
     
-    // In production, this would generate a PDF
-    setTimeout(() => {
+    try {
+      const element = document.getElementById('scorecard-content');
+      if (!element) return;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${currentMetrics.clientName}-Performance-Report-${new Date().toISOString().split('T')[0]}.pdf`);
+      
       toast({
         title: "Report Ready",
-        description: "White-label PDF has been generated and is ready for download",
+        description: "White-label PDF has been downloaded successfully",
       });
-    }, 2000);
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Unable to generate PDF. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const scheduleQBR = () => {
@@ -87,7 +111,7 @@ export const ClientPerformanceScorecard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" id="scorecard-content">
       {/* Header with Controls */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>

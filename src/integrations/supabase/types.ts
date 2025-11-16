@@ -335,6 +335,133 @@ export type Database = {
         }
         Relationships: []
       }
+      client_performance_metrics: {
+        Row: {
+          agency_user_id: string
+          client_id: string
+          created_at: string | null
+          emails_sent: number
+          engagement_rate: number
+          id: string
+          metric_date: string
+          metric_metadata: Json | null
+          revenue_growth: number | null
+          segments_active: number
+          segments_total: number
+          total_revenue: number
+          updated_at: string | null
+        }
+        Insert: {
+          agency_user_id: string
+          client_id: string
+          created_at?: string | null
+          emails_sent?: number
+          engagement_rate?: number
+          id?: string
+          metric_date?: string
+          metric_metadata?: Json | null
+          revenue_growth?: number | null
+          segments_active?: number
+          segments_total?: number
+          total_revenue?: number
+          updated_at?: string | null
+        }
+        Update: {
+          agency_user_id?: string
+          client_id?: string
+          created_at?: string | null
+          emails_sent?: number
+          engagement_rate?: number
+          id?: string
+          metric_date?: string
+          metric_metadata?: Json | null
+          revenue_growth?: number | null
+          segments_active?: number
+          segments_total?: number
+          total_revenue?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_performance_metrics_agency_user_id_fkey"
+            columns: ["agency_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_performance_metrics_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "agency_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cross_client_best_practices: {
+        Row: {
+          agency_user_id: string
+          analysis_date: string
+          average_value: string
+          best_performing_client_id: string
+          best_value: string
+          created_at: string | null
+          id: string
+          metric_name: string
+          recommendation: string
+          worst_performing_client_id: string
+          worst_value: string
+        }
+        Insert: {
+          agency_user_id: string
+          analysis_date?: string
+          average_value: string
+          best_performing_client_id: string
+          best_value: string
+          created_at?: string | null
+          id?: string
+          metric_name: string
+          recommendation: string
+          worst_performing_client_id: string
+          worst_value: string
+        }
+        Update: {
+          agency_user_id?: string
+          analysis_date?: string
+          average_value?: string
+          best_performing_client_id?: string
+          best_value?: string
+          created_at?: string | null
+          id?: string
+          metric_name?: string
+          recommendation?: string
+          worst_performing_client_id?: string
+          worst_value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_client_best_practices_agency_user_id_fkey"
+            columns: ["agency_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_client_best_practices_best_performing_client_id_fkey"
+            columns: ["best_performing_client_id"]
+            isOneToOne: false
+            referencedRelation: "agency_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_client_best_practices_worst_performing_client_id_fkey"
+            columns: ["worst_performing_client_id"]
+            isOneToOne: false
+            referencedRelation: "agency_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_audit_log: {
         Row: {
           email_type: string
@@ -567,6 +694,66 @@ export type Database = {
         }
         Relationships: []
       }
+      roi_campaign_results: {
+        Row: {
+          campaign_date: string
+          campaign_name: string
+          client_id: string | null
+          created_at: string | null
+          emails_sent: number
+          engagement_rate: number | null
+          id: string
+          revenue_generated: number
+          segment_name: string
+          time_saved_hours: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_date?: string
+          campaign_name: string
+          client_id?: string | null
+          created_at?: string | null
+          emails_sent: number
+          engagement_rate?: number | null
+          id?: string
+          revenue_generated?: number
+          segment_name: string
+          time_saved_hours?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_date?: string
+          campaign_name?: string
+          client_id?: string | null
+          created_at?: string | null
+          emails_sent?: number
+          engagement_rate?: number | null
+          id?: string
+          revenue_generated?: number
+          segment_name?: string
+          time_saved_hours?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roi_campaign_results_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "agency_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roi_campaign_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       segment_analytics_cache: {
         Row: {
           cached_at: string | null
@@ -679,6 +866,66 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      segment_performance: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          emails_sent: number
+          engagement_rate: number
+          id: string
+          klaviyo_key_id: string
+          klaviyo_segment_id: string | null
+          metric_date: string
+          profile_count: number
+          revenue: number
+          segment_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          emails_sent?: number
+          engagement_rate?: number
+          id?: string
+          klaviyo_key_id: string
+          klaviyo_segment_id?: string | null
+          metric_date?: string
+          profile_count?: number
+          revenue?: number
+          segment_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          emails_sent?: number
+          engagement_rate?: number
+          id?: string
+          klaviyo_key_id?: string
+          klaviyo_segment_id?: string | null
+          metric_date?: string
+          profile_count?: number
+          revenue?: number
+          segment_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "segment_performance_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "agency_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "segment_performance_klaviyo_key_id_fkey"
+            columns: ["klaviyo_key_id"]
+            isOneToOne: false
+            referencedRelation: "klaviyo_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       two_factor_auth: {
         Row: {

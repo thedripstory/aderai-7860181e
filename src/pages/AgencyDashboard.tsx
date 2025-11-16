@@ -271,9 +271,11 @@ export default function AgencyDashboard() {
         />
 
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-4xl grid-cols-4">
             <TabsTrigger value="clients">Clients</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
+            <TabsTrigger value="agency-tools">Agency Tools</TabsTrigger>
+            <TabsTrigger value="ai">AI Features</TabsTrigger>
           </TabsList>
 
           <TabsContent value="clients" className="space-y-6">
@@ -451,6 +453,92 @@ export default function AgencyDashboard() {
                 </Button>
               </div>
               <AgencyTeamDashboard />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="agency-tools" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <button
+                onClick={() => navigate('/agency-tools')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Building2 className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">Agency Tools Hub</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Access all agency tools including scorecards, insights, and proposals</p>
+              </button>
+
+              <button
+                onClick={() => navigate('/features')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <TrendingUp className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">Feature Showcase</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">ROI calculators and value demonstration tools</p>
+              </button>
+
+              <button
+                onClick={() => navigate('/roi-dashboard')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-emerald-500 hover:shadow-lg transition-all text-left group"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                    <DollarSign className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <h3 className="text-lg font-bold">ROI Tracker</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Track campaign performance and revenue</p>
+              </button>
+
+              <button
+                onClick={() => navigate('/segment-health')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-accent hover:shadow-lg transition-all text-left group"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                    <Users className="w-6 h-6 text-accent" />
+                  </div>
+                  <h3 className="text-lg font-bold">Segment Health</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Monitor segment health across all clients</p>
+              </button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="ai" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <button
+                onClick={() => navigate('/ai-features')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-purple-500 hover:shadow-lg transition-all text-left group"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                    <TrendingUp className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <h3 className="text-lg font-bold">Predictive Analytics</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">AI-powered segment performance forecasting</p>
+              </button>
+
+              <button
+                onClick={() => navigate('/ai-features')}
+                className="p-6 bg-card border-2 border-border rounded-lg hover:border-orange-500 hover:shadow-lg transition-all text-left group"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center group-hover:bg-orange-500/20 transition-colors">
+                    <AlertCircle className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-lg font-bold">Churn Prediction</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Identify at-risk customers with AI</p>
+              </button>
             </div>
           </TabsContent>
         </Tabs>
