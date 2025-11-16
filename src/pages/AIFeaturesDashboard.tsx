@@ -2,9 +2,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, Shield } from "lucide-react";
 import { PredictiveAnalytics } from "@/components/PredictiveAnalytics";
 import { ChurnPredictor } from "@/components/ChurnPredictor";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 export default function AIFeaturesDashboard() {
   return (
+    <SubscriptionGate>
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
@@ -36,5 +38,6 @@ export default function AIFeaturesDashboard() {
         </Tabs>
       </div>
     </div>
+    </SubscriptionGate>
   );
 }

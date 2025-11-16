@@ -7,9 +7,11 @@ import { ComparisonChart } from "@/components/ComparisonChart";
 import { RevenueTestimonials } from "@/components/RevenueTestimonials";
 import { ROITracker } from "@/components/ROITracker";
 import { SegmentHealthMonitor } from "@/components/SegmentHealthMonitor";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 export default function FeatureShowcase() {
   return (
+    <SubscriptionGate>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <section className="py-12 px-6 bg-gradient-to-br from-primary/5 to-background border-b">
@@ -73,5 +75,6 @@ export default function FeatureShowcase() {
         </div>
       </section>
     </div>
+    </SubscriptionGate>
   );
 }
