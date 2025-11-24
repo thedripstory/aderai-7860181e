@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Sparkles, Loader, CheckCircle, Lightbulb } from 'lucide-react';
+import { Sparkles, Loader, CheckCircle, Lightbulb, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
+import { useAILimits } from '@/hooks/useAILimits';
 import { toast } from 'sonner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LoadingState } from '@/components/ui/loading-state';
+import { Progress } from '@/components/ui/progress';
+import { Link } from 'react-router-dom';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -16,12 +19,22 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const { trackAction } = useFeatureTracking('ai_segment_suggester');
+  const { allowed, remaining, total_used, daily_limit, loading: limitsLoading, incrementUsage } = useAILimits();
 
   const generateAiSuggestions = async () => {
     if (!aiPrompt.trim()) {
       toast.warning('Please enter a description of your business goal', {
         description: 'Describe what you want to achieve with your segments',
         duration: 4000,
+      });
+      return;
+    }
+
+    // Check if user has reached their limit
+    if (!allowed) {
+      toast.error("Daily AI suggestion limit reached", {
+        description: `You've used all ${daily_limit} AI suggestions for today. Limits reset at midnight UTC.`,
+        duration: 6000,
       });
       return;
     }
@@ -45,6 +58,10 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
       if (error) throw error;
       setAiSuggestions(response.segments || []);
+      
+      // Increment usage counter after successful generation
+      await incrementUsage();
+      
       toast.success('AI suggestions generated successfully!', {
         description: `Created ${response.segments?.length || 0} segment suggestions for you`,
         duration: 3000,
@@ -106,6 +123,43 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Usage Limit Indicator */}
+      {!limitsLoading && (
+        <div className="bg-card border border-border rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">
+              {allowed ? (
+                <span className="text-foreground">
+                  {remaining} of {daily_limit} AI suggestions remaining today
+                </span>
+              ) : (
+                <span className="text-destructive flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  Daily limit reached
+                </span>
+              )}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Resets at midnight UTC
+            </span>
+          </div>
+          <Progress value={(total_used / daily_limit) * 100} className="h-2" />
+          {!allowed && (
+            <div className="mt-4 p-3 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground mb-2">
+                You've used all {daily_limit} AI suggestions for today. While you wait for the reset, explore our 70+ pre-built segments!
+              </p>
+              <Link 
+                to="/dashboard?tab=segments"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                View Pre-built Segments →
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="bg-card border border-border rounded-lg p-8 mb-8">
         <h2 className="text-2xl font-bold mb-4">Describe Your Goal</h2>
         <p className="text-muted-foreground mb-6">
@@ -121,7 +175,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
         <button
           onClick={generateAiSuggestions}
-          disabled={aiLoading || !aiPrompt.trim()}
+          disabled={aiLoading || !aiPrompt.trim() || !allowed}
           className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {aiLoading ? (

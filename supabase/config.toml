@@ -1,1 +1,10 @@
 project_id = "kfsvgcijligxschxyuyb"
+
+[functions.check-ai-limit]
+verify_jwt = true
+
+[functions.increment-ai-usage]
+verify_jwt = true
+
+[functions.reset-daily-limits]
+verify_jwt = false

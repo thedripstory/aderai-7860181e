@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, TrendingUp, Zap, Activity } from "lucide-react";
+import { Users, TrendingUp, Zap, Activity, Sparkles, AlertTriangle } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 
 export const AdminUsageTracking = () => {
@@ -10,8 +10,12 @@ export const AdminUsageTracking = () => {
     verifiedUsers: 0,
     activeKlaviyoKeys: 0,
     totalSegmentsCreated: 0,
+    totalAISuggestions: 0,
+    usersHittingLimits: 0,
+    avgAISuggestionsPerUser: 0,
     dailySignups: [] as any[],
-    segmentCreationTrend: [] as any[]
+    segmentCreationTrend: [] as any[],
+    aiUsageTrend: [] as any[]
   });
 
   useEffect(() => {
@@ -87,13 +91,44 @@ export const AdminUsageTracking = () => {
         };
       });
 
+      // Get AI usage limits data
+      const { data: usageLimits } = await supabase
+        .from("usage_limits")
+        .select("ai_suggestions_today, ai_suggestions_total");
+
+      const totalAISuggestions = usageLimits?.reduce((sum, limit) => sum + limit.ai_suggestions_total, 0) || 0;
+      const usersHittingLimits = usageLimits?.filter(limit => limit.ai_suggestions_today >= 10).length || 0;
+      const avgAISuggestionsPerUser = Math.round(totalAISuggestions / (totalUsers || 1));
+
+      // Generate AI usage trend (last 14 days)
+      const { data: analyticsEvents } = await supabase
+        .from("analytics_events")
+        .select("created_at, event_metadata")
+        .eq("event_name", "ai_suggestion_used")
+        .gte("created_at", new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString());
+
+      const aiUsageTrend = last14Days.map(date => {
+        const usage = analyticsEvents?.filter(event => 
+          event.created_at?.split('T')[0] === date
+        ).length || 0;
+        
+        return {
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          usage
+        };
+      });
+
       setUsageData({
         totalUsers,
         verifiedUsers,
         activeKlaviyoKeys,
         totalSegmentsCreated,
+        totalAISuggestions,
+        usersHittingLimits,
+        avgAISuggestionsPerUser,
         dailySignups,
-        segmentCreationTrend
+        segmentCreationTrend,
+        aiUsageTrend
       });
     } catch (error) {
       console.error("Failed to load usage data:", error);
@@ -154,6 +189,48 @@ export const AdminUsageTracking = () => {
         </Card>
       </div>
 
+      {/* AI Usage Metrics */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Total AI Suggestions</CardTitle>
+            <Sparkles className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{usageData.totalAISuggestions}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Lifetime usage (for cost monitoring)
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Users at Limit</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{usageData.usersHittingLimits}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Hit 10/day limit today
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Avg AI/User/Day</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{usageData.avgAISuggestionsPerUser}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Average suggestions per user
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>User Signups (Last 30 Days)</CardTitle>
@@ -195,6 +272,30 @@ export const AdminUsageTracking = () => {
                 fill="hsl(var(--accent))" 
               />
             </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>AI Suggestions Usage (Last 14 Days)</CardTitle>
+          <CardDescription>AI suggestions generated per day (for cost monitoring)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={usageData.aiUsageTrend}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Line 
+                type="monotone" 
+                dataKey="usage" 
+                stroke="hsl(var(--primary))" 
+                strokeWidth={2}
+                dot={{ fill: "hsl(var(--primary))" }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>

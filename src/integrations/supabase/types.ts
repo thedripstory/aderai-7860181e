@@ -560,6 +560,33 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_limits: {
+        Row: {
+          ai_suggestions_today: number
+          ai_suggestions_total: number
+          created_at: string | null
+          last_reset_date: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_suggestions_today?: number
+          ai_suggestions_total?: number
+          created_at?: string | null
+          last_reset_date?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_suggestions_today?: number
+          ai_suggestions_total?: number
+          created_at?: string | null
+          last_reset_date?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_feedback: {
         Row: {
           created_at: string | null
