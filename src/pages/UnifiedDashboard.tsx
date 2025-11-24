@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
+import { FeedbackWidget } from '@/components/FeedbackWidget';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
@@ -241,6 +242,7 @@ export default function UnifiedDashboard() {
                   apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
                 />
               )}
+              <FeedbackWidget />
               <Button variant="outline" onClick={() => navigate('/settings')}>
                 <SettingsIcon className="w-4 h-4 mr-2" />
                 Settings
