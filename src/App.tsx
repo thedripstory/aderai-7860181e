@@ -19,6 +19,7 @@ import AdminPortal from "./pages/AdminPortal";
 import FeatureShowcase from "./pages/FeatureShowcase";
 import SegmentHealthDashboard from "./pages/SegmentHealthDashboard";
 import AIFeaturesDashboard from "./pages/AIFeaturesDashboard";
+import HelpCenter from "./pages/HelpCenter";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/segment-health" element={<ProtectedRoute><SegmentHealthDashboard /></ProtectedRoute>} />
               <Route path="/ai-features" element={<ProtectedRoute><AIFeaturesDashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminPortal /></ProtectedRoute>} />
+              <Route path="/help" element={<HelpCenter />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -253,6 +253,81 @@ export type Database = {
         }
         Relationships: []
       }
+      help_article_views: {
+        Row: {
+          article_id: string | null
+          id: string
+          session_id: string | null
+          user_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          article_id?: string | null
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          article_id?: string | null
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "help_article_views_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "help_article_popularity"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "help_article_views_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "help_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      help_articles: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          excerpt: string | null
+          id: string
+          order_index: number
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          order_index?: number
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          order_index?: number
+          slug?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       klaviyo_keys: {
         Row: {
           aov: number | null
@@ -758,6 +833,18 @@ export type Database = {
           failed: number | null
           successful: number | null
           total_emails: number | null
+        }
+        Relationships: []
+      }
+      help_article_popularity: {
+        Row: {
+          category: string | null
+          id: string | null
+          last_viewed: string | null
+          slug: string | null
+          title: string | null
+          unique_users: number | null
+          view_count: number | null
         }
         Relationships: []
       }
