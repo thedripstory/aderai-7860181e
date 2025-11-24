@@ -161,10 +161,7 @@ As a beta user, your input shapes the product:
 
 ## After Beta
 
-When we transition to paid plans:
-- Beta users get special lifetime pricing
-- All your segments and data remain intact
-- No interruption to your Klaviyo segments
+Aderai is currently free for all users. Enjoy full access to all features with no limitations.
 - You'll be notified well in advance
 
 ## Fair Use Policy

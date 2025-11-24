@@ -113,6 +113,11 @@ export default function LandingPage() {
                 Official Klaviyo Partner
               </span>
             </div>
+            
+            <div className="inline-flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 mb-6">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-sm font-semibold text-emerald-600">Free Forever</span>
+            </div>
 
             <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
               Segment like a<br />
@@ -506,7 +511,6 @@ export default function LandingPage() {
               <span>Unlock All 70 Segments</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
-            <p className="text-sm text-muted-foreground mt-4">One-time payment • Instant access • No monthly fees</p>
           </div>
         </div>
       </section>
@@ -593,7 +597,7 @@ export default function LandingPage() {
         {/* Revenue Testimonials Section */}
         <RevenueTestimonials />
 
-        {/* Pricing Bottom Trust Section */}
+        {/* Trust Section */}
         <section className="py-20 px-4 bg-background">
           <div className="mt-20 text-center relative">
 
@@ -603,14 +607,14 @@ export default function LandingPage() {
                 <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500/10 border-2 border-emerald-500/20 mb-8">
                   <Sparkles className="w-5 h-5 text-emerald-500" />
                   <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
-                    The Ultimate Win-Win
+                    Built for Growth
                   </span>
                 </div>
                 
                 <h3 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                  No retainers. No recurring fees.<br />
+                  Always free. Always updated.<br />
                   <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                    Just pure, permanent value.
+                    Built for your success.
                   </span>
                 </h3>
               </div>
@@ -656,9 +660,9 @@ export default function LandingPage() {
                         <CheckCircle2 className="w-7 h-7 text-white" />
                       </div>
                     </div>
-                    <h4 className="text-xl font-bold mb-4">One-Time Investment</h4>
+                    <h4 className="text-xl font-bold mb-4">Always Free</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      <span className="text-orange-500 font-semibold">Pay once. Own forever.</span> No hidden fees. No subscriptions. No agency retainers eating your budget every month.
+                      <span className="text-orange-500 font-semibold">Free forever. No limits.</span> Full access to all features, segments, and analytics.
                     </p>
                   </div>
                 </div>
@@ -770,12 +774,6 @@ export default function LandingPage() {
                   <li>
                     <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
                       <span>Features</span>
-                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#pricing" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Pricing</span>
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>

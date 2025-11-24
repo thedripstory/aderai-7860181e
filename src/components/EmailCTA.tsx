@@ -6,10 +6,10 @@ export const EmailCTA = () => {
       <div className="max-w-3xl mx-auto">
         <div className="bg-foreground text-background rounded-lg p-8 sm:p-12 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            100% money-back guarantee
+            Get Started in Seconds
           </h2>
           <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto">
-            Try risk-free. If these 70 segments don't boost your email performance, get your money back. Zero risk.
+            Deploy 70+ segments to Klaviyo instantly. No setup, no complexity, just results.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -17,7 +17,7 @@ export const EmailCTA = () => {
               size="lg" 
               className="text-base font-semibold bg-background text-foreground hover:bg-background/90"
             >
-              Get started for $49
+              Get Started
             </Button>
             <Button 
               variant="outline" 
@@ -29,7 +29,7 @@ export const EmailCTA = () => {
           </div>
           
           <p className="text-sm opacity-80 font-medium">
-            Instant setup • Money-back guarantee • Works with Klaviyo
+            Instant setup • Works with Klaviyo
           </p>
         </div>
       </div>

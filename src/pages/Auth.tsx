@@ -172,6 +172,12 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             >
               {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
             </Button>
+            
+            {isSignUp && (
+              <p className="text-xs text-muted-foreground text-center mt-3">
+                Free forever • No credit card required
+              </p>
+            )}
           </form>
 
           <div className="mt-6 text-center">

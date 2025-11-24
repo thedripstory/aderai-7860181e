@@ -23,7 +23,7 @@ export const EmailHero = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <Button size="lg" className="text-base font-semibold">
-            Get started for $49
+            Get Started
           </Button>
           <Button variant="outline" size="lg" className="text-base font-semibold">
             See how it works
