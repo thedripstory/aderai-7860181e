@@ -23,6 +23,7 @@ export default function Settings() {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
   const [showTwoFactorDisable, setShowTwoFactorDisable] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -67,13 +68,14 @@ export default function Settings() {
 
       const { data: userData } = await supabase
         .from("users")
-        .select("account_name, email")
+        .select("account_name, email, email_verified")
         .eq("id", user.id)
         .single();
 
       if (userData) {
         setAccountName(userData.account_name);
         setEmail(userData.email);
+        setEmailVerified(userData.email_verified || false);
       }
 
       const { data: keyData } = await supabase
@@ -403,7 +405,12 @@ export default function Settings() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Email
+                    {!emailVerified && (
+                      <span className="ml-2 text-xs text-muted-foreground">(Unverified)</span>
+                    )}
+                  </label>
                   <input
                     type="email"
                     value={email}

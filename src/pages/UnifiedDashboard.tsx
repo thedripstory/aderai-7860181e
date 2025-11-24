@@ -138,11 +138,6 @@ export default function UnifiedDashboard() {
   };
 
   const handleCreateSegments = async (segmentIds?: string[]) => {
-    if (!emailVerified) {
-      toast.error("Please verify your email before creating segments");
-      return;
-    }
-
     const segmentsToCreate = segmentIds || selectedSegments;
     if (segmentsToCreate.length === 0 || klaviyoKeys.length === 0) {
       return;
@@ -396,7 +391,7 @@ export default function UnifiedDashboard() {
                   </div>
                   <Button
                     onClick={() => handleCreateSegments()}
-                    disabled={creatingSegments || !emailVerified}
+                    disabled={creatingSegments}
                     size="lg"
                   >
                     {creatingSegments ? 'Creating...' : 'Create Segments'}
