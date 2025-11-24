@@ -37,9 +37,10 @@ export function usePageViewTracking() {
   const { trackEvent } = useAnalyticsTracking();
 
   useEffect(() => {
+    // Track page view with analytics tracking
     trackEvent('page_view', {
       path: window.location.pathname,
       referrer: document.referrer,
     });
-  }, [window.location.pathname]);
+  }, []);
 }

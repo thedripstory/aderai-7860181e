@@ -23,6 +23,7 @@ import { AdminUserSessions } from "@/components/AdminUserSessions";
 import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
 import { AdminErrorTracking } from "@/components/AdminErrorTracking";
 import { AdminUsageTracking } from "@/components/AdminUsageTracking";
+import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
 import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
 import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
@@ -448,8 +449,9 @@ const AdminDashboard = () => {
           </TabsContent>
 
           {/* Usage Tracking Tab */}
-          <TabsContent value="usage">
+          <TabsContent value="usage" className="space-y-6">
             <AdminUsageTracking />
+            <AdminFeatureUsage />
           </TabsContent>
 
           {/* Email Monitoring Tab */}
