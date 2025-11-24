@@ -27,8 +27,7 @@ export const ValueCalculator = () => {
       newMonthlyRevenue: Math.round(newMonthlyRevenue),
       annualImpact: Math.round(annualImpact),
       timeSaved,
-      timeSavingsValue,
-      roi: Math.round((revenueIncrease / 79) * 100) // Based on Professional plan
+      timeSavingsValue
     };
   };
 
@@ -155,10 +154,10 @@ export const ValueCalculator = () => {
                 </div>
 
                 <div className="bg-primary/10 rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">Return on Investment</div>
-                  <div className="text-3xl font-bold">{impact.roi}x ROI</div>
+                  <div className="text-sm text-muted-foreground mb-1">Efficiency Gain</div>
+                  <div className="text-3xl font-bold">10+ hrs/mo</div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    First month ROI (Professional plan)
+                    Time saved with automated segmentation
                   </div>
                 </div>
               </div>

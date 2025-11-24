@@ -15,9 +15,6 @@ export const EmailFooter = () => {
           <a href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition">
             How it works
           </a>
-          <a href="/#pricing" className="text-muted-foreground hover:text-foreground transition">
-            Pricing
-          </a>
           <a href="/affiliate" className="text-muted-foreground hover:text-foreground transition">
             Become an Affiliate
           </a>

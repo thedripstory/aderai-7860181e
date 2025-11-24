@@ -38,7 +38,7 @@ export const RevenueTestimonials = () => {
       metric: "9% revenue share"
     },
     {
-      quote: "Aderai's AI suggested a 'seasonal high-spenders' segment we hadn't considered. That single segment drove $19K during our Q4 campaign. Best $79 we've ever spent.",
+      quote: "Aderai's AI suggested a 'seasonal high-spenders' segment we hadn't considered. That single segment drove $19K during our Q4 campaign. Absolute game-changer.",
       author: "Ryan Mitchell",
       role: "Marketing Lead",
       company: "Home Decor Direct",

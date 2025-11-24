@@ -132,4 +132,4 @@ Built with [Lovable](https://lovable.dev) - The fastest way to build web applica
 
 ---
 
-**Note**: This is a free beta product. Features and pricing may change as we transition from beta to production.
+**Note**: Aderai is currently free for all users. We're gathering feedback to improve the product before considering future pricing models.
