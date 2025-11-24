@@ -128,17 +128,13 @@ export default function LandingPage() {
             </div>
 
             <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
-              Segment like a<br />
-              <span className="text-accent block my-4">$50M brand.</span>
+              70 Klaviyo Segments<br />
+              <span className="text-accent block my-4">in 30 Seconds</span>
             </h1>
 
-            <p className="text-2xl md:text-3xl text-foreground/80 mb-4 max-w-3xl mx-auto font-medium text-center">
-              Instantly import 70+ segments, with one click- straight inside{" "}
+            <p className="text-2xl md:text-3xl text-foreground/80 mb-12 max-w-3xl mx-auto font-medium text-center">
+              Stop spending hours building segments manually. Deploy expert-grade segmentation straight into{" "}
               <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />
-            </p>
-
-            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Deploy expert-grade Klaviyo segmentation without the agency price tag.
             </p>
 
             {/* CTA Button */}
@@ -149,19 +145,15 @@ export default function LandingPage() {
               </button>
             </div>
 
-            {/* Pricing & Trust */}
+            {/* Trust indicators */}
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>100% Free</span>
-              </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
                 <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>Instant access</span>
+                <span>Setup in under 2 minutes</span>
               </div>
             </div>
           </div>
@@ -323,8 +315,8 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <button className="group px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 hover:scale-105 inline-flex items-center justify-center">
-                Unlock Forever
+              <button onClick={handleGetStarted} className="group px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 hover:scale-105 inline-flex items-center justify-center">
+                Get Started
               </button>
             </div>
 
@@ -605,79 +597,64 @@ export default function LandingPage() {
         {/* Revenue Testimonials Section */}
         <RevenueTestimonials />
 
-        {/* Trust Section */}
+        {/* Features Section */}
         <section className="py-20 px-4 bg-background">
-          <div className="mt-20 text-center relative">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border-2 border-primary/20 mb-8">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span className="text-base font-bold text-primary uppercase tracking-wide">
+                  Built for E-commerce
+                </span>
+              </div>
+              
+              <h3 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                Built for Klaviyo brands.<br />
+                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  Optimized for growth.
+                </span>
+              </h3>
+            </div>
 
-            <div className="max-w-7xl mx-auto mb-10 relative">
-              {/* Header with badge */}
-              <div className="mb-20">
-                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500/10 border-2 border-emerald-500/20 mb-8">
-                  <Sparkles className="w-5 h-5 text-emerald-500" />
-                  <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
-                    Built for Growth
-                  </span>
+            <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+              <div className="text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                    <Zap className="w-7 h-7 text-white" />
+                  </div>
                 </div>
-                
-                <h3 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                  Always free. Always updated.<br />
-                  <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                    Built for your success.
-                  </span>
-                </h3>
+                <h4 className="text-xl font-bold mb-4">Dynamic Segments</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Create once, auto-update forever. Segments sync with your <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" loading="lazy" /> data in real-time.
+                </p>
               </div>
 
-              {/* Horizontal Timeline Flow */}
-              <div className="relative max-w-6xl mx-auto">
-                <div className="grid md:grid-cols-3 gap-16 relative">
-                  {/* Item 1 */}
-                  <div className="relative text-center">
-                    <div className="flex justify-center mb-6">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
-                        <Zap className="w-7 h-7 text-white" />
-                      </div>
-                    </div>
-                    <h4 className="text-xl font-bold mb-4">Set Once, Live Forever</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" loading="lazy" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
-                    </p>
-                  </div>
-
-                  {/* Item 2 */}
-                  <div className="relative text-center">
-                    <div className="flex justify-center mb-6">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
-                        <BarChart3 className="w-7 h-7 text-white" />
-                      </div>
-                    </div>
-                    <h4 className="text-xl font-bold mb-4">Lifetime Dashboard Access</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Monitor performance, track metrics, optimize campaigns. <span className="text-accent font-semibold">All analytics, forever</span>. No subscription. No expiration.
-                    </p>
-                  </div>
-
-                  {/* Item 3 */}
-                  <div className="relative text-center">
-                    <div className="absolute -top-12 left-1/2 -translate-x-1/2">
-                      <span className="font-bad-script text-2xl text-orange-500 rotate-[-5deg] block animate-slide-in-left">
-                        best part!
-                      </span>
-                    </div>
-                    <div className="flex justify-center mb-6">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
-                        <CheckCircle2 className="w-7 h-7 text-white" />
-                      </div>
-                    </div>
-                    <h4 className="text-xl font-bold mb-4">Always Free</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      <span className="text-orange-500 font-semibold">Free forever. No limits.</span> Full access to all features, segments, and analytics.
-                    </p>
+              <div className="text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                    <BarChart3 className="w-7 h-7 text-white" />
                   </div>
                 </div>
+                <h4 className="text-xl font-bold mb-4">Performance Analytics</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Monitor segment health, track metrics, and optimize campaigns with built-in analytics.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                    <MousePointerClick className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+                <h4 className="text-xl font-bold mb-4">One-Click Deploy</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Select segments, customize thresholds, deploy. All 70 segments created instantly in Klaviyo.
+                </p>
               </div>
             </div>
-            
-            <div className="relative z-10">
+
+            <div className="mt-16 text-center">
               <PoweredByBadge />
             </div>
           </div>
