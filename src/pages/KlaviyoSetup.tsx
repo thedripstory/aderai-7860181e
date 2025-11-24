@@ -191,7 +191,7 @@ const KlaviyoSetup = () => {
       });
 
       // Navigate to dashboard
-      navigate("/app");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error saving Klaviyo setup:", error);
       toast({
@@ -437,7 +437,7 @@ const KlaviyoSetup = () => {
                         description: "You'll see a reminder to connect Klaviyo on your dashboard.",
                       });
                       
-                      navigate("/app");
+                      navigate("/dashboard");
                     }}
                     className="w-full text-muted-foreground"
                     disabled={isSaving}

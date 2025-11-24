@@ -30,7 +30,6 @@ const App = () => (
             <Route path="/" element={<LandingPage />} />
             <Route path="/dashboard" element={<UnifiedDashboard />} />
             <Route path="/admin" element={<AdminPortal />} />
-            <Route path="/app" element={<Index />} />
             <Route path="/login" element={<Auth initialView="signin" />} />
             <Route path="/signup" element={<Auth initialView="signup" />} />
             <Route path="/onboarding" element={<Onboarding />} />

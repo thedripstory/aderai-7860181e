@@ -22,7 +22,7 @@ export const OnboardingSkipOption = () => {
         .eq("id", user.id);
 
       toast.success("Onboarding skipped. You'll be reminded to connect Klaviyo on your dashboard.");
-      navigate("/app");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error skipping onboarding:", error);
       toast.error("Failed to skip onboarding");
