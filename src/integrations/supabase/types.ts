@@ -92,159 +92,6 @@ export type Database = {
         }
         Relationships: []
       }
-      affiliate_clicks: {
-        Row: {
-          affiliate_code: string
-          converted: boolean | null
-          created_at: string | null
-          id: string
-          ip_address: string | null
-          referrer: string | null
-          user_agent: string | null
-        }
-        Insert: {
-          affiliate_code: string
-          converted?: boolean | null
-          created_at?: string | null
-          id?: string
-          ip_address?: string | null
-          referrer?: string | null
-          user_agent?: string | null
-        }
-        Update: {
-          affiliate_code?: string
-          converted?: boolean | null
-          created_at?: string | null
-          id?: string
-          ip_address?: string | null
-          referrer?: string | null
-          user_agent?: string | null
-        }
-        Relationships: []
-      }
-      affiliate_stats: {
-        Row: {
-          affiliate_user_id: string
-          commission_amount: number
-          commission_paid: boolean | null
-          commission_type: string
-          created_at: string | null
-          id: string
-          payment_date: string | null
-          referred_user_id: string
-          stripe_payment_id: string | null
-        }
-        Insert: {
-          affiliate_user_id: string
-          commission_amount: number
-          commission_paid?: boolean | null
-          commission_type: string
-          created_at?: string | null
-          id?: string
-          payment_date?: string | null
-          referred_user_id: string
-          stripe_payment_id?: string | null
-        }
-        Update: {
-          affiliate_user_id?: string
-          commission_amount?: number
-          commission_paid?: boolean | null
-          commission_type?: string
-          created_at?: string | null
-          id?: string
-          payment_date?: string | null
-          referred_user_id?: string
-          stripe_payment_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "affiliate_stats_affiliate_user_id_fkey"
-            columns: ["affiliate_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "affiliate_stats_referred_user_id_fkey"
-            columns: ["referred_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      agency_clients: {
-        Row: {
-          agency_user_id: string
-          brand_user_id: string
-          client_name: string
-          created_at: string | null
-          id: string
-          notes: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          agency_user_id: string
-          brand_user_id: string
-          client_name: string
-          created_at?: string | null
-          id?: string
-          notes?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          agency_user_id?: string
-          brand_user_id?: string
-          client_name?: string
-          created_at?: string | null
-          id?: string
-          notes?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      agency_team_invitations: {
-        Row: {
-          agency_user_id: string
-          created_at: string | null
-          id: string
-          invitation_token: string
-          invited_user_id: string | null
-          member_email: string
-          member_role: string
-          status: string
-          token_expires_at: string
-          updated_at: string | null
-        }
-        Insert: {
-          agency_user_id: string
-          created_at?: string | null
-          id?: string
-          invitation_token: string
-          invited_user_id?: string | null
-          member_email: string
-          member_role?: string
-          status?: string
-          token_expires_at: string
-          updated_at?: string | null
-        }
-        Update: {
-          agency_user_id?: string
-          created_at?: string | null
-          id?: string
-          invitation_token?: string
-          invited_user_id?: string | null
-          member_email?: string
-          member_role?: string
-          status?: string
-          token_expires_at?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       ai_suggestions: {
         Row: {
           challenge: string | null
@@ -334,133 +181,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      client_performance_metrics: {
-        Row: {
-          agency_user_id: string
-          client_id: string
-          created_at: string | null
-          emails_sent: number
-          engagement_rate: number
-          id: string
-          metric_date: string
-          metric_metadata: Json | null
-          revenue_growth: number | null
-          segments_active: number
-          segments_total: number
-          total_revenue: number
-          updated_at: string | null
-        }
-        Insert: {
-          agency_user_id: string
-          client_id: string
-          created_at?: string | null
-          emails_sent?: number
-          engagement_rate?: number
-          id?: string
-          metric_date?: string
-          metric_metadata?: Json | null
-          revenue_growth?: number | null
-          segments_active?: number
-          segments_total?: number
-          total_revenue?: number
-          updated_at?: string | null
-        }
-        Update: {
-          agency_user_id?: string
-          client_id?: string
-          created_at?: string | null
-          emails_sent?: number
-          engagement_rate?: number
-          id?: string
-          metric_date?: string
-          metric_metadata?: Json | null
-          revenue_growth?: number | null
-          segments_active?: number
-          segments_total?: number
-          total_revenue?: number
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "client_performance_metrics_agency_user_id_fkey"
-            columns: ["agency_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "client_performance_metrics_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "agency_clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      cross_client_best_practices: {
-        Row: {
-          agency_user_id: string
-          analysis_date: string
-          average_value: string
-          best_performing_client_id: string
-          best_value: string
-          created_at: string | null
-          id: string
-          metric_name: string
-          recommendation: string
-          worst_performing_client_id: string
-          worst_value: string
-        }
-        Insert: {
-          agency_user_id: string
-          analysis_date?: string
-          average_value: string
-          best_performing_client_id: string
-          best_value: string
-          created_at?: string | null
-          id?: string
-          metric_name: string
-          recommendation: string
-          worst_performing_client_id: string
-          worst_value: string
-        }
-        Update: {
-          agency_user_id?: string
-          analysis_date?: string
-          average_value?: string
-          best_performing_client_id?: string
-          best_value?: string
-          created_at?: string | null
-          id?: string
-          metric_name?: string
-          recommendation?: string
-          worst_performing_client_id?: string
-          worst_value?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cross_client_best_practices_agency_user_id_fkey"
-            columns: ["agency_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cross_client_best_practices_best_performing_client_id_fkey"
-            columns: ["best_performing_client_id"]
-            isOneToOne: false
-            referencedRelation: "agency_clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cross_client_best_practices_worst_performing_client_id_fkey"
-            columns: ["worst_performing_client_id"]
-            isOneToOne: false
-            referencedRelation: "agency_clients"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       email_audit_log: {
         Row: {
@@ -694,66 +414,6 @@ export type Database = {
         }
         Relationships: []
       }
-      roi_campaign_results: {
-        Row: {
-          campaign_date: string
-          campaign_name: string
-          client_id: string | null
-          created_at: string | null
-          emails_sent: number
-          engagement_rate: number | null
-          id: string
-          revenue_generated: number
-          segment_name: string
-          time_saved_hours: number | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          campaign_date?: string
-          campaign_name: string
-          client_id?: string | null
-          created_at?: string | null
-          emails_sent: number
-          engagement_rate?: number | null
-          id?: string
-          revenue_generated?: number
-          segment_name: string
-          time_saved_hours?: number | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          campaign_date?: string
-          campaign_name?: string
-          client_id?: string | null
-          created_at?: string | null
-          emails_sent?: number
-          engagement_rate?: number | null
-          id?: string
-          revenue_generated?: number
-          segment_name?: string
-          time_saved_hours?: number | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "roi_campaign_results_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "agency_clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "roi_campaign_results_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       segment_analytics_cache: {
         Row: {
           cached_at: string | null
@@ -867,66 +527,6 @@ export type Database = {
         }
         Relationships: []
       }
-      segment_performance: {
-        Row: {
-          client_id: string
-          created_at: string | null
-          emails_sent: number
-          engagement_rate: number
-          id: string
-          klaviyo_key_id: string
-          klaviyo_segment_id: string | null
-          metric_date: string
-          profile_count: number
-          revenue: number
-          segment_name: string
-          updated_at: string | null
-        }
-        Insert: {
-          client_id: string
-          created_at?: string | null
-          emails_sent?: number
-          engagement_rate?: number
-          id?: string
-          klaviyo_key_id: string
-          klaviyo_segment_id?: string | null
-          metric_date?: string
-          profile_count?: number
-          revenue?: number
-          segment_name: string
-          updated_at?: string | null
-        }
-        Update: {
-          client_id?: string
-          created_at?: string | null
-          emails_sent?: number
-          engagement_rate?: number
-          id?: string
-          klaviyo_key_id?: string
-          klaviyo_segment_id?: string | null
-          metric_date?: string
-          profile_count?: number
-          revenue?: number
-          segment_name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "segment_performance_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "agency_clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "segment_performance_klaviyo_key_id_fkey"
-            columns: ["klaviyo_key_id"]
-            isOneToOne: false
-            referencedRelation: "klaviyo_keys"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       two_factor_auth: {
         Row: {
           backup_codes: string[] | null
@@ -1017,32 +617,18 @@ export type Database = {
       users: {
         Row: {
           account_name: string
-          account_type: string
-          affiliate_code: string | null
-          agency_size: string | null
-          agency_specialization: string | null
-          client_management_needs: string | null
           created_at: string | null
           current_challenges: string | null
           email: string
-          email_list_size_range: string | null
           email_verified: boolean | null
           id: string
           industry: string | null
           klaviyo_setup_completed: boolean | null
           marketing_goals: string | null
-          monthly_revenue_range: string | null
-          number_of_clients: string | null
           onboarding_completed: boolean | null
           password_hash: string
           password_reset_expires: string | null
           password_reset_token: string | null
-          referred_by: string | null
-          service_offerings: string | null
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          subscription_status: string | null
-          subscription_tier: string | null
           two_factor_backup_codes: Json | null
           two_factor_enabled: boolean | null
           two_factor_prompt_shown_at: string | null
@@ -1051,32 +637,18 @@ export type Database = {
         }
         Insert: {
           account_name: string
-          account_type: string
-          affiliate_code?: string | null
-          agency_size?: string | null
-          agency_specialization?: string | null
-          client_management_needs?: string | null
           created_at?: string | null
           current_challenges?: string | null
           email: string
-          email_list_size_range?: string | null
           email_verified?: boolean | null
           id?: string
           industry?: string | null
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
-          monthly_revenue_range?: string | null
-          number_of_clients?: string | null
           onboarding_completed?: boolean | null
           password_hash: string
           password_reset_expires?: string | null
           password_reset_token?: string | null
-          referred_by?: string | null
-          service_offerings?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
           two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
           two_factor_prompt_shown_at?: string | null
@@ -1085,32 +657,18 @@ export type Database = {
         }
         Update: {
           account_name?: string
-          account_type?: string
-          affiliate_code?: string | null
-          agency_size?: string | null
-          agency_specialization?: string | null
-          client_management_needs?: string | null
           created_at?: string | null
           current_challenges?: string | null
           email?: string
-          email_list_size_range?: string | null
           email_verified?: boolean | null
           id?: string
           industry?: string | null
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
-          monthly_revenue_range?: string | null
-          number_of_clients?: string | null
           onboarding_completed?: boolean | null
           password_hash?: string
           password_reset_expires?: string | null
           password_reset_token?: string | null
-          referred_by?: string | null
-          service_offerings?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
           two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
           two_factor_prompt_shown_at?: string | null
@@ -1150,7 +708,6 @@ export type Database = {
       }
     }
     Functions: {
-      generate_affiliate_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

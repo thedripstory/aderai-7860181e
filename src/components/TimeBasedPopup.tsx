@@ -21,11 +21,11 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
       // Get user data to check 2FA prompt timing
       const { data: userData } = await supabase
         .from("users")
-        .select("created_at, two_factor_prompt_shown_at, account_type")
+        .select("created_at, two_factor_prompt_shown_at")
         .eq("id", user.id)
         .single();
 
-      if (!userData || userData.account_type !== "agency") return;
+      if (!userData) return;
 
       // Check if it's been 3 days since signup and popup hasn't been shown
       const signupDate = new Date(userData.created_at);
