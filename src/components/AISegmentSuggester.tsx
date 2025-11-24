@@ -3,6 +3,7 @@ import { Sparkles, Loader, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
+import { toast } from 'sonner';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -16,7 +17,10 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
   const generateAiSuggestions = async () => {
     if (!aiPrompt.trim()) {
-      alert('Please enter a description of your business goal');
+      toast.warning('Please enter a description of your business goal', {
+        description: 'Describe what you want to achieve with your segments',
+        duration: 4000,
+      });
       return;
     }
 
@@ -39,9 +43,19 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
       if (error) throw error;
       setAiSuggestions(response.segments || []);
+      toast.success('AI suggestions generated successfully!', {
+        description: `Created ${response.segments?.length || 0} segment suggestions for you`,
+        duration: 3000,
+      });
     } catch (error: any) {
       console.error('AI generation error:', error);
-      alert(`Failed to generate suggestions: ${error.message || 'Unknown error'}`);
+      toast.error('Failed to generate AI suggestions', {
+        description: error.message || 'Check your Klaviyo connection and try again',
+        action: {
+          label: 'Retry',
+          onClick: () => generateAiSuggestions(),
+        },
+      });
     } finally {
       setAiLoading(false);
     }
@@ -63,14 +77,26 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       if (error) throw error;
 
       if (response.status === 'exists') {
-        alert(`Segment "${suggestion.name}" already exists in your Klaviyo account`);
+        toast.info(`Segment "${suggestion.name}" already exists`, {
+          description: 'This segment is already in your Klaviyo account',
+          duration: 4000,
+        });
       } else if (response.status === 'created') {
-        alert(`Successfully created segment "${suggestion.name}"!`);
+        toast.success(`Created segment "${suggestion.name}"!`, {
+          description: 'Segment is now live in your Klaviyo account',
+          duration: 3000,
+        });
         setAiSuggestions(prev => prev.filter(s => s.name !== suggestion.name));
       }
     } catch (error: any) {
       console.error('Segment creation error:', error);
-      alert(`Failed to create segment: ${error.message || 'Unknown error'}`);
+      toast.error('Failed to create segment', {
+        description: error.message || 'Check your Klaviyo API key and try again',
+        action: {
+          label: 'Retry',
+          onClick: () => createAiSegment(suggestion),
+        },
+      });
     } finally {
       setAiLoading(false);
     }
