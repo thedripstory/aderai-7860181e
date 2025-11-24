@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
+import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
@@ -220,6 +221,8 @@ export default function UnifiedDashboard() {
           userId={currentUser.id}
         />
       )}
+      
+      <KlaviyoSetupBanner hasKlaviyoKeys={klaviyoKeys.length > 0} />
       
       <div className="border-b-2 border-border bg-card">
         <div className="max-w-7xl mx-auto px-4 py-4">
