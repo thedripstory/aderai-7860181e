@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Loader, Users, TrendingUp, BarChart3, Activity, Search, Download, ArrowUp, ArrowDown } from 'lucide-react';
+import { Loader, Users, TrendingUp, BarChart3, Activity, Search, Download, ArrowUp, ArrowDown, Database, Key } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { EmptyState } from '@/components/ui/empty-state';
+import { LoadingState } from '@/components/ui/loading-state';
+import { AnalyticsChartSkeleton } from '@/components/ui/skeleton-loader';
+import { toast } from 'sonner';
 
 interface SegmentStats {
   profileCount: number;
@@ -97,9 +101,16 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       a.href = url;
       a.download = `aderai-segments-${Date.now()}.csv`;
       a.click();
+      
+      toast.success('Analytics exported successfully', {
+        description: `Downloaded ${sortedSegments.length} segments to CSV`,
+        duration: 3000,
+      });
     } catch (error) {
       console.error('Export error:', error);
-      alert('Failed to export data');
+      toast.error('Failed to export analytics', {
+        description: 'Please try again or contact support',
+      });
     } finally {
       setExportLoading(false);
     }
@@ -107,12 +118,33 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   if (loadingAnalytics) {
     return (
-      <div className="text-center py-12">
-        <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-        <p className="text-muted-foreground">
-          Loading segments... {analyticsProgress.current} of {analyticsProgress.total}
-        </p>
-      </div>
+      <LoadingState
+        message="Loading your analytics"
+        description="Fetching segment data and calculating metrics..."
+        progress={analyticsProgress.total > 0 ? analyticsProgress : undefined}
+      />
+    );
+  }
+
+  if (allSegments.length === 0) {
+    return (
+      <EmptyState
+        icon={Database}
+        title="No analytics data available"
+        description="Connect your Klaviyo account to view segment analytics and insights. You'll see performance metrics, growth trends, and more."
+        actionLabel="Connect Klaviyo"
+        onAction={() => window.location.href = '/klaviyo-setup'}
+      />
+    );
+  }
+
+  if (Object.keys(segmentStats).length === 0) {
+    return (
+      <EmptyState
+        icon={Key}
+        title="Analytics loading"
+        description="We're preparing your analytics dashboard. This may take a moment as we fetch all your segment data from Klaviyo."
+      />
     );
   }
 

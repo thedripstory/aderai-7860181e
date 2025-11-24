@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Sparkles, Loader, CheckCircle } from 'lucide-react';
+import { Sparkles, Loader, CheckCircle, Lightbulb } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { toast } from 'sonner';
+import { EmptyState } from '@/components/ui/empty-state';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -136,11 +138,26 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
         </button>
       </div>
 
-      {aiSuggestions.length > 0 && (
+      {aiLoading && (
+        <LoadingState
+          message="Generating AI suggestions"
+          description="Our AI is analyzing your goal and creating custom segment suggestions..."
+        />
+      )}
+
+      {!aiLoading && aiSuggestions.length === 0 && aiPrompt.trim() === '' && (
+        <EmptyState
+          icon={Lightbulb}
+          title="Get your first AI suggestion"
+          description="Describe your business goal above, and our AI will create custom segment suggestions tailored to your needs. For example: 'I want to target customers likely to purchase again in the next 30 days'."
+        />
+      )}
+
+      {!aiLoading && aiSuggestions.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-xl font-bold">AI Suggestions</h3>
           {aiSuggestions.map((suggestion, idx) => (
-            <div key={idx} className="bg-card border border-border rounded-lg p-6">
+            <div key={idx} className="bg-card border border-border rounded-lg p-6 animate-fade-in">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h4 className="text-lg font-bold mb-2">{suggestion.name}</h4>
