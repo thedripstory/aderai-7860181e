@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, Loader, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
+import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -11,6 +12,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const { trackAction } = useFeatureTracking('ai_segment_suggester');
 
   const generateAiSuggestions = async () => {
     if (!aiPrompt.trim()) {
@@ -18,6 +20,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       return;
     }
 
+    trackAction('generate_suggestions', { prompt_length: aiPrompt.length });
     setAiLoading(true);
 
     try {
@@ -45,6 +48,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
   };
 
   const createAiSegment = async (suggestion: any) => {
+    trackAction('create_ai_segment', { segment_name: suggestion.name });
     setAiLoading(true);
 
     try {

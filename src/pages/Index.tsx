@@ -14,14 +14,16 @@ export default function Index() {
         return;
       }
 
-      // Check if klaviyo setup is completed
+      // Check onboarding and setup status
       const { data: userData } = await supabase
         .from('users')
-        .select('klaviyo_setup_completed')
+        .select('onboarding_completed, klaviyo_setup_completed')
         .eq('id', session.user.id)
         .single();
 
-      if (userData && !userData.klaviyo_setup_completed) {
+      if (!userData?.onboarding_completed) {
+        navigate('/onboarding');
+      } else if (!userData?.klaviyo_setup_completed) {
         navigate('/klaviyo-setup');
       } else {
         navigate('/dashboard');

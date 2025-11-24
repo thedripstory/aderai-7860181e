@@ -15,6 +15,7 @@ import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
 import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
+import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
@@ -34,6 +35,7 @@ export default function UnifiedDashboard() {
   const [analyticsProgress, setAnalyticsProgress] = useState({ current: 0, total: 0 });
 
   const { loading: creatingSegments, results, createSegments, setResults } = useKlaviyoSegments();
+  const { trackAction } = useFeatureTracking('unified_dashboard');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -116,6 +118,7 @@ export default function UnifiedDashboard() {
       return;
     }
 
+    trackAction('create_segments', { segment_count: segmentsToCreate.length });
     setView('creating');
     await createSegments(
       segmentsToCreate,
@@ -133,6 +136,7 @@ export default function UnifiedDashboard() {
   const fetchAllSegments = async () => {
     if (klaviyoKeys.length === 0) return;
 
+    trackAction('fetch_analytics');
     setLoadingAnalytics(true);
     try {
       const activeKey = klaviyoKeys[activeKeyIndex];

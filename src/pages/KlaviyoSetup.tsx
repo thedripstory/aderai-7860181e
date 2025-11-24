@@ -172,10 +172,13 @@ const KlaviyoSetup = () => {
         return;
       }
 
-      // Mark klaviyo setup as completed
+      // Mark klaviyo setup and onboarding as completed
       const { error: updateError } = await supabase
         .from("users")
-        .update({ klaviyo_setup_completed: true })
+        .update({ 
+          klaviyo_setup_completed: true,
+          onboarding_completed: true
+        })
         .eq("id", user.id);
 
       if (updateError) {

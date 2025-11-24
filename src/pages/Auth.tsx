@@ -46,7 +46,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             title: "Account created!",
             description: "Welcome to Aderai",
           });
-          navigate('/klaviyo-setup');
+          navigate('/onboarding');
         }
       } else {
         // Sign in

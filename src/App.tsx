@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import KlaviyoSetup from "./pages/KlaviyoSetup";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -30,8 +31,9 @@ const App = () => (
             <Route path="/dashboard" element={<UnifiedDashboard />} />
             <Route path="/admin" element={<AdminPortal />} />
             <Route path="/app" element={<Index />} />
-            <Route path="/login" element={<Auth />} />
-            <Route path="/signup" element={<Auth />} />
+            <Route path="/login" element={<Auth initialView="signin" />} />
+            <Route path="/signup" element={<Auth initialView="signup" />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/klaviyo-setup" element={<KlaviyoSetup />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/features" element={<FeatureShowcase />} />
