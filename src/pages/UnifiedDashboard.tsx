@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, LogOut, Settings as SettingsIcon, Loader } from 'lucide-react';
+import { Building2, LogOut, Settings as SettingsIcon, Loader, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -295,14 +295,38 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <AnalyticsDashboard
-              allSegments={allSegments}
-              segmentStats={segmentStats}
-              loadingAnalytics={loadingAnalytics}
-              analyticsProgress={analyticsProgress}
-              onShowHealthScore={() => {}}
-              calculateHealthScore={() => 0}
-            />
+            {klaviyoKeys.length === 0 ? (
+              <div className="bg-card border border-border rounded-lg p-8 text-center">
+                <p className="text-muted-foreground mb-4">
+                  Connect your Klaviyo account to view analytics
+                </p>
+                <Button onClick={() => navigate('/klaviyo-setup')}>
+                  Connect Klaviyo
+                </Button>
+              </div>
+            ) : (
+              <>
+                {allSegments.length === 0 && !loadingAnalytics && (
+                  <div className="bg-card border border-border rounded-lg p-8 text-center mb-4">
+                    <p className="text-muted-foreground mb-4">
+                      Load your segments to see analytics
+                    </p>
+                    <Button onClick={fetchAllSegments} disabled={loadingAnalytics}>
+                      <RefreshCw className={`w-4 h-4 mr-2 ${loadingAnalytics ? 'animate-spin' : ''}`} />
+                      Fetch Analytics
+                    </Button>
+                  </div>
+                )}
+                <AnalyticsDashboard
+                  allSegments={allSegments}
+                  segmentStats={segmentStats}
+                  loadingAnalytics={loadingAnalytics}
+                  analyticsProgress={analyticsProgress}
+                  onShowHealthScore={() => {}}
+                  calculateHealthScore={() => 0}
+                />
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="ai">
