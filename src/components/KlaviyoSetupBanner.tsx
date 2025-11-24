@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, X, ArrowRight } from 'lucide-react';
+import { AlertCircle, X, ArrowRight, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
@@ -73,8 +73,17 @@ export const KlaviyoSetupBanner: React.FC<KlaviyoSetupBannerProps> = ({ hasKlavi
               <p className="text-sm font-medium text-foreground">
                 Connect your Klaviyo account to start creating segments
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
                 Set up your API key and preferences to unlock all features
+                <a 
+                  href="/help?article=klaviyo-setup" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline inline-flex items-center gap-0.5"
+                >
+                  <HelpCircle className="w-3 h-3" />
+                  <span>Need help?</span>
+                </a>
               </p>
             </div>
           </div>

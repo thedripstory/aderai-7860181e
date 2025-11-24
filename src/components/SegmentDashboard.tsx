@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
 
 export const SEGMENTS = [
   {
@@ -212,8 +212,17 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
             </div>
           )}
         </div>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground flex items-center gap-2">
           Select individual segments or choose a pre-built bundle to get started quickly
+          <a 
+            href="/help?article=getting-started" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline inline-flex items-center gap-1 text-sm"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Learn more</span>
+          </a>
         </p>
       </div>
 
