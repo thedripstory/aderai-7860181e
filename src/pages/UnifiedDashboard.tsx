@@ -1,69 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, LogOut, Gift, Settings as SettingsIcon, Loader, TrendingUp, DollarSign, Activity, Sparkles } from 'lucide-react';
+import { Building2, LogOut, Settings as SettingsIcon, Loader } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ClientSwitcher, AddClientModal } from '@/components/ClientSwitcher';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
-import { TimeBasedPopup } from '@/components/TimeBasedPopup';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { AISegmentSuggester } from '@/components/AISegmentSuggester';
 import { KlaviyoSyncIndicator } from '@/components/KlaviyoSyncIndicator';
-import { AgencyTeamManager } from '@/components/AgencyTeamManager';
 import { SegmentPerformance } from '@/components/SegmentPerformance';
 import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
 import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
-import { APIAccessSection } from '@/components/APIAccessSection';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { toast } from 'sonner';
-import { SubscriptionGate } from '@/components/SubscriptionGate';
-import { useSubscription } from '@/hooks/useSubscription';
 
 export default function UnifiedDashboard() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const urlClientId = searchParams.get('clientId'); // For agencies accessing client dashboards
-  const [clientId, setClientId] = useState<string | null>(null);
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [klaviyoKeys, setKlaviyoKeys] = useState<KlaviyoKey[]>([]);
   const [activeKeyIndex, setActiveKeyIndex] = useState(0);
-  const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [view, setView] = useState<'creating' | 'results' | null>(null);
   const [emailVerified, setEmailVerified] = useState(true);
-  const [accountType, setAccountType] = useState("");
 
   // Analytics state
   const [allSegments, setAllSegments] = useState<any[]>([]);
   const [segmentStats, setSegmentStats] = useState<Record<string, any>>({});
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [analyticsProgress, setAnalyticsProgress] = useState({ current: 0, total: 0 });
-  const [showHealthScore, setShowHealthScore] = useState(false);
 
   const { loading: creatingSegments, results, createSegments, setResults } = useKlaviyoSegments();
-  const { isStarter, isProfessional, isGrowth, tier } = useSubscription();
-
-  // Tier limits
-  const SEGMENT_LIMITS = {
-    starter: 50,
-    professional: 999, // Unlimited
-    growth: 999, // Unlimited
-  };
-
-  const KLAVIYO_ACCOUNT_LIMITS = {
-    starter: 1,
-    professional: 1,
-    growth: 2,
-  };
-
-  const getSegmentLimit = () => SEGMENT_LIMITS[tier as keyof typeof SEGMENT_LIMITS] || 50;
-  const getAccountLimit = () => KLAVIYO_ACCOUNT_LIMITS[tier as keyof typeof KLAVIYO_ACCOUNT_LIMITS] || 1;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -85,51 +55,9 @@ export default function UnifiedDashboard() {
         return;
       }
 
-      // Redirect if onboarding not complete
-      if (!userData.onboarding_completed) {
-        if (userData.account_type === 'brand') {
-          navigate('/onboarding/brand');
-        } else {
-          navigate('/onboarding/agency');
-        }
-        return;
-      }
-
       setEmailVerified(userData.email_verified || false);
-      setAccountType(userData.account_type);
       setCurrentUser(session.user);
-      
-      // Verify clientId if provided in URL (SECURITY CHECK)
-      if (urlClientId) {
-        // Only agencies can access client data
-        if (userData.account_type !== "agency") {
-          toast.error("You don't have permission to access client data");
-          navigate("/dashboard");
-          return;
-        }
-        
-        // Verify agency owns this client
-        const { data: clientRelation, error: clientError } = await supabase
-          .from("agency_clients")
-          .select("id")
-          .eq("agency_user_id", session.user.id)
-          .eq("brand_user_id", urlClientId)
-          .maybeSingle();
-
-        if (clientError || !clientRelation) {
-          toast.error("You don't have access to this client");
-          navigate("/agency-dashboard");
-          return;
-        }
-        
-        // Valid client access
-        setClientId(urlClientId);
-        setSelectedClientId(urlClientId);
-        await loadClientKeys(session.user.id, urlClientId);
-      } else {
-        await loadKlaviyoKeys(session.user.id);
-      }
-      
+      await loadKlaviyoKeys(session.user.id);
       setLoading(false);
     };
 
@@ -150,76 +78,11 @@ export default function UnifiedDashboard() {
     }
   };
 
-  const loadClientKeys = async (agencyUserId: string, clientUserId: string) => {
-    // Verify agency manages this client
-    const { data: clientData, error: verifyError } = await supabase
-      .from('agency_clients')
-      .select('id')
-      .eq('agency_user_id', agencyUserId)
-      .eq('brand_user_id', clientUserId)
-      .single();
-
-    if (verifyError || !clientData) {
-      toast.error("You don't have permission to access this client's dashboard");
-      navigate('/agency-dashboard');
-      return;
-    }
-
-    // Load client's Klaviyo keys
-    const { data } = await supabase
-      .from('klaviyo_keys')
-      .select('*')
-      .eq('user_id', clientUserId)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (data && data.length > 0) {
-      setKlaviyoKeys(data);
-      setActiveKeyIndex(0);
-    }
-  };
-
-  const handleSelectClient = (index: number) => {
-    setActiveKeyIndex(index);
-  };
-
-  const handleAddClient = async () => {
-    const limit = getAccountLimit();
-    
-    // Check if user has reached their Klaviyo account limit
-    if (klaviyoKeys.length >= limit) {
-      toast.error(
-        `Your ${tier === 'starter' ? 'Starter' : tier === 'professional' ? 'Professional' : 'Growth'} plan is limited to ${limit} Klaviyo account${limit > 1 ? 's' : ''}. ${
-          tier === 'starter' ? 'Upgrade to Professional for more features, or Growth for 2 accounts.' :
-          tier === 'professional' ? 'Upgrade to Growth for 2 Klaviyo accounts and API access.' :
-          'You have reached your account limit.'
-        }`
-      );
-      return;
-    }
-    
-    setShowAddClientModal(true);
-  };
-
-  const handleClientAdded = async () => {
-    if (currentUser) {
-      await loadKlaviyoKeys(currentUser.id);
-    }
-  };
-
   const toggleSegment = (segmentId: string) => {
     setSelectedSegments(prev => {
       if (prev.includes(segmentId)) {
         return prev.filter(id => id !== segmentId);
       }
-      
-      // Check tier limit
-      const limit = getSegmentLimit();
-      if (prev.length >= limit) {
-        toast.error(`${tier === 'starter' ? 'Starter' : tier === 'professional' ? 'Professional' : 'Growth'} tier is limited to ${limit} segments. Upgrade to access more.`);
-        return prev;
-      }
-      
       return [...prev, segmentId];
     });
   };
@@ -229,30 +92,13 @@ export default function UnifiedDashboard() {
     if (bundle) {
       setSelectedSegments(prev => {
         const newSegments = [...prev, ...bundle.segments];
-        const uniqueSegments = Array.from(new Set(newSegments));
-        const limit = getSegmentLimit();
-        
-        if (uniqueSegments.length > limit) {
-          toast.error(`This bundle would exceed your ${limit}-segment limit. Upgrade to select more segments.`);
-          return prev;
-        }
-        
-        return uniqueSegments;
+        return Array.from(new Set(newSegments));
       });
     }
   };
 
   const handleSelectAll = () => {
-    const limit = getSegmentLimit();
-    const allSegmentIds = SEGMENTS.map(s => s.id);
-    
-    if (allSegmentIds.length > limit) {
-      const limitedSegments = allSegmentIds.slice(0, limit);
-      setSelectedSegments(limitedSegments);
-      toast.warning(`Selected first ${limit} segments (your tier limit). Upgrade for unlimited access.`);
-    } else {
-      setSelectedSegments(allSegmentIds);
-    }
+    setSelectedSegments(SEGMENTS.map(s => s.id));
   };
 
   const handleClearAll = () => {
@@ -260,33 +106,27 @@ export default function UnifiedDashboard() {
   };
 
   const handleCreateSegments = async (segmentIds?: string[]) => {
-    // Check email verification
     if (!emailVerified) {
       toast.error("Please verify your email before creating segments");
       return;
     }
 
     const segmentsToCreate = segmentIds || selectedSegments;
-
     if (segmentsToCreate.length === 0 || klaviyoKeys.length === 0) {
       return;
     }
 
     setView('creating');
-    
-    const { SEGMENTS } = await import('@/components/SegmentDashboard');
-    
     await createSegments(
       segmentsToCreate,
       klaviyoKeys[activeKeyIndex],
       SEGMENTS
     );
-
     setView('results');
   };
 
   const handleRetryFailed = async (failedSegmentIds: string[]) => {
-    setResults([]); // Clear previous results
+    setResults([]);
     await handleCreateSegments(failedSegmentIds);
   };
 
@@ -294,42 +134,35 @@ export default function UnifiedDashboard() {
     if (klaviyoKeys.length === 0) return;
 
     setLoadingAnalytics(true);
-    setAnalyticsProgress({ current: 0, total: 0 });
-
     try {
       const activeKey = klaviyoKeys[activeKeyIndex];
       
       const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
         body: {
-          klaviyoKeyId: activeKey.id,
-          apiKey: activeKey.klaviyo_api_key_hash,
-          endpoint: 'segments',
+          keyId: activeKey.id,
+          endpoint: `https://a.klaviyo.com/api/segments/`,
           method: 'GET',
         },
       });
 
       if (error) throw error;
-
       const segments = data?.data || [];
       setAllSegments(segments);
-      setAnalyticsProgress({ current: 0, total: segments.length });
-
+      
       // Fetch profile counts
       const stats: Record<string, any> = {};
       for (let i = 0; i < segments.length; i++) {
         const segment = segments[i];
-        
         try {
-          const { data: profileData, error: profileError } = await supabase.functions.invoke('klaviyo-proxy', {
+          const { data: profileData } = await supabase.functions.invoke('klaviyo-proxy', {
             body: {
-              klaviyoKeyId: activeKey.id,
-              apiKey: activeKey.klaviyo_api_key_hash,
-              endpoint: `segments/${segment.id}/profiles`,
+              keyId: activeKey.id,
+              endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/profiles`,
               method: 'GET',
             },
           });
 
-          if (!profileError && profileData) {
+          if (profileData) {
             stats[segment.id] = {
               profileCount: profileData.data?.length || 0,
               name: segment.attributes?.name || 'Unnamed Segment',
@@ -338,7 +171,6 @@ export default function UnifiedDashboard() {
         } catch (err) {
           console.error(`Error fetching segment ${segment.id}:`, err);
         }
-
         setAnalyticsProgress({ current: i + 1, total: segments.length });
       }
 
@@ -349,16 +181,6 @@ export default function UnifiedDashboard() {
     } finally {
       setLoadingAnalytics(false);
     }
-  };
-
-  const calculateHealthScore = () => {
-    const totalSegments = allSegments.length;
-    const activeSegments = Object.values(segmentStats).filter((s: any) => s.profileCount > 0).length;
-
-    if (totalSegments === 0) return 0;
-
-    const coverageScore = (activeSegments / totalSegments) * 100;
-    return Math.round(coverageScore);
   };
 
   const handleLogout = async () => {
@@ -386,7 +208,6 @@ export default function UnifiedDashboard() {
   }
 
   return (
-    <SubscriptionGate showToast={false}>
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {currentUser && !emailVerified && (
         <EmailVerificationBanner 
@@ -395,7 +216,6 @@ export default function UnifiedDashboard() {
           userId={currentUser.id}
         />
       )}
-      {accountType === "agency" && <TimeBasedPopup onGetStarted={() => navigate("/settings")} />}
       
       <div className="border-b-2 border-border bg-card">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -414,16 +234,6 @@ export default function UnifiedDashboard() {
                   apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
                 />
               )}
-              <ClientSwitcher
-                klaviyoKeys={klaviyoKeys}
-                activeKeyIndex={activeKeyIndex}
-                onSelectClient={handleSelectClient}
-                onAddClient={handleAddClient}
-              />
-              <Button variant="outline" onClick={() => navigate('/affiliate')}>
-                <Gift className="w-4 h-4 mr-2" />
-                Affiliate
-              </Button>
               <Button variant="outline" onClick={() => navigate('/settings')}>
                 <SettingsIcon className="w-4 h-4 mr-2" />
                 Settings
@@ -437,23 +247,14 @@ export default function UnifiedDashboard() {
         </div>
       </div>
 
-      <AddClientModal
-        isOpen={showAddClientModal}
-        onClose={() => setShowAddClientModal(false)}
-        onSuccess={handleClientAdded}
-        userId={currentUser?.id || ''}
-      />
-
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs defaultValue="segments" className="w-full">
-          <TabsList className="grid w-full grid-cols-8 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="segments">Segments</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="ai">AI</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
-            {accountType === "agency" && <TabsTrigger value="team">Team</TabsTrigger>}
-            <TabsTrigger value="api">API</TabsTrigger>
             <TabsTrigger value="more">More</TabsTrigger>
           </TabsList>
 
@@ -464,8 +265,8 @@ export default function UnifiedDashboard() {
               onSelectBundle={selectBundle}
               onSelectAll={handleSelectAll}
               onClearAll={handleClearAll}
-              segmentLimit={getSegmentLimit()}
-              currentTier={tier}
+              segmentLimit={999}
+              currentTier="free"
             />
 
             {selectedSegments.length > 0 && (
@@ -474,7 +275,6 @@ export default function UnifiedDashboard() {
                   <div>
                     <p className="font-medium">
                       {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
-                      {tier === 'starter' && <span className="text-sm text-muted-foreground ml-2">(max {getSegmentLimit()})</span>}
                     </p>
                     <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
                   </div>
@@ -496,8 +296,8 @@ export default function UnifiedDashboard() {
               segmentStats={segmentStats}
               loadingAnalytics={loadingAnalytics}
               analyticsProgress={analyticsProgress}
-              onShowHealthScore={() => setShowHealthScore(true)}
-              calculateHealthScore={calculateHealthScore}
+              onShowHealthScore={() => {}}
+              calculateHealthScore={() => 0}
             />
           </TabsContent>
 
@@ -511,136 +311,30 @@ export default function UnifiedDashboard() {
 
           <TabsContent value="performance">
             {klaviyoKeys.length > 0 && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <SegmentPerformance
-                  klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
-                  apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
-                />
-                <SegmentCloner
-                  currentKeyId={klaviyoKeys[activeKeyIndex].id}
-                  segments={allSegments}
-                />
-              </div>
+              <SegmentPerformance 
+                klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
+                apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
+              />
             )}
           </TabsContent>
 
           <TabsContent value="templates">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SegmentTemplateManager
-                currentSegment={selectedSegments.length > 0 ? {
-                  name: `${selectedSegments.length} selected segments`,
-                  conditions: []
-                } : undefined}
-              />
-              <AutomationPlaybooks />
-            </div>
-          </TabsContent>
-
-          {accountType === "agency" && (
-            <TabsContent value="team">
-              <AgencyTeamManager />
-            </TabsContent>
-          )}
-
-          <TabsContent value="api">
-            <APIAccessSection />
+            <SegmentTemplateManager />
           </TabsContent>
 
           <TabsContent value="more">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <button
-                onClick={() => navigate('/features')}
-                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
-                data-tour="feature-showcase"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <TrendingUp className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-bold">Feature Showcase</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">Explore ROI calculators, comparisons, and success stories</p>
-              </button>
-
-              <button
-                onClick={() => navigate('/roi-dashboard')}
-                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
-                data-tour="roi-tracker"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-                    <DollarSign className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <h3 className="text-lg font-bold">ROI Tracker</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">Track campaign performance and revenue metrics</p>
-              </button>
-
-              <button
-                onClick={() => navigate('/segment-health')}
-                className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
-                data-tour="segment-health"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <Activity className="w-6 h-6 text-accent" />
-                  </div>
-                  <h3 className="text-lg font-bold">Segment Health</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">Monitor segment health status and trends</p>
-              </button>
-
-              {accountType === "agency" && (
-                <>
-                  <button
-                    onClick={() => navigate('/agency-tools')}
-                    className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
-                    data-tour="agency-tools"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                        <Building2 className="w-6 h-6 text-primary" />
-                      </div>
-                      <h3 className="text-lg font-bold">Agency Tools</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Client scorecards, team management, and proposals</p>
-                  </button>
-
-                  <button
-                    onClick={() => navigate('/ai-features')}
-                    className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
-                    data-tour="ai-features"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                        <Sparkles className="w-6 h-6 text-purple-600" />
-                      </div>
-                      <h3 className="text-lg font-bold">AI Features</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Predictive analytics and churn prediction</p>
-                  </button>
-                </>
-              )}
-
-              {accountType === "brand" && (
-                <button
-                  onClick={() => navigate('/ai-features')}
-                  className="p-6 bg-card border-2 border-border rounded-lg hover:border-primary hover:shadow-lg transition-all text-left group"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                      <Sparkles className="w-6 h-6 text-purple-600" />
-                    </div>
-                    <h3 className="text-lg font-bold">AI Features</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Predictive analytics and churn prediction</p>
-                </button>
+            <div className="grid gap-6">
+              <AutomationPlaybooks />
+              {klaviyoKeys.length > 0 && (
+                <SegmentCloner 
+                  currentKeyId={klaviyoKeys[activeKeyIndex].id}
+                  segments={allSegments}
+                />
               )}
             </div>
           </TabsContent>
         </Tabs>
       </div>
     </div>
-    </SubscriptionGate>
   );
 }

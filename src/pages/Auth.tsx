@@ -1,481 +1,148 @@
 import { useState, useEffect } from "react";
-import { Building2, Users, ArrowRight } from "lucide-react";
-import { PoweredByBadge } from "@/components/PoweredByBadge";
-import { CircleDoodle } from "@/components/CircleDoodle";
+import { Building2, Mail, Lock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface AuthProps {
-  onComplete: (user: any) => void;
-  initialView?: "choice" | "brand-signup" | "agency-signup";
+  onComplete?: (user: any) => void;
+  initialView?: "signup" | "signin";
 }
 
-export default function Auth({ onComplete, initialView = "choice" }: AuthProps) {
-  const [authView, setAuthView] = useState(initialView);
+export default function Auth({ onComplete, initialView = "signup" }: AuthProps) {
+  const [isSignUp, setIsSignUp] = useState(initialView === "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accountName, setAccountName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [referralCode, setReferralCode] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Capture referral code from URL on mount
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    
-    if (ref) {
-      setReferralCode(ref);
-      localStorage.setItem('aderai_ref', ref);
-      
-      // Track the affiliate click
-      trackAffiliateClick(ref);
-    } else {
-      // Check if we have a stored referral code
-      const storedRef = localStorage.getItem('aderai_ref');
-      if (storedRef) {
-        setReferralCode(storedRef);
-      }
-    }
-  }, []);
-
-  const trackAffiliateClick = async (code: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('affiliate-track-click', {
-        body: {
-          affiliateCode: code,
-          referrer: document.referrer || null,
-        },
-      });
-
-      if (error) {
-        console.error('Failed to track affiliate click:', error);
-      } else {
-        console.log('Affiliate click tracked:', data);
-      }
-    } catch (err) {
-      console.error('Error tracking click:', err);
-    }
-  };
-
-  const handleAuth = async () => {
-    // Input validation using basic checks (Zod would be better for production)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    if (!email?.trim() || !password) {
-      setError("Please fill in all fields");
-      return;
-    }
-
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
-
-    if (authView.includes("signup") && !accountName?.trim()) {
-      setError("Please enter your account name");
-      return;
-    }
-
-    if (authView.includes("signup") && accountName.length > 100) {
-      setError("Account name is too long (max 100 characters)");
-      return;
-    }
-
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
-    setError("");
-    
+
     try {
-      // Check if user already exists first
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('email')
-        .eq('email', email.toLowerCase())
-        .maybeSingle();
-
-      if (existingUser) {
-        setError("An account with this email already exists. Please sign in instead.");
-        setLoading(false);
-        return;
-      }
-
-      // Sign up
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/app`,
-          data: {
-            account_name: accountName,
-            account_type: authView.includes("agency") ? "agency" : "brand",
-            referred_by: referralCode || null,
+      if (isSignUp) {
+        // Sign up
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              account_name: accountName || email.split('@')[0],
+            },
           },
-        },
-      });
+        });
 
-      if (signUpError) {
-        // Handle specific error cases
-        if (signUpError.message.includes("already registered")) {
-          setError("An account with this email already exists. Please sign in instead.");
-        } else {
-          setError(signUpError.message);
-        }
-        setLoading(false);
-        return;
-      }
+        if (signUpError) throw signUpError;
 
-      if (authData.user) {
-        // Insert user into users table with referral code
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert({
-            id: authData.user.id,
-            email: authData.user.email!,
-            password_hash: 'handled_by_auth',
-            account_name: accountName,
-            account_type: authView.includes("agency") ? "agency" : "brand",
-            referred_by: referralCode || null,
-            email_verified: true, // Auto-confirmed now
-          });
-
-        if (insertError) {
-          console.error('Error inserting user:', insertError);
+        if (authData.user) {
           toast({
-            title: "Warning",
-            description: "Account created but profile setup had issues. Please contact support if problems persist.",
-            variant: "default",
+            title: "Account created!",
+            description: "Welcome to Aderai",
           });
+          navigate('/klaviyo-setup');
         }
+      } else {
+        // Sign in
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-        // Clear stored referral code
-        localStorage.removeItem('aderai_ref');
-
-        // Send welcome email (non-blocking)
-        try {
-          await supabase.functions.invoke('send-welcome-email', {
-            body: {
-              email: authData.user.email,
-              userName: accountName,
-              accountType: authView.includes("agency") ? "agency" : "brand",
-              userId: authData.user.id
-            }
-          });
-        } catch (emailError) {
-          console.error("Welcome email error:", emailError);
-          // Don't block signup if email fails
-        }
+        if (error) throw error;
 
         toast({
-          title: "Account created!",
-          description: "Choose your plan to continue...",
+          title: "Welcome back!",
+          description: "Successfully signed in",
         });
-        
-        // Redirect to pricing choice for brand accounts
-        const accountType = authView.includes("agency") ? "agency" : "brand";
-        
-        if (accountType === "brand") {
-          setTimeout(() => {
-            navigate('/pricing-choice');
-          }, 500);
-        } else {
-          // Agency accounts skip payment
-          setTimeout(() => {
-            navigate('/onboarding/agency');
-          }, 500);
-        }
+        navigate('/dashboard');
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
       setLoading(false);
     }
   };
 
-  // Choice View
-  if (authView === "choice") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-6">
-        <div className="w-full max-w-4xl">
-          {/* Elegant Header */}
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-block mb-6">
-              <h1 className="text-6xl md:text-7xl font-playfair font-bold tracking-tight">
-                aderai<span className="text-primary">.</span>
-              </h1>
-              <div className="h-1 w-full bg-gradient-to-r from-transparent via-primary to-transparent mt-2 opacity-30" />
-            </div>
-            <p className="text-xl text-muted-foreground font-light max-w-md mx-auto">
-              AI-powered segmentation for modern marketers
-            </p>
-            
-            {referralCode && (
-              <div className="mt-6 inline-block bg-primary/10 border border-primary/20 rounded-full px-6 py-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <p className="text-sm text-primary font-medium">
-                  🎁 Referred by: {referralCode}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Account Type Selection */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {/* Brand Account */}
-            <button
-              onClick={() => setAuthView("brand-signup")}
-              className="group relative bg-card/50 backdrop-blur-sm border-2 border-border hover:border-primary rounded-3xl p-10 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 text-left animate-fade-in"
-              style={{ animationDelay: '0.1s' }}
-            >
-              <div className="absolute top-6 right-6">
-                <span className="text-xs bg-primary/10 text-primary px-4 py-1.5 rounded-full font-semibold">
-                  MOST POPULAR
-                </span>
-              </div>
-              
-              <div className="mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Building2 className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="text-3xl font-bold mb-2">Brand</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Perfect for single brands looking to elevate their email marketing strategy
-                </p>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">$79</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Professional Plan - Most Popular</p>
-              </div>
-
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
-                  70+ pre-built segments
-                </li>
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
-                  Unlimited AI suggestions
-                </li>
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary mr-3" />
-                  Advanced analytics
-                </li>
-              </ul>
-
-              <div className="flex items-center text-primary font-semibold group-hover:gap-3 gap-2 transition-all">
-                Get Started <ArrowRight className="w-4 h-4" />
-              </div>
-            </button>
-
-            {/* Agency Account */}
-            <button
-              onClick={() => setAuthView("agency-signup")}
-              className="group relative bg-card/50 backdrop-blur-sm border-2 border-border hover:border-accent rounded-3xl p-10 transition-all duration-300 hover:shadow-2xl hover:shadow-accent/10 hover:-translate-y-1 text-left animate-fade-in"
-              style={{ animationDelay: '0.2s' }}
-            >
-              <div className="mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Users className="w-7 h-7 text-accent" />
-                </div>
-                <h3 className="text-3xl font-bold mb-2">Agency</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Manage multiple clients effortlessly with our agency plan
-                </p>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">$399</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Agency Pro - Recommended</p>
-              </div>
-
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
-                  Up to 15 client accounts
-                </li>
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
-                  Team collaboration (10 seats)
-                </li>
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
-                  White-label reporting
-                </li>
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
-                  Dedicated account manager
-                </li>
-                <li className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent mr-3" />
-                  Priority support
-                </li>
-              </ul>
-
-              <div className="flex items-center text-accent font-semibold group-hover:gap-3 gap-2 transition-all">
-                Get Started <ArrowRight className="w-4 h-4" />
-              </div>
-            </button>
-          </div>
-
-          {/* Footer Links */}
-          <div className="text-center space-y-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <div>
-              <p className="text-muted-foreground mb-4">Already have an account?</p>
-              <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => navigate("/brand-login")}
-                  className="px-6 py-2 rounded-full border border-primary/20 hover:border-primary hover:bg-primary/5 transition-all text-primary font-medium"
-                >
-                  Brand Sign In
-                </button>
-                <button
-                  onClick={() => navigate("/agency-login")}
-                  className="px-6 py-2 rounded-full border border-accent/20 hover:border-accent hover:bg-accent/5 transition-all text-accent font-medium"
-                >
-                  Agency Sign In
-                </button>
-              </div>
-            </div>
-            <a 
-              href="/" 
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              ← Back to home
-            </a>
-            <div className="pt-4">
-              <PoweredByBadge />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Signup Forms Only
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <button
-          onClick={() => setAuthView("choice")}
-          className="text-muted-foreground hover:text-foreground mb-8 flex items-center gap-2 transition-all hover:gap-3"
-        >
-          ← Back to account selection
-        </button>
-
-        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-3xl p-10 shadow-xl animate-fade-in">
-          {/* Elegant Header */}
+        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-3xl p-10 shadow-xl">
           <div className="text-center mb-8">
-            <div className="inline-block mb-4">
-              <h1 className="text-4xl font-playfair font-bold">
-                aderai<span className="text-primary">.</span>
-              </h1>
-              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-primary to-transparent mt-1 opacity-30" />
-            </div>
-
-            <h2 className="text-2xl font-bold mb-2">Create your account</h2>
-            <p className="text-muted-foreground text-sm">
-              {authView.includes("brand") ? "Brand Account" : "Agency Account"}
+            <Building2 className="w-12 h-12 text-primary mx-auto mb-4" />
+            <h1 className="text-3xl font-bold mb-2">
+              {isSignUp ? "Create Account" : "Welcome Back"}
+            </h1>
+            <p className="text-muted-foreground">
+              {isSignUp ? "Get started with Aderai" : "Sign in to your account"}
             </p>
           </div>
 
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 mb-6">
-              <p className="text-destructive text-sm">{error}</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {authView.includes("signup") && (
+          <form onSubmit={handleAuth} className="space-y-4">
+            {isSignUp && (
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  {authView.includes("brand") ? "Brand Name" : "Agency Name"}
-                </label>
-                <input
+                <Label htmlFor="accountName">Account Name</Label>
+                <Input
+                  id="accountName"
                   type="text"
                   value={accountName}
                   onChange={(e) => setAccountName(e.target.value)}
-                  placeholder={authView.includes("brand") ? "My Brand" : "My Agency"}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition"
+                  placeholder="My Business"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <input
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition"
+                required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
-              <input
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition"
+                required
+                minLength={8}
               />
             </div>
 
-            <button
-              onClick={handleAuth}
+            <Button
+              type="submit"
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground py-3.5 rounded-full font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+              className="w-full"
             >
-              {loading ? "Please wait..." : "Create Account"}
-            </button>
-          </div>
+              {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+            </Button>
+          </form>
 
-          {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-border space-y-4">
-            <div className="text-center">
-              <button
-                onClick={() => {
-                  if (authView === "brand-signup") navigate("/brand-login");
-                  else if (authView === "agency-signup") navigate("/agency-login");
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Already have an account?{" "}
-                <span className={authView.includes("brand") ? "text-primary font-semibold" : "text-accent font-semibold"}>
-                  Sign in
-                </span>
-              </button>
-            </div>
-            <div className="text-center">
-              <button
-                onClick={() => {
-                  if (authView.includes("brand")) {
-                    setAuthView("agency-signup");
-                  } else {
-                    setAuthView("brand-signup");
-                  }
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Looking for {authView.includes("brand") ? "Agency" : "Brand"} account? <span className={authView.includes("brand") ? "text-accent font-semibold" : "text-primary font-semibold"}>Switch here</span>
-              </button>
-            </div>
-            <div className="flex justify-center">
-              <PoweredByBadge />
-            </div>
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+            </button>
           </div>
         </div>
       </div>

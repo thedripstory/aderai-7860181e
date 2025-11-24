@@ -2,11 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-/**
- * Index.tsx - Redirects to appropriate dashboard
- * This file has been refactored. Main app logic is now in UnifiedDashboard.tsx
- */
-
 export default function Index() {
   const navigate = useNavigate();
 
@@ -19,50 +14,27 @@ export default function Index() {
         return;
       }
 
+      // Check if klaviyo setup is completed
       const { data: userData } = await supabase
         .from('users')
-        .select('account_type, onboarding_completed, klaviyo_setup_completed')
+        .select('klaviyo_setup_completed')
         .eq('id', session.user.id)
         .single();
 
-      if (!userData) {
-        navigate('/login');
-        return;
-      }
-
-      // Redirect based on account type and onboarding status
-      if (!userData.onboarding_completed) {
-        if (userData.account_type === 'brand') {
-          navigate('/onboarding/brand');
-        } else {
-          navigate('/onboarding/agency');
-        }
-        return;
-      }
-
-      // For brands, check klaviyo setup (only if not already on dashboard)
-      if (userData.account_type === 'brand' && !userData.klaviyo_setup_completed) {
+      if (userData && !userData.klaviyo_setup_completed) {
         navigate('/klaviyo-setup');
-        return;
-      }
-
-      // Redirect to appropriate dashboard - consistent routing
-      if (userData.account_type === 'agency') {
-        navigate('/agency-dashboard');
       } else {
-        navigate('/brand-dashboard');
+        navigate('/dashboard');
       }
     };
 
     checkAuthAndRedirect();
   }, [navigate]);
 
-  // Show loading state while redirecting
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div className="text-center">
         <div className="relative w-16 h-16 mx-auto mb-4">
-          {/* Aggressive rotating loader */}
           <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
           <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
           <div className="absolute inset-0 flex items-center justify-center">
