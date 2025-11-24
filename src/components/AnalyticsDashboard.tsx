@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader, Users, TrendingUp, BarChart3, Activity, Search, Download, ArrowUp, ArrowDown, Database, Key } from 'lucide-react';
+import { Loader, Users, TrendingUp, BarChart3, Activity, Search, Download, ArrowUp, ArrowDown, Database, Key, HelpCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -109,7 +109,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Failed to export analytics', {
-        description: 'Please try again or contact support',
+        description: 'Unable to export data. Need help troubleshooting?',
+        action: {
+          label: 'Get Help',
+          onClick: () => window.open('/help?article=troubleshooting', '_blank'),
+        },
       });
     } finally {
       setExportLoading(false);
@@ -196,7 +200,18 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
       <div className="bg-card border border-border rounded-lg p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold">Segment Performance</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl font-bold">Segment Performance</h3>
+            <a 
+              href="/help?article=analytics" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              title="Learn about analytics"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </a>
+          </div>
           <div className="flex items-center gap-4">
             <select
               value={selectedMetric}

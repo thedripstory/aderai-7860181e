@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Loader, CheckCircle, Lightbulb, AlertCircle } from 'lucide-react';
+import { Sparkles, Loader, CheckCircle, Lightbulb, AlertCircle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
@@ -137,8 +137,8 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       toast.error('Failed to create segment', {
         description: error.message || 'Check your Klaviyo API key and try again',
         action: {
-          label: 'Retry',
-          onClick: () => createAiSegment(suggestion),
+          label: 'Get Help',
+          onClick: () => window.open('/help?article=troubleshooting', '_blank'),
         },
       });
     } finally {
@@ -186,10 +186,23 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       )}
 
       <div className="bg-card border border-border rounded-lg p-8 mb-8">
-        <h2 className="text-2xl font-bold mb-4">Describe Your Goal</h2>
-        <p className="text-muted-foreground mb-6">
-          Tell us what you're trying to achieve, and our AI will suggest custom segments tailored to your needs.
-        </p>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold mb-2">Describe Your Goal</h2>
+            <p className="text-muted-foreground">
+              Tell us what you're trying to achieve, and our AI will suggest custom segments tailored to your needs.
+            </p>
+          </div>
+          <a 
+            href="/help?article=ai-features" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors"
+            title="Learn about AI features"
+          >
+            <HelpCircle className="w-5 h-5" />
+          </a>
+        </div>
 
         <textarea
           value={aiPrompt}
@@ -229,6 +242,8 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
           icon={Lightbulb}
           title="Get your first AI suggestion"
           description="Describe your business goal above, and our AI will create custom segment suggestions tailored to your needs. For example: 'I want to target customers likely to purchase again in the next 30 days'."
+          secondaryActionLabel="Learn how AI works →"
+          onSecondaryAction={() => window.open('/help?article=ai-features', '_blank')}
         />
       )}
 

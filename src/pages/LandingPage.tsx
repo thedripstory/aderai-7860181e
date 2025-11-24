@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3 } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle } from "lucide-react";
 import { TubelightNavbar } from "@/components/TubelightNavbar";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
@@ -51,6 +51,14 @@ export default function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-4">
+            <a
+              href="/help"
+              className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1.5"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Help</span>
+            </a>
+            
             <button
               onClick={() => navigate("/login")}
               className="text-base text-muted-foreground hover:text-foreground transition-colors font-medium"

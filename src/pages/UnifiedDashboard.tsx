@@ -326,11 +326,15 @@ export default function UnifiedDashboard() {
               {/* Help Menu with Tour Restart */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" title="Help Center">
                     <HelpCircle className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate('/help')}>
+                    <HelpCircle className="w-4 h-4 mr-2" />
+                    Help Center
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={startTour}>
                     <Sparkles className="w-4 h-4 mr-2" />
                     Restart Tour
