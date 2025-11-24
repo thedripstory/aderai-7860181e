@@ -90,7 +90,7 @@ export const FlipTestimonialCard = ({
             <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
               {image && (
                 <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary">
-                  <img src={image} alt={name} className="w-full h-full object-cover" />
+                  <img src={image} alt={`${name} profile photo`} className="w-full h-full object-cover" loading="lazy" />
                 </div>
               )}
               <div className="flex-1">

@@ -84,10 +84,10 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm">
             <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
               <div className="flex -space-x-2">
-                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/cm-round-min.png" alt="Brand" className="w-6 h-6 rounded-full border-2 border-background" />
-                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/kraus-round-min.png" alt="Brand" className="w-6 h-6 rounded-full border-2 border-background" />
-                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/tiger-marr-round-min.png" alt="Brand" className="w-6 h-6 rounded-full border-2 border-background" />
-                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/uppl-logo-round-min.png" alt="Brand" className="w-6 h-6 rounded-full border-2 border-background" />
+                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/cm-round-min.png" alt="Customer logo" className="w-6 h-6 rounded-full border-2 border-background" loading="lazy" />
+                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/kraus-round-min.png" alt="Customer logo" className="w-6 h-6 rounded-full border-2 border-background" loading="lazy" />
+                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/tiger-marr-round-min.png" alt="Customer logo" className="w-6 h-6 rounded-full border-2 border-background" loading="lazy" />
+                <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/uppl-logo-round-min.png" alt="Customer logo" className="w-6 h-6 rounded-full border-2 border-background" loading="lazy" />
               </div>
               <span className="text-muted-foreground">10,00+ brands use Aderai</span>
             </div>
@@ -304,7 +304,7 @@ export default function LandingPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Instant Deployment</h3>
                     <p className="text-muted-foreground text-sm">
-                      Push segments to <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-1" /> with one click - no manual work
+                      <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.85em] inline-block align-text-bottom mx-1" loading="lazy" />
                     </p>
                   </div>
                 </div>
@@ -627,7 +627,7 @@ export default function LandingPage() {
                     </div>
                     <h4 className="text-xl font-bold mb-4">Set Once, Live Forever</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
+                      Create segments once and they <span className="text-primary font-semibold">auto-update in <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" loading="lazy" /> forever</span>. Zero maintenance. Zero effort. Infinite value.
                     </p>
                   </div>
 
@@ -728,7 +728,7 @@ export default function LandingPage() {
               </h3>
               <p className="text-muted-foreground mb-6">
                 Join 10,000+ marketers getting weekly insights on 
-                <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom mx-1" /> 
+                <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.9em] inline-block align-text-bottom mx-1" loading="lazy" /> 
                 segmentation
               </p>
               <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -758,7 +758,7 @@ export default function LandingPage() {
                 <p className="text-sm text-muted-foreground mb-6 flex flex-col items-start gap-1">
                   <span>AI-powered segmentation</span>
                   <span className="flex items-center gap-1">
-                    for <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom" />
+                    for <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.9em] inline-block align-text-bottom" loading="lazy" />
                   </span>
                 </p>
               </div>

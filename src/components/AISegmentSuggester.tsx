@@ -84,8 +84,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
           }
         }
       } catch (achievementError) {
-        // Silently fail - don't disrupt user flow
-        console.log('Achievement already earned or error:', achievementError);
+        // Silently handle - achievement might already be earned
       }
       
       toast.success('AI suggestions generated successfully!', {

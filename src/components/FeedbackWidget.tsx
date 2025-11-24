@@ -130,8 +130,7 @@ export const FeedbackWidget: React.FC = () => {
             .single();
         }
       } catch (achievementError) {
-        // Silently fail - achievement might already be earned
-        console.log('Achievement already earned or error:', achievementError);
+        // Silently handle - achievement might already be earned
       }
 
       toast.success('Thanks for your feedback!', {
