@@ -22,7 +22,7 @@ import { AdminSystemHealth } from "@/components/AdminSystemHealth";
 import { AdminUserSessions } from "@/components/AdminUserSessions";
 import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
 import { AdminErrorTracking } from "@/components/AdminErrorTracking";
-import { AdminRevenueTracking } from "@/components/AdminRevenueTracking";
+import { AdminUsageTracking } from "@/components/AdminUsageTracking";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
 import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
 import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
@@ -42,8 +42,6 @@ const AdminDashboard = () => {
   // Data states
   const [users, setUsers] = useState<any[]>([]);
   const [klaviyoKeys, setKlaviyoKeys] = useState<any[]>([]);
-  const [agencyClients, setAgencyClients] = useState<any[]>([]);
-  const [affiliateStats, setAffiliateStats] = useState<any[]>([]);
   const [emailLogs, setEmailLogs] = useState<any[]>([]);
   const [segmentErrors, setSegmentErrors] = useState<any[]>([]);
   const [userRoles, setUserRoles] = useState<any[]>([]);
@@ -88,8 +86,6 @@ const AdminDashboard = () => {
     await Promise.all([
       loadUsers(),
       loadKlaviyoKeys(),
-      loadAgencyClients(),
-      loadAffiliateStats(),
       loadEmailLogs(),
       loadSegmentErrors(),
       loadUserRoles(),
@@ -115,23 +111,6 @@ const AdminDashboard = () => {
     if (!error && data) setKlaviyoKeys(data);
   };
 
-  const loadAgencyClients = async () => {
-    const { data, error } = await supabase
-      .from("agency_clients")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
-    if (!error && data) setAgencyClients(data);
-  };
-
-  const loadAffiliateStats = async () => {
-    const { data, error } = await supabase
-      .from("affiliate_stats")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
-    if (!error && data) setAffiliateStats(data);
-  };
 
   const loadEmailLogs = async () => {
     const { data, error } = await supabase
@@ -264,21 +243,21 @@ const AdminDashboard = () => {
     }
   };
 
-  const toggleUserStatus = async (userId: string, currentStatus: string) => {
-    const newStatus = currentStatus === "active" ? "inactive" : "active";
+  const toggleUserEmailVerification = async (userId: string, currentVerified: boolean) => {
+    const newVerified = !currentVerified;
     const { error } = await supabase
       .from("users")
-      .update({ subscription_status: newStatus })
+      .update({ email_verified: newVerified })
       .eq("id", userId);
 
     if (!error) {
-      await logAuditAction("user_status_update", "users", userId, { status: currentStatus }, { status: newStatus });
+      await logAuditAction("user_email_verification_update", "users", userId, { email_verified: currentVerified }, { email_verified: newVerified });
     }
 
     if (error) {
-      toast.error("Failed to update user status");
+      toast.error("Failed to update user verification status");
     } else {
-      toast.success("User status updated");
+      toast.success("User verification status updated");
       loadUsers();
       loadAuditLogs();
     }
@@ -321,13 +300,7 @@ const AdminDashboard = () => {
 
     if (filterConfig.status && filterConfig.status.length > 0) {
       filtered = filtered.filter((item: any) => 
-        filterConfig.status.includes(item.status || item.subscription_status)
-      );
-    }
-
-    if (filterConfig.accountType && filterConfig.accountType.length > 0) {
-      filtered = filtered.filter((item: any) => 
-        filterConfig.accountType.includes(item.account_type)
+        filterConfig.status.includes(item.status)
       );
     }
 
@@ -364,19 +337,18 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-13 w-full mb-8">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-12 w-full mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="journey">User Journey</TabsTrigger>
             <TabsTrigger value="health">System Health</TabsTrigger>
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
             <TabsTrigger value="api">API Monitor</TabsTrigger>
             <TabsTrigger value="errors">Errors</TabsTrigger>
-            <TabsTrigger value="revenue">Revenue</TabsTrigger>
+            <TabsTrigger value="usage">Usage Stats</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
-            <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="audit">Audit</TabsTrigger>
           </TabsList>
 
@@ -411,13 +383,13 @@ const AdminDashboard = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Agency Clients</CardTitle>
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">Email Logs</CardTitle>
+                  <Mail className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{agencyClients.length}</div>
+                  <div className="text-2xl font-bold">{emailLogs.length}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {agencyClients.filter(c => c.status === 'active').length} active
+                    {emailLogs.filter(e => e.status === 'sent').length} sent successfully
                   </p>
                 </CardContent>
               </Card>
@@ -475,9 +447,9 @@ const AdminDashboard = () => {
             <AdminErrorTracking />
           </TabsContent>
 
-          {/* Revenue Tracking Tab */}
-          <TabsContent value="revenue">
-            <AdminRevenueTracking />
+          {/* Usage Tracking Tab */}
+          <TabsContent value="usage">
+            <AdminUsageTracking />
           </TabsContent>
 
           {/* Email Monitoring Tab */}
@@ -604,9 +576,9 @@ const AdminDashboard = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => toggleUserStatus(user.id, user.subscription_status)}
+                            onClick={() => toggleUserEmailVerification(user.id, user.email_verified)}
                           >
-                            Toggle Status
+                            Toggle Verification
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -776,46 +748,6 @@ const AdminDashboard = () => {
                         <TableCell>{key.currency}</TableCell>
                         <TableCell>{key.currency_symbol}{key.aov}</TableCell>
                         <TableCell>{new Date(key.created_at).toLocaleDateString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Agencies Tab */}
-          <TabsContent value="agencies">
-            <Card>
-              <CardHeader>
-                <CardTitle>Agency-Client Relationships</CardTitle>
-                <CardDescription>View all agency client connections</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Client Name</TableHead>
-                      <TableHead>Agency ID</TableHead>
-                      <TableHead>Brand ID</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Notes</TableHead>
-                      <TableHead>Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {agencyClients.map((client) => (
-                      <TableRow key={client.id}>
-                        <TableCell className="font-medium">{client.client_name}</TableCell>
-                        <TableCell className="font-mono text-xs">{client.agency_user_id.slice(0, 8)}...</TableCell>
-                        <TableCell className="font-mono text-xs">{client.brand_user_id.slice(0, 8)}...</TableCell>
-                        <TableCell>
-                          <Badge variant={client.status === 'active' ? 'default' : 'outline'}>
-                            {client.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate">{client.notes || '-'}</TableCell>
-                        <TableCell>{new Date(client.created_at).toLocaleDateString()}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

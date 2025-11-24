@@ -57,20 +57,20 @@ export const AdminBulkActions = ({
     toast.success(`Exported ${items.length} items to CSV`);
   };
 
-  const bulkUpdateUserStatus = async (status: string) => {
+  const bulkUpdateUserVerification = async (verified: boolean) => {
     setLoading(true);
     try {
       const { error } = await supabase
         .from("users")
-        .update({ subscription_status: status })
+        .update({ email_verified: verified })
         .in("id", selectedIds);
 
       if (error) throw error;
 
       // Log audit trail
-      await logAuditAction("bulk_user_status_update", selectedIds.length, { status });
+      await logAuditAction("bulk_user_verification_update", selectedIds.length, { email_verified: verified });
 
-      toast.success(`Updated ${selectedIds.length} users to ${status}`);
+      toast.success(`Updated ${selectedIds.length} users' email verification status`);
       onSelectionChange([]);
       onActionComplete();
     } catch (error: any) {
@@ -158,11 +158,11 @@ export const AdminBulkActions = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => bulkUpdateUserStatus("active")}>
-                  Set Active
+                <DropdownMenuItem onClick={() => bulkUpdateUserVerification(true)}>
+                  Verify Emails
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => bulkUpdateUserStatus("inactive")}>
-                  Set Inactive
+                <DropdownMenuItem onClick={() => bulkUpdateUserVerification(false)}>
+                  Unverify Emails
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
