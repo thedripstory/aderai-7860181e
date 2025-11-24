@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, LogOut, Settings as SettingsIcon, Loader, RefreshCw } from 'lucide-react';
+import { Building2, LogOut, Settings as SettingsIcon, Loader, RefreshCw, HelpCircle, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
 import { FeedbackWidget } from '@/components/FeedbackWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
+import { OnboardingTour } from '@/components/OnboardingTour';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
@@ -19,6 +26,7 @@ import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
@@ -40,6 +48,14 @@ export default function UnifiedDashboard() {
 
   const { loading: creatingSegments, results, createSegments, setResults } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
+  const { 
+    run: runTour, 
+    stepIndex, 
+    loading: tourLoading,
+    startTour,
+    handleJoyrideCallback,
+    completeTour 
+  } = useOnboardingTour();
 
   // Handle URL tab parameter
   useEffect(() => {
@@ -226,6 +242,16 @@ export default function UnifiedDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      {/* Onboarding Tour */}
+      {!tourLoading && (
+        <OnboardingTour
+          run={runTour}
+          stepIndex={stepIndex}
+          onCallback={handleJoyrideCallback}
+          onComplete={completeTour}
+        />
+      )}
+
       {currentUser && !emailVerified && (
         <EmailVerificationBanner 
           userEmail={currentUser.email}
@@ -254,7 +280,23 @@ export default function UnifiedDashboard() {
                 />
               )}
               <FeedbackWidget />
-              <Button variant="outline" onClick={() => navigate('/settings')}>
+              
+              {/* Help Menu with Tour Restart */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <HelpCircle className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={startTour}>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Restart Tour
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Button variant="outline" onClick={() => navigate('/settings')} data-tour="settings-button">
                 <SettingsIcon className="w-4 h-4 mr-2" />
                 Settings
               </Button>
@@ -271,16 +313,18 @@ export default function UnifiedDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-7 mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="segments">Segments</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="ai">AI</TabsTrigger>
+            <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
+            <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
+            <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="more">More</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
-            <DashboardOverview />
+            <div data-tour="dashboard-stats">
+              <DashboardOverview />
+            </div>
           </TabsContent>
 
           <TabsContent value="segments">
