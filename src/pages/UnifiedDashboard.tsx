@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
 import { FeedbackWidget } from '@/components/FeedbackWidget';
+import { DashboardOverview } from '@/components/DashboardOverview';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
@@ -29,6 +30,7 @@ export default function UnifiedDashboard() {
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [view, setView] = useState<'creating' | 'results' | null>(null);
   const [emailVerified, setEmailVerified] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Analytics state
   const [allSegments, setAllSegments] = useState<any[]>([]);
@@ -38,6 +40,15 @@ export default function UnifiedDashboard() {
 
   const { loading: creatingSegments, results, createSegments, setResults } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
+
+  // Handle URL tab parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -257,8 +268,9 @@ export default function UnifiedDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Tabs defaultValue="segments" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-7 mb-8">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="segments">Segments</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="ai">AI</TabsTrigger>
@@ -266,6 +278,10 @@ export default function UnifiedDashboard() {
             <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="more">More</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview">
+            <DashboardOverview />
+          </TabsContent>
 
           <TabsContent value="segments">
             <SegmentDashboard
