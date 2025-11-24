@@ -193,7 +193,7 @@ export default function UnifiedDashboard() {
         if (totalCount >= 50) await checkAchievements(50);
       }
     } catch (error) {
-      console.log('Achievement check error:', error);
+      // Silently handle achievement check errors
     }
 
     setView('results');

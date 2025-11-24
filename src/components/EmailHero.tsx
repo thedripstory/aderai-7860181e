@@ -33,8 +33,9 @@ export const EmailHero = () => {
         <div className="rounded-lg overflow-hidden shadow-lg border border-border">
           <img 
             src={heroImage} 
-            alt="Aderai Segmentation Dashboard for Klaviyo" 
+            alt="Aderai Segmentation Dashboard showing Klaviyo segment management interface" 
             className="w-full h-auto"
+            loading="lazy"
           />
         </div>
       </div>

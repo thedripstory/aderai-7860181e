@@ -194,7 +194,7 @@ export function TwoFactorSetup({ userId, userEmail, onSetupComplete }: TwoFactor
             </p>
             {qrCodeUrl && (
               <div className="flex justify-center mb-4">
-                <img src={qrCodeUrl} alt="QR Code" className="border-2 border-border rounded-lg" />
+                <img src={qrCodeUrl} alt="Two-factor authentication QR code for scanning with authenticator app" className="border-2 border-border rounded-lg" />
               </div>
             )}
             <div className="bg-muted p-4 rounded-lg">

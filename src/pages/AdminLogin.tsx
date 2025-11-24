@@ -70,7 +70,6 @@ const AdminLogin = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        console.log('Admin login attempt');
         
         // Check admin role in database (server-side check only)
         const { data: roleData, error: roleError } = await supabase

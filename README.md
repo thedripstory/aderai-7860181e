@@ -1,73 +1,135 @@
-# Welcome to your Lovable project
+# Aderai - Instant Klaviyo Segmentation Tool
 
-## Project info
+## What is Aderai?
 
-**URL**: https://lovable.dev/projects/c451bf5d-442f-460b-8be6-a48c785bbc31
+Aderai is a **free beta** tool that integrates officially with Klaviyo and provides instant, expert-grade segmentation for e-commerce brands and agencies. It replaces manual, time-consuming segmentation by offering 70+ pre-built segments and AI-powered custom options, deployed to Klaviyo with a single click.
 
-## How can I edit this code?
+## 🎯 Key Features
 
-There are several ways of editing your application.
+### 🚀 Instant Segmentation
+- **70+ Pre-Built Segments**: Industry-standard segments across 7 categories
+- **One-Click Deployment**: Deploy segments directly to your Klaviyo account
+- **Bundle Creation**: Deploy multiple related segments at once
 
-**Use Lovable**
+### 🤖 AI-Powered Suggestions
+- **Custom Segment AI**: Get personalized segment suggestions based on your industry and goals
+- **Smart Recommendations**: AI analyzes your needs and suggests optimal segments
+- **Daily AI Limit**: 10 AI suggestions per day per user during beta
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c451bf5d-442f-460b-8be6-a48c785bbc31) and start prompting.
+### 📊 Analytics & Performance
+- **Segment Analytics**: Track performance of deployed segments
+- **Health Monitoring**: Monitor segment health and identify issues
+- **Campaign Performance**: See which segments drive the most revenue
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🎓 Help & Support
+- **In-App Help Center**: Comprehensive documentation and guides
+- **Interactive Onboarding**: Guided tour for new users
+- **Contextual Help**: Get help exactly where you need it
 
-**Use your preferred IDE**
+### 🎉 Engagement Features
+- **Achievements System**: Earn badges for milestones
+- **Feedback Widget**: Submit bugs, feature requests, and general feedback
+- **Email Notifications**: Stay updated on important events (opt-in)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🔧 Tech Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Frontend**: React 18, TypeScript, Vite
+- **UI Framework**: Tailwind CSS, shadcn/ui
+- **Backend**: Lovable Cloud (Supabase)
+- **Authentication**: Supabase Auth
+- **Database**: PostgreSQL (via Supabase)
+- **Email**: Resend API
+- **AI**: Claude API (for segment suggestions)
+- **State Management**: TanStack Query
+- **Forms**: React Hook Form + Zod
+- **Routing**: React Router v6
 
-Follow these steps:
+## 🚀 Getting Started
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+### Prerequisites
+- Node.js 18+ and npm installed
+- Klaviyo account with API access
+
+### Installation
+
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The project uses Lovable Cloud for backend services. Environment variables are automatically configured:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_PROJECT_ID`
 
-**Use GitHub Codespaces**
+## 📖 How to Use
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. **Sign Up**: Create a free account at Aderai
+2. **Connect Klaviyo**: Add your Klaviyo Private API Key
+3. **Browse Segments**: Explore 70+ pre-built segments across 7 categories
+4. **Deploy**: Click to deploy individual segments or bundles
+5. **Get AI Suggestions**: Use AI to generate custom segments
+6. **Monitor Performance**: Track segment analytics and health
 
-## What technologies are used for this project?
+## 🎯 Free Beta Positioning
 
-This project is built with:
+Aderai is currently in **free beta** to validate product-market fit. All features are free during this phase:
+- ✅ Unlimited segment creation
+- ✅ Full access to 70+ pre-built segments
+- ✅ 10 AI suggestions per day
+- ✅ Analytics and performance tracking
+- ✅ Email notifications
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+We're monitoring user sign-ups and feature adoption to understand how the tool is performing with real users before launching paid plans in the future.
 
-## How can I deploy this project?
+## 🤝 How to Contribute Feedback
 
-Simply open [Lovable](https://lovable.dev/projects/c451bf5d-442f-460b-8be6-a48c785bbc31) and click on Share -> Publish.
+We'd love to hear from you! Use the in-app feedback widget to:
+- 🐛 **Report Bugs**: Help us identify and fix issues
+- 💡 **Request Features**: Tell us what you'd like to see
+- 💬 **General Feedback**: Share your thoughts and suggestions
 
-## Can I connect a custom domain to my Lovable project?
+Or email us directly at: **akshat@aderai.io**
 
-Yes, you can!
+## 📱 Browser Support
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🔒 Security & Privacy
+
+- All API keys are encrypted at rest
+- Secure authentication via Supabase
+- HTTPS-only connections
+- No data shared with third parties
+
+## 📄 License
+
+Proprietary - All rights reserved
+
+## 🌐 Links
+
+- **Website**: [https://aderai.io](https://aderai.io)
+- **Documentation**: In-app Help Center at `/help`
+- **Support**: akshat@aderai.io
+
+## 🙏 Acknowledgments
+
+Built with [Lovable](https://lovable.dev) - The fastest way to build web applications
+
+---
+
+**Note**: This is a free beta product. Features and pricing may change as we transition from beta to production.
