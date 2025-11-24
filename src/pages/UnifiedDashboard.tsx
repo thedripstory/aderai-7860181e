@@ -24,6 +24,7 @@ import { SegmentPerformance } from '@/components/SegmentPerformance';
 import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
 import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
+import { AchievementsPanel } from '@/components/AchievementsPanel';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
@@ -154,6 +155,47 @@ export default function UnifiedDashboard() {
       klaviyoKeys[activeKeyIndex],
       SEGMENTS
     );
+    
+    // Check segment creation achievements
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Get total segment count
+        const { count } = await supabase
+          .from('ai_suggestions')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+
+        // Award achievements based on segment count
+        const checkAchievements = async (criteriaValue: number) => {
+          const { data: achievement } = await supabase
+            .from('achievements')
+            .select('id')
+            .eq('criteria_type', 'segments_created')
+            .eq('criteria_value', criteriaValue)
+            .single();
+
+          if (achievement) {
+            await supabase
+              .from('user_achievements')
+              .insert({
+                user_id: user.id,
+                achievement_id: achievement.id
+              })
+              .select()
+              .single();
+          }
+        };
+
+        const totalCount = (count || 0) + segmentsToCreate.length;
+        if (totalCount >= 1) await checkAchievements(1);
+        if (totalCount >= 25) await checkAchievements(25);
+        if (totalCount >= 50) await checkAchievements(50);
+      }
+    } catch (error) {
+      console.log('Achievement check error:', error);
+    }
+
     setView('results');
   };
 
@@ -322,8 +364,9 @@ export default function UnifiedDashboard() {
           </TabsList>
 
           <TabsContent value="overview">
-            <div data-tour="dashboard-stats">
+            <div data-tour="dashboard-stats" className="space-y-6">
               <DashboardOverview />
+              <AchievementsPanel />
             </div>
           </TabsContent>
 

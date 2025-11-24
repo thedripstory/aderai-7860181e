@@ -213,6 +213,26 @@ const KlaviyoSetup = () => {
         description: "Your Klaviyo integration is ready. Welcome to your dashboard!",
       });
 
+      // Award "First Steps" achievement
+      try {
+        const { data: achievements } = await supabase
+          .from('achievements')
+          .select('id')
+          .eq('criteria_type', 'klaviyo_connected')
+          .single();
+
+        if (achievements) {
+          await supabase
+            .from('user_achievements')
+            .insert({
+              user_id: user.id,
+              achievement_id: achievements.id
+            });
+        }
+      } catch (achievementError) {
+        console.error('Error awarding achievement:', achievementError);
+      }
+
       // Navigate to dashboard
       navigate("/dashboard");
     } catch (error) {

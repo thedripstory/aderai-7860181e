@@ -61,6 +61,32 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       
       // Increment usage counter after successful generation
       await incrementUsage();
+
+      // Award "AI Explorer" achievement
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: achievements } = await supabase
+            .from('achievements')
+            .select('id')
+            .eq('criteria_type', 'ai_used')
+            .single();
+
+          if (achievements) {
+            await supabase
+              .from('user_achievements')
+              .insert({
+                user_id: user.id,
+                achievement_id: achievements.id
+              })
+              .select()
+              .single();
+          }
+        }
+      } catch (achievementError) {
+        // Silently fail - don't disrupt user flow
+        console.log('Achievement already earned or error:', achievementError);
+      }
       
       toast.success('AI suggestions generated successfully!', {
         description: `Created ${response.segments?.length || 0} segment suggestions for you`,

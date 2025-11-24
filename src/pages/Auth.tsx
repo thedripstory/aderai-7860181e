@@ -60,6 +60,26 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             // Don't block signup on email error
           }
 
+          // Award "Beta Pioneer" achievement
+          try {
+            const { data: achievement } = await supabase
+              .from('achievements')
+              .select('id')
+              .eq('criteria_type', 'beta_user')
+              .single();
+
+            if (achievement) {
+              await supabase
+                .from('user_achievements')
+                .insert({
+                  user_id: authData.user.id,
+                  achievement_id: achievement.id
+                });
+            }
+          } catch (achievementError) {
+            console.error('Error awarding beta achievement:', achievementError);
+          }
+
           toast({
             title: "Account created!",
             description: "Welcome to Aderai",

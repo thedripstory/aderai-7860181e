@@ -110,6 +110,30 @@ export const FeedbackWidget: React.FC = () => {
       }
 
       trackAction('feedback_submitted', { type });
+
+      // Award "Feedback Champion" achievement
+      try {
+        const { data: achievements } = await supabase
+          .from('achievements')
+          .select('id')
+          .eq('criteria_type', 'feedback_submitted')
+          .single();
+
+        if (achievements) {
+          await supabase
+            .from('user_achievements')
+            .insert({
+              user_id: user.id,
+              achievement_id: achievements.id
+            })
+            .select()
+            .single();
+        }
+      } catch (achievementError) {
+        // Silently fail - achievement might already be earned
+        console.log('Achievement already earned or error:', achievementError);
+      }
+
       toast.success('Thanks for your feedback!', {
         description: 'We review every submission and will get back to you if needed.',
         duration: 5000,
