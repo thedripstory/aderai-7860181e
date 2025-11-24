@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { 
   Users, Shield, Key, Building2, Mail, AlertCircle, 
-  TrendingUp, LogOut, Search, RefreshCw, UserCog, FileText 
+  TrendingUp, LogOut, Search, RefreshCw, UserCog, FileText, Download
 } from "lucide-react";
 import { AdminBulkActions } from "@/components/AdminBulkActions";
 import { AdminAnalyticsCharts } from "@/components/AdminAnalyticsCharts";
@@ -27,6 +27,13 @@ import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
 import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
 import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
+import { AdminCohortAnalysis } from "@/components/AdminCohortAnalysis";
+import { AdminSegmentAnalytics } from "@/components/AdminSegmentAnalytics";
+import { AdminUserHealth } from "@/components/AdminUserHealth";
+import { AdminAdvancedFeatureUsage } from "@/components/AdminAdvancedFeatureUsage";
+import { AdminSystemHealthMetrics } from "@/components/AdminSystemHealthMetrics";
+import { exportUsersToCSV, exportFeedbackToCSV } from "@/lib/csvExport";
+import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 
 const AdminDashboard = () => {
@@ -39,6 +46,7 @@ const AdminDashboard = () => {
   const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [filters, setFilters] = useState<any>({});
+  const [dateRange, setDateRange] = useState<DateRange>("30d");
 
   // Data states
   const [users, setUsers] = useState<any[]>([]);
@@ -338,24 +346,29 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-12 w-full mb-8">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-14 w-full mb-8 gap-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="journey">User Journey</TabsTrigger>
-            <TabsTrigger value="health">System Health</TabsTrigger>
+            <TabsTrigger value="cohorts">Cohorts</TabsTrigger>
+            <TabsTrigger value="segments">Segments</TabsTrigger>
+            <TabsTrigger value="userhealth">User Health</TabsTrigger>
+            <TabsTrigger value="features">Features</TabsTrigger>
+            <TabsTrigger value="systemhealth">System</TabsTrigger>
+            <TabsTrigger value="journey">Journey</TabsTrigger>
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="api">API Monitor</TabsTrigger>
+            <TabsTrigger value="api">API</TabsTrigger>
             <TabsTrigger value="errors">Errors</TabsTrigger>
-            <TabsTrigger value="usage">Usage Stats</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
             <TabsTrigger value="audit">Audit</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            <div className="flex justify-end">
+              <AdminDateRangeFilter value={dateRange} onChange={setDateRange} />
+            </div>
+            
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -424,6 +437,31 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
 
+          {/* Cohort Analysis Tab */}
+          <TabsContent value="cohorts">
+            <AdminCohortAnalysis />
+          </TabsContent>
+
+          {/* Segment Analytics Tab */}
+          <TabsContent value="segments">
+            <AdminSegmentAnalytics />
+          </TabsContent>
+
+          {/* User Health Tab */}
+          <TabsContent value="userhealth">
+            <AdminUserHealth />
+          </TabsContent>
+
+          {/* Feature Usage Tab */}
+          <TabsContent value="features">
+            <AdminAdvancedFeatureUsage />
+          </TabsContent>
+
+          {/* System Health Metrics Tab */}
+          <TabsContent value="systemhealth">
+            <AdminSystemHealthMetrics />
+          </TabsContent>
+
           {/* User Journey Tab */}
           <TabsContent value="journey">
             <AdminUserJourneyAnalytics />
@@ -449,21 +487,14 @@ const AdminDashboard = () => {
             <AdminErrorTracking />
           </TabsContent>
 
-          {/* Usage Tracking Tab */}
-          <TabsContent value="usage" className="space-y-6">
-            <AdminUsageTracking />
-            <AdminFeatureUsage />
-          </TabsContent>
+          {/* Usage Tracking Tab - removed, merged into Features tab */}
 
           {/* Email Monitoring Tab */}
           <TabsContent value="emails">
             <AdminEmailMonitoring />
           </TabsContent>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <AdminAnalyticsCharts />
-          </TabsContent>
+          {/* Analytics Tab - removed, split into dedicated tabs */}
 
           {/* Users Tab */}
           <TabsContent value="users">
@@ -486,6 +517,14 @@ const AdminDashboard = () => {
                       <CardDescription>Manage user accounts and permissions</CardDescription>
                     </div>
                     <div className="flex gap-2">
+                      <Button 
+                        onClick={() => exportUsersToCSV(filteredUsers)} 
+                        variant="outline" 
+                        size="sm"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Export CSV
+                      </Button>
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
