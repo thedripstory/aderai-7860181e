@@ -121,11 +121,6 @@ export default function LandingPage() {
                 Official Klaviyo Partner
               </span>
             </div>
-            
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 mb-6">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="text-sm font-semibold text-emerald-600">Free Forever</span>
-            </div>
 
             <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
               70 Klaviyo Segments<br />
