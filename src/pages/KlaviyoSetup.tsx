@@ -185,6 +185,29 @@ const KlaviyoSetup = () => {
         console.error("Error updating user:", updateError);
       }
 
+      // Send Klaviyo connected confirmation email
+      try {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('account_name')
+          .eq('id', user.id)
+          .single();
+
+        await supabase.functions.invoke('send-email', {
+          body: {
+            to: user.email,
+            template_name: 'klaviyo_connected',
+            template_data: {
+              accountName: userData?.account_name || clientName || 'there',
+            },
+            userId: user.id,
+          },
+        });
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        // Don't block flow on email error
+      }
+
       toast({
         title: "Success!",
         description: "Your Klaviyo integration is ready. Welcome to your dashboard!",

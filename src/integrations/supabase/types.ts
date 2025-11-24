@@ -187,6 +187,8 @@ export type Database = {
           email_type: string
           error_message: string | null
           id: string
+          metadata: Json | null
+          opened_at: string | null
           recipient_email: string
           sent_at: string | null
           status: string | null
@@ -197,6 +199,8 @@ export type Database = {
           email_type: string
           error_message?: string | null
           id?: string
+          metadata?: Json | null
+          opened_at?: string | null
           recipient_email: string
           sent_at?: string | null
           status?: string | null
@@ -207,6 +211,8 @@ export type Database = {
           email_type?: string
           error_message?: string | null
           id?: string
+          metadata?: Json | null
+          opened_at?: string | null
           recipient_email?: string
           sent_at?: string | null
           status?: string | null
@@ -347,6 +353,7 @@ export type Database = {
           email_on_password_reset: boolean | null
           email_on_segment_creation: boolean | null
           email_on_settings_updated: boolean | null
+          email_product_updates: boolean | null
           email_weekly_summary: boolean | null
           id: string
           updated_at: string | null
@@ -362,6 +369,7 @@ export type Database = {
           email_on_password_reset?: boolean | null
           email_on_segment_creation?: boolean | null
           email_on_settings_updated?: boolean | null
+          email_product_updates?: boolean | null
           email_weekly_summary?: boolean | null
           id?: string
           updated_at?: string | null
@@ -377,6 +385,7 @@ export type Database = {
           email_on_password_reset?: boolean | null
           email_on_segment_creation?: boolean | null
           email_on_settings_updated?: boolean | null
+          email_product_updates?: boolean | null
           email_weekly_summary?: boolean | null
           id?: string
           updated_at?: string | null

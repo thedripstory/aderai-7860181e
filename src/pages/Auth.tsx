@@ -42,6 +42,24 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
         if (signUpError) throw signUpError;
 
         if (authData.user) {
+          // Send welcome email
+          try {
+            await supabase.functions.invoke('send-email', {
+              body: {
+                to: email,
+                template_name: 'welcome',
+                template_data: {
+                  userName: accountName || email.split('@')[0],
+                  accountName: accountName || email.split('@')[0],
+                },
+                userId: authData.user.id,
+              },
+            });
+          } catch (emailError) {
+            console.error('Error sending welcome email:', emailError);
+            // Don't block signup on email error
+          }
+
           toast({
             title: "Account created!",
             description: "Welcome to Aderai",
