@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, User, Lock, AlertCircle, CheckCircle, ArrowLeft, LogOut, Bell, Shield, CreditCard } from "lucide-react";
+import { Settings as SettingsIcon, User, Lock, AlertCircle, ArrowLeft, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { TwoFactorSetup, TwoFactorDisable } from "@/components/TwoFactorSetup";
-import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -17,7 +16,7 @@ const CURRENCIES = [
 ];
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications" | "2fa">("account");
+  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications">("account");
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeKey, setActiveKey] = useState<any>(null);
@@ -320,7 +319,7 @@ export default function Settings() {
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate("/app")}
+              onClick={() => navigate("/dashboard")}
               className="p-2 rounded-lg border-2 border-border hover:bg-muted transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -412,22 +411,6 @@ export default function Settings() {
                     className="w-full px-4 py-3 rounded-lg border-2 border-input bg-muted text-muted-foreground cursor-not-allowed"
                   />
                   <p className="text-xs text-muted-foreground mt-1">Contact support to change your email</p>
-                </div>
-
-                <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <CreditCard className="w-4 h-4" />
-                    Subscription & Billing
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Manage your subscription plan, view billing history, and update payment methods.
-                  </p>
-                  <button
-                    onClick={() => navigate('/subscription-management')}
-                    className="w-full bg-background hover:bg-accent px-4 py-2 rounded-lg font-medium transition-colors border border-border"
-                  >
-                    Manage Subscription
-                  </button>
                 </div>
 
                 <button
@@ -721,7 +704,7 @@ export default function Settings() {
                 <div className="pt-6 border-t-2 border-border">
                   <div className="bg-blue-500/10 border-2 border-blue-500/20 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
                         <h4 className="font-medium mb-1">Email Delivery</h4>
                         <p className="text-sm text-muted-foreground">
@@ -731,78 +714,6 @@ export default function Settings() {
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeTab === "2fa" && (
-              <div className="space-y-6 max-w-2xl">
-                {!showTwoFactorSetup && !showTwoFactorDisable && (
-                  <div>
-                    {twoFactorEnabled ? (
-                      <div className="space-y-6">
-                        <div className="bg-green-500/10 border-2 border-green-500/20 rounded-lg p-6">
-                          <div className="flex items-start gap-4">
-                            <Shield className="w-6 h-6 text-green-500 mt-1" />
-                            <div className="flex-1">
-                              <h3 className="text-lg font-semibold mb-2">2FA is Enabled</h3>
-                              <p className="text-sm text-muted-foreground">
-                                Your account is protected with two-factor authentication
-                              </p>
-                            </div>
-                            <CheckCircle className="w-6 h-6 text-green-500" />
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setShowTwoFactorDisable(true)}
-                          className="w-full px-6 py-3 rounded-lg border-2 border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors font-medium"
-                        >
-                          Disable 2FA
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-6">
-                        <div className="bg-yellow-500/10 border-2 border-yellow-500/20 rounded-lg p-6">
-                          <div className="flex items-start gap-4">
-                            <AlertCircle className="w-6 h-6 text-yellow-500 mt-1" />
-                            <div className="flex-1">
-                              <h3 className="text-lg font-semibold mb-2">2FA is Disabled</h3>
-                              <p className="text-sm text-muted-foreground">
-                                Add an extra layer of security to your account
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setShowTwoFactorSetup(true)}
-                          className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                        >
-                          Enable 2FA
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {showTwoFactorSetup && (
-                  <TwoFactorSetup
-                    userId={currentUser?.id}
-                    userEmail={email}
-                    onSetupComplete={() => {
-                      setShowTwoFactorSetup(false);
-                      setTwoFactorEnabled(true);
-                    }}
-                  />
-                )}
-
-                {showTwoFactorDisable && (
-                  <TwoFactorDisable
-                    userId={currentUser?.id}
-                    onDisabled={() => {
-                      setShowTwoFactorDisable(false);
-                      setTwoFactorEnabled(false);
-                    }}
-                  />
-                )}
               </div>
             )}
           </div>
