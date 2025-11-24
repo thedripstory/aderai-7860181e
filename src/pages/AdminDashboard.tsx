@@ -347,6 +347,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="errors">Errors</TabsTrigger>
             <TabsTrigger value="usage">Usage Stats</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>

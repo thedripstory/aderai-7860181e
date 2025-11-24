@@ -8,3 +8,12 @@ verify_jwt = true
 
 [functions.reset-daily-limits]
 verify_jwt = false
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.send-weekly-digest]
+verify_jwt = false
+
+[functions.send-milestone-email]
+verify_jwt = false
