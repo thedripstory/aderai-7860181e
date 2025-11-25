@@ -68,6 +68,8 @@ const KlaviyoSetup = () => {
       GBP: "£",
       CAD: "C$",
       AUD: "A$",
+      JPY: "¥",
+      INR: "₹",
     };
     setCurrencySymbol(symbols[value] || "$");
   };
@@ -372,6 +374,8 @@ const KlaviyoSetup = () => {
                           <SelectItem value="GBP">GBP (£)</SelectItem>
                           <SelectItem value="CAD">CAD (C$)</SelectItem>
                           <SelectItem value="AUD">AUD (A$)</SelectItem>
+                          <SelectItem value="JPY">JPY (¥)</SelectItem>
+                          <SelectItem value="INR">INR (₹)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
