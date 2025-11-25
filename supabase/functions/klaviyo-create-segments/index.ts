@@ -20,6 +20,10 @@ const METRIC_MAPPING: Record<string, string> = {
   'Left Review': 'left_review',
 };
 
+// Aderai branding suffix and tag
+const ADERAI_SUFFIX = ' | Aderai';
+const ADERAI_TAG = 'Aderai';
+
 function findMetricId(segmentId: string, metricMap: Map<string, string>): string | null {
   const metricName = METRIC_MAPPING[segmentId];
   if (!metricName) return null;
@@ -447,151 +451,132 @@ function getSegmentDefinition(
           conditions: [
             { type: 'metric', metric_id: viewedProductId, operator: 'has-performed', time_period: 'within_last', time_value: 7, time_unit: 'days' },
             { type: 'metric', metric_id: addedToCartId, operator: 'has-not-performed', time_period: 'within_last', time_value: 7, time_unit: 'days' },
-            { type: 'metric', metric_id: placedOrderId, operator: 'has-not-performed', time_period: 'within_last', time_value: 7, time_unit: 'days' },
           ],
         }],
       },
     },
-    'category-interest': {
-      name: 'Category Interest (Customizable)',
+    'multi-purchasers-90': {
+      name: 'Multi-Purchasers (90 Days)',
+      definition: {
+        type: 'all',
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'greater-or-equal', count: 2, time_period: 'within_last', time_value: 90, time_unit: 'days' }] }],
+      },
+    },
+    'high-frequency-buyers': {
+      name: 'High Frequency Buyers',
+      definition: {
+        type: 'all',
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'greater-or-equal', count: 3, time_period: 'within_last', time_value: 180, time_unit: 'days' }] }],
+      },
+    },
+    'first-purchase-high-value': {
+      name: 'First Purchase - High Value ($200+)',
       definition: {
         type: 'all',
         groups: [{
           type: 'all',
           conditions: [
-            { type: 'metric', metric_id: viewedProductId, operator: 'greater-or-equal', count: 2, time_period: 'all_time' },
-            { type: 'metric', metric_id: placedOrderId, operator: 'has-not-performed', time_period: 'all_time' },
+            { type: 'metric', metric_id: placedOrderId, operator: 'equals', count: 1, time_period: 'all_time' },
+            { type: 'metric_property', metric_id: placedOrderId, operator: 'greater-or-equal', property: 'value', value: 200, time_period: 'all_time' },
           ],
         }],
       },
     },
-    'product-interest': {
-      name: 'Product-Specific Interest (Customizable)',
+    'product-viewers-30': {
+      name: 'Product Viewers (Last 30 Days)',
       definition: {
         type: 'all',
-        groups: [{
-          type: 'all',
-          conditions: [
-            { type: 'metric', metric_id: viewedProductId, operator: 'greater-or-equal', count: 2, time_period: 'all_time' },
-            { type: 'metric', metric_id: placedOrderId, operator: 'has-not-performed', time_period: 'all_time' },
-          ],
-        }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: viewedProductId, operator: 'has-performed', time_period: 'within_last', time_value: 30, time_unit: 'days' }] }],
       },
     },
-    'cross-sell': {
-      name: 'Cross-Sell Opportunity (Customizable)',
+    'cart-adders-30': {
+      name: 'Cart Adders (Last 30 Days)',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'has-performed', time_period: 'all_time' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: addedToCartId, operator: 'has-performed', time_period: 'within_last', time_value: 30, time_unit: 'days' }] }],
       },
     },
-    'category-buyers': {
-      name: 'Category Buyers (Customizable)',
+    'checkout-starters-7': {
+      name: 'Checkout Starters (Last 7 Days)',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'has-performed', time_period: 'all_time' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: startedCheckoutId, operator: 'has-performed', time_period: 'within_last', time_value: 7, time_unit: 'days' }] }],
       },
     },
-    'multi-category': {
-      name: 'Multi-Category Shoppers',
+    'refund-requesters': {
+      name: 'Refund Requesters',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'greater-or-equal', count: 2, time_period: 'all_time' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: refundedOrderId, operator: 'has-performed', time_period: 'within_last', time_value: 90, time_unit: 'days' }] }],
       },
     },
-    'frequent-visitors': {
-      name: 'Frequent Site Visitors',
+    'review-leavers': {
+      name: 'Review Leavers',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: activeOnSiteId, operator: 'greater-or-equal', count: 10, time_period: 'within_last', time_value: 30, time_unit: 'days' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: leftReviewId, operator: 'has-performed', time_period: 'all_time' }] }],
       },
     },
-    'coupon-users': {
-      name: 'Coupon Users',
+    'repeat-refunders': {
+      name: 'Repeat Refunders',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'property', property: 'used_coupon', operator: 'equals', value: true }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: refundedOrderId, operator: 'greater-or-equal', count: 2, time_period: 'all_time' }] }],
       },
     },
-    'full-price-buyers': {
-      name: 'Full-Price Buyers',
+    'seasonal-buyers': {
+      name: 'Seasonal Buyers (Q4)',
       definition: {
         type: 'all',
-        groups: [{
-          type: 'all',
-          conditions: [
-            { type: 'metric', metric_id: placedOrderId, operator: 'has-performed', time_period: 'all_time' },
-            { type: 'property', property: 'used_coupon', operator: 'is-not-set' },
-          ],
-        }],
-      },
-    },
-    'product-reviewers': {
-      name: 'Product Reviewers',
-      definition: {
-        type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: leftReviewId, operator: 'greater-or-equal', count: 1, time_period: 'all_time' }] }],
-      },
-    },
-    'non-reviewers': {
-      name: 'Non-Reviewers',
-      definition: {
-        type: 'all',
-        groups: [{
-          type: 'all',
-          conditions: [
-            { type: 'metric', metric_id: placedOrderId, operator: 'has-performed', time_period: 'all_time' },
-            { type: 'metric', metric_id: leftReviewId, operator: 'has-not-performed', time_period: 'all_time' },
-          ],
-        }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'has-performed', time_period: 'within_last', time_value: 365, time_unit: 'days' }] }],
       },
     },
 
     // EXCLUSION SEGMENTS (12)
-    'unsubscribed': {
-      name: 'Unsubscribed Contacts',
+    'do-not-email': {
+      name: 'Do Not Email',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'property', property: '$consent', operator: 'equals', value: 'unsubscribed' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'property', property: 'consent', operator: 'equals', value: 'never_subscribed' }] }],
       },
     },
     'bounced-emails': {
-      name: 'Bounced Email Addresses',
+      name: 'Bounced Emails',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'property', property: '$email_suppression', operator: 'is-set' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'property', property: 'bounced', operator: 'equals', value: true }] }],
       },
     },
-    'not-opted-in': {
-      name: 'Not Opted-In Profiles',
+    'unsubscribed': {
+      name: 'Unsubscribed',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'property', property: '$consent', operator: 'not-equals', value: 'subscribed' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'property', property: 'consent', operator: 'equals', value: 'unsubscribed' }] }],
       },
     },
     'recent-purchasers-exclude': {
-      name: 'Recent Purchasers (Exclusion - 14 Days)',
+      name: 'Recent Purchasers (Exclude)',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'has-performed', time_period: 'within_last', time_value: 14, time_unit: 'days' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'has-performed', time_period: 'within_last', time_value: 7, time_unit: 'days' }] }],
       },
     },
-    'refunded-customers': {
-      name: 'Refunded Customers',
+    'recent-email-recipients': {
+      name: 'Recent Email Recipients (3 Days)',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: refundedOrderId, operator: 'has-performed', time_period: 'within_last', time_value: 30, time_unit: 'days' }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: receivedEmailId, operator: 'has-performed', time_period: 'within_last', time_value: 3, time_unit: 'days' }] }],
       },
     },
-    'negative-feedback': {
-      name: 'Negative Feedback',
+    'vip-exclude': {
+      name: 'VIP Customers (Exclude)',
       definition: {
         type: 'all',
-        groups: [{ type: 'all', conditions: [{ type: 'property', property: 'review_rating', operator: 'less-or-equal', value: 2 }] }],
+        groups: [{ type: 'all', conditions: [{ type: 'metric', metric_id: placedOrderId, operator: 'greater-or-equal', count: 5, time_period: 'all_time' }] }],
       },
     },
-    'unengaged-exclusion': {
-      name: 'Unengaged Subscribers (Exclusion)',
+    'inactive-180': {
+      name: 'Inactive 180+ Days',
       definition: {
         type: 'all',
         groups: [{
@@ -675,6 +660,9 @@ async function createKlaviyoSegment(
     return { error: 'Required metrics not available in your Klaviyo account', status: 'missing_metrics', segmentId };
   }
 
+  // Add Aderai suffix and tag to the segment name
+  const segmentNameWithBranding = definition.name + ADERAI_SUFFIX;
+
   try {
     const response = await fetch('https://a.klaviyo.com/api/segments/', {
       method: 'POST',
@@ -683,12 +671,21 @@ async function createKlaviyoSegment(
         'revision': '2024-10-15',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: { type: 'segment', attributes: definition } }),
+      body: JSON.stringify({ 
+        data: { 
+          type: 'segment', 
+          attributes: {
+            ...definition,
+            name: segmentNameWithBranding,
+            tags: [ADERAI_TAG],
+          } 
+        } 
+      }),
     });
 
     if (!response.ok) {
       if (response.status === 409) {
-        return { status: 'exists', name: definition.name, segmentId };
+        return { status: 'exists', name: segmentNameWithBranding, segmentId };
       }
       const errorText = await response.text();
       console.error(`Klaviyo API error for ${segmentId}:`, errorText);
@@ -696,8 +693,8 @@ async function createKlaviyoSegment(
     }
 
     const data = await response.json();
-    console.log(`Successfully created segment: ${definition.name}`);
-    return { status: 'created', name: definition.name, data, segmentId };
+    console.log(`Successfully created segment: ${segmentNameWithBranding}`);
+    return { status: 'created', name: segmentNameWithBranding, data, segmentId, klaviyoId: data.data?.id };
   } catch (error) {
     console.error(`Error creating segment ${segmentId}:`, error);
     return { error: error instanceof Error ? error.message : 'Unknown error', status: 'error', segmentId };
@@ -710,7 +707,7 @@ serve(async (req) => {
   }
 
   try {
-    let { apiKey, segmentIds, currencySymbol, settings } = await req.json();
+    let { apiKey, segmentIds, currencySymbol, settings, userId, klaviyoKeyId } = await req.json();
 
     if (apiKey && isEncrypted(apiKey)) {
       console.log('Decrypting API key...');
@@ -724,7 +721,7 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Creating ${segmentIds.length} segments in Klaviyo...`);
+    console.log(`Creating ${segmentIds.length} segments in Klaviyo with Aderai branding...`);
 
     const metricsResponse = await fetch('https://a.klaviyo.com/api/metrics/', {
       headers: { 'Authorization': `Klaviyo-API-Key ${apiKey}`, 'revision': '2024-10-15' },
