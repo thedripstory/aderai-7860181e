@@ -35,6 +35,12 @@ export const useKlaviyoSegments = () => {
     segmentsList: any[],
     jobId?: string
   ) => {
+    console.log('[useKlaviyoSegments] createSegments called with:', {
+      selectedSegmentsCount: selectedSegments.length,
+      selectedSegments: selectedSegments,
+      activeKeyId: activeKey.id,
+    });
+
     if (selectedSegments.length === 0) {
       throw new Error('Please select at least one segment to create');
     }
@@ -44,23 +50,28 @@ export const useKlaviyoSegments = () => {
     setProgress({ current: 0, total: selectedSegments.length });
 
     try {
-      const currencySymbol = activeKey.currency_symbol;
+      const currencySymbol = activeKey.currency_symbol || '$';
       
       const settings = {
-        highValue: activeKey.vip_threshold,
-        mediumValue: activeKey.high_value_threshold,
-        lowValue: activeKey.aov,
-        atRiskDays: activeKey.lapsed_days,
-        lostDays: activeKey.churned_days,
-        recentDays: activeKey.new_customer_days,
+        highValue: activeKey.vip_threshold || 1000,
+        mediumValue: activeKey.high_value_threshold || 500,
+        lowValue: activeKey.aov || 100,
+        atRiskDays: activeKey.lapsed_days || 180,
+        lostDays: activeKey.churned_days || 365,
+        recentDays: activeKey.new_customer_days || 30,
         activeDays: 90,
-        vipThreshold: activeKey.vip_threshold,
-        highValueThreshold: activeKey.high_value_threshold,
-        aov: activeKey.aov,
+        vipThreshold: activeKey.vip_threshold || 1000,
+        highValueThreshold: activeKey.high_value_threshold || 500,
+        aov: activeKey.aov || 100,
       };
 
       // Pass segment IDs directly - they match the backend definitions
-      const segmentIds = selectedSegments;
+      const segmentIds = [...selectedSegments]; // Create a copy to ensure it's a fresh array
+      
+      console.log('[useKlaviyoSegments] Sending to edge function:', {
+        segmentIdsCount: segmentIds.length,
+        segmentIds: segmentIds,
+      });
 
       // Save progress if jobId provided
       if (jobId) {
@@ -76,75 +87,90 @@ export const useKlaviyoSegments = () => {
 
       console.log('Creating segments:', segmentIds);
 
+      const requestBody = {
+        apiKey: activeKey.klaviyo_api_key_hash,
+        segmentIds: segmentIds,
+        currencySymbol,
+        settings,
+      };
+      
+      console.log('[useKlaviyoSegments] Request body:', JSON.stringify(requestBody, null, 2));
+
       const { data: response, error } = await supabase.functions.invoke('klaviyo-create-segments', {
-        body: {
-          apiKey: activeKey.klaviyo_api_key_hash,
-          segmentIds: segmentIds,
-          currencySymbol,
-          settings,
-        },
+        body: requestBody,
       });
 
+      console.log('[useKlaviyoSegments] Edge function response:', { response, error });
+
       if (error) {
-        console.error('Supabase function error:', error);
+        console.error('[useKlaviyoSegments] Supabase function error:', error);
         throw error;
       }
 
-      if (!response || !response.results) {
-        console.error('Invalid response from edge function:', response);
-        throw new Error('Invalid response from segment creation service');
+      if (!response) {
+        console.error('[useKlaviyoSegments] No response from edge function');
+        throw new Error('No response from segment creation service');
       }
 
-      console.log('Segment creation response:', response);
+      // Handle case where response doesn't have results array
+      const resultsArray = response.results || [];
+      console.log('[useKlaviyoSegments] Results array:', resultsArray);
 
       // Create a map of results by segmentId for reliable lookup
       const resultsMap = new Map<string, any>();
-      response.results.forEach((result: any) => {
+      resultsArray.forEach((result: any) => {
         if (result && result.segmentId) {
           resultsMap.set(result.segmentId, result);
         }
       });
 
+      console.log('[useKlaviyoSegments] Results map keys:', Array.from(resultsMap.keys()));
+
       const newResults: SegmentResult[] = selectedSegments.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
+        const segmentName = segment?.name || segmentId;
         const result = resultsMap.get(segmentId);
+
+        console.log(`[useKlaviyoSegments] Processing segment ${segmentId}:`, { result, segmentName });
 
         if (!result) {
           return {
             segmentId,
-            status: "error",
-            message: `Failed to create "${segment?.name || segmentId}": No response from server`,
+            status: "error" as const,
+            message: `Failed to create "${segmentName}": No response from server`,
           };
         }
 
-        if (result.status === 'created') {
+        const resultStatus = result.status;
+
+        if (resultStatus === 'created') {
           // Log the operation for audit trail
-          logSegmentOperation(segmentId, segment?.name, 'create', 'success', activeKey.id, result.klaviyoId);
+          logSegmentOperation(segmentId, segmentName, 'create', 'success', activeKey.id, result.klaviyoId);
           return {
             segmentId,
-            status: "success",
-            message: `Successfully created "${segment?.name || segmentId}"`,
+            status: "success" as const,
+            message: `Successfully created "${segmentName}"`,
             klaviyoId: result.data?.data?.id || result.klaviyoId,
           };
-        } else if (result.status === 'exists') {
+        } else if (resultStatus === 'exists') {
           return {
             segmentId,
-            status: "skipped",
-            message: `"${segment?.name || segmentId}" already exists`,
+            status: "skipped" as const,
+            message: `"${segmentName}" already exists`,
           };
-        } else if (result.status === 'missing_metrics') {
+        } else if (resultStatus === 'missing_metrics') {
           return {
             segmentId,
-            status: "error",
-            message: `Cannot create "${segment?.name || segmentId}": Required metrics not available in your Klaviyo account`,
+            status: "error" as const,
+            message: `Cannot create "${segmentName}": Required metrics not available in your Klaviyo account`,
           };
         } else {
           // Log failed operations
-          logSegmentOperation(segmentId, segment?.name, 'create', 'failed', activeKey.id, undefined, result.error);
+          logSegmentOperation(segmentId, segmentName, 'create', 'failed', activeKey.id, undefined, result.error);
           return {
             segmentId,
-            status: "error",
-            message: `Failed to create "${segment?.name || segmentId}": ${result.error || 'Unknown error'}`,
+            status: "error" as const,
+            message: `Failed to create "${segmentName}": ${result.error || 'Unknown error'}`,
           };
         }
       });
