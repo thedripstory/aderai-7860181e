@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.klaviyo-webhook-handler]
 verify_jwt = false
+
+[functions.check-orphan-users]
+verify_jwt = false

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -8,25 +9,72 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+
+      // Check if user has profile
+      if (session?.user) {
+        const { data: profile, error } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error checking user profile:', error);
+          setHasProfile(false);
+          
+          // Log orphan user detection
+          await supabase.from('analytics_events').insert({
+            user_id: session.user.id,
+            event_name: 'orphan_user_detected',
+            event_metadata: {
+              email: session.user.email,
+              detected_at: new Date().toISOString(),
+            }
+          });
+
+          toast.error('Profile not found. Please contact support at akshat@aderai.io', {
+            duration: 10000,
+          });
+        } else {
+          setHasProfile(!!profile);
+        }
+      }
     };
 
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
+      
+      // Reset profile check on auth state change
+      if (session?.user) {
+        setTimeout(() => {
+          supabase
+            .from('users')
+            .select('id')
+            .eq('id', session.user.id)
+            .maybeSingle()
+            .then(({ data: profile }) => {
+              setHasProfile(!!profile);
+            });
+        }, 0);
+      } else {
+        setHasProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Still checking auth
-  if (isAuthenticated === null) {
+  // Still checking auth or profile
+  if (isAuthenticated === null || (isAuthenticated && hasProfile === null)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         <div className="relative w-8 h-8">
@@ -51,6 +99,29 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Authenticated, render children
+  // Authenticated but no profile (orphan user)
+  if (!hasProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <div className="max-w-md mx-auto p-6 bg-card rounded-lg border border-border shadow-lg">
+          <h2 className="text-xl font-bold text-destructive mb-4">Profile Not Found</h2>
+          <p className="text-muted-foreground mb-4">
+            Your user profile could not be found. This is a rare issue that our team has been notified about.
+          </p>
+          <p className="text-sm text-muted-foreground mb-6">
+            Please contact support at <strong>akshat@aderai.io</strong> to resolve this issue.
+          </p>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated with profile, render children
   return <>{children}</>;
 }
