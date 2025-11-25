@@ -552,6 +552,60 @@ function getSegmentDefinition(
       }
     } : null,
 
+    'abandoned-cart': (addedToCartId && placedOrderId) ? {
+      name: `Abandoned Cart${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(addedToCartId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
+    'abandoned-checkout': (startedCheckoutId && placedOrderId) ? {
+      name: `Abandoned Checkout${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(startedCheckoutId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
+    'browse-abandonment': (viewedProductId && addedToCartId) ? {
+      name: `Browse Abandonment${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(viewedProductId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(addedToCartId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
     // =====================================
     // EXCLUSION SEGMENTS
     // =====================================
