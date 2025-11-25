@@ -19,7 +19,7 @@ const KlaviyoSetup = lazy(() => import("./pages/KlaviyoSetup"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const UnifiedDashboard = lazy(() => import("./pages/UnifiedDashboard"));
-const AdminPortal = lazy(() => import("./pages/AdminPortal"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const FeatureShowcase = lazy(() => import("./pages/FeatureShowcase"));
 const SegmentHealthDashboard = lazy(() => import("./pages/SegmentHealthDashboard"));
@@ -72,7 +72,7 @@ const App = () => (
                 <Route path="/segment-health" element={<ProtectedRoute><SegmentHealthDashboard /></ProtectedRoute>} />
                 <Route path="/ai-features" element={<ProtectedRoute><AIFeaturesDashboard /></ProtectedRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
-                <Route path="/admin" element={<AdminProtectedRoute><AdminPortal /></AdminProtectedRoute>} />
+                <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
                 <Route path="/help" element={<HelpCenter />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
