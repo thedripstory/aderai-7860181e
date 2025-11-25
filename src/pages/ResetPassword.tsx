@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Lock } from "lucide-react";
+import { Lock, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -80,61 +80,98 @@ export default function ResetPassword() {
 
   if (!validSession) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="relative w-8 h-8">
           <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
           <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
+      </div>
+
       <div className="w-full max-w-md">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="w-6 h-6 text-primary" />
-              Create New Password
-            </CardTitle>
-            <CardDescription>
-              Enter your new password below
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleResetPassword} className="space-y-4">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <a href="/" className="inline-block group">
+            <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
+              aderai<span className="text-accent group-hover:animate-pulse">.</span>
+            </div>
+          </a>
+        </div>
+
+        <Card className="border-border/50 shadow-2xl bg-card/80 backdrop-blur-sm">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                <Lock className="w-5 h-5 text-primary" />
+              </div>
               <div>
+                <CardTitle className="text-xl">Create New Password</CardTitle>
+                <CardDescription className="text-sm">
+                  Enter your new password below
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div className="space-y-2">
                 <Label htmlFor="password">New Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={8}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pl-10 h-12"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
                   Must be at least 8 characters
                 </p>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={8}
-                />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pl-10 h-12"
+                    required
+                    minLength={8}
+                  />
+                </div>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Updating..." : "Update Password"}
+              <Button type="submit" disabled={loading} className="w-full h-12 font-semibold">
+                {loading ? (
+                  <div className="relative w-5 h-5">
+                    <div className="absolute inset-0 border-2 border-transparent border-t-primary-foreground border-r-primary-foreground rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  "Update Password"
+                )}
               </Button>
             </form>
           </CardContent>

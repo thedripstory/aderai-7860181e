@@ -38,7 +38,13 @@ export default function Onboarding() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="fixed inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        </div>
+
         <div className="relative w-8 h-8">
           <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
           <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
@@ -54,5 +60,29 @@ export default function Onboarding() {
     return null;
   }
 
-  return <OnboardingFlow userId={userId} />;
+  return (
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Header with Logo */}
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <a href="/" className="group flex items-center gap-3">
+              <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
+                aderai<span className="text-accent group-hover:animate-pulse">.</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
+      </div>
+
+      <OnboardingFlow userId={userId} />
+    </div>
+  );
 }
