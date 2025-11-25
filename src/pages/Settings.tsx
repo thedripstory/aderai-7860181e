@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, User, Lock, AlertCircle, ArrowLeft, LogOut } from "lucide-react";
+import { Settings as SettingsIcon, User, Lock, AlertCircle, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { TwoFactorSetup, TwoFactorDisable } from "@/components/TwoFactorSetup";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -310,422 +324,336 @@ export default function Settings() {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <div className="max-w-5xl mx-auto p-6">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="p-2 rounded-lg border-2 border-border hover:bg-muted transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+    <div className="min-h-screen bg-background">
+      <DashboardHeader showSettings={false} />
+      
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      <main className="max-w-5xl mx-auto px-4 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+              <SettingsIcon className="w-6 h-6 text-primary" />
+            </div>
             <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <SettingsIcon className="w-8 h-8 text-primary" />
-                Settings
-              </h1>
+              <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
               <p className="text-muted-foreground">Manage your account and preferences</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </button>
         </div>
 
-        <div className="bg-card rounded-lg border-2 border-border shadow-lg overflow-hidden">
-          <div className="flex border-b-2 border-border">
-            <button
-              onClick={() => setActiveTab("account")}
-              className={`flex-1 px-6 py-4 font-medium transition-colors ${
-                activeTab === "account"
-                  ? "bg-primary/10 text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <User className="w-5 h-5 inline mr-2" />
-              Account
-            </button>
-            <button
-              onClick={() => setActiveTab("thresholds")}
-              className={`flex-1 px-6 py-4 font-medium transition-colors ${
-                activeTab === "thresholds"
-                  ? "bg-primary/10 text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <SettingsIcon className="w-5 h-5 inline mr-2" />
-              Thresholds
-            </button>
-            <button
-              onClick={() => setActiveTab("security")}
-              className={`flex-1 px-6 py-4 font-medium transition-colors ${
-                activeTab === "security"
-                  ? "bg-primary/10 text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <Lock className="w-5 h-5 inline mr-2" />
-              Security
-            </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`flex-1 px-6 py-4 font-medium transition-colors ${
-                activeTab === "notifications"
-                  ? "bg-primary/10 text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <AlertCircle className="w-5 h-5 inline mr-2" />
-              Notifications
-            </button>
-          </div>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
+          <TabsList className="grid grid-cols-4 bg-card border border-border">
+            <TabsTrigger value="account" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">Account</span>
+            </TabsTrigger>
+            <TabsTrigger value="thresholds" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+              <SettingsIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Thresholds</span>
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+              <Lock className="w-4 h-4" />
+              <span className="hidden sm:inline">Security</span>
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+              <Bell className="w-4 h-4" />
+              <span className="hidden sm:inline">Notifications</span>
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="p-8">
-            {activeTab === "account" && (
-              <div className="space-y-6 max-w-xl">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Account Name</label>
-                  <input
-                    type="text"
+          {/* Account Tab */}
+          <TabsContent value="account">
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader>
+                <CardTitle>Account Information</CardTitle>
+                <CardDescription>Update your account details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="accountName">Account Name</Label>
+                  <Input
+                    id="accountName"
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
+                    className="max-w-md"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
+                <div className="space-y-2">
+                  <Label htmlFor="email">
                     Email
                     {!emailVerified && (
                       <span className="ml-2 text-xs text-muted-foreground">(Unverified)</span>
                     )}
-                  </label>
-                  <input
+                  </Label>
+                  <Input
+                    id="email"
                     type="email"
                     value={email}
                     disabled
-                    className="w-full px-4 py-3 rounded-lg border-2 border-input bg-muted text-muted-foreground cursor-not-allowed"
+                    className="max-w-md bg-muted"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">Contact support to change your email</p>
+                  <p className="text-xs text-muted-foreground">Contact support to change your email</p>
                 </div>
 
-                <button
-                  onClick={handleSaveAccount}
-                  disabled={loading}
-                  className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
-                >
+                <Button onClick={handleSaveAccount} disabled={loading}>
                   {loading ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            )}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            {activeTab === "thresholds" && (
-              <div className="space-y-6 max-w-xl">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Currency</label>
-                  <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
-                  >
-                    {CURRENCIES.map((curr) => (
-                      <option key={curr.code} value={curr.code}>
-                        {curr.symbol} {curr.name}
-                      </option>
-                    ))}
-                  </select>
+          {/* Thresholds Tab */}
+          <TabsContent value="thresholds">
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader>
+                <CardTitle>Segmentation Thresholds</CardTitle>
+                <CardDescription>Configure your customer value and lifecycle parameters</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Currency</Label>
+                  <Select value={currency} onValueChange={setCurrency}>
+                    <SelectTrigger className="max-w-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCIES.map((curr) => (
+                        <SelectItem key={curr.code} value={curr.code}>
+                          {curr.symbol} {curr.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Average Order Value</label>
-                    <input
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="aov">Average Order Value</Label>
+                    <Input
+                      id="aov"
                       type="number"
                       value={aov}
                       onChange={(e) => setAov(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">VIP Threshold</label>
-                    <input
+                  <div className="space-y-2">
+                    <Label htmlFor="vipThreshold">VIP Threshold</Label>
+                    <Input
+                      id="vipThreshold"
                       type="number"
                       value={vipThreshold}
                       onChange={(e) => setVipThreshold(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="highValueThreshold">High-Value Threshold</Label>
+                    <Input
+                      id="highValueThreshold"
+                      type="number"
+                      value={highValueThreshold}
+                      onChange={(e) => setHighValueThreshold(e.target.value)}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">High-Value Threshold</label>
-                  <input
-                    type="number"
-                    value={highValueThreshold}
-                    onChange={(e) => setHighValueThreshold(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">New Customer Days</label>
-                    <input
-                      type="number"
-                      value={newCustomerDays}
-                      onChange={(e) => setNewCustomerDays(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Lapsed Days</label>
-                    <input
-                      type="number"
-                      value={lapsedDays}
-                      onChange={(e) => setLapsedDays(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Churned Days</label>
-                    <input
-                      type="number"
-                      value={churnedDays}
-                      onChange={(e) => setChurnedDays(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
-                    />
+                <div className="pt-4 border-t border-border">
+                  <h4 className="font-medium mb-4">Customer Lifecycle (Days)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="newCustomerDays">New Customer</Label>
+                      <Input
+                        id="newCustomerDays"
+                        type="number"
+                        value={newCustomerDays}
+                        onChange={(e) => setNewCustomerDays(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lapsedDays">Lapsed</Label>
+                      <Input
+                        id="lapsedDays"
+                        type="number"
+                        value={lapsedDays}
+                        onChange={(e) => setLapsedDays(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="churnedDays">Churned</Label>
+                      <Input
+                        id="churnedDays"
+                        type="number"
+                        value={churnedDays}
+                        onChange={(e) => setChurnedDays(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <button
-                  onClick={handleSaveThresholds}
-                  disabled={loading}
-                  className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
-                >
-                  {loading ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            )}
+                <Button onClick={handleSaveThresholds} disabled={loading}>
+                  {loading ? "Saving..." : "Save Thresholds"}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            {activeTab === "security" && (
-              <div className="space-y-6 max-w-xl">
-                <div className="bg-yellow-500/10 border-2 border-yellow-500/20 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+          {/* Security Tab */}
+          <TabsContent value="security">
+            <div className="space-y-6">
+              <Card className="border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle>Change Password</CardTitle>
+                  <CardDescription>Update your account password</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="max-w-md"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="max-w-md"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  <Button onClick={handleChangePassword} disabled={loading}>
+                    {loading ? "Updating..." : "Update Password"}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle>Two-Factor Authentication</CardTitle>
+                  <CardDescription>Add an extra layer of security to your account</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium mb-1">Password Requirements</h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>• At least 8 characters</li>
-                        <li>• Mix of letters and numbers recommended</li>
-                      </ul>
+                      <p className="font-medium">
+                        {twoFactorEnabled ? "2FA is enabled" : "2FA is disabled"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {twoFactorEnabled
+                          ? "Your account is protected with two-factor authentication"
+                          : "Enable 2FA for enhanced security"}
+                      </p>
                     </div>
+                    <Button
+                      variant={twoFactorEnabled ? "destructive" : "default"}
+                      onClick={() => twoFactorEnabled ? setShowTwoFactorDisable(true) : setShowTwoFactorSetup(true)}
+                    >
+                      {twoFactorEnabled ? "Disable 2FA" : "Enable 2FA"}
+                    </Button>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">New Password</label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Confirm New Password</label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-input bg-background focus:border-primary focus:outline-none"
-                  />
-                </div>
-
-                <button
-                  onClick={handleChangePassword}
-                  disabled={loading}
-                  className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
-                >
-                  {loading ? "Updating..." : "Change Password"}
-                </button>
-
-                <div className="pt-6 border-t-2 border-border">
-                  <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4">
-                    <h4 className="font-medium mb-2">API Key Security</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Your Klaviyo API keys are encrypted and stored securely. They are never exposed in the client-side code.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "notifications" && (
-              <div className="space-y-6 max-w-xl">
-                <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4 mb-6">
-                  <h4 className="font-medium mb-2">Email Notification Preferences</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Choose which email notifications you'd like to receive. You can update these preferences at any time.
-                  </p>
-                </div>
-
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader>
+                <CardTitle>Email Notifications</CardTitle>
+                <CardDescription>Choose what emails you want to receive</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">Segment Creation</div>
-                      <div className="text-sm text-muted-foreground">Get notified when segments are successfully created in Klaviyo</div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Segment creation</p>
+                      <p className="text-sm text-muted-foreground">Get notified when segments are created</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={emailOnSegmentCreation}
-                      onChange={(e) => setEmailOnSegmentCreation(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">Client Management</div>
-                      <div className="text-sm text-muted-foreground">Receive notifications when new clients are added (agencies only)</div>
+                    <Switch checked={emailOnSegmentCreation} onCheckedChange={setEmailOnSegmentCreation} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">API key changes</p>
+                      <p className="text-sm text-muted-foreground">Get notified when API keys are added or changed</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={emailOnClientAdded}
-                      onChange={(e) => setEmailOnClientAdded(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">API Key Changes</div>
-                      <div className="text-sm text-muted-foreground">Get notified when Klaviyo API keys are added or updated</div>
+                    <Switch checked={emailOnApiKeyChanges} onCheckedChange={setEmailOnApiKeyChanges} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Weekly summary</p>
+                      <p className="text-sm text-muted-foreground">Receive a weekly digest of your activity</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={emailOnApiKeyAdded}
-                      onChange={(e) => setEmailOnApiKeyAdded(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">API Key Changes</div>
-                      <div className="text-sm text-muted-foreground">Get notified about Klaviyo API key modifications and updates</div>
+                    <Switch checked={emailWeeklySummary} onCheckedChange={setEmailWeeklySummary} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Password reset</p>
+                      <p className="text-sm text-muted-foreground">Get notified when password is reset</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={emailOnApiKeyChanges}
-                      onChange={(e) => setEmailOnApiKeyChanges(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">Settings Updates</div>
-                      <div className="text-sm text-muted-foreground">Receive confirmations when account or threshold settings are updated</div>
+                    <Switch checked={emailOnPasswordReset} onCheckedChange={setEmailOnPasswordReset} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Marketing emails</p>
+                      <p className="text-sm text-muted-foreground">Receive product updates and tips</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={emailOnSettingsUpdated}
-                      onChange={(e) => setEmailOnSettingsUpdated(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">Password Reset</div>
-                      <div className="text-sm text-muted-foreground">Receive notifications for password reset requests and confirmations</div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={emailOnPasswordReset}
-                      onChange={(e) => setEmailOnPasswordReset(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">Client Invitations</div>
-                      <div className="text-sm text-muted-foreground">Get notified when you're invited to join a client account</div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={emailOnClientInvitation}
-                      onChange={(e) => setEmailOnClientInvitation(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">Weekly Summary</div>
-                      <div className="text-sm text-muted-foreground">Receive weekly performance summaries and insights</div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={emailWeeklySummary}
-                      onChange={(e) => setEmailWeeklySummary(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <div className="font-medium">Marketing Emails</div>
-                      <div className="text-sm text-muted-foreground">Opt-in to receive product updates, tips, and promotional content</div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={emailMarketing}
-                      onChange={(e) => setEmailMarketing(e.target.checked)}
-                      className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    />
-                  </label>
-                </div>
-
-                <button
-                  onClick={handleSaveNotifications}
-                  disabled={loading}
-                  className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
-                >
-                  {loading ? "Saving..." : "Save Preferences"}
-                </button>
-
-                <div className="pt-6 border-t-2 border-border">
-                  <div className="bg-blue-500/10 border-2 border-blue-500/20 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-medium mb-1">Email Delivery</h4>
-                        <p className="text-sm text-muted-foreground">
-                          All emails are sent from <strong>onboarding@resend.dev</strong>. Make sure to whitelist this sender to ensure you receive notifications.
-                        </p>
-                      </div>
-                    </div>
+                    <Switch checked={emailMarketing} onCheckedChange={setEmailMarketing} />
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+
+                <Button onClick={handleSaveNotifications} disabled={loading}>
+                  {loading ? "Saving..." : "Save Preferences"}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* 2FA Modals */}
+      {showTwoFactorSetup && currentUser && (
+        <TwoFactorSetup
+          userId={currentUser.id}
+          userEmail={email}
+          onSetupComplete={() => {
+            setShowTwoFactorSetup(false);
+            setTwoFactorEnabled(true);
+            toast({
+              title: "2FA enabled",
+              description: "Two-factor authentication is now active",
+            });
+          }}
+        />
+      )}
+
+      {showTwoFactorDisable && currentUser && (
+        <TwoFactorDisable
+          userId={currentUser.id}
+          onDisableComplete={() => {
+            setShowTwoFactorDisable(false);
+            setTwoFactorEnabled(false);
+            toast({
+              title: "2FA disabled",
+              description: "Two-factor authentication has been disabled",
+            });
+          }}
+        />
+      )}
     </div>
   );
 }
