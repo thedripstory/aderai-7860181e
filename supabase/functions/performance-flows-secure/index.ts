@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,7 +58,7 @@ serve(async (req: Request) => {
     // Verify user owns this API key
     const { data: apiKeyData, error: keyError } = await supabaseClient
       .from('klaviyo_keys')
-      .select('api_key')
+      .select('klaviyo_api_key_hash')
       .eq('id', keyId)
       .eq('user_id', user.id)
       .single();
@@ -69,11 +70,18 @@ serve(async (req: Request) => {
       });
     }
 
+    let apiKey = apiKeyData.klaviyo_api_key_hash;
+    
+    // Decrypt API key if it's encrypted
+    if (isEncrypted(apiKey)) {
+      apiKey = await decryptApiKey(apiKey);
+    }
+
     // Call Klaviyo API
     const response = await fetch("https://a.klaviyo.com/api/flows/", {
       method: "GET",
       headers: {
-        "Authorization": `Klaviyo-API-Key ${apiKeyData.api_key}`,
+        "Authorization": `Klaviyo-API-Key ${apiKey}`,
         "revision": "2024-10-15",
         "Accept": "application/json",
       },

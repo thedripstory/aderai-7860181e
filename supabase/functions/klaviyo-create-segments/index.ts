@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -416,7 +417,12 @@ serve(async (req) => {
   }
 
   try {
-    const { apiKey, segmentIds, currencySymbol, settings } = await req.json();
+    let { apiKey, segmentIds, currencySymbol, settings } = await req.json();
+
+    // Decrypt API key if it's encrypted
+    if (apiKey && isEncrypted(apiKey)) {
+      apiKey = await decryptApiKey(apiKey);
+    }
 
     if (!apiKey || !segmentIds || !Array.isArray(segmentIds)) {
       return new Response(

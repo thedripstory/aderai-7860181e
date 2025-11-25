@@ -17,3 +17,63 @@ verify_jwt = false
 
 [functions.send-milestone-email]
 verify_jwt = false
+
+[functions.klaviyo-validate-key]
+verify_jwt = false
+
+[functions.klaviyo-create-segments]
+verify_jwt = true
+
+[functions.klaviyo-proxy]
+verify_jwt = true
+
+[functions.klaviyo-suggest-segments]
+verify_jwt = true
+
+[functions.klaviyo-create-custom-segment]
+verify_jwt = true
+
+[functions.send-feedback-notification]
+verify_jwt = false
+
+[functions.calculate-segment-performance]
+verify_jwt = true
+
+[functions.performance-metrics]
+verify_jwt = false
+
+[functions.performance-metrics-secure]
+verify_jwt = true
+
+[functions.performance-flows]
+verify_jwt = false
+
+[functions.performance-flows-secure]
+verify_jwt = true
+
+[functions.performance-campaigns]
+verify_jwt = false
+
+[functions.performance-campaigns-secure]
+verify_jwt = true
+
+[functions.predict-churn-risk]
+verify_jwt = true
+
+[functions.predict-segment-performance]
+verify_jwt = true
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.send-verification-email]
+verify_jwt = false
+
+[functions.send-password-reset]
+verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
+
+[functions.klaviyo-webhook-handler]
+verify_jwt = false

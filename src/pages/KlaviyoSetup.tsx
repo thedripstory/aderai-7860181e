@@ -144,12 +144,15 @@ const KlaviyoSetup = () => {
         return;
       }
 
+      // Use the encrypted key returned from validation
+      const encryptedKey = validationData.encryptedKey || apiKey;
+
       // Save Klaviyo configuration
       const { error: klaviyoError } = await supabase
         .from("klaviyo_keys")
         .insert({
           user_id: user.id,
-          klaviyo_api_key_hash: apiKey,
+          klaviyo_api_key_hash: encryptedKey,
           client_name: clientName || "My Business",
           currency,
           currency_symbol: currencySymbol,

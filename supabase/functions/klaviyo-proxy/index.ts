@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.78.0';
+import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -62,13 +63,20 @@ Deno.serve(async (req) => {
       );
     }
 
+    let apiKey = keyData.klaviyo_api_key_hash;
+    
+    // Decrypt API key if it's encrypted
+    if (isEncrypted(apiKey)) {
+      apiKey = await decryptApiKey(apiKey);
+    }
+
     console.log(`Making ${method} request to Klaviyo for user ${user.id}`);
 
     // Make request to Klaviyo with the API key (never exposed to client)
     const klaviyoResponse = await fetch(endpoint, {
       method,
       headers: {
-        'Authorization': `Klaviyo-API-Key ${keyData.klaviyo_api_key_hash}`,
+        'Authorization': `Klaviyo-API-Key ${apiKey}`,
         'revision': '2024-02-15',
         'Content-Type': 'application/json',
       },
