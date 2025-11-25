@@ -117,6 +117,48 @@ function buildMetricCondition(
 }
 
 // ==========================================
+// HELPER: Build predictive analytics condition
+// ==========================================
+
+function buildPredictiveCondition(
+  dimension: string,
+  filterType: 'string' | 'numeric',
+  operator: string,
+  value: string | number
+): any {
+  return {
+    type: 'profile-predictive-analytics',
+    dimension: dimension,
+    filter: {
+      type: filterType,
+      operator: operator,
+      value: value
+    }
+  };
+}
+
+// ==========================================
+// HELPER: Build profile property condition
+// ==========================================
+
+function buildProfilePropertyCondition(
+  property: string,
+  filterType: 'string' | 'numeric' | 'boolean' | 'date',
+  operator: string,
+  value: any
+): any {
+  return {
+    type: 'profile-property',
+    property: property,
+    filter: {
+      type: filterType,
+      operator: operator,
+      value: value
+    }
+  };
+}
+
+// ==========================================
 // STEP 3: SEGMENT DEFINITIONS (Correct Klaviyo API Format)
 // ==========================================
 
@@ -805,6 +847,128 @@ function getSegmentDefinition(
         }]
       }
     } : null,
+
+    // =====================================
+    // DEMOGRAPHIC SEGMENTS (Predictive)
+    // =====================================
+
+    'gender-male': {
+      name: `Likely Male${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('predicted_gender', 'string', 'equals', 'likely_male')
+          ]
+        }]
+      }
+    },
+
+    'gender-female': {
+      name: `Likely Female${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('predicted_gender', 'string', 'equals', 'likely_female')
+          ]
+        }]
+      }
+    },
+
+    'gender-uncertain': {
+      name: `Gender Uncertain${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('predicted_gender', 'string', 'equals', 'uncertain')
+          ]
+        }]
+      }
+    },
+
+    // =====================================
+    // PREDICTIVE ANALYTICS SEGMENTS
+    // =====================================
+
+    'predicted-vips': {
+      name: `Predicted VIPs (High CLV)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('predicted_clv', 'numeric', 'greater-than', vipThreshold)
+          ]
+        }]
+      }
+    },
+
+    'high-churn-risk': {
+      name: `High Churn Risk${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('churn_risk', 'string', 'equals', 'high')
+          ]
+        }]
+      }
+    },
+
+    'likely-purchase-soon': {
+      name: `Likely to Purchase Soon${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('predicted_number_of_orders', 'numeric', 'greater-than', 0)
+          ]
+        }]
+      }
+    },
+
+    'high-churn-risk-exclude': {
+      name: `🚫 High Churn Risk Exclusion${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('churn_risk', 'string', 'equals', 'high')
+          ]
+        }]
+      }
+    },
+
+    // =====================================
+    // VALUE-BASED SEGMENTS
+    // =====================================
+
+    'high-aov': {
+      name: `High AOV Customers (${currencySymbol}${aov * 2}+)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('average_order_value', 'numeric', 'greater-or-equal', aov * 2)
+          ]
+        }]
+      }
+    },
+
+    'low-aov': {
+      name: `Low AOV Customers (Under ${currencySymbol}${aov / 2})${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('average_order_value', 'numeric', 'less-than', aov / 2)
+          ]
+        }]
+      }
+    },
+
+    'bargain-shoppers': {
+      name: `Bargain Shoppers (Low AOV)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildPredictiveCondition('average_order_value', 'numeric', 'less-than', aov * 0.75)
+          ]
+        }]
+      }
+    },
   };
 
   return definitions[segmentId] || null;
@@ -956,17 +1120,15 @@ async function createKlaviyoSegment(
       
       // Check if it's an unimplemented segment type
       const unimplementedSegments = [
-        'gender-male', 'gender-female', 'gender-uncertain',
         'age-18-24', 'age-25-40', 'birthday-month',
         'location-country', 'location-proximity',
-        'predicted-vips', 'high-churn-risk', 'likely-purchase-soon',
         'abandoned-cart-high-value', 'abandoned-checkout-high-value',
         'category-interest', 'product-interest', 'cross-sell',
         'category-buyers', 'multi-category', 'coupon-users',
         'full-price-buyers', 'product-reviewers', 'non-reviewers',
-        'frequent-visitors', 'high-churn-risk-exclude', 'refunded-customers',
+        'frequent-visitors', 'refunded-customers',
         'negative-feedback', 'marked-spam', 'received-3-in-3-days',
-        'received-5-opened-0', 'bargain-shoppers', 'high-aov', 'low-aov'
+        'received-5-opened-0'
       ];
       
       if (unimplementedSegments.includes(segmentId)) {
