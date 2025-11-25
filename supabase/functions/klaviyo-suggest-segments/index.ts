@@ -72,8 +72,8 @@ For each segment, respond with this EXACT JSON structure:
                   "value": 0
                 },
                 "timeframe_filter": {
-                  "type": "preset",
-                  "preset": "in-the-last",
+                  "type": "date",
+                  "operator": "in-the-last",
                   "quantity": 30,
                   "unit": "day"
                 }
@@ -90,11 +90,12 @@ RULES:
 1. metric_id must be an EXACT ID from the available metrics list above
 2. measurement can be: "count" or "sum"
 3. operator can be: "greater-than", "less-than", "equals", "greater-or-equal", "less-or-equal"
-4. timeframe preset can be: "in-the-last" (requires quantity and unit) or "over-all-time"
-5. unit can be: "day", "week", "month"
-6. For multiple conditions that must ALL be true, put them in the same conditions array
-7. For conditions where ANY can be true (OR logic), use separate condition_groups
-8. Always append " | Aderai" to segment names`;
+4. For time-based conditions, use timeframe_filter with type: "date" and operator: "in-the-last" (requires quantity and unit)
+5. For "over all time" conditions, set timeframe_filter to null
+6. unit can be: "day", "week", "month"
+7. For multiple conditions that must ALL be true, put them in the same conditions array
+8. For conditions where ANY can be true (OR logic), use separate condition_groups
+9. Always append " | Aderai" to segment names`;
 
     const userPrompt = `Brand Information:
 ${Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n')}

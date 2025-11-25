@@ -94,15 +94,14 @@ function buildMetricCondition(
     }
   };
 
+  // FIXED: Use correct Klaviyo API timeframe format
   if (timeframe.type === 'over-all-time') {
-    condition.timeframe_filter = {
-      type: 'preset',
-      preset: 'over-all-time'
-    };
+    // For "over all time", set timeframe_filter to null
+    condition.timeframe_filter = null;
   } else if (timeframe.type === 'in-the-last') {
     condition.timeframe_filter = {
-      type: 'preset',
-      preset: 'in-the-last',
+      type: 'date',
+      operator: 'in-the-last',
       quantity: timeframe.quantity,
       unit: timeframe.unit || 'day'
     };
@@ -110,7 +109,7 @@ function buildMetricCondition(
     condition.timeframe_filter = {
       type: 'date',
       operator: 'after',
-      date: timeframe.date
+      value: timeframe.date
     };
   }
 
