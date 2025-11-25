@@ -1009,6 +1009,83 @@ function getSegmentDefinition(
     },
 
     // =====================================
+    // AGE-BASED SEGMENTS
+    // =====================================
+
+    'age-18-24': {
+      name: `Age 18-24${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: "properties['age']",
+            filter: {
+              type: 'numeric',
+              operator: 'greater-than-or-equal',
+              value: 18
+            }
+          }, {
+            type: 'profile-property',
+            property: "properties['age']",
+            filter: {
+              type: 'numeric',
+              operator: 'less-than-or-equal',
+              value: 24
+            }
+          }]
+        }]
+      }
+    },
+
+    'age-25-40': {
+      name: `Age 25-40${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: "properties['age']",
+            filter: {
+              type: 'numeric',
+              operator: 'greater-than-or-equal',
+              value: 25
+            }
+          }, {
+            type: 'profile-property',
+            property: "properties['age']",
+            filter: {
+              type: 'numeric',
+              operator: 'less-than-or-equal',
+              value: 40
+            }
+          }]
+        }]
+      }
+    },
+
+    // =====================================
+    // LOCATION PROXIMITY SEGMENT
+    // =====================================
+
+    'location-proximity': {
+      name: `Near Major Metro (25 Miles)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-postal-code-distance',
+            country_code: 'USA',
+            postal_code: '10001',
+            unit: 'miles',
+            filter: {
+              type: 'numeric',
+              operator: 'less-than',
+              value: 25
+            }
+          }]
+        }]
+      }
+    },
+
+    // =====================================
     // EMAIL ENGAGEMENT EXCLUSIONS
     // =====================================
 
