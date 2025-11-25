@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle } from "lucide-react";
 import { TubelightNavbar } from "@/components/TubelightNavbar";
+import { useABTest, trackABTestConversion } from "@/hooks/useABTest";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
@@ -20,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const heroVariant = useABTest('hero-headline');
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -28,6 +30,7 @@ export default function LandingPage() {
   }, []);
   
   const handleGetStarted = () => {
+    trackABTestConversion('hero-headline');
     navigate("/signup");
   };
 
@@ -123,13 +126,35 @@ export default function LandingPage() {
             </div>
 
             <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
-              70 Klaviyo Segments<br />
-              <span className="text-accent block my-4">in 30 Seconds</span>
+              {heroVariant === 'A' ? (
+                <>
+                  70 Klaviyo Segments<br />
+                  <span className="text-accent block my-4">in 30 Seconds</span>
+                </>
+              ) : (
+                <>
+                  Segment like a<br />
+                  <span className="text-accent block my-4">$50M brand.</span>
+                </>
+              )}
             </h1>
 
             <p className="text-2xl md:text-3xl text-foreground/80 mb-12 max-w-3xl mx-auto font-medium text-center">
-              Stop spending hours building segments manually. Deploy expert-grade segmentation straight into{" "}
-              <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />
+              {heroVariant === 'A' 
+                ? (
+                  <>
+                    Stop spending hours building segments manually. Deploy expert-grade segmentation straight into{" "}
+                    <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />
+                  </>
+                )
+                : (
+                  <>
+                    Instantly import 70+ segments, with one click- straight inside{" "}
+                    <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />{" "}
+                    Deploy expert-grade Klaviyo segmentation without the agency price tag.
+                  </>
+                )
+              }
             </p>
 
             {/* CTA Button */}
