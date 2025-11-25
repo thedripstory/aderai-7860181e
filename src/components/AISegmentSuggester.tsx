@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useAILimits } from '@/hooks/useAILimits';
+import { ErrorLogger } from '@/lib/errorLogger';
 import { toast } from 'sonner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -93,6 +94,10 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       });
     } catch (error: any) {
       console.error('AI generation error:', error);
+      
+      // Log AI error to database
+      await ErrorLogger.logAIError(error, 'Generate AI Suggestions');
+      
       toast.error('Failed to generate AI suggestions', {
         description: error.message || 'Check your Klaviyo connection and try again',
         action: {

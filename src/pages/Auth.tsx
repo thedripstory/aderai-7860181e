@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ErrorLogger } from "@/lib/errorLogger";
 
 interface AuthProps {
   onComplete?: (user: any) => void;
@@ -102,6 +103,12 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
         navigate('/dashboard');
       }
     } catch (error: any) {
+      // Log authentication error
+      await ErrorLogger.logAuthError(
+        error, 
+        isSignUp ? 'signup' : 'signin'
+      );
+      
       toast({
         title: "Error",
         description: error.message,

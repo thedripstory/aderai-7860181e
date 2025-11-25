@@ -25,6 +25,8 @@ import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
 import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
 import { AchievementsPanel } from '@/components/AchievementsPanel';
+import { TestErrorButton } from '@/components/TestErrorButton';
+import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
@@ -247,6 +249,14 @@ export default function UnifiedDashboard() {
       setSegmentStats(stats);
     } catch (error) {
       console.error('Error fetching segments:', error);
+      
+      // Log Klaviyo API error
+      await ErrorLogger.logKlaviyoError(
+        'Fetch All Segments',
+        error as Error,
+        klaviyoKeys[activeKeyIndex]?.id
+      );
+      
       toast.error('Failed to load analytics');
     } finally {
       setLoadingAnalytics(false);

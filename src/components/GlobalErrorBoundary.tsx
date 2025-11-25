@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ErrorLogger } from '@/lib/errorLogger';
 
 interface Props {
   children: ReactNode;
@@ -24,6 +25,13 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+    
+    // Log error to database for monitoring
+    ErrorLogger.logError(error, {
+      componentStack: errorInfo.componentStack,
+      errorBoundary: 'GlobalErrorBoundary',
+      timestamp: new Date().toISOString(),
+    });
     
     // Show user-friendly toast notification
     toast.error('An unexpected error occurred', {
