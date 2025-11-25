@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,13 +13,18 @@ serve(async (req) => {
   }
 
   try {
-    const { apiKey, answers } = await req.json();
+    let { apiKey, answers } = await req.json();
 
     if (!apiKey || !answers) {
       return new Response(
         JSON.stringify({ error: 'Missing apiKey or answers' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Decrypt API key if encrypted
+    if (isEncrypted(apiKey)) {
+      apiKey = await decryptApiKey(apiKey);
     }
 
     // Fetch available metrics from Klaviyo

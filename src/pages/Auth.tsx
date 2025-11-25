@@ -46,14 +46,11 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
         if (authData.user) {
           // Send welcome email
           try {
-            await supabase.functions.invoke('send-email', {
+            await supabase.functions.invoke('send-welcome-email', {
               body: {
-                to: email,
-                template_name: 'welcome',
-                template_data: {
-                  userName: accountName || email.split('@')[0],
-                  accountName: accountName || email.split('@')[0],
-                },
+                email: email,
+                userName: accountName || email.split('@')[0],
+                accountType: 'brand',
                 userId: authData.user.id,
               },
             });

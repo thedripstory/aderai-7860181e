@@ -220,11 +220,11 @@ export const useKlaviyoSegments = () => {
             status: "skipped" as const,
             message: `"${segmentName}" already exists`,
           };
-        } else if (resultStatus === 'missing_metrics') {
+        } else if (resultStatus === 'skipped' || resultStatus === 'missing_metrics') {
           return {
             segmentId,
-            status: "error" as const,
-            message: `Cannot create "${segmentName}": Required metrics not available in your Klaviyo account`,
+            status: "skipped" as const,
+            message: `"${segmentName}" skipped: Required metrics not available in your Klaviyo account`,
           };
         } else {
           // Log failed operations
