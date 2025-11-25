@@ -139,23 +139,22 @@ export default function LandingPage() {
               )}
             </h1>
 
-            <p className="text-2xl md:text-3xl text-foreground/80 mb-12 max-w-3xl mx-auto font-medium text-center">
-              {heroVariant === 'A' 
-                ? (
-                  <>
-                    Stop spending hours building segments manually. Deploy expert-grade segmentation straight into{" "}
-                    <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />
-                  </>
-                )
-                : (
-                  <>
-                    Instantly import 70+ segments, with one click- straight inside{" "}
-                    <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />{" "}
-                    Deploy expert-grade Klaviyo segmentation without the agency price tag.
-                  </>
-                )
-              }
-            </p>
+            {heroVariant === 'A' ? (
+              <p className="text-2xl md:text-3xl text-foreground/80 mb-12 max-w-3xl mx-auto font-medium text-center">
+                Stop spending hours building segments manually. Deploy expert-grade segmentation straight into{" "}
+                <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />
+              </p>
+            ) : (
+              <div className="mb-12 max-w-3xl mx-auto">
+                <p className="text-2xl md:text-3xl text-foreground/80 mb-4 font-medium text-center">
+                  Instantly import 70+ segments, with one click- straight inside{" "}
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.9em] inline-block align-text-bottom ml-1" />
+                </p>
+                <p className="text-lg md:text-xl text-muted-foreground text-center">
+                  Deploy expert-grade Klaviyo segmentation without the agency price tag.
+                </p>
+              </div>
+            )}
 
             {/* CTA Button */}
             <div className="flex justify-center mb-8">
