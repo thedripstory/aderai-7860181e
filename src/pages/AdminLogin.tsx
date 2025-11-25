@@ -3,11 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { toast } from "sonner";
 
+const ADMIN_EMAIL = "akshat@aderai.io";
+const ADMIN_PASSWORD = "drip@123";
+
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     checkExistingSession();
@@ -16,88 +24,69 @@ const AdminLogin = () => {
   const checkExistingSession = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     
-    if (user) {
-      // Check admin role in database (server-side check only)
-      const { data: roleData, error: roleError } = await supabase
+    if (user && user.email === ADMIN_EMAIL) {
+      // Check admin role in database
+      const { data: roleData } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
         .eq("role", "admin")
         .maybeSingle();
 
-      if (roleError) {
-        console.error("Error checking admin role");
-        await supabase.auth.signOut();
-        toast.error("Access denied. Admin privileges required.");
-        return;
-      }
-
       if (roleData) {
         navigate("/admin");
       } else {
-        // No admin role found
         await supabase.auth.signOut();
-        toast.error("Access denied. Admin privileges required.");
       }
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate credentials match hardcoded admin
+    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+      toast.error("Invalid credentials. Access denied.");
+      return;
+    }
+
+    setLoading(true);
+    
     try {
-      const redirectUrl = `${window.location.origin}/admin`;
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      if (error) throw error;
+      if (error) {
+        toast.error("Invalid credentials. Access denied.");
+        return;
+      }
 
-      // The actual email check will happen in the redirect callback
-    } catch (error: any) {
-      console.error("Error signing in with Google:", error);
-      toast.error("Failed to sign in with Google");
-    }
-  };
-
-  // Listen for auth state changes after OAuth redirect
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        
-        // Check admin role in database (server-side check only)
-        const { data: roleData, error: roleError } = await supabase
+      if (data.user) {
+        // Verify admin role in database
+        const { data: roleData } = await supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", session.user.id)
+          .eq("user_id", data.user.id)
           .eq("role", "admin")
           .maybeSingle();
 
-        if (roleError) {
-          console.error("Error checking admin role");
-          await supabase.auth.signOut();
-          toast.error("Access denied. Admin privileges required.");
-          return;
-        }
-
         if (roleData) {
+          toast.success("Welcome back, Admin!");
           navigate("/admin");
         } else {
-          // No admin role found
           await supabase.auth.signOut();
           toast.error("Access denied. Admin privileges required.");
         }
       }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
@@ -109,40 +98,51 @@ const AdminLogin = () => {
           <div>
             <CardTitle className="text-3xl font-bold">Admin Access</CardTitle>
             <CardDescription className="mt-2">
-              Sign in with your authorized Google account to access the admin dashboard
+              Sign in to access the admin dashboard
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Button 
-            onClick={handleGoogleSignIn}
-            className="w-full h-12 text-base font-medium"
-            size="lg"
-          >
-            <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
               />
-              <path
-                fill="currentColor"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
               />
-              <path
-                fill="currentColor"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            Continue with Google
-          </Button>
+            </div>
 
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Only authorized administrators can access this area</p>
-          </div>
+            <Button 
+              type="submit"
+              className="w-full h-12 text-base font-medium"
+              size="lg"
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+
+            <div className="text-center text-sm text-muted-foreground">
+              <p>Only authorized administrators can access this area</p>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

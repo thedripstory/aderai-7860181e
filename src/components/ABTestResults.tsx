@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { TrendingUp, Users, Target, AlertCircle, CheckCircle2, TrendingDown } from 'lucide-react';
+import { TrendingUp, Users, Target, AlertCircle, CheckCircle2, RefreshCw, Activity } from 'lucide-react';
 
 interface ABTestStats {
   variant: string;
@@ -25,12 +26,54 @@ export function ABTestResults({ testName }: { testName: string }) {
   const [stats, setStats] = useState<ABTestStats[]>([]);
   const [significance, setSignificance] = useState<StatisticalSignificance | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
     fetchStats();
   }, [testName]);
 
-  async function fetchStats() {
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      fetchStats(true);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, testName]);
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('ab-test-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'analytics_events',
+          filter: `event_metadata->>test_name=eq.${testName}`
+        },
+        () => {
+          // Fetch new stats when new events come in
+          fetchStats(true);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [testName]);
+
+  async function fetchStats(isAutoRefresh = false) {
+    if (isAutoRefresh) {
+      setRefreshing(true);
+    }
+    
     try {
       // Get views
       const { data: viewsData } = await supabase
@@ -64,12 +107,19 @@ export function ABTestResults({ testName }: { testName: string }) {
         const sig = calculateStatisticalSignificance(results[0], results[1]);
         setSignificance(sig);
       }
+      
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Failed to fetch AB test stats:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }
+
+  const handleManualRefresh = () => {
+    fetchStats(true);
+  };
 
   function calculateStatisticalSignificance(
     variantA: ABTestStats,
@@ -139,7 +189,14 @@ export function ABTestResults({ testName }: { testName: string }) {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Loading A/B test results...</div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-3">
+          <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading A/B test results...</p>
+        </div>
+      </div>
+    );
   }
 
   const winner = stats.reduce((prev, current) => 
@@ -150,14 +207,38 @@ export function ABTestResults({ testName }: { testName: string }) {
 
   return (
     <div className="space-y-6">
+      {/* Header with controls */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Target className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold">Hero Headline A/B Test</h3>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            <h3 className="text-lg font-semibold">Hero Headline A/B Test</h3>
+          </div>
+          <Badge variant="outline" className="text-sm">
+            {totalSampleSize} total visitors
+          </Badge>
+          {autoRefresh && (
+            <Badge variant="secondary" className="text-xs flex items-center gap-1">
+              <Activity className="w-3 h-3 animate-pulse" />
+              Live
+            </Badge>
+          )}
         </div>
-        <Badge variant="outline" className="text-sm">
-          {totalSampleSize} total visitors
-        </Badge>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">
+            Updated {lastUpdated.toLocaleTimeString()}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            className="gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Statistical Significance Alert */}
@@ -219,7 +300,7 @@ export function ABTestResults({ testName }: { testName: string }) {
         {stats.map((stat) => (
           <Card 
             key={stat.variant}
-            className={stat.variant === winner.variant ? 'border-primary' : ''}
+            className={`transition-all ${stat.variant === winner.variant ? 'border-primary ring-2 ring-primary/20' : ''}`}
           >
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -233,25 +314,40 @@ export function ABTestResults({ testName }: { testName: string }) {
                 </div>
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                {stat.variant === 'A' ? '"70 segments. One click."' : '"Segment like a $50M brand."'}
+                {stat.variant === 'A' ? '"70 Klaviyo Segments in 30 Seconds"' : '"Segment like a $50M brand."'}
               </p>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Views:</span>
-                <span className="font-semibold">{stat.views}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Sign-ups:</span>
-                <span className="font-semibold">{stat.conversions}</span>
-              </div>
-              <div className="pt-2 border-t">
-                <div className="text-2xl font-bold text-primary">
-                  {stat.conversionRate.toFixed(2)}%
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users className="w-4 h-4" />
+                    <span className="text-sm">Views</span>
+                  </div>
+                  <span className="text-2xl font-bold">{stat.views}</span>
                 </div>
-                <div className="text-xs text-muted-foreground">Conversion Rate</div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="text-sm">Sign-ups</span>
+                  </div>
+                  <span className="text-2xl font-bold">{stat.conversions}</span>
+                </div>
+              </div>
+              <div className="pt-3 border-t">
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <div className="text-3xl font-bold text-primary">
+                      {stat.conversionRate.toFixed(2)}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">Conversion Rate</div>
+                  </div>
+                  {significance && stat.variant === winner.variant && (
+                    <Badge variant="outline" className="text-xs">
+                      +{Math.abs(significance.improvement).toFixed(1)}%
+                    </Badge>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -260,9 +356,16 @@ export function ABTestResults({ testName }: { testName: string }) {
 
       <Card className="bg-muted/30">
         <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground">
-            <strong>Note:</strong> The test tracks anonymous visitors. Each visitor is randomly assigned to variant A or B (50-50 split) and will consistently see that variant. Conversions are tracked when users click "Get Started".
-          </p>
+          <div className="flex items-start gap-3">
+            <Activity className="w-5 h-5 text-primary mt-0.5" />
+            <div className="flex-1 space-y-2 text-sm">
+              <p className="font-medium">Real-Time Tracking Active</p>
+              <p className="text-muted-foreground">
+                The test tracks anonymous visitors with a 50-50 random split. Each visitor consistently sees their assigned variant. 
+                Conversions are tracked when users click "Get Started". Data refreshes automatically every 30 seconds.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
