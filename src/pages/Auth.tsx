@@ -153,7 +153,17 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label htmlFor="password">Password</Label>
+                {!isSignUp && (
+                  <a
+                    href="/forgot-password"
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </a>
+                )}
+              </div>
               <Input
                 id="password"
                 type="password"

@@ -14,6 +14,8 @@ import { PublicRoute } from "@/components/PublicRoute";
 const Index = lazy(() => import("./pages/Index"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const KlaviyoSetup = lazy(() => import("./pages/KlaviyoSetup"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -64,6 +66,8 @@ const App = () => (
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<PublicRoute><Auth initialView="signin" /></PublicRoute>} />
                 <Route path="/signup" element={<PublicRoute><Auth initialView="signup" /></PublicRoute>} />
+                <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/dashboard" element={<ProtectedRoute><UnifiedDashboard /></ProtectedRoute>} />
                 <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
                 <Route path="/klaviyo-setup" element={<ProtectedRoute><KlaviyoSetup /></ProtectedRoute>} />
