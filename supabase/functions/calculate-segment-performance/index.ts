@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,12 +41,18 @@ serve(async (req) => {
       throw new Error("Klaviyo key not found");
     }
 
+    // Decrypt API key if encrypted
+    let apiKey = keyData.klaviyo_api_key_hash;
+    if (isEncrypted(apiKey)) {
+      apiKey = await decryptApiKey(apiKey);
+    }
+
     // Fetch segments and their metrics from Klaviyo
     const segmentsResponse = await fetch(
       "https://a.klaviyo.com/api/segments/",
       {
         headers: {
-          Authorization: `Klaviyo-API-Key ${keyData.klaviyo_api_key_hash}`,
+          Authorization: `Klaviyo-API-Key ${apiKey}`,
           revision: "2024-10-15",
         },
       }
@@ -64,7 +71,7 @@ serve(async (req) => {
         `https://a.klaviyo.com/api/segments/${segment.id}/metrics/`,
         {
           headers: {
-            Authorization: `Klaviyo-API-Key ${keyData.klaviyo_api_key_hash}`,
+            Authorization: `Klaviyo-API-Key ${apiKey}`,
             revision: "2024-10-15",
           },
         }

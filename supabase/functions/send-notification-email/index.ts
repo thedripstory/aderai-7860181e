@@ -12,12 +12,13 @@ const corsHeaders = {
 interface NotificationEmailRequest {
   userId: string;
   email: string;
-  notificationType: "segment_created" | "client_added" | "api_key_added" | "settings_updated";
+  notificationType: "segment_created" | "client_added" | "api_key_added" | "settings_updated" | "klaviyo_connected";
   data: {
     title: string;
     message: string;
     actionUrl?: string;
     actionLabel?: string;
+    accountName?: string;
   };
 }
 
@@ -54,6 +55,9 @@ const handler = async (req: Request): Promise<Response> => {
       case "settings_updated":
         shouldSend = prefs?.email_on_settings_updated ?? true;
         break;
+      case "klaviyo_connected":
+        shouldSend = prefs?.email_on_api_key_added ?? true;
+        break;
     }
 
     if (!shouldSend) {
@@ -63,18 +67,66 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const iconMap = {
+    const iconMap: Record<string, string> = {
       segment_created: "✨",
       client_added: "👥",
       api_key_added: "🔑",
       settings_updated: "⚙️",
+      klaviyo_connected: "✅",
     };
 
-    const emailResponse = await resend.emails.send({
-      from: "Klaviyo Segments <onboarding@resend.dev>",
-      to: [email],
-      subject: data.title,
-      html: `
+    const dashboardUrl = Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '.lovable.app') || 'https://app.lovable.app';
+
+    // Handle klaviyo_connected template specially
+    let subject = data.title;
+    let htmlContent = "";
+    
+    if (notificationType === "klaviyo_connected") {
+      subject = "✅ Klaviyo Connected Successfully!";
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; }
+            .button { display: inline-block; background: #7c3aed; color: white; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa; border-radius: 0 0 10px 10px; }
+            ul { padding-left: 20px; }
+            li { margin: 8px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎉 Your Klaviyo Account is Connected!</h1>
+            </div>
+            <div class="content">
+              <p>Hey ${data.accountName || 'there'},</p>
+              <p>Great news! Your Klaviyo account has been successfully connected to Aderai.</p>
+              <p><strong>You're now ready to:</strong></p>
+              <ul>
+                <li>Create sophisticated customer segments in seconds</li>
+                <li>Use AI-powered segment suggestions</li>
+                <li>Track segment performance</li>
+              </ul>
+              <div style="text-align: center;">
+                <a href="${dashboardUrl}/dashboard" class="button">Go to Dashboard</a>
+              </div>
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">Welcome to Aderai!</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+    } else {
+      htmlContent = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -111,15 +163,22 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} Klaviyo Segments. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
               <p>
-                <a href="${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '.lovable.app') || 'https://app.lovable.app'}/settings" class="preferences-link">Manage Email Preferences</a>
+                <a href="${dashboardUrl}/settings" class="preferences-link">Manage Email Preferences</a>
               </p>
             </div>
           </div>
         </body>
         </html>
-      `,
+      `;
+    }
+
+    const emailResponse = await resend.emails.send({
+      from: "Aderai <onboarding@resend.dev>",
+      to: [email],
+      subject: subject,
+      html: htmlContent,
     });
 
     // Log to audit trail

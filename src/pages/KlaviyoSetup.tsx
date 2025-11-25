@@ -199,14 +199,16 @@ const KlaviyoSetup = () => {
           .eq('id', user.id)
           .single();
 
-        await supabase.functions.invoke('send-email', {
+        await supabase.functions.invoke('send-notification-email', {
           body: {
-            to: user.email,
-            template_name: 'klaviyo_connected',
-            template_data: {
+            userId: user.id,
+            email: user.email,
+            notificationType: 'klaviyo_connected',
+            data: {
+              title: 'Klaviyo Connected Successfully!',
+              message: 'Your Klaviyo account has been connected.',
               accountName: userData?.account_name || clientName || 'there',
             },
-            userId: user.id,
           },
         });
       } catch (emailError) {
