@@ -926,6 +926,21 @@ export type Database = {
       }
     }
     Functions: {
+      check_for_orphan_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          user_id: string
+        }[]
+      }
+      fix_orphan_users: {
+        Args: never
+        Returns: {
+          fixed_email: string
+          fixed_user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
