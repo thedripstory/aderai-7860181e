@@ -811,6 +811,104 @@ function getSegmentDefinition(
 }
 
 // ==========================================
+// HELPER: Get or Create "Aderai" Tag
+// ==========================================
+
+async function getOrCreateAderaiTag(apiKey: string): Promise<string | null> {
+  try {
+    // First, try to find existing "Aderai" tag
+    const listTagsResponse = await fetch('https://a.klaviyo.com/api/tags/', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Klaviyo-API-Key ${apiKey}`,
+        'Accept': 'application/json',
+        'revision': '2024-10-15'
+      }
+    });
+
+    if (listTagsResponse.ok) {
+      const tagsData = await listTagsResponse.json();
+      const existingTag = tagsData.data?.find((tag: any) => tag.attributes?.name === 'Aderai');
+      if (existingTag) {
+        console.log('[klaviyo-create-segments] Found existing Aderai tag:', existingTag.id);
+        return existingTag.id;
+      }
+    }
+
+    // Tag doesn't exist, create it
+    console.log('[klaviyo-create-segments] Creating new Aderai tag...');
+    const createTagResponse = await fetch('https://a.klaviyo.com/api/tags/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Klaviyo-API-Key ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'revision': '2024-10-15'
+      },
+      body: JSON.stringify({
+        data: {
+          type: 'tag',
+          attributes: {
+            name: 'Aderai'
+          }
+        }
+      })
+    });
+
+    if (createTagResponse.ok) {
+      const newTagData = await createTagResponse.json();
+      console.log('[klaviyo-create-segments] Created Aderai tag:', newTagData.data?.id);
+      return newTagData.data?.id || null;
+    } else {
+      const errorText = await createTagResponse.text();
+      console.error('[klaviyo-create-segments] Failed to create tag:', errorText);
+      return null;
+    }
+  } catch (error) {
+    console.error('[klaviyo-create-segments] Error getting/creating Aderai tag:', error);
+    return null;
+  }
+}
+
+// ==========================================
+// HELPER: Add Tag to Segment
+// ==========================================
+
+async function addTagToSegment(apiKey: string, tagId: string, segmentId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`https://a.klaviyo.com/api/tags/${tagId}/relationships/segments/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Klaviyo-API-Key ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'revision': '2024-10-15'
+      },
+      body: JSON.stringify({
+        data: [
+          {
+            type: 'segment',
+            id: segmentId
+          }
+        ]
+      })
+    });
+
+    if (response.ok || response.status === 204) {
+      console.log(`[klaviyo-create-segments] Tagged segment ${segmentId} with Aderai`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      console.error(`[klaviyo-create-segments] Failed to tag segment ${segmentId}:`, errorText);
+      return false;
+    }
+  } catch (error) {
+    console.error(`[klaviyo-create-segments] Error tagging segment ${segmentId}:`, error);
+    return false;
+  }
+}
+
+// ==========================================
 // STEP 4: CREATE SEGMENT
 // ==========================================
 
@@ -819,7 +917,8 @@ async function createKlaviyoSegment(
   segmentId: string, 
   metricMap: Record<string, string>, 
   currencySymbol: string, 
-  settings: any = {}
+  settings: any = {},
+  tagId: string | null = null
 ) {
   try {
     const segmentDef = getSegmentDefinition(segmentId, metricMap, currencySymbol, settings);
@@ -880,6 +979,12 @@ async function createKlaviyoSegment(
     }
 
     console.log(`[klaviyo-create-segments] Successfully created: ${segmentDef.name}`);
+    
+    // Tag the segment with Aderai
+    if (tagId && responseData.data?.id) {
+      await addTagToSegment(apiKey, tagId, responseData.data.id);
+    }
+    
     return {
       segmentId,
       status: 'created',
@@ -956,7 +1061,15 @@ serve(async (req) => {
     // Step 1: Detect available metrics
     const metricMap = await detectAvailableMetrics(apiKey);
 
-    // Step 2: Create segments with rate limiting
+    // Step 2: Get or create the Aderai tag (do this once)
+    const aderaiTagId = await getOrCreateAderaiTag(apiKey);
+    if (aderaiTagId) {
+      console.log('[klaviyo-create-segments] Will tag segments with Aderai tag:', aderaiTagId);
+    } else {
+      console.log('[klaviyo-create-segments] Could not get Aderai tag, segments will not be tagged');
+    }
+
+    // Step 3: Create segments with rate limiting
     const results = [];
     let successCount = 0;
     let existsCount = 0;
@@ -969,7 +1082,8 @@ serve(async (req) => {
         segmentId,
         metricMap,
         currencySymbol || '$',
-        settings || {}
+        settings || {},
+        aderaiTagId
       );
       
       results.push(result);
