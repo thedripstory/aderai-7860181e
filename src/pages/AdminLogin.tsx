@@ -8,9 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { toast } from "sonner";
 
-const ADMIN_EMAIL = "akshat@aderai.io";
-const ADMIN_PASSWORD = "drip@123";
-
 const AdminLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -24,7 +21,7 @@ const AdminLogin = () => {
   const checkExistingSession = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     
-    if (user && user.email === ADMIN_EMAIL) {
+    if (user) {
       // Check admin role in database
       const { data: roleData } = await supabase
         .from("user_roles")
@@ -43,13 +40,6 @@ const AdminLogin = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate credentials match hardcoded admin
-    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
-      toast.error("Invalid credentials. Access denied.");
-      return;
-    }
-
     setLoading(true);
     
     try {

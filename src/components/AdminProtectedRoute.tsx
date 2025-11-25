@@ -8,18 +8,47 @@ interface AdminProtectedRouteProps {
 
 export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      
+      if (session?.user) {
+        // Check if user has admin role
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        
+        setIsAdmin(!!roleData);
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      }
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        
+        setIsAdmin(!!roleData);
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -51,6 +80,11 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
     return <Navigate to="/admin-login" state={{ from: location }} replace />;
   }
 
-  // Authenticated, render children
+  // Authenticated but not admin, show access denied
+  if (!isAdmin) {
+    return <Navigate to="/admin-login" state={{ from: location }} replace />;
+  }
+
+  // Authenticated and admin, render children
   return <>{children}</>;
 }
