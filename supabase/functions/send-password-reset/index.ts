@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import React from "https://esm.sh/react@18.3.1";
+import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22";
+import { PasswordResetEmail } from "./_templates/password-reset.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -61,51 +64,19 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("email", email)
       .single();
 
+    // Render React Email template
+    const html = await renderAsync(
+      React.createElement(PasswordResetEmail, {
+        userName,
+        resetLink,
+      })
+    );
+
     const emailResponse = await resend.emails.send({
-      from: "Klaviyo Segments <onboarding@resend.dev>",
+      from: "Aderai <onboarding@resend.dev>",
       to: [email],
-      subject: "Password Reset Request",
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .header h1 { color: white; margin: 0; font-size: 24px; }
-            .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 10px 10px; }
-            .button { display: inline-block; background: #FF6B35; color: white; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-            .warning { background: #FFF3CD; border-left: 4px solid #FFC107; padding: 15px; margin: 20px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🔐 Password Reset Request</h1>
-            </div>
-            <div class="content">
-              <p>Hi ${userName},</p>
-              <p>We received a request to reset your password. Click the button below to create a new password:</p>
-              <div style="text-align: center;">
-                <a href="${resetLink}" class="button">Reset Password</a>
-              </div>
-              <div class="warning">
-                <strong>⚠️ Security Notice:</strong> This link will expire in 1 hour. If you didn't request this reset, please ignore this email and your password will remain unchanged.
-              </div>
-              <p>For security reasons, this link can only be used once.</p>
-              <p>If you're having trouble clicking the button, copy and paste this URL into your browser:</p>
-              <p style="word-break: break-all; color: #666; font-size: 12px;">${resetLink}</p>
-            </div>
-            <div class="footer">
-              <p>© ${new Date().getFullYear()} Klaviyo Segments. All rights reserved.</p>
-              <p>This is an automated email, please do not reply.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
+      subject: "Reset Your Aderai Password",
+      html,
     });
 
     // Log email to audit trail
