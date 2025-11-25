@@ -32,6 +32,7 @@ import { AdminSegmentAnalytics } from "@/components/AdminSegmentAnalytics";
 import { AdminUserHealth } from "@/components/AdminUserHealth";
 import { AdminAdvancedFeatureUsage } from "@/components/AdminAdvancedFeatureUsage";
 import { AdminSystemHealthMetrics } from "@/components/AdminSystemHealthMetrics";
+import { ABTestResults } from "@/components/ABTestResults";
 import { exportUsersToCSV, exportFeedbackToCSV } from "@/lib/csvExport";
 import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
@@ -346,7 +347,7 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-14 w-full mb-8 gap-2">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-15 w-full mb-8 gap-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="cohorts">Cohorts</TabsTrigger>
             <TabsTrigger value="segments">Segments</TabsTrigger>
@@ -360,6 +361,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
+            <TabsTrigger value="abtests">A/B Tests</TabsTrigger>
             <TabsTrigger value="audit">Audit</TabsTrigger>
           </TabsList>
 
@@ -876,6 +878,11 @@ const AdminDashboard = () => {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* A/B Tests Tab */}
+          <TabsContent value="abtests" className="space-y-6">
+            <ABTestResults testName="hero-headline" />
           </TabsContent>
 
           {/* Audit Trail Tab */}
