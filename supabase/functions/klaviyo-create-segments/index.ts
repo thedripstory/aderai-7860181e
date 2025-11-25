@@ -969,6 +969,125 @@ function getSegmentDefinition(
         }]
       }
     },
+
+    // =====================================
+    // PROFILE PROPERTY SEGMENTS
+    // =====================================
+
+    'birthday-month': {
+      name: `Birthday This Month${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: 'properties["birthday"]',
+            filter: {
+              type: 'date',
+              operator: 'is-in-month',
+              value: new Date().getMonth() + 1
+            }
+          }]
+        }]
+      }
+    },
+
+    'location-country': {
+      name: `United States Customers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: "location['country']",
+            filter: {
+              type: 'string',
+              operator: 'equals',
+              value: 'United States'
+            }
+          }]
+        }]
+      }
+    },
+
+    // =====================================
+    // EMAIL ENGAGEMENT EXCLUSIONS
+    // =====================================
+
+    'not-opted-in': {
+      name: `🚫 Not Opted In (Email)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-marketing-consent',
+            consent: {
+              channel: 'email',
+              can_receive_marketing: false,
+              consent_status: {
+                subscription: 'any'
+              }
+            }
+          }]
+        }]
+      }
+    },
+
+    'unengaged-exclusion': openedEmailId ? {
+      name: `🚫 Unengaged Exclusion (180+ Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    // =====================================
+    // OVER-MESSAGED SEGMENTS
+    // =====================================
+
+    'received-3-in-3-days': openedEmailId ? {
+      name: `🚫 Received 3+ Emails in 3 Days${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'greater-than', 2, { type: 'in-the-last', quantity: 3, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'received-5-opened-0': openedEmailId ? {
+      name: `🚫 Received 5+ Emails, Opened 0${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    // =====================================
+    // SUNSET/WINBACK SEGMENT
+    // =====================================
+
+    'sunset-segment': (openedEmailId && clickedEmailId) ? {
+      name: `Sunset Candidates (No Engagement 120+ Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
   };
 
   return definitions[segmentId] || null;
@@ -1120,15 +1239,14 @@ async function createKlaviyoSegment(
       
       // Check if it's an unimplemented segment type
       const unimplementedSegments = [
-        'age-18-24', 'age-25-40', 'birthday-month',
-        'location-country', 'location-proximity',
+        'age-18-24', 'age-25-40',
+        'location-proximity',
         'abandoned-cart-high-value', 'abandoned-checkout-high-value',
         'category-interest', 'product-interest', 'cross-sell',
         'category-buyers', 'multi-category', 'coupon-users',
         'full-price-buyers', 'product-reviewers', 'non-reviewers',
         'frequent-visitors', 'refunded-customers',
-        'negative-feedback', 'marked-spam', 'received-3-in-3-days',
-        'received-5-opened-0'
+        'negative-feedback', 'marked-spam'
       ];
       
       if (unimplementedSegments.includes(segmentId)) {
