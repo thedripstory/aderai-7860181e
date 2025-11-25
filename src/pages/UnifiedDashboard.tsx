@@ -1,31 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, LogOut, Settings as SettingsIcon, Loader, RefreshCw, HelpCircle, Sparkles } from 'lucide-react';
+import { Loader, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
 import { FeedbackWidget } from '@/components/FeedbackWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import { OnboardingTour } from '@/components/OnboardingTour';
 import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { AISegmentSuggester } from '@/components/AISegmentSuggester';
 import { KlaviyoSyncIndicator } from '@/components/KlaviyoSyncIndicator';
+import { KlaviyoHealthDashboard } from '@/components/KlaviyoHealthDashboard';
+import { SegmentHistoricalTrends } from '@/components/SegmentHistoricalTrends';
+import { SegmentOperationHistory } from '@/components/SegmentOperationHistory';
+import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
 import { SegmentPerformance } from '@/components/SegmentPerformance';
 import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
 import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
 import { SegmentCloner } from '@/components/SegmentCloner';
 import { AchievementsPanel } from '@/components/AchievementsPanel';
-import { TestErrorButton } from '@/components/TestErrorButton';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
@@ -309,56 +307,16 @@ export default function UnifiedDashboard() {
       
       <KlaviyoSetupBanner hasKlaviyoKeys={klaviyoKeys.length > 0} />
       
-      <div className="border-b-2 border-border bg-card">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Building2 className="w-8 h-8 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold">Aderai</h1>
-                <p className="text-sm text-muted-foreground">AI-Powered Segmentation</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              {klaviyoKeys.length > 0 && (
-                <KlaviyoSyncIndicator
-                  klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
-                  apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
-                />
-              )}
-              <FeedbackWidget />
-              
-              {/* Help Menu with Tour Restart */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" title="Help Center">
-                    <HelpCircle className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate('/help')}>
-                    <HelpCircle className="w-4 h-4 mr-2" />
-                    Help Center
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={startTour}>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Restart Tour
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button variant="outline" onClick={() => navigate('/settings')} data-tour="settings-button">
-                <SettingsIcon className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* New Header with Logo */}
+      <DashboardHeader onStartTour={startTour}>
+        {klaviyoKeys.length > 0 && (
+          <KlaviyoSyncIndicator
+            klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
+            apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
+          />
+        )}
+        <FeedbackWidget />
+      </DashboardHeader>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -469,6 +427,17 @@ export default function UnifiedDashboard() {
 
           <TabsContent value="more">
             <div className="grid gap-6">
+              {klaviyoKeys.length > 0 && (
+                <>
+                  <KlaviyoHealthDashboard 
+                    klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
+                    apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
+                  />
+                  <SegmentHistoricalTrends klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
+                  <SegmentOperationHistory klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
+                  <AderaiSegmentManager klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
+                </>
+              )}
               <AutomationPlaybooks />
               {klaviyoKeys.length > 0 && (
                 <SegmentCloner 

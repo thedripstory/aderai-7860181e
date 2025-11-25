@@ -712,6 +712,75 @@ export type Database = {
         }
         Relationships: []
       }
+      segment_historical_data: {
+        Row: {
+          id: string
+          klaviyo_key_id: string
+          profile_count: number
+          recorded_at: string
+          segment_klaviyo_id: string
+          segment_name: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          klaviyo_key_id: string
+          profile_count?: number
+          recorded_at?: string
+          segment_klaviyo_id: string
+          segment_name: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          klaviyo_key_id?: string
+          profile_count?: number
+          recorded_at?: string
+          segment_klaviyo_id?: string
+          segment_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      segment_operations: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          klaviyo_key_id: string
+          metadata: Json | null
+          operation_status: string
+          operation_type: string
+          segment_klaviyo_id: string | null
+          segment_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          klaviyo_key_id: string
+          metadata?: Json | null
+          operation_status: string
+          operation_type: string
+          segment_klaviyo_id?: string | null
+          segment_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          klaviyo_key_id?: string
+          metadata?: Json | null
+          operation_status?: string
+          operation_type?: string
+          segment_klaviyo_id?: string | null
+          segment_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       two_factor_auth: {
         Row: {
           backup_codes: string[] | null
