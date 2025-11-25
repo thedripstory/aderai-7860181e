@@ -1088,6 +1088,143 @@ function getSegmentDefinition(
         ]
       }
     } : null,
+
+    // =====================================
+    // ADVANCED SHOPPING SEGMENTS
+    // =====================================
+
+    'abandoned-cart-high-value': (addedToCartId && placedOrderId) ? {
+      name: `Abandoned Cart - High Value (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              {
+                type: 'profile-metric',
+                metric_id: addedToCartId,
+                measurement: 'sum',
+                measurement_filter: {
+                  type: 'numeric',
+                  operator: 'greater-than-or-equal',
+                  value: highValueThreshold
+                },
+                timeframe_filter: {
+                  type: 'date',
+                  operator: 'in-the-last',
+                  quantity: 7,
+                  unit: 'day'
+                }
+              }
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 7, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
+    'abandoned-checkout-high-value': (startedCheckoutId && placedOrderId) ? {
+      name: `Abandoned Checkout - High Value (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              {
+                type: 'profile-metric',
+                metric_id: startedCheckoutId,
+                measurement: 'sum',
+                measurement_filter: {
+                  type: 'numeric',
+                  operator: 'greater-than-or-equal',
+                  value: highValueThreshold
+                },
+                timeframe_filter: {
+                  type: 'date',
+                  operator: 'in-the-last',
+                  quantity: 7,
+                  unit: 'day'
+                }
+              }
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 7, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
+    'frequent-visitors': activeOnSiteId ? {
+      name: `Frequent Site Visitors (5+ in 7 Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(activeOnSiteId, 'count', 'greater-than', 4, { type: 'in-the-last', quantity: 7, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'multi-category': placedOrderId ? {
+      name: `Multi-Category Buyers (3+ Orders)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 2, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+
+    'cross-sell': placedOrderId ? {
+      name: `Cross-Sell Candidates (1-2 Orders)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
+            buildMetricCondition(placedOrderId, 'count', 'less-than', 3, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+
+    'category-buyers': placedOrderId ? {
+      name: `Active Category Buyers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'product-interest': viewedProductId ? {
+      name: `Product Interest (3+ Views)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(viewedProductId, 'count', 'greater-than', 2, { type: 'in-the-last', quantity: 14, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'category-interest': viewedProductId ? {
+      name: `Category Interest (5+ Views)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(viewedProductId, 'count', 'greater-than', 4, { type: 'in-the-last', quantity: 30, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
   };
 
   return definitions[segmentId] || null;
@@ -1241,12 +1378,9 @@ async function createKlaviyoSegment(
       const unimplementedSegments = [
         'age-18-24', 'age-25-40',
         'location-proximity',
-        'abandoned-cart-high-value', 'abandoned-checkout-high-value',
-        'category-interest', 'product-interest', 'cross-sell',
-        'category-buyers', 'multi-category', 'coupon-users',
-        'full-price-buyers', 'product-reviewers', 'non-reviewers',
-        'frequent-visitors', 'refunded-customers',
-        'negative-feedback', 'marked-spam'
+        'coupon-users', 'full-price-buyers',
+        'product-reviewers', 'non-reviewers',
+        'refunded-customers', 'negative-feedback', 'marked-spam'
       ];
       
       if (unimplementedSegments.includes(segmentId)) {
