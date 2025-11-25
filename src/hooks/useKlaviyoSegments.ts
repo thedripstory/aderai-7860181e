@@ -29,22 +29,6 @@ export const useKlaviyoSegments = () => {
   const [results, setResults] = useState<SegmentResult[]>([]);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
 
-  const segmentIdMapping: Record<string, string> = {
-    'vip': 'vip-customers',
-    'high-value': 'high-value-customers',
-    'new-customers': 'recent-customers',
-    'repeat-customers': 'repeat-customers',
-    'one-time-buyers': 'browsers',
-    'active-customers': 'active-customers',
-    'lapsed-customers': 'at-risk-customers',
-    'churned-customers': 'lost-customers',
-    'high-frequency': 'loyal-customers',
-    'engaged-subscribers': 'engaged-subscribers',
-    'unengaged-subscribers': 'highly-engaged',
-    'cart-abandoners': 'cart-abandoners',
-    'browse-abandoners': 'checkout-abandoners',
-  };
-
   const createSegments = async (
     selectedSegments: string[],
     activeKey: KlaviyoKey,
@@ -70,11 +54,13 @@ export const useKlaviyoSegments = () => {
         lostDays: activeKey.churned_days,
         recentDays: activeKey.new_customer_days,
         activeDays: 90,
+        vipThreshold: activeKey.vip_threshold,
+        highValueThreshold: activeKey.high_value_threshold,
+        aov: activeKey.aov,
       };
 
-      const mappedSegmentIds = selectedSegments
-        .map(id => segmentIdMapping[id])
-        .filter(Boolean);
+      // Pass segment IDs directly - they match the backend definitions
+      const segmentIds = selectedSegments;
 
       // Save progress if jobId provided
       if (jobId) {
@@ -88,45 +74,77 @@ export const useKlaviyoSegments = () => {
           .eq('id', jobId);
       }
 
+      console.log('Creating segments:', segmentIds);
+
       const { data: response, error } = await supabase.functions.invoke('klaviyo-create-segments', {
         body: {
           apiKey: activeKey.klaviyo_api_key_hash,
-          segmentIds: mappedSegmentIds,
+          segmentIds: segmentIds,
           currencySymbol,
           settings,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
-      const newResults: SegmentResult[] = selectedSegments.map((segmentId, index) => {
+      if (!response || !response.results) {
+        console.error('Invalid response from edge function:', response);
+        throw new Error('Invalid response from segment creation service');
+      }
+
+      console.log('Segment creation response:', response);
+
+      // Create a map of results by segmentId for reliable lookup
+      const resultsMap = new Map<string, any>();
+      response.results.forEach((result: any) => {
+        if (result && result.segmentId) {
+          resultsMap.set(result.segmentId, result);
+        }
+      });
+
+      const newResults: SegmentResult[] = selectedSegments.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
-        const result = response.results[index];
+        const result = resultsMap.get(segmentId);
+
+        if (!result) {
+          return {
+            segmentId,
+            status: "error",
+            message: `Failed to create "${segment?.name || segmentId}": No response from server`,
+          };
+        }
 
         if (result.status === 'created') {
+          // Log the operation for audit trail
+          logSegmentOperation(segmentId, segment?.name, 'create', 'success', activeKey.id, result.klaviyoId);
           return {
             segmentId,
             status: "success",
-            message: `Successfully created "${segment?.name}"`,
-            klaviyoId: result.data?.data?.id,
+            message: `Successfully created "${segment?.name || segmentId}"`,
+            klaviyoId: result.data?.data?.id || result.klaviyoId,
           };
         } else if (result.status === 'exists') {
           return {
             segmentId,
             status: "skipped",
-            message: `"${segment?.name}" already exists`,
+            message: `"${segment?.name || segmentId}" already exists`,
           };
         } else if (result.status === 'missing_metrics') {
           return {
             segmentId,
             status: "error",
-            message: `Cannot create "${segment?.name}": Required metrics not available`,
+            message: `Cannot create "${segment?.name || segmentId}": Required metrics not available in your Klaviyo account`,
           };
         } else {
+          // Log failed operations
+          logSegmentOperation(segmentId, segment?.name, 'create', 'failed', activeKey.id, undefined, result.error);
           return {
             segmentId,
             status: "error",
-            message: `Failed to create "${segment?.name}": ${result.error || 'Unknown error'}`,
+            message: `Failed to create "${segment?.name || segmentId}": ${result.error || 'Unknown error'}`,
           };
         }
       });
@@ -178,7 +196,7 @@ export const useKlaviyoSegments = () => {
         return {
           segmentId,
           status: "error",
-          message: `Failed to create "${segment?.name}": ${error.message || 'Unknown error'}`,
+          message: `Failed to create "${segment?.name || segmentId}": ${error.message || 'Unknown error'}`,
         };
       });
       
@@ -197,3 +215,32 @@ export const useKlaviyoSegments = () => {
     setResults,
   };
 };
+
+// Helper function to log segment operations for audit trail
+async function logSegmentOperation(
+  segmentId: string,
+  segmentName: string | undefined,
+  operationType: string,
+  status: string,
+  klaviyoKeyId: string,
+  klaviyoSegmentId?: string,
+  errorMessage?: string
+) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from('segment_operations').insert({
+      user_id: user.id,
+      klaviyo_key_id: klaviyoKeyId,
+      segment_name: segmentName || segmentId,
+      segment_klaviyo_id: klaviyoSegmentId,
+      operation_type: operationType,
+      operation_status: status,
+      error_message: errorMessage,
+      metadata: { segmentId },
+    });
+  } catch (err) {
+    console.error('Failed to log segment operation:', err);
+  }
+}
