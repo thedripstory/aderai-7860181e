@@ -22,6 +22,7 @@ import { AdminSystemHealth } from "@/components/AdminSystemHealth";
 import { AdminUserSessions } from "@/components/AdminUserSessions";
 import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
 import { AdminErrorTracking } from "@/components/AdminErrorTracking";
+import { AdminEmailTracking } from "@/components/AdminEmailTracking";
 import { AdminUsageTracking } from "@/components/AdminUsageTracking";
 import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
@@ -388,6 +389,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
             <TabsTrigger value="api">API</TabsTrigger>
             <TabsTrigger value="errors">Errors</TabsTrigger>
+            <TabsTrigger value="email-tracking">Email Tracking</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
@@ -517,6 +519,11 @@ const AdminDashboard = () => {
           {/* Error Tracking Tab */}
           <TabsContent value="errors">
             <AdminErrorTracking />
+          </TabsContent>
+
+          {/* Email Tracking Tab */}
+          <TabsContent value="email-tracking">
+            <AdminEmailTracking />
           </TabsContent>
 
           {/* Usage Tracking Tab - removed, merged into Features tab */}
