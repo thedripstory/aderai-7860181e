@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encryptApiKey } from "../_shared/encryption.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,12 +38,16 @@ serve(async (req) => {
 
     if (klaviyoResponse.ok) {
       const data = await klaviyoResponse.json();
+      
+      // Encrypt the API key before returning
+      const encryptedKey = await encryptApiKey(apiKey);
+      
       return new Response(
         JSON.stringify({
           valid: true,
+          encryptedKey,
           accountInfo: {
             accountId: data.data?.[0]?.id || null,
-            // Add other relevant account info if needed
           },
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
