@@ -68,8 +68,8 @@ CRITICAL: Use this EXACT Klaviyo API format:
               "value": 0
             },
             "timeframe_filter": {
-              "type": "preset",
-              "preset": "in-the-last",
+              "type": "date",
+              "operator": "in-the-last",
               "quantity": 30,
               "unit": "day"
             }
@@ -84,9 +84,10 @@ RULES:
 1. metric_id must be an EXACT ID from the metrics list
 2. measurement: "count" or "sum"
 3. operator: "greater-than", "less-than", "equals", "greater-or-equal", "less-or-equal"
-4. timeframe preset: "in-the-last" (needs quantity/unit) or "over-all-time"
-5. Always append " | Aderai" to the segment name
-6. Return ONLY valid JSON, no markdown or explanations`;
+4. For time-based conditions, use timeframe_filter with type: "date" and operator: "in-the-last" (requires quantity/unit)
+5. For "over all time" conditions, set timeframe_filter to null
+6. Always append " | Aderai" to the segment name
+7. Return ONLY valid JSON, no markdown or explanations`;
 
     const userPrompt = `Create a segment with:
 Name: ${segmentName}
