@@ -2,6 +2,45 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorLogger } from '@/lib/errorLogger';
 
+// Bundle definitions - each bundle expands to multiple segment IDs
+const SEGMENT_BUNDLES: Record<string, string[]> = {
+  'core-essentials': [
+    'engaged-30-days',
+    'repeat-customers', 
+    'cart-abandoners',
+    'vip-customers',
+    'recent-purchasers-30'
+  ],
+  'engagement-maximizer': [
+    'highly-engaged',
+    'email-openers-30',
+    'email-clickers-30',
+    'recent-clickers-90',
+    'active-site-30'
+  ],
+  'lifecycle-manager': [
+    'new-subscribers',
+    'first-time-buyers',
+    'repeat-customers',
+    'at-risk-customers',
+    'churned-customers',
+    'vip-customers'
+  ],
+  'shopping-behavior': [
+    'cart-abandoners',
+    'browse-abandoners',
+    'product-viewers',
+    'checkout-starters',
+    'frequent-browsers'
+  ],
+  'smart-exclusions': [
+    'recent-purchasers-exclusion',
+    'unengaged-exclusion',
+    'never-engaged-exclusion',
+    'bounced-emails'
+  ]
+};
+
 export interface SegmentResult {
   segmentId: string;
   status: "success" | "error" | "skipped";
@@ -45,9 +84,23 @@ export const useKlaviyoSegments = () => {
       throw new Error('Please select at least one segment to create');
     }
 
+    // Expand any bundle IDs into their component segments
+    let expandedSegmentIds = [...selectedSegments];
+    selectedSegments.forEach(id => {
+      if (SEGMENT_BUNDLES[id]) {
+        // Remove the bundle ID and add its component segments
+        expandedSegmentIds = expandedSegmentIds.filter(s => s !== id);
+        expandedSegmentIds.push(...SEGMENT_BUNDLES[id]);
+      }
+    });
+    // Remove duplicates
+    expandedSegmentIds = [...new Set(expandedSegmentIds)];
+    
+    console.log('[useKlaviyoSegments] Expanded segment IDs:', expandedSegmentIds);
+
     setLoading(true);
     setResults([]);
-    setProgress({ current: 0, total: selectedSegments.length });
+    setProgress({ current: 0, total: expandedSegmentIds.length });
 
     try {
       const currencySymbol = activeKey.currency_symbol || '$';
@@ -65,12 +118,10 @@ export const useKlaviyoSegments = () => {
         aov: activeKey.aov || 100,
       };
 
-      // Pass segment IDs directly - they match the backend definitions
-      const segmentIds = [...selectedSegments]; // Create a copy to ensure it's a fresh array
-      
+      // Use expanded segment IDs for API call
       console.log('[useKlaviyoSegments] Sending to edge function:', {
-        segmentIdsCount: segmentIds.length,
-        segmentIds: segmentIds,
+        segmentIdsCount: expandedSegmentIds.length,
+        segmentIds: expandedSegmentIds,
       });
 
       // Save progress if jobId provided
@@ -80,16 +131,16 @@ export const useKlaviyoSegments = () => {
           .update({
             status: 'in_progress',
             segments_processed: 0,
-            total_segments: selectedSegments.length
+            total_segments: expandedSegmentIds.length
           })
           .eq('id', jobId);
       }
 
-      console.log('Creating segments:', segmentIds);
+      console.log('Creating segments:', expandedSegmentIds);
 
       const requestBody = {
         apiKey: activeKey.klaviyo_api_key_hash,
-        segmentIds: segmentIds,
+        segmentIds: expandedSegmentIds,
         currencySymbol,
         settings,
       };
@@ -137,7 +188,7 @@ export const useKlaviyoSegments = () => {
 
       console.log('[useKlaviyoSegments] Results map keys:', Array.from(resultsMap.keys()));
 
-      const newResults: SegmentResult[] = selectedSegments.map((segmentId) => {
+      const newResults: SegmentResult[] = expandedSegmentIds.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
         const segmentName = segment?.name || segmentId;
         const result = resultsMap.get(segmentId);
@@ -195,7 +246,7 @@ export const useKlaviyoSegments = () => {
           .from('segment_creation_jobs')
           .update({
             status: 'completed',
-            segments_processed: selectedSegments.length,
+            segments_processed: expandedSegmentIds.length,
             completed_at: new Date().toISOString(),
             success_count: successCount,
             error_count: newResults.filter(r => r.status === 'error').length
@@ -209,10 +260,10 @@ export const useKlaviyoSegments = () => {
       
       // Log error to database for production monitoring
       await ErrorLogger.logSegmentError(
-        `Batch creation (${selectedSegments.length} segments)`,
+        `Batch creation (${expandedSegmentIds.length} segments)`,
         error,
         { 
-          selectedSegments, 
+          expandedSegmentIds, 
           activeKeyId: activeKey.id,
           jobId 
         }
@@ -228,11 +279,11 @@ export const useKlaviyoSegments = () => {
           .eq('id', jobId);
       }
 
-      const errorResults: SegmentResult[] = selectedSegments.map((segmentId) => {
+      const errorResults: SegmentResult[] = expandedSegmentIds.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
         return {
           segmentId,
-          status: "error",
+          status: "error" as const,
           message: `Failed to create "${segment?.name || segmentId}": ${error.message || 'Unknown error'}`,
         };
       });
