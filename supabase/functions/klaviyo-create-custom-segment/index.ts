@@ -45,32 +45,48 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY not configured');
     }
 
-    const systemPrompt = `You are a Klaviyo segmentation expert. Create a detailed segment definition for Klaviyo based on the segment name and description provided.
+    const systemPrompt = `You are a Klaviyo segmentation expert. Create a segment definition based on the name and description provided.
 
 Available Klaviyo metrics:
 ${availableMetrics.map((m: any) => `- ${m.name} (ID: ${m.id})`).join('\n')}
 
-Create a segment definition using the Klaviyo API format with proper conditions and operators. Use only metric IDs from the list above.
+CRITICAL: Use this EXACT Klaviyo API format:
 
-Format your response as JSON:
 {
-  "name": "Segment Name",
+  "name": "Segment Name | Aderai",
   "definition": {
-    "type": "all|any",
-    "groups": [
+    "condition_groups": [
       {
-        "type": "all|any",
         "conditions": [
           {
-            "metric_id": "metric_id_here",
-            "operator": "greater-than|less-than|equals|etc",
-            "value": "value_here"
+            "type": "profile-metric",
+            "metric_id": "USE_EXACT_METRIC_ID_FROM_LIST",
+            "measurement": "count",
+            "measurement_filter": {
+              "type": "numeric",
+              "operator": "greater-than",
+              "value": 0
+            },
+            "timeframe_filter": {
+              "type": "preset",
+              "preset": "in-the-last",
+              "quantity": 30,
+              "unit": "day"
+            }
           }
         ]
       }
     ]
   }
-}`;
+}
+
+RULES:
+1. metric_id must be an EXACT ID from the metrics list
+2. measurement: "count" or "sum"
+3. operator: "greater-than", "less-than", "equals", "greater-or-equal", "less-or-equal"
+4. timeframe preset: "in-the-last" (needs quantity/unit) or "over-all-time"
+5. Always append " | Aderai" to the segment name
+6. Return ONLY valid JSON, no markdown or explanations`;
 
     const userPrompt = `Create a segment with:
 Name: ${segmentName}
@@ -89,6 +105,7 @@ Description: ${segmentDescription || 'No description provided'}`;
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.7,
+        response_format: { type: "json_object" },
       }),
     });
 
