@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, Search, CheckCircle2, Package, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export const SEGMENTS = [
   // ENGAGEMENT & ACTIVITY (14 segments)
@@ -642,152 +643,275 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
     });
   };
 
+  const selectedCount = selectedSegments.length;
+  const totalSegments = SEGMENTS.length;
+
   return (
-    <div>
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-3xl font-bold">Create Segments</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              {SEGMENTS.length} professional segments available
+    <div className="animate-fade-in">
+      {/* Header Section */}
+      <div className="mb-8 space-y-6">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <h2 className="text-4xl font-bold tracking-tight">Create Segments</h2>
+            <p className="text-muted-foreground flex items-center gap-2 text-base">
+              <Sparkles className="w-4 h-4 text-primary" />
+              {SEGMENTS.length} professional segments at your fingertips
             </p>
           </div>
-          {onSelectAll && onClearAll && (
-            <div className="flex gap-2">
-              <button
-                onClick={onSelectAll}
-                className="px-4 py-2 text-sm border border-border rounded-lg hover:bg-muted"
-              >
-                Select All
-              </button>
-              <button
-                onClick={onClearAll}
-                className="px-4 py-2 text-sm border border-border rounded-lg hover:bg-muted"
-              >
-                Clear All
-              </button>
+          
+          {/* Selection Counter */}
+          <div className="flex flex-col items-end gap-3">
+            <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 text-center">
+              <div className="text-2xl font-bold text-primary">{selectedCount}</div>
+              <div className="text-xs text-muted-foreground">Selected</div>
             </div>
-          )}
+            
+            {onSelectAll && onClearAll && (
+              <div className="flex gap-2">
+                <button
+                  onClick={onSelectAll}
+                  className="px-4 py-2 text-sm font-medium border-2 border-primary/50 text-primary rounded-lg hover:bg-primary/10 transition-all"
+                >
+                  Select All
+                </button>
+                <button
+                  onClick={onClearAll}
+                  className="px-4 py-2 text-sm font-medium border-2 border-border rounded-lg hover:bg-muted transition-all"
+                >
+                  Clear All
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <p className="text-muted-foreground flex items-center gap-2">
-          Select individual segments or choose a pre-built bundle to get started quickly
-          <a 
-            href="/help?article=getting-started" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline inline-flex items-center gap-1 text-sm"
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>Learn more</span>
-          </a>
-        </p>
 
-        {/* Search Bar */}
-        <div className="mt-4">
+        {/* Info Banner */}
+        <div className="bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-4">
+          <p className="text-sm flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" />
+            <span className="text-foreground">
+              Select individual segments or choose a pre-built bundle to get started quickly
+            </span>
+            <a 
+              href="/help?article=getting-started" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline inline-flex items-center gap-1 ml-auto font-medium"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Learn more</span>
+            </a>
+          </p>
+        </div>
+
+        {/* Enhanced Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search segments..."
+            placeholder="Search segments by name or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 border border-border rounded-lg bg-background"
+            className="w-full pl-12 pr-4 py-3 border-2 border-border rounded-xl bg-background focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
+          {searchQuery && (
+            <Badge variant="secondary" className="absolute right-4 top-1/2 -translate-y-1/2">
+              {filteredSegments.length} results
+            </Badge>
+          )}
         </div>
       </div>
 
-      {/* Bundles */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {BUNDLES.map((bundle) => (
-          <div
-            key={bundle.id}
-            className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors cursor-pointer"
-            onClick={() => onSelectBundle(bundle.id)}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="text-4xl">{bundle.icon}</div>
-              <div className="text-sm text-muted-foreground">{bundle.segments.length} segments</div>
-            </div>
-            <h3 className="text-xl font-bold mb-2">{bundle.name}</h3>
-            <p className="text-sm text-muted-foreground mb-4">{bundle.description}</p>
-            <button className="w-full bg-primary/10 text-primary py-2 rounded-lg font-medium hover:bg-primary/20">
-              Add Bundle
-            </button>
-          </div>
-        ))}
+      {/* Enhanced Bundles Section */}
+      <div className="mb-12">
+        <div className="flex items-center gap-2 mb-6">
+          <Package className="w-5 h-5 text-primary" />
+          <h3 className="text-2xl font-bold">Quick Start Bundles</h3>
+          <Badge variant="secondary" className="ml-2">Popular</Badge>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {BUNDLES.map((bundle, index) => {
+            const bundleSelected = bundle.segments.every(id => selectedSegments.includes(id));
+            return (
+              <div
+                key={bundle.id}
+                className="group relative bg-gradient-to-br from-card to-card/50 border-2 border-border rounded-2xl p-6 hover:border-primary hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+                onClick={() => onSelectBundle(bundle.id)}
+              >
+                {/* Hover gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="text-5xl group-hover:scale-110 transition-transform duration-300">
+                      {bundle.icon}
+                    </div>
+                    <Badge variant={bundleSelected ? "default" : "secondary"} className="text-xs">
+                      {bundle.segments.length} segments
+                    </Badge>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                    {bundle.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-5 line-clamp-2">
+                    {bundle.description}
+                  </p>
+                  
+                  <button className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-all group-hover:shadow-md flex items-center justify-center gap-2">
+                    {bundleSelected ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Bundle Added</span>
+                      </>
+                    ) : (
+                      <>
+                        <Package className="w-4 h-4" />
+                        <span>Add Bundle</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Segments by Category */}
-      <div className="space-y-4">
-        {categories.map((category) => {
+      {/* Enhanced Segments by Category */}
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <h3 className="text-2xl font-bold">Browse by Category</h3>
+          <p className="text-sm text-muted-foreground">
+            {categories.length} categories • {filteredSegments.length} segments
+          </p>
+        </div>
+
+        {categories.map((category, categoryIndex) => {
           const categorySegments = filteredSegments.filter((s) => s.category === category);
           const isExpanded = expandedCategory === category;
+          const categorySelectedCount = categorySegments.filter(s => selectedSegments.includes(s.id)).length;
 
           if (categorySegments.length === 0 && searchQuery) return null;
 
           return (
-            <div key={category} className="bg-card border border-border rounded-lg overflow-hidden">
+            <div 
+              key={category} 
+              className="bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary/30 transition-all animate-slide-in"
+              style={{ animationDelay: `${categoryIndex * 50}ms` }}
+            >
+              {/* Category Header */}
               <button
                 onClick={() => setExpandedCategory(isExpanded ? null : category)}
-                className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
+                className="w-full px-6 py-5 flex items-center justify-between hover:bg-muted/30 transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">{categoryIcons[category]}</div>
+                <div className="flex items-center gap-4">
+                  <div className="text-3xl group-hover:scale-110 transition-transform">
+                    {categoryIcons[category]}
+                  </div>
                   <div className="text-left">
-                    <h3 className="font-bold">{category}</h3>
-                    <p className="text-sm text-muted-foreground">{categorySegments.length} segments</p>
+                    <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
+                      {category}
+                    </h3>
+                    <div className="flex items-center gap-3 mt-1">
+                      <p className="text-sm text-muted-foreground">
+                        {categorySegments.length} segments
+                      </p>
+                      {categorySelectedCount > 0 && (
+                        <Badge variant="default" className="text-xs">
+                          {categorySelectedCount} selected
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                
+                <div className="flex items-center gap-3">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       selectAllInCategory(category);
                     }}
-                    className="px-3 py-1 text-xs border border-border rounded hover:bg-muted"
+                    className="px-4 py-2 text-sm font-medium border-2 border-primary/50 text-primary rounded-lg hover:bg-primary/10 transition-all"
                   >
-                    Select All in Category
+                    Select All
                   </button>
-                  {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  <div className={`p-2 rounded-lg bg-muted transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                    <ChevronDown className="w-5 h-5" />
+                  </div>
                 </div>
               </button>
 
+              {/* Category Content */}
               {isExpanded && (
-                <div className="border-t border-border p-6 space-y-4">
-                  {categorySegments.map((segment) => {
-                    const isSelected = selectedSegments.includes(segment.id);
-                    return (
-                      <div
-                        key={segment.id}
-                        className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                          isSelected
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/30"
-                        }`}
-                        onClick={() => onToggleSegment(segment.id)}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="text-2xl mt-1">{segment.icon}</div>
-                          <div className="flex-1">
-                            <h4 className="font-bold mb-1">{segment.name}</h4>
-                            <p className="text-sm text-muted-foreground mb-2">{segment.description}</p>
-                            <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded inline-block">
-                              {segment.definition}
+                <div className="border-t-2 border-border bg-gradient-to-b from-background to-muted/20 p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {categorySegments.map((segment, segmentIndex) => {
+                      const isSelected = selectedSegments.includes(segment.id);
+                      return (
+                        <div
+                          key={segment.id}
+                          className={`group relative p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer animate-fade-in ${
+                            isSelected
+                              ? "border-primary bg-primary/10 shadow-md"
+                              : "border-border hover:border-primary/50 hover:shadow-sm bg-card"
+                          }`}
+                          style={{ animationDelay: `${segmentIndex * 30}ms` }}
+                          onClick={() => onToggleSegment(segment.id)}
+                        >
+                          {/* Selection indicator */}
+                          {isSelected && (
+                            <div className="absolute top-3 right-3">
+                              <CheckCircle2 className="w-5 h-5 text-primary" />
+                            </div>
+                          )}
+                          
+                          <div className="flex items-start gap-4">
+                            <div className="text-3xl mt-1 group-hover:scale-110 transition-transform">
+                              {segment.icon}
+                            </div>
+                            <div className="flex-1 pr-6">
+                              <h4 className="font-bold text-base mb-2 group-hover:text-primary transition-colors">
+                                {segment.name}
+                              </h4>
+                              <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                                {segment.description}
+                              </p>
+                              <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-muted/50 border border-border">
+                                <span className="font-mono text-muted-foreground">
+                                  {segment.definition}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => onToggleSegment(segment.id)}
-                            className="w-5 h-5 mt-1"
-                          />
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
           );
         })}
+
+        {/* Empty State for Search */}
+        {searchQuery && filteredSegments.length === 0 && (
+          <div className="text-center py-16 bg-muted/20 rounded-2xl border-2 border-dashed border-border">
+            <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-bold mb-2">No segments found</h3>
+            <p className="text-muted-foreground mb-4">
+              Try adjusting your search term or browse by category
+            </p>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all"
+            >
+              Clear Search
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
