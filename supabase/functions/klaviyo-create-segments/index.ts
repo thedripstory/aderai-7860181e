@@ -1602,6 +1602,21 @@ serve(async (req) => {
 
     console.log(`[klaviyo-create-segments] Complete: ${successCount} created, ${existsCount} exist, ${skippedCount} skipped, ${errorCount} errors`);
 
+    // Check which key metrics are available
+    const metricsAvailability = {
+      'Placed Order': !!findMetricId('placed-order', metricMap),
+      'Started Checkout': !!findMetricId('started-checkout', metricMap),
+      'Viewed Product': !!findMetricId('viewed-product', metricMap),
+      'Active on Site': !!findMetricId('active-on-site', metricMap),
+      'Opened Email': !!findMetricId('opened-email', metricMap),
+      'Clicked Email': !!findMetricId('clicked-email', metricMap),
+      'Added to Cart': !!findMetricId('added-to-cart', metricMap),
+    };
+
+    const missingMetrics = Object.entries(metricsAvailability)
+      .filter(([_, available]) => !available)
+      .map(([name]) => name);
+
     return new Response(
       JSON.stringify({ 
         results, 
@@ -1610,7 +1625,12 @@ serve(async (req) => {
           exists: existsCount, 
           skipped: skippedCount,
           errors: errorCount 
-        } 
+        },
+        metricsAvailability,
+        missingMetrics,
+        metricsNote: missingMetrics.length > 0 
+          ? `Some segments may be unavailable because your Klaviyo account is missing these metrics: ${missingMetrics.join(', ')}. Make sure your ecommerce platform is properly integrated with Klaviyo.`
+          : 'All required metrics are available in your Klaviyo account.'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

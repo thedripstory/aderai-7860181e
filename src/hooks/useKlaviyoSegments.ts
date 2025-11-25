@@ -116,6 +116,17 @@ export const useKlaviyoSegments = () => {
       const resultsArray = response.results || [];
       console.log('[useKlaviyoSegments] Results array:', resultsArray);
 
+      // Log metrics availability for debugging
+      if (response.missingMetrics && response.missingMetrics.length > 0) {
+        console.warn('[useKlaviyoSegments] Missing Klaviyo metrics:', response.missingMetrics);
+        console.warn('[useKlaviyoSegments]', response.metricsNote);
+      }
+
+      // Notify user about missing metrics
+      if (response.missingMetrics && response.missingMetrics.length > 0 && response.summary?.skipped > 0) {
+        console.info(`Note: ${response.summary.skipped} segments were skipped. ${response.metricsNote}`);
+      }
+
       // Create a map of results by segmentId for reliable lookup
       const resultsMap = new Map<string, any>();
       resultsArray.forEach((result: any) => {
