@@ -214,6 +214,7 @@ export type Database = {
       }
       email_audit_log: {
         Row: {
+          email_log_id: string | null
           email_type: string
           error_message: string | null
           id: string
@@ -226,6 +227,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          email_log_id?: string | null
           email_type: string
           error_message?: string | null
           id?: string
@@ -238,6 +240,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          email_log_id?: string | null
           email_type?: string
           error_message?: string | null
           id?: string
@@ -255,6 +258,41 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_tracking: {
+        Row: {
+          created_at: string | null
+          email_log_id: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_log_id?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email_log_id?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_tracking_email_log_id_fkey"
+            columns: ["email_log_id"]
+            isOneToOne: false
+            referencedRelation: "email_audit_log"
             referencedColumns: ["id"]
           },
         ]
