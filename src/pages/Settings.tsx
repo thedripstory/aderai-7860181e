@@ -644,7 +644,7 @@ export default function Settings() {
       {showTwoFactorDisable && currentUser && (
         <TwoFactorDisable
           userId={currentUser.id}
-          onDisableComplete={() => {
+          onDisabled={() => {
             setShowTwoFactorDisable(false);
             setTwoFactorEnabled(false);
             toast({
