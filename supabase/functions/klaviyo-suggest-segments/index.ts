@@ -115,6 +115,7 @@ Based on this information and the available Klaviyo metrics, suggest segments th
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.7,
+        response_format: { type: "json_object" },
       }),
     });
 
