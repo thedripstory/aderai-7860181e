@@ -45,32 +45,38 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY not configured');
     }
 
-    const systemPrompt = `You are a Klaviyo segmentation expert. Based on the user's brand information and available Klaviyo metrics, suggest 3-5 highly relevant customer segments that will help them achieve their goals.
+    const systemPrompt = `You are a Klaviyo segmentation expert. Based on the user's brand information and available Klaviyo metrics, suggest 3-5 highly relevant customer segments.
 
 Available Klaviyo metrics:
 ${availableMetrics.map((m: any) => `- ${m.name} (ID: ${m.id})`).join('\n')}
 
-For each segment, provide:
-1. A clear, descriptive name
-2. Brief explanation of why this segment is valuable
-3. The specific Klaviyo conditions to create it (using metric IDs from the list above)
+CRITICAL: You must use the EXACT Klaviyo API format below. Any deviation will cause errors.
 
-Format your response as a JSON array of segment objects with this structure:
+For each segment, respond with this EXACT JSON structure:
 {
   "segments": [
     {
-      "name": "Segment Name",
+      "name": "Segment Name | Aderai",
       "description": "Why this segment matters",
-      "conditions": {
-        "type": "all|any",
-        "groups": [
+      "definition": {
+        "condition_groups": [
           {
-            "type": "all|any",
             "conditions": [
               {
-                "metric_id": "metric_id_here",
-                "operator": "greater-than|less-than|equals|etc",
-                "value": "value_here"
+                "type": "profile-metric",
+                "metric_id": "USE_EXACT_METRIC_ID_FROM_LIST",
+                "measurement": "count",
+                "measurement_filter": {
+                  "type": "numeric",
+                  "operator": "greater-than",
+                  "value": 0
+                },
+                "timeframe_filter": {
+                  "type": "preset",
+                  "preset": "in-the-last",
+                  "quantity": 30,
+                  "unit": "day"
+                }
               }
             ]
           }
@@ -78,7 +84,17 @@ Format your response as a JSON array of segment objects with this structure:
       }
     }
   ]
-}`;
+}
+
+RULES:
+1. metric_id must be an EXACT ID from the available metrics list above
+2. measurement can be: "count" or "sum"
+3. operator can be: "greater-than", "less-than", "equals", "greater-or-equal", "less-or-equal"
+4. timeframe preset can be: "in-the-last" (requires quantity and unit) or "over-all-time"
+5. unit can be: "day", "week", "month"
+6. For multiple conditions that must ALL be true, put them in the same conditions array
+7. For conditions where ANY can be true (OR logic), use separate condition_groups
+8. Always append " | Aderai" to segment names`;
 
     const userPrompt = `Brand Information:
 ${Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n')}
