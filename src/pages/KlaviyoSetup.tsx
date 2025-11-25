@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,9 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Key, DollarSign, Users, TrendingUp, Loader2 } from "lucide-react";
-import { PoweredByBadge } from "@/components/PoweredByBadge";
+import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+
+const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
 const KlaviyoSetup = () => {
   const navigate = useNavigate();
@@ -252,18 +253,12 @@ const KlaviyoSetup = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="relative w-8 h-8">
           <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
           <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
-          </div>
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
-          </div>
-          <div className="absolute inset-0 animate-[spin_2s_linear_infinite_reverse]">
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-500" />
           </div>
         </div>
       </div>
@@ -271,36 +266,58 @@ const KlaviyoSetup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <a href="/" className="group flex items-center gap-3">
+              <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
+                aderai<span className="text-accent group-hover:animate-pulse">.</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </header>
+
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-12">
+      <main className="relative z-10 container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8 space-y-2">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Key className="w-8 h-8 text-primary" />
+          <div className="text-center mb-10 space-y-4">
+            <div className="inline-flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20 mb-4">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                Official Klaviyo Partner
+              </span>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Connect Your Klaviyo Account
+
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+              Connect Your{" "}
+              <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-baseline" />{" "}
+              Account
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Let's integrate your email marketing platform to unlock powerful automation
+            <p className="text-xl text-muted-foreground max-w-xl mx-auto">
+              Let's integrate your email marketing platform to unlock powerful segmentation
             </p>
           </div>
 
           {/* Setup Form */}
-          <Card className="backdrop-blur-sm bg-card/50 border-primary/20 shadow-2xl">
+          <Card className="border-border/50 shadow-2xl bg-card/80 backdrop-blur-sm">
             <CardContent className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 {/* API Key Section */}
-                <div className="space-y-4 pb-6 border-b border-border/50">
-                  <div className="flex items-center gap-2">
-                    <Key className="w-5 h-5 text-primary" />
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 pb-2 border-b border-border">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Key className="w-5 h-5 text-primary" />
+                    </div>
                     <h3 className="text-lg font-semibold">API Configuration</h3>
                   </div>
 
@@ -312,7 +329,7 @@ const KlaviyoSetup = () => {
                       placeholder="pk_..."
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
-                      className="bg-background/50"
+                      className="h-12"
                       required
                     />
                     <p className="text-sm text-muted-foreground">
@@ -328,15 +345,17 @@ const KlaviyoSetup = () => {
                       placeholder="My Business"
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
-                      className="bg-background/50"
+                      className="h-12"
                     />
                   </div>
                 </div>
 
                 {/* Currency Settings */}
-                <div className="space-y-4 pb-6 border-b border-border/50">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-primary" />
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 pb-2 border-b border-border">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <DollarSign className="w-5 h-5 text-primary" />
+                    </div>
                     <h3 className="text-lg font-semibold">Currency Settings</h3>
                   </div>
 
@@ -344,7 +363,7 @@ const KlaviyoSetup = () => {
                     <div className="space-y-2">
                       <Label htmlFor="currency">Currency</Label>
                       <Select value={currency} onValueChange={handleCurrencyChange}>
-                        <SelectTrigger className="bg-background/50">
+                        <SelectTrigger className="h-12">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -364,7 +383,7 @@ const KlaviyoSetup = () => {
                         type="number"
                         value={aov}
                         onChange={(e) => setAov(e.target.value)}
-                        className="bg-background/50"
+                        className="h-12"
                         min="0"
                         step="0.01"
                       />
@@ -373,9 +392,11 @@ const KlaviyoSetup = () => {
                 </div>
 
                 {/* Customer Thresholds */}
-                <div className="space-y-4 pb-6 border-b border-border/50">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary" />
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 pb-2 border-b border-border">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                    </div>
                     <h3 className="text-lg font-semibold">Customer Value Thresholds</h3>
                   </div>
 
@@ -387,7 +408,7 @@ const KlaviyoSetup = () => {
                         type="number"
                         value={vipThreshold}
                         onChange={(e) => setVipThreshold(e.target.value)}
-                        className="bg-background/50"
+                        className="h-12"
                         min="0"
                         step="0.01"
                       />
@@ -400,7 +421,7 @@ const KlaviyoSetup = () => {
                         type="number"
                         value={highValueThreshold}
                         onChange={(e) => setHighValueThreshold(e.target.value)}
-                        className="bg-background/50"
+                        className="h-12"
                         min="0"
                         step="0.01"
                       />
@@ -410,8 +431,10 @@ const KlaviyoSetup = () => {
 
                 {/* Customer Lifecycle Parameters */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-3 pb-2 border-b border-border">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Users className="w-5 h-5 text-primary" />
+                    </div>
                     <h3 className="text-lg font-semibold">Customer Lifecycle (Days)</h3>
                   </div>
 
@@ -423,7 +446,7 @@ const KlaviyoSetup = () => {
                         type="number"
                         value={newCustomerDays}
                         onChange={(e) => setNewCustomerDays(e.target.value)}
-                        className="bg-background/50"
+                        className="h-12"
                         min="1"
                       />
                     </div>
@@ -435,7 +458,7 @@ const KlaviyoSetup = () => {
                         type="number"
                         value={lapsedDays}
                         onChange={(e) => setLapsedDays(e.target.value)}
-                        className="bg-background/50"
+                        className="h-12"
                         min="1"
                       />
                     </div>
@@ -447,7 +470,7 @@ const KlaviyoSetup = () => {
                         type="number"
                         value={churnedDays}
                         onChange={(e) => setChurnedDays(e.target.value)}
-                        className="bg-background/50"
+                        className="h-12"
                         min="1"
                       />
                     </div>
@@ -455,15 +478,16 @@ const KlaviyoSetup = () => {
                 </div>
 
                 {/* Submit Buttons */}
-                <div className="pt-6 space-y-3">
+                <div className="pt-4 space-y-3">
                   <Button
                     type="submit"
                     disabled={isSaving}
-                    className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-white font-semibold py-6"
+                    className="w-full h-14 text-lg font-semibold"
+                    size="lg"
                   >
                     {isSaving ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                         Connecting...
                       </>
                     ) : (
@@ -474,21 +498,20 @@ const KlaviyoSetup = () => {
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={async () => {
-                      if (!user) return;
-                      
-                      // Don't mark as completed - just navigate
-                      toast({
-                        title: "Skipped for now",
-                        description: "You'll see a reminder to connect Klaviyo on your dashboard.",
-                      });
-                      
-                      navigate("/dashboard");
-                    }}
                     className="w-full text-muted-foreground"
-                    disabled={isSaving}
+                    onClick={async () => {
+                      try {
+                        await supabase.from("users").update({ 
+                          onboarding_completed: true 
+                        }).eq("id", user.id);
+                        navigate("/dashboard");
+                      } catch (error) {
+                        console.error("Error skipping setup:", error);
+                        navigate("/dashboard");
+                      }
+                    }}
                   >
-                    Skip for now, I'll add this later
+                    Skip for now
                   </Button>
                 </div>
               </form>
@@ -496,23 +519,16 @@ const KlaviyoSetup = () => {
           </Card>
 
           {/* Help Text */}
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               Need help finding your API key?{" "}
-              <a
-                href="https://help.klaviyo.com/hc/en-us/articles/115005062267"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline"
-              >
-                View Klaviyo's guide
+              <a href="/help" className="text-primary hover:underline">
+                Read our guide
               </a>
             </p>
           </div>
         </div>
-      </div>
-
-      <PoweredByBadge />
+      </main>
     </div>
   );
 };
