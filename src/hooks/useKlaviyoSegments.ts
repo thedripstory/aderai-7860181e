@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { ErrorLogger } from '@/lib/errorLogger';
 
 export interface SegmentResult {
   segmentId: string;
@@ -150,6 +151,17 @@ export const useKlaviyoSegments = () => {
       return newResults;
     } catch (error: any) {
       console.error('Segment creation error:', error);
+      
+      // Log error to database for production monitoring
+      await ErrorLogger.logSegmentError(
+        `Batch creation (${selectedSegments.length} segments)`,
+        error,
+        { 
+          selectedSegments, 
+          activeKeyId: activeKey.id,
+          jobId 
+        }
+      );
       
       if (jobId) {
         await supabase

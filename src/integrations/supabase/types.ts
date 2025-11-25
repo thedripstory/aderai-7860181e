@@ -283,6 +283,39 @@ export type Database = {
         }
         Relationships: []
       }
+      error_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string
+          error_type: string
+          id: string
+          page_url: string | null
+          stack_trace: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message: string
+          error_type: string
+          id?: string
+          page_url?: string | null
+          stack_trace?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string
+          error_type?: string
+          id?: string
+          page_url?: string | null
+          stack_trace?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       help_article_views: {
         Row: {
           article_id: string | null
