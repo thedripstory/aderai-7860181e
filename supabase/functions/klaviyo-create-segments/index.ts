@@ -59,6 +59,9 @@ function findMetricId(metricType: string, metricMap: Record<string, string>): st
     'clicked-email': ['Clicked Email', 'Email Clicked'],
     'subscribed': ['Subscribed to List', 'Subscribe', 'List Subscribe'],
     'added-to-cart': ['Added to Cart', 'Add to Cart'],
+    'reviewed-product': ['Reviewed Product', 'Product Review', 'Left Review', 'Submitted Review'],
+    'refunded-order': ['Refunded Order', 'Order Refunded', 'Refund Issued', 'Cancelled Order', 'Order Cancelled'],
+    'submitted-feedback': ['Submitted Feedback', 'Feedback Submitted', 'Survey Response', 'NPS Response'],
   };
 
   const possibleNames = metricMappings[metricType] || [];
@@ -185,6 +188,9 @@ function getSegmentDefinition(
   const openedEmailId = findMetricId('opened-email', metricMap);
   const clickedEmailId = findMetricId('clicked-email', metricMap);
   const addedToCartId = findMetricId('added-to-cart', metricMap);
+  const reviewedProductId = findMetricId('reviewed-product', metricMap);
+  const refundedOrderId = findMetricId('refunded-order', metricMap);
+  const submittedFeedbackId = findMetricId('submitted-feedback', metricMap);
 
   const definitions: Record<string, any> = {
     // =====================================
@@ -1066,6 +1072,52 @@ function getSegmentDefinition(
     // LOCATION PROXIMITY SEGMENT
     // =====================================
 
+    'age-41-55': {
+      name: `Age 41-55${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: "properties['age']",
+            filter: {
+              type: 'numeric',
+              operator: 'greater-than-or-equal',
+              value: 41
+            }
+          }, {
+            type: 'profile-property',
+            property: "properties['age']",
+            filter: {
+              type: 'numeric',
+              operator: 'less-than-or-equal',
+              value: 55
+            }
+          }]
+        }]
+      }
+    },
+
+    'age-55-plus': {
+      name: `Age 55+${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: "properties['age']",
+            filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: 55
+            }
+          }]
+        }]
+      }
+    },
+
+    // =====================================
+    // LOCATION PROXIMITY SEGMENTS
+    // =====================================
+
     'location-proximity': {
       name: `Near Major Metro (25 Miles)${ADERAI_SUFFIX}`,
       definition: {
@@ -1084,6 +1136,253 @@ function getSegmentDefinition(
         }]
       }
     },
+
+    'location-los-angeles': {
+      name: `Near Los Angeles (25 Miles)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-postal-code-distance',
+            country_code: 'USA',
+            postal_code: '90001',
+            unit: 'miles',
+            filter: {
+              type: 'numeric',
+              operator: 'less-than',
+              value: 25
+            }
+          }]
+        }]
+      }
+    },
+
+    'location-chicago': {
+      name: `Near Chicago (25 Miles)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-postal-code-distance',
+            country_code: 'USA',
+            postal_code: '60601',
+            unit: 'miles',
+            filter: {
+              type: 'numeric',
+              operator: 'less-than',
+              value: 25
+            }
+          }]
+        }]
+      }
+    },
+
+    'location-houston': {
+      name: `Near Houston (25 Miles)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-postal-code-distance',
+            country_code: 'USA',
+            postal_code: '77001',
+            unit: 'miles',
+            filter: {
+              type: 'numeric',
+              operator: 'less-than',
+              value: 25
+            }
+          }]
+        }]
+      }
+    },
+
+    // =====================================
+    // PURCHASE BEHAVIOR - DISCOUNT SENSITIVITY
+    // =====================================
+
+    'coupon-users': placedOrderId ? {
+      name: `Discount Shoppers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-metric',
+            metric_id: placedOrderId,
+            measurement: 'count',
+            measurement_filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: 0
+            },
+            timeframe_filter: {
+              type: 'date',
+              operator: 'in-the-last',
+              quantity: 90,
+              unit: 'day'
+            },
+            metric_filters: [{
+              property: '$discount_value',
+              filter: {
+                type: 'numeric',
+                operator: 'greater-than',
+                value: 0
+              }
+            }]
+          }]
+        }]
+      }
+    } : null,
+
+    'full-price-buyers': placedOrderId ? {
+      name: `Full Price Buyers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-metric',
+            metric_id: placedOrderId,
+            measurement: 'count',
+            measurement_filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: 0
+            },
+            timeframe_filter: {
+              type: 'date',
+              operator: 'in-the-last',
+              quantity: 90,
+              unit: 'day'
+            },
+            metric_filters: [{
+              property: '$discount_value',
+              filter: {
+                type: 'numeric',
+                operator: 'equals',
+                value: 0
+              }
+            }]
+          }]
+        }]
+      }
+    } : null,
+
+    // =====================================
+    // REVIEW SEGMENTS
+    // =====================================
+
+    'product-reviewers': reviewedProductId ? {
+      name: `Product Reviewers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(reviewedProductId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : (placedOrderId ? {
+      name: `Repeat Buyers (Likely Reviewers)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 1, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null),
+
+    'non-reviewers': (reviewedProductId && placedOrderId) ? {
+      name: `Purchased But Never Reviewed${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(reviewedProductId, 'count', 'equals', 0, { type: 'over-all-time' })
+            ]
+          }
+        ]
+      }
+    } : (placedOrderId ? {
+      name: `One-Time Buyers (Review Candidates)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null),
+
+    // =====================================
+    // REFUND & FEEDBACK SEGMENTS
+    // =====================================
+
+    'refunded-customers': refundedOrderId ? {
+      name: `🚫 Refunded Customers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(refundedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+          ]
+        }]
+      }
+    } : (placedOrderId ? {
+      name: `🚫 Single Purchase Only (Potential Refund)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null),
+
+    'negative-feedback': submittedFeedbackId ? {
+      name: `🚫 Negative Feedback${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-metric',
+            metric_id: submittedFeedbackId,
+            measurement: 'count',
+            measurement_filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: 0
+            },
+            timeframe_filter: null,
+            metric_filters: [{
+              property: 'rating',
+              filter: {
+                type: 'numeric',
+                operator: 'less-than',
+                value: 3
+              }
+            }]
+          }]
+        }]
+      }
+    } : (openedEmailId ? {
+      name: `🚫 Unengaged (Potential Negative Experience)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
+          ]
+        }]
+      }
+    } : null),
+
+    'marked-spam': openedEmailId ? {
+      name: `🚫 Unengaged 90+ Days (Spam Risk)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
 
     // =====================================
     // EMAIL ENGAGEMENT EXCLUSIONS
@@ -1481,18 +1780,8 @@ async function createKlaviyoSegment(
         }
       }
       
-      // Check if it's an unimplemented segment type
-      const unimplementedSegments = [
-        'age-18-24', 'age-25-40',
-        'location-proximity',
-        'coupon-users', 'full-price-buyers',
-        'product-reviewers', 'non-reviewers',
-        'refunded-customers', 'negative-feedback', 'marked-spam'
-      ];
-      
-      if (unimplementedSegments.includes(segmentId)) {
-        errorReason = `This segment type (${segmentId}) is coming soon! We're working on adding support for it.`;
-      }
+      // All segments are now implemented - provide actionable feedback
+      errorReason = 'This segment requires specific data that may not be in your Klaviyo account. Check that your ecommerce platform is properly syncing all events.';
       
       console.log(`[klaviyo-create-segments] Skipping ${segmentId} - ${errorReason}`);
       return {
