@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, HelpCircle, Search, CheckCircle2, Package, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ChevronDown, HelpCircle, Search, CheckCircle2, Package, Sparkles, Star, Eye, Keyboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { SegmentPreviewModal } from './SegmentPreviewModal';
+import { toast } from 'sonner';
 
 export const SEGMENTS = [
   // ENGAGEMENT & ACTIVITY (14 segments)
@@ -609,6 +611,56 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
 }) => {
   const [expandedCategory, setExpandedCategory] = useState<string | null>("Engagement & Activity");
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    const stored = localStorage.getItem('segment-favorites');
+    return stored ? JSON.parse(stored) : [];
+  });
+  const [previewSegment, setPreviewSegment] = useState<typeof SEGMENTS[0] | null>(null);
+  const [showShortcutsHint, setShowShortcutsHint] = useState(true);
+
+  // Persist favorites to localStorage
+  useEffect(() => {
+    localStorage.setItem('segment-favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + A to select all
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+        e.preventDefault();
+        if (onSelectAll) {
+          onSelectAll();
+          toast.success('All segments selected', { duration: 2000 });
+        }
+      }
+      // Escape to clear selection
+      if (e.key === 'Escape') {
+        if (previewSegment) {
+          setPreviewSegment(null);
+        } else if (onClearAll && selectedSegments.length > 0) {
+          onClearAll();
+          toast.info('Selection cleared', { duration: 2000 });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onSelectAll, onClearAll, selectedSegments.length, previewSegment]);
+
+  const toggleFavorite = useCallback((segmentId: string) => {
+    setFavorites(prev => {
+      const newFavorites = prev.includes(segmentId)
+        ? prev.filter(id => id !== segmentId)
+        : [...prev, segmentId];
+      toast.success(
+        prev.includes(segmentId) ? 'Removed from favorites' : 'Added to favorites',
+        { duration: 2000 }
+      );
+      return newFavorites;
+    });
+  }, []);
 
   const categories = [
     "Engagement & Activity",
@@ -631,6 +683,8 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
     segment.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const favoriteSegments = SEGMENTS.filter(s => favorites.includes(s.id));
+
   const selectAllInCategory = (category: string) => {
     const categorySegmentIds = SEGMENTS
       .filter(s => s.category === category)
@@ -648,6 +702,17 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
 
   return (
     <div className="animate-fade-in">
+      {/* Preview Modal */}
+      <SegmentPreviewModal
+        segment={previewSegment}
+        isOpen={!!previewSegment}
+        onClose={() => setPreviewSegment(null)}
+        onSelect={onToggleSegment}
+        onToggleFavorite={toggleFavorite}
+        isSelected={previewSegment ? selectedSegments.includes(previewSegment.id) : false}
+        isFavorite={previewSegment ? favorites.includes(previewSegment.id) : false}
+      />
+
       {/* Header Section */}
       <div className="mb-8 space-y-6">
         <div className="flex items-start justify-between">
@@ -685,6 +750,28 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
           </div>
         </div>
 
+        {/* Keyboard Shortcuts Hint */}
+        {showShortcutsHint && (
+          <div className="bg-muted/50 border border-border rounded-lg px-4 py-3 flex items-center justify-between animate-fade-in">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <Keyboard className="w-4 h-4" />
+              <span>
+                <kbd className="px-2 py-0.5 bg-background border border-border rounded text-xs font-mono mr-1">Ctrl+A</kbd>
+                Select all
+                <span className="mx-2">•</span>
+                <kbd className="px-2 py-0.5 bg-background border border-border rounded text-xs font-mono mr-1">Esc</kbd>
+                Clear selection
+              </span>
+            </div>
+            <button 
+              onClick={() => setShowShortcutsHint(false)}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Info Banner */}
         <div className="bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-4">
           <p className="text-sm flex items-center gap-2">
@@ -721,6 +808,68 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Favorites Section */}
+      {favoriteSegments.length > 0 && !searchQuery && (
+        <div className="mb-12 animate-fade-in">
+          <div className="flex items-center gap-2 mb-6">
+            <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+            <h3 className="text-2xl font-bold">Favorites</h3>
+            <Badge variant="secondary" className="ml-2">{favoriteSegments.length}</Badge>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {favoriteSegments.map((segment, index) => {
+              const isSelected = selectedSegments.includes(segment.id);
+              return (
+                <div
+                  key={segment.id}
+                  className={`group relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer animate-fade-in ${
+                    isSelected
+                      ? "border-primary bg-primary/10 shadow-md"
+                      : "border-yellow-500/30 hover:border-yellow-500/50 bg-yellow-500/5"
+                  }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                  onClick={() => onToggleSegment(segment.id)}
+                >
+                  <div className="absolute top-2 right-2 flex gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewSegment(segment);
+                      }}
+                      className="p-1.5 rounded-lg bg-background/80 border border-border hover:bg-muted transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(segment.id);
+                      }}
+                      className="p-1.5 rounded-lg bg-background/80 border border-border hover:bg-muted transition-all"
+                    >
+                      <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                    </button>
+                  </div>
+                  {isSelected && (
+                    <div className="absolute bottom-2 right-2">
+                      <CheckCircle2 className="w-4 h-4 text-primary" />
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{segment.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-sm truncate">{segment.name}</h4>
+                      <p className="text-xs text-muted-foreground truncate">{segment.description}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Enhanced Bundles Section */}
       <div className="mb-12">
@@ -850,6 +999,7 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {categorySegments.map((segment, segmentIndex) => {
                       const isSelected = selectedSegments.includes(segment.id);
+                      const isFavorite = favorites.includes(segment.id);
                       return (
                         <div
                           key={segment.id}
@@ -861,18 +1011,44 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
                           style={{ animationDelay: `${segmentIndex * 30}ms` }}
                           onClick={() => onToggleSegment(segment.id)}
                         >
-                          {/* Selection indicator */}
-                          {isSelected && (
-                            <div className="absolute top-3 right-3">
-                              <CheckCircle2 className="w-5 h-5 text-primary" />
-                            </div>
-                          )}
+                          {/* Action buttons */}
+                          <div className="absolute top-3 right-3 flex gap-1.5">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewSegment(segment);
+                              }}
+                              className="p-1.5 rounded-lg bg-background/80 border border-border hover:bg-muted transition-all opacity-0 group-hover:opacity-100"
+                              title="Preview segment"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(segment.id);
+                              }}
+                              className={`p-1.5 rounded-lg border transition-all ${
+                                isFavorite 
+                                  ? 'bg-yellow-500/10 border-yellow-500/30' 
+                                  : 'bg-background/80 border-border opacity-0 group-hover:opacity-100 hover:bg-muted'
+                              }`}
+                              title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                            >
+                              <Star className={`w-3.5 h-3.5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground'}`} />
+                            </button>
+                            {isSelected && (
+                              <div className="p-1.5">
+                                <CheckCircle2 className="w-4 h-4 text-primary" />
+                              </div>
+                            )}
+                          </div>
                           
                           <div className="flex items-start gap-4">
                             <div className="text-3xl mt-1 group-hover:scale-110 transition-transform">
                               {segment.icon}
                             </div>
-                            <div className="flex-1 pr-6">
+                            <div className="flex-1 pr-20">
                               <h4 className="font-bold text-base mb-2 group-hover:text-primary transition-colors">
                                 {segment.name}
                               </h4>
