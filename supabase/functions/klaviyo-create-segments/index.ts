@@ -924,11 +924,60 @@ async function createKlaviyoSegment(
     const segmentDef = getSegmentDefinition(segmentId, metricMap, currencySymbol, settings);
     
     if (!segmentDef) {
-      console.log(`[klaviyo-create-segments] Skipping ${segmentId} - missing required metrics or definition not found`);
+      // Determine the actual reason for skipping
+      let errorReason = 'Segment definition not implemented yet';
+      
+      // Check if it's a metrics issue by looking at what metrics are available
+      const hasPlacedOrder = !!findMetricId('placed-order', metricMap);
+      const hasOpenedEmail = !!findMetricId('opened-email', metricMap);
+      const hasViewedProduct = !!findMetricId('viewed-product', metricMap);
+      const hasStartedCheckout = !!findMetricId('started-checkout', metricMap);
+      
+      // Segments that need specific metrics
+      const metricsRequired: Record<string, string[]> = {
+        'cart-abandoners': ['Started Checkout', 'Placed Order'],
+        'browse-abandoners': ['Viewed Product', 'Started Checkout'],
+        'product-viewers': ['Viewed Product'],
+        'frequent-browsers': ['Viewed Product'],
+        'browse-abandonment': ['Viewed Product', 'Added to Cart'],
+        'engaged-non-buyers': ['Opened Email', 'Placed Order'],
+        'vip-customers': ['Placed Order'],
+        'repeat-customers': ['Placed Order'],
+        'churned-customers': ['Placed Order'],
+        'lapsed-customers': ['Placed Order'],
+      };
+      
+      if (metricsRequired[segmentId]) {
+        const missing = metricsRequired[segmentId].filter(m => !metricMap[m]);
+        if (missing.length > 0) {
+          errorReason = `Missing metrics: ${missing.join(', ')}. Make sure your Klaviyo account tracks these events.`;
+        }
+      }
+      
+      // Check if it's an unimplemented segment type
+      const unimplementedSegments = [
+        'gender-male', 'gender-female', 'gender-uncertain',
+        'age-18-24', 'age-25-40', 'birthday-month',
+        'location-country', 'location-proximity',
+        'predicted-vips', 'high-churn-risk', 'likely-purchase-soon',
+        'abandoned-cart-high-value', 'abandoned-checkout-high-value',
+        'category-interest', 'product-interest', 'cross-sell',
+        'category-buyers', 'multi-category', 'coupon-users',
+        'full-price-buyers', 'product-reviewers', 'non-reviewers',
+        'frequent-visitors', 'high-churn-risk-exclude', 'refunded-customers',
+        'negative-feedback', 'marked-spam', 'received-3-in-3-days',
+        'received-5-opened-0', 'bargain-shoppers', 'high-aov', 'low-aov'
+      ];
+      
+      if (unimplementedSegments.includes(segmentId)) {
+        errorReason = `This segment type (${segmentId}) is coming soon! We're working on adding support for it.`;
+      }
+      
+      console.log(`[klaviyo-create-segments] Skipping ${segmentId} - ${errorReason}`);
       return {
         segmentId,
         status: 'skipped',
-        error: 'Required metrics not found in your Klaviyo account'
+        error: errorReason
       };
     }
 
