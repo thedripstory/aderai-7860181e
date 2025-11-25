@@ -1291,6 +1291,36 @@ async function getOrCreateAderaiTag(apiKey: string): Promise<string | null> {
 }
 
 // ==========================================
+// HELPER: Find existing segment by name
+// ==========================================
+
+async function findSegmentByName(apiKey: string, segmentName: string): Promise<string | null> {
+  try {
+    // URL encode the segment name for the filter
+    const encodedName = encodeURIComponent(segmentName);
+    const response = await fetch(`https://a.klaviyo.com/api/segments/?filter=equals(name,"${encodedName}")`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Klaviyo-API-Key ${apiKey}`,
+        'Accept': 'application/json',
+        'revision': '2024-10-15'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.data && data.data.length > 0) {
+        return data.data[0].id;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('[klaviyo-create-segments] Error finding segment by name:', error);
+    return null;
+  }
+}
+
+// ==========================================
 // HELPER: Add Tag to Segment
 // ==========================================
 
@@ -1425,6 +1455,16 @@ async function createKlaviyoSegment(
       // Check for duplicate/already exists error
       if (response.status === 409) {
         console.log(`[klaviyo-create-segments] Segment already exists: ${segmentDef.name}`);
+        
+        // Try to find the existing segment and tag it
+        if (tagId) {
+          const existingSegmentId = await findSegmentByName(apiKey, segmentDef.name);
+          if (existingSegmentId) {
+            console.log(`[klaviyo-create-segments] Found existing segment ${existingSegmentId}, adding Aderai tag...`);
+            await addTagToSegment(apiKey, tagId, existingSegmentId);
+          }
+        }
+        
         return {
           segmentId,
           status: 'exists',
