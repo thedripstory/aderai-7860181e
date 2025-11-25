@@ -773,6 +773,39 @@ function getSegmentDefinition(
         ]
       }
     } : null,
+
+    'recent-purchasers-exclude': placedOrderId ? {
+      name: `🚫 Recent Purchasers Exclusion (14 Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'unsubscribed': openedEmailId ? {
+      name: `🚫 Unsubscribed Contacts${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+
+    'bounced-emails': openedEmailId ? {
+      name: `🚫 Bounced Email Addresses${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
   };
 
   return definitions[segmentId] || null;
