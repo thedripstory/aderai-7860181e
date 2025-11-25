@@ -707,21 +707,49 @@ serve(async (req) => {
   }
 
   try {
-    let { apiKey, segmentIds, currencySymbol, settings, userId, klaviyoKeyId } = await req.json();
+    const bodyText = await req.text();
+    console.log('[klaviyo-create-segments] Raw request body:', bodyText);
+    
+    let body;
+    try {
+      body = JSON.parse(bodyText);
+    } catch (parseError) {
+      console.error('[klaviyo-create-segments] Failed to parse request body:', parseError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    let { apiKey, segmentIds, currencySymbol, settings, userId, klaviyoKeyId } = body;
+    
+    console.log('[klaviyo-create-segments] Parsed body:', {
+      hasApiKey: !!apiKey,
+      segmentIds: segmentIds,
+      segmentIdsType: typeof segmentIds,
+      segmentIdsLength: Array.isArray(segmentIds) ? segmentIds.length : 'not an array',
+      currencySymbol,
+    });
 
     if (apiKey && isEncrypted(apiKey)) {
-      console.log('Decrypting API key...');
+      console.log('[klaviyo-create-segments] Decrypting API key...');
       apiKey = await decryptApiKey(apiKey);
     }
 
     if (!apiKey || !segmentIds || !Array.isArray(segmentIds)) {
+      console.error('[klaviyo-create-segments] Validation failed:', {
+        hasApiKey: !!apiKey,
+        hasSegmentIds: !!segmentIds,
+        isArray: Array.isArray(segmentIds),
+      });
       return new Response(
-        JSON.stringify({ error: 'Missing apiKey or segmentIds' }),
+        JSON.stringify({ error: 'Missing apiKey or segmentIds', details: { hasApiKey: !!apiKey, hasSegmentIds: !!segmentIds, isArray: Array.isArray(segmentIds) } }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Creating ${segmentIds.length} segments in Klaviyo with Aderai branding...`);
+    console.log(`[klaviyo-create-segments] Creating ${segmentIds.length} segments in Klaviyo with Aderai branding...`);
+    console.log('[klaviyo-create-segments] Segment IDs to create:', segmentIds);
 
     const metricsResponse = await fetch('https://a.klaviyo.com/api/metrics/', {
       headers: { 'Authorization': `Klaviyo-API-Key ${apiKey}`, 'revision': '2024-10-15' },
