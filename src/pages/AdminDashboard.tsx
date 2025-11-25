@@ -144,12 +144,39 @@ const AdminDashboard = () => {
   };
 
   const loadUserRoles = async () => {
-    const { data, error } = await supabase
+    // Query roles and users separately due to foreign key issues
+    const { data: rolesData, error: rolesError } = await supabase
       .from("user_roles")
-      .select("*, users(email, account_name)")
+      .select("*")
       .order("created_at", { ascending: false });
     
-    if (!error && data) setUserRoles(data);
+    if (rolesError || !rolesData) {
+      console.error("Error loading user roles:", rolesError);
+      return;
+    }
+
+    // Get all unique user IDs from roles
+    const userIds = [...new Set(rolesData.map(r => r.user_id))];
+    
+    // Fetch user details for these IDs
+    const { data: usersData, error: usersError } = await supabase
+      .from("users")
+      .select("id, email, account_name")
+      .in("id", userIds);
+    
+    if (usersError) {
+      console.error("Error loading users for roles:", usersError);
+      setUserRoles(rolesData);
+      return;
+    }
+
+    // Merge user data with roles
+    const mergedData = rolesData.map(role => ({
+      ...role,
+      users: usersData?.find(u => u.id === role.user_id) || null
+    }));
+    
+    setUserRoles(mergedData);
   };
 
   const loadAuditLogs = async () => {

@@ -91,7 +91,7 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto">
-          {/* Top Bar - Social Proof */}
+          {/* Top Bar - Trust Indicators */}
           <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm">
             <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
               <div className="flex -space-x-2">
@@ -100,12 +100,7 @@ export default function LandingPage() {
                 <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/tiger-marr-round-min.png" alt="Customer logo" className="w-6 h-6 rounded-full border-2 border-background" loading="lazy" />
                 <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/uppl-logo-round-min.png" alt="Customer logo" className="w-6 h-6 rounded-full border-2 border-background" loading="lazy" />
               </div>
-              <span className="text-muted-foreground">10,00+ brands use Aderai</span>
-            </div>
-            <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm">
-              <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-              <span className="font-semibold">4.8/5</span>
-              <span className="text-muted-foreground">(727 reviews)</span>
+              <span className="text-muted-foreground">Trusted by growing brands</span>
             </div>
             <div className="flex items-center gap-2 bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -739,9 +734,9 @@ export default function LandingPage() {
                 Get segmentation tips & updates
               </h3>
               <p className="text-muted-foreground mb-6">
-                Join 10,000+ marketers getting weekly insights on 
+                Get weekly insights on 
                 <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.9em] inline-block align-text-bottom mx-1" loading="lazy" /> 
-                segmentation
+                segmentation strategies
               </p>
               <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
@@ -780,14 +775,14 @@ export default function LandingPage() {
                 <h4 className="font-bold mb-4 text-sm">Product</h4>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li>
-                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Features</span>
+                    <a href="#how-it-works" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>How it Works</span>
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>
                   <li>
-                    <a href="#how-it-works" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>How it Works</span>
+                    <a href="/help" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Help Center</span>
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>
@@ -795,23 +790,17 @@ export default function LandingPage() {
               </div>
 
               <div>
-                <h4 className="font-bold mb-4 text-sm">Company</h4>
+                <h4 className="font-bold mb-4 text-sm">Resources</h4>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li>
-                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>About</span>
+                    <a href="/help?category=getting-started" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>Getting Started</span>
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Contact</span>
-                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Careers</span>
+                    <a href="/help?category=ai-features" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
+                      <span>AI Features</span>
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>
@@ -822,22 +811,10 @@ export default function LandingPage() {
                 <h4 className="font-bold mb-4 text-sm">Legal</h4>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li>
-                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Privacy</span>
-                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </a>
+                    <span className="text-muted-foreground/60">Privacy (Coming Soon)</span>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Terms</span>
-                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Security</span>
-                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </a>
+                    <span className="text-muted-foreground/60">Terms (Coming Soon)</span>
                   </li>
                 </ul>
               </div>
