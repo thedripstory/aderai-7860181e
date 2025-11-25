@@ -36,6 +36,7 @@ import { ABTestResults } from "@/components/ABTestResults";
 import { exportUsersToCSV, exportFeedbackToCSV } from "@/lib/csvExport";
 import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
+import { AdminUserManagement } from "@/components/AdminUserManagement";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -500,138 +501,7 @@ const AdminDashboard = () => {
 
           {/* Users Tab */}
           <TabsContent value="users">
-            <div className="space-y-6">
-              <AdminTableFilters
-                config={{
-                  search: true,
-                  dateRange: true,
-                  status: ["active", "inactive"],
-                  accountType: ["brand", "agency"]
-                }}
-                onFilterChange={setFilters}
-              />
-              
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>All Users</CardTitle>
-                      <CardDescription>Manage user accounts and permissions</CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={() => exportUsersToCSV(filteredUsers)} 
-                        variant="outline" 
-                        size="sm"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Export CSV
-                      </Button>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search users..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="pl-9 w-64"
-                        />
-                      </div>
-                      <Button variant="outline" size="icon" onClick={loadUsers}>
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <AdminBulkActions
-                      selectedIds={selectedUserIds}
-                      onSelectionChange={setSelectedUserIds}
-                      items={users}
-                      type="users"
-                      onActionComplete={() => {
-                        loadUsers();
-                        loadAuditLogs();
-                      }}
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-12">
-                          <Checkbox
-                            checked={selectedUserIds.length === filteredUsers.length && filteredUsers.length > 0}
-                            onCheckedChange={() => {
-                              if (selectedUserIds.length === filteredUsers.length) {
-                                setSelectedUserIds([]);
-                              } else {
-                                setSelectedUserIds(filteredUsers.map(u => u.id));
-                              }
-                            }}
-                          />
-                        </TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Verified</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                    <TableBody>
-                      {filteredUsers.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell>
-                            <Checkbox
-                              checked={selectedUserIds.includes(user.id)}
-                              onCheckedChange={() => {
-                                if (selectedUserIds.includes(user.id)) {
-                                  setSelectedUserIds(selectedUserIds.filter(id => id !== user.id));
-                                } else {
-                                  setSelectedUserIds([...selectedUserIds, user.id]);
-                                }
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell className="font-medium">{user.email}</TableCell>
-                          <TableCell>{user.account_name}</TableCell>
-                        <TableCell>
-                          <Badge variant={user.account_type === 'agency' ? 'default' : 'secondary'}>
-                            {user.account_type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={user.subscription_status === 'active' ? 'default' : 'outline'}>
-                            {user.subscription_status || 'inactive'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {user.email_verified ? (
-                            <Badge variant="default">Yes</Badge>
-                          ) : (
-                            <Badge variant="destructive">No</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(user.created_at).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toggleUserEmailVerification(user.id, user.email_verified)}
-                          >
-                            Toggle Verification
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </div>
+            <AdminUserManagement />
           </TabsContent>
 
           {/* Roles Tab */}
