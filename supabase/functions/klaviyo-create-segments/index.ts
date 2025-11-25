@@ -607,6 +607,141 @@ function getSegmentDefinition(
     } : null,
 
     // =====================================
+    // CUSTOMER LIFECYCLE ADDITIONS
+    // =====================================
+
+    'new-subscribers': (openedEmailId && placedOrderId) ? {
+      name: `New Subscribers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
+    'never-purchased': placedOrderId ? {
+      name: `Never Purchased (Prospects)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+
+    'first-time-buyers': placedOrderId ? {
+      name: `First-Time Buyers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+
+    'high-frequency-buyers': placedOrderId ? {
+      name: `High Frequency Buyers (5+ Orders)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 4, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+
+    'recent-purchasers-7': placedOrderId ? {
+      name: `Recent Purchasers (7 Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 7, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'recent-purchasers-14': placedOrderId ? {
+      name: `Recent Purchasers (14 Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'recent-purchasers-60': placedOrderId ? {
+      name: `Recent Purchasers (60 Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'recent-purchasers-90': placedOrderId ? {
+      name: `Recent Purchasers (90 Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+
+    'at-risk-customers': placedOrderId ? {
+      name: `At-Risk Customers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
+    'dormant-customers': placedOrderId ? {
+      name: `Dormant Customers (120+ Days)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
+            ]
+          }
+        ]
+      }
+    } : null,
+
+    // =====================================
     // EXCLUSION SEGMENTS
     // =====================================
     
