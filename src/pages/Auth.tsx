@@ -16,7 +16,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleAuth = async (email: string, password: string, accountName?: string) => {
+  const handleAuth = async (email: string, password: string, firstName?: string, brandName?: string) => {
     setLoading(true);
 
     try {
@@ -28,7 +28,8 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
             data: {
-              account_name: accountName || email.split('@')[0],
+              first_name: firstName || '',
+              account_name: brandName || email.split('@')[0],
             },
           },
         });
@@ -41,7 +42,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             await supabase.functions.invoke('send-welcome-email', {
               body: {
                 email: email,
-                userName: accountName || email.split('@')[0],
+                userName: firstName || email.split('@')[0],
                 accountType: 'brand',
                 userId: authData.user.id,
               },
