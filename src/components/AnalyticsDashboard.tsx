@@ -139,16 +139,9 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     );
   }
 
+  // Don't show anything when no segments loaded - parent component handles this case
   if (allSegments.length === 0) {
-    return (
-      <EmptyState
-        icon={Database}
-        title="No analytics data available"
-        description="Connect your Klaviyo account to view segment analytics and insights. You'll see performance metrics, growth trends, and more."
-        actionLabel="Connect Klaviyo"
-        onAction={() => window.location.href = '/klaviyo-setup'}
-      />
-    );
+    return null;
   }
 
   if (Object.keys(segmentStats).length === 0) {
