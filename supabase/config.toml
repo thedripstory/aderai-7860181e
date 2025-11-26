@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.check-orphan-users]
 verify_jwt = false
+
+[functions.record-segment-snapshots]
+verify_jwt = false

@@ -266,6 +266,53 @@ export default function UnifiedDashboard() {
       
       console.log('Klaviyo segments fetched:', allFetchedSegments.length);
       console.log('Tags collected:', Object.keys(includedTags).length);
+      
+      // Now fetch profile counts for each segment in parallel batches
+      const BATCH_SIZE = 5; // Fetch 5 at a time to respect rate limits
+      const segmentProfileCounts: Record<string, number> = {};
+      
+      for (let i = 0; i < allFetchedSegments.length; i += BATCH_SIZE) {
+        const batch = allFetchedSegments.slice(i, i + BATCH_SIZE);
+        
+        const batchPromises = batch.map(async (segment) => {
+          try {
+            const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
+              body: {
+                keyId: activeKey.id,
+                endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/?additional-fields[segment]=profile_count`,
+                method: 'GET',
+              },
+            });
+            
+            if (!error && data?.data?.attributes?.profile_count !== undefined) {
+              return { id: segment.id, count: data.data.attributes.profile_count };
+            }
+            return { id: segment.id, count: null };
+          } catch {
+            return { id: segment.id, count: null };
+          }
+        });
+        
+        const results = await Promise.all(batchPromises);
+        results.forEach(r => {
+          if (r.count !== null) {
+            segmentProfileCounts[r.id] = r.count;
+          }
+        });
+        
+        // Update progress
+        setAnalyticsProgress({ 
+          current: Math.min(i + BATCH_SIZE, allFetchedSegments.length), 
+          total: allFetchedSegments.length 
+        });
+        
+        // Small delay between batches for rate limiting
+        if (i + BATCH_SIZE < allFetchedSegments.length) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      }
+      
+      console.log('Profile counts fetched for', Object.keys(segmentProfileCounts).length, 'segments');
       setAllSegments(allFetchedSegments);
       
       // Build stats from segment attributes
@@ -273,7 +320,8 @@ export default function UnifiedDashboard() {
       const historicalDataToInsert: any[] = [];
       
       allFetchedSegments.forEach((segment: any) => {
-        const profileCount = segment.attributes?.profile_count ?? null; // May not be available in API
+        // Use fetched profile count or fall back to null
+        const profileCount = segmentProfileCounts[segment.id] ?? null;
         const segmentName = segment.attributes?.name || 'Unnamed Segment';
         
         // Check if segment has Aderai tag (tag-based detection)
@@ -325,11 +373,12 @@ export default function UnifiedDashboard() {
           });
       }
       
-      // Count Aderai segments for toast
+      // Count Aderai segments and segments with profile counts for toast
       const aderaiCount = Object.values(stats).filter((s: any) => s.isAderai).length;
+      const profileCountsLoaded = Object.values(stats).filter((s: any) => s.profileCount !== null).length;
       
       toast.success('Analytics loaded successfully', {
-        description: `${allFetchedSegments.length} segments fetched${aderaiCount > 0 ? ` (${aderaiCount} Aderai)` : ''}`,
+        description: `${allFetchedSegments.length} segments fetched (${profileCountsLoaded} with counts)${aderaiCount > 0 ? ` • ${aderaiCount} Aderai` : ''}`,
       });
     } catch (error) {
       console.error('Error fetching segments:', error);
