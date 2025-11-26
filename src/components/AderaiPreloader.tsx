@@ -32,7 +32,7 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Text-based Aderai logo with glow effect */}
+        {/* Aderai logo with glow effect */}
         <motion.div
           className="relative"
           animate={{ 
@@ -44,12 +44,10 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
             ease: "easeInOut" 
           }}
         >
-          <div className="absolute inset-0 blur-2xl bg-primary/20 rounded-full scale-150" />
-          <h1 className="text-5xl md:text-6xl font-playfair font-bold tracking-tight relative z-10">
-            <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
-              Aderai
-            </span>
-          </h1>
+          <div className="absolute inset-0 blur-3xl bg-primary/10 rounded-full scale-150" />
+          <div className="text-5xl md:text-6xl font-playfair font-bold tracking-tight relative z-10">
+            aderai<span className="text-accent animate-pulse">.</span>
+          </div>
         </motion.div>
         
         {/* Loading message */}
