@@ -42,7 +42,7 @@ const handler = async (req: Request): Promise<Response> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: "Aderai <onboarding@resend.dev>",
+        from: "Aderai <akshat@aderai.io>",
         to: ["akshat@aderai.io"],
         subject: `New ${typeDisplay} from ${userName}`,
         html: `

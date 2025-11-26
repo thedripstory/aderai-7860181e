@@ -46,7 +46,7 @@ const handler = async (req: Request): Promise<Response> => {
     const trackingPixelUrl = `${supabaseUrl}/functions/v1/track-email-event?e=${emailLogId}&u=${userId}`;
     
     // Dashboard URL
-    const dashboardUrl = supabaseUrl.replace('.supabase.co', '.lovable.app') || 'https://aderai.lovable.app';
+    const dashboardUrl = 'https://aderai.io';
 
     let html: string;
     let subject: string;
@@ -85,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email
     const emailResponse = await resend.emails.send({
-      from: "Aderai <onboarding@resend.dev>",
+      from: "Aderai <akshat@aderai.io>",
       to: [to],
       subject,
       html,

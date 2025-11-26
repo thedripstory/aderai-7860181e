@@ -53,7 +53,7 @@ const handler = async (req: Request): Promise<Response> => {
     const trackingPixelUrl = `${supabaseUrl}/functions/v1/track-email-event?e=${emailLogId}&u=${userId}`;
     
     // Dashboard URL
-    const dashboardUrl = supabaseUrl.replace('.supabase.co', '.lovable.app') || 'https://aderai.lovable.app';
+    const dashboardUrl = 'https://aderai.io';
 
     // Render React Email template
     const html = await renderAsync(
@@ -65,7 +65,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const emailResponse = await resend.emails.send({
-      from: "Aderai <onboarding@resend.dev>",
+      from: "Aderai <akshat@aderai.io>",
       to: [email],
       subject: "Welcome to Aderai - Start Creating Segments!",
       html,
