@@ -46,18 +46,18 @@ const SimpleLoader = () => (
 );
 
 const App = () => {
-  const [isFirstLoad, setIsFirstLoad] = useState(() => {
-    // Check if this is the first load of the session
-    return !sessionStorage.getItem('aderai_loaded');
+  // Check if this is the first load of the session - sparkles on first, simple on subsequent
+  const [isFirstLoad] = useState(() => {
+    const hasLoaded = sessionStorage.getItem('aderai_loaded');
+    if (!hasLoaded) {
+      // Mark as loaded immediately so subsequent navigations use simple loader
+      sessionStorage.setItem('aderai_loaded', 'true');
+      return true; // First load - show sparkles
+    }
+    return false; // Subsequent load - show simple loader
   });
 
-  useEffect(() => {
-    // Mark as loaded after first render
-    if (isFirstLoad) {
-      sessionStorage.setItem('aderai_loaded', 'true');
-    }
-  }, [isFirstLoad]);
-
+  // First load = sparkles preloader, subsequent = simple loader
   const LoaderComponent = isFirstLoad ? AderaiPreloader : SimpleLoader;
 
   return (
