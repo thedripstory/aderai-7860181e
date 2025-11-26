@@ -220,7 +220,7 @@ export default function UnifiedDashboard() {
       const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
         body: {
           keyId: activeKey.id,
-          endpoint: `https://a.klaviyo.com/api/segments/?page[size]=100`,
+          endpoint: 'https://a.klaviyo.com/api/segments/',
           method: 'GET',
         },
       });
