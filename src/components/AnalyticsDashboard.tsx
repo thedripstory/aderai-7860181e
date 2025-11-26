@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Loader, Users, TrendingUp, BarChart3, Activity, Search, Download, ArrowUp, ArrowDown, Database, Key, HelpCircle } from 'lucide-react';
+import { Users, TrendingUp, BarChart3, Activity, Search, Download, ArrowUp, ArrowDown, HelpCircle, Key } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { EmptyState } from '@/components/ui/empty-state';
-import { LoadingState } from '@/components/ui/loading-state';
-import { AnalyticsChartSkeleton } from '@/components/ui/skeleton-loader';
+import { AnalyticsDashboardSkeleton } from '@/components/ui/skeleton-loader';
 import { SegmentDetailModal } from '@/components/SegmentDetailModal';
 import { toast } from 'sonner';
 
@@ -130,13 +129,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   };
 
   if (loadingAnalytics) {
-    return (
-      <LoadingState
-        message="Loading your analytics"
-        description="Fetching segment data and calculating metrics..."
-        progress={analyticsProgress.total > 0 ? analyticsProgress : undefined}
-      />
-    );
+    return <AnalyticsDashboardSkeleton />;
   }
 
   // Don't show anything when no segments loaded - parent component handles this case
