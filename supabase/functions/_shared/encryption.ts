@@ -3,10 +3,16 @@
  * Uses AES-GCM encryption with the ENCRYPTION_KEY secret
  */
 
-const ENCRYPTION_KEY = Deno.env.get('ENCRYPTION_KEY');
-
-if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
-  throw new Error('ENCRYPTION_KEY must be a 32-character string');
+/**
+ * Get and validate the encryption key
+ * Throws only when actually needed for encryption/decryption
+ */
+function getEncryptionKeyString(): string {
+  const key = Deno.env.get('ENCRYPTION_KEY');
+  if (!key || key.length !== 32) {
+    throw new Error('ENCRYPTION_KEY must be a 32-character string. Please configure this secret in your Supabase Edge Functions settings.');
+  }
+  return key;
 }
 
 /**
@@ -52,7 +58,8 @@ function base64ToUint8Array(base64: string): Uint8Array {
  * Generate encryption key from ENCRYPTION_KEY string
  */
 async function getEncryptionKey(): Promise<CryptoKey> {
-  const keyMaterial = stringToUint8Array(ENCRYPTION_KEY!);
+  const keyString = getEncryptionKeyString();
+  const keyMaterial = stringToUint8Array(keyString);
   return await crypto.subtle.importKey(
     'raw',
     keyMaterial as BufferSource,
@@ -86,7 +93,7 @@ export async function encryptApiKey(plaintext: string): Promise<string> {
     return uint8ArrayToBase64(combined);
   } catch (error) {
     console.error('Encryption error:', error);
-    throw new Error('Failed to encrypt API key');
+    throw new Error(`Failed to encrypt API key: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -112,7 +119,7 @@ export async function decryptApiKey(encrypted: string): Promise<string> {
     return uint8ArrayToString(new Uint8Array(decrypted));
   } catch (error) {
     console.error('Decryption error:', error);
-    throw new Error('Failed to decrypt API key');
+    throw new Error(`Failed to decrypt API key: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
