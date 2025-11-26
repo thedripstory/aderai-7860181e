@@ -247,6 +247,11 @@ export default function UnifiedDashboard() {
       });
 
       setSegmentStats(stats);
+      
+      // Show success toast
+      toast.success('Analytics loaded successfully', {
+        description: `${segments.length} segments fetched from Klaviyo`,
+      });
     } catch (error) {
       console.error('Error fetching segments:', error);
       
