@@ -176,75 +176,184 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Interactive Comparison Cards */}
-          <div className="relative max-w-5xl mx-auto mb-24">
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Before Card */}
-              <div className="group bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 border-2 border-border hover:border-border/50 transition-all hover:scale-[1.02] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/5 rounded-full blur-2xl" />
-                <div className="relative">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-background/50 rounded-xl border border-border">
-                      <Clock className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                    <div className="px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold rounded-full border border-red-500/20">
-                      YOUR CURRENT WAY
+          {/* Immersive Transformation Section */}
+          <div className="relative max-w-6xl mx-auto mb-24">
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-primary">The Transformation</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                From Hours to Seconds
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                See how Aderai eliminates the complexity of manual segmentation
+              </p>
+            </div>
+
+            {/* Main Comparison Container */}
+            <div className="relative">
+              {/* Background Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-primary/10 rounded-[2.5rem] blur-xl" />
+              
+              <div className="relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-[2.5rem] p-4 md:p-8 overflow-hidden">
+                {/* Animated Connection Line */}
+                <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-red-500/50 via-muted to-primary/50 -translate-y-1/2 hidden md:block">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary to-transparent animate-[shimmer_3s_ease-in-out_infinite]" style={{ backgroundSize: '200% 100%' }} />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 md:gap-16 relative">
+                  {/* BEFORE - The Pain */}
+                  <div className="relative group">
+                    <div className="absolute -inset-4 bg-gradient-to-br from-red-500/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative space-y-8">
+                      {/* Header */}
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <Clock className="w-8 h-8 text-red-500" />
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+                            <X className="w-3 h-3 text-red-500" />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-red-500 uppercase tracking-widest mb-1">The Old Way</div>
+                          <div className="text-2xl font-bold text-foreground">Manual Work</div>
+                        </div>
+                      </div>
+
+                      {/* Time Display */}
+                      <div className="relative">
+                        <div className="text-7xl md:text-8xl font-black text-foreground/10 absolute -top-4 left-0">10+</div>
+                        <div className="relative pt-8">
+                          <span className="text-6xl md:text-7xl font-black bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">10+</span>
+                          <span className="text-2xl md:text-3xl font-bold text-muted-foreground ml-2">hours</span>
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-2">of tedious, repetitive work</div>
+                      </div>
+
+                      {/* Pain Points */}
+                      <div className="space-y-4">
+                        {[
+                          { text: "Build 70 segments one by one", time: "4+ hrs" },
+                          { text: "Debug complex Boolean logic", time: "2+ hrs" },
+                          { text: "Test each segment manually", time: "2+ hrs" },
+                          { text: "Fix errors & edge cases", time: "2+ hrs" }
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-red-500/5 border border-red-500/10 group/item hover:bg-red-500/10 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                                <X className="w-4 h-4 text-red-500" />
+                              </div>
+                              <span className="text-sm text-muted-foreground">{item.text}</span>
+                            </div>
+                            <span className="text-xs font-mono text-red-500/70 bg-red-500/10 px-2 py-1 rounded">{item.time}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="text-sm text-muted-foreground mb-2 font-medium uppercase tracking-wide">
-                    Manual Segmentation
+                  {/* Center Divider with Arrow */}
+                  <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+                      <div className="relative bg-background border-2 border-primary rounded-full p-5 shadow-2xl shadow-primary/20">
+                        <ArrowRight className="w-10 h-10 text-primary" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-5xl font-bold mb-4 text-foreground">10+ hours</div>
 
-                  <div className="space-y-3">
-                    {["Build 70 segments one by one", "Debug complex Boolean logic", "Test each segment manually", "Fix errors & edge cases"].map((item, i) => <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <X className="w-4 h-4 text-red-500 flex-shrink-0" />
-                        <span>{item}</span>
-                      </div>)}
+                  {/* Mobile Arrow */}
+                  <div className="flex md:hidden justify-center -my-4">
+                    <div className="bg-background border-2 border-primary rounded-full p-3 shadow-xl">
+                      <ArrowRight className="w-6 h-6 text-primary rotate-90" />
+                    </div>
+                  </div>
+
+                  {/* AFTER - The Solution */}
+                  <div className="relative group">
+                    <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative space-y-8">
+                      {/* Header */}
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                            <Zap className="w-8 h-8 text-primary" />
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-primary uppercase tracking-widest mb-1">With Aderai</div>
+                          <div className="text-2xl font-bold text-foreground">Automated</div>
+                        </div>
+                      </div>
+
+                      {/* Time Display */}
+                      <div className="relative">
+                        <div className="text-7xl md:text-8xl font-black text-primary/10 absolute -top-4 left-0">30</div>
+                        <div className="relative pt-8">
+                          <CircleDoodle delay="1.5s">
+                            <span className="text-6xl md:text-7xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                              <AnimatedTimeCounter />
+                            </span>
+                          </CircleDoodle>
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-2">and all 70 segments are live</div>
+                      </div>
+
+                      {/* Benefits */}
+                      <div className="space-y-4">
+                        {[
+                          { text: "Select from 70 pre-built segments", icon: "✓" },
+                          { text: "Customize to your metrics", icon: "✓" },
+                          { text: "One-click deploy to Klaviyo", icon: "✓" },
+                          { text: "All segments auto-created", icon: "✓" }
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10 group/item hover:bg-primary/10 transition-colors">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <CheckCircle2 className="w-4 h-4 text-primary" />
+                            </div>
+                            <span className="text-sm text-foreground">{item.text}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* After Card */}
-              <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl animate-[slide-in-right_0.8s_ease-out_0.3s_both]">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-2xl animate-pulse" />
-                <div className="relative">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-primary/10 rounded-xl border border-primary/20">
-                      <Zap className="w-6 h-6 text-primary" />
+                {/* Bottom Stats Bar */}
+                <div className="mt-12 pt-8 border-t border-border/50">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div className="space-y-1">
+                      <div className="text-3xl font-black text-primary">99%</div>
+                      <div className="text-xs text-muted-foreground">Time Saved</div>
                     </div>
-                    <div className="px-3 py-1 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/30 animate-pulse">
-                      NEW WAY
+                    <div className="space-y-1">
+                      <div className="text-3xl font-black text-primary">70</div>
+                      <div className="text-xs text-muted-foreground">Segments Ready</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-3xl font-black text-primary">0</div>
+                      <div className="text-xs text-muted-foreground">Code Required</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-3xl font-black text-primary">1</div>
+                      <div className="text-xs text-muted-foreground">Click Deploy</div>
                     </div>
                   </div>
-
-                  <div className="text-sm text-primary mb-2 font-bold uppercase tracking-wide">With Aderai</div>
-                  <div className="text-5xl font-bold mb-4 text-foreground">
-                    <CircleDoodle delay="1.5s">
-                      <AnimatedTimeCounter />
-                    </CircleDoodle>
-                  </div>
-
-                  <div className="space-y-3">
-                    {["Select from 70 pre-built segments", "Customize to your metrics", "One-click deploy to Klaviyo", "All segments auto-created"].map((item, i) => <div key={i} className="flex items-center gap-3 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-foreground/90">{item}</span>
-                      </div>)}
-                  </div>
-                </div>
-              </div>
-
-              {/* Arrow Connection */}
-              <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                <div className="bg-background border-2 border-primary rounded-full p-4 shadow-xl">
-                  <ArrowRight className="w-8 h-8 text-primary animate-pulse" />
                 </div>
               </div>
             </div>
 
             {/* Revolving Testimonials */}
-            <RevolvingTestimonials />
+            <div className="mt-16">
+              <RevolvingTestimonials />
+            </div>
           </div>
 
           {/* Visual Demo */}
