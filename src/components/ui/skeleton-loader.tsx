@@ -42,6 +42,70 @@ export const AnalyticsChartSkeleton = () => (
   </div>
 );
 
+export const AnalyticsDashboardSkeleton = () => (
+  <div className="space-y-8 animate-fade-in">
+    {/* KPI Cards */}
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="bg-card border border-border rounded-lg p-6">
+          <div className="flex items-center justify-between mb-3">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="w-5 h-5 rounded" />
+          </div>
+          <Skeleton className="h-9 w-20" />
+        </div>
+      ))}
+    </div>
+
+    {/* Chart Section */}
+    <div className="bg-card border border-border rounded-lg p-6">
+      <div className="flex items-center justify-between mb-6">
+        <Skeleton className="h-6 w-48" />
+        <div className="flex gap-3">
+          <Skeleton className="h-9 w-24 rounded-lg" />
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        </div>
+      </div>
+      <div className="h-[300px] flex items-end justify-between gap-2 px-4">
+        {[40, 65, 45, 80, 55, 70, 50, 85, 60, 75].map((height, i) => (
+          <div key={i} className="flex-1 flex flex-col items-center gap-2">
+            <Skeleton 
+              className="w-full rounded-t" 
+              style={{ height: `${height}%` }} 
+            />
+            <Skeleton className="h-3 w-12" />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Segments List */}
+    <div className="bg-card border border-border rounded-lg p-6">
+      <div className="flex items-center justify-between mb-6">
+        <Skeleton className="h-6 w-32" />
+        <div className="flex gap-3">
+          <Skeleton className="h-9 w-40 rounded-lg" />
+          <Skeleton className="h-9 w-24 rounded-lg" />
+          <Skeleton className="h-9 w-24 rounded-lg" />
+        </div>
+      </div>
+      <div className="space-y-3">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="p-4 rounded-lg border border-border">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <Skeleton className="h-5 w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 export const DashboardStatsSkeleton = () => (
   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in">
     {[1, 2, 3, 4].map((i) => (
