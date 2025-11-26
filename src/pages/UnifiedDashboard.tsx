@@ -218,7 +218,9 @@ export default function UnifiedDashboard() {
       console.log('Fetching segments with keyId:', activeKey.id);
       
       let allFetchedSegments: any[] = [];
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?fields[segment]=name,created,updated,profile_count,is_active,is_starred&page[size]=100';
+      let includedTags: Record<string, any> = {};
+      // Use additional-fields for profile_count (not fields), and include tags for Aderai detection
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?additional-fields[segment]=profile_count&include=tags&page[size]=100';
       
       // Fetch all pages of segments
       while (nextPageUrl) {
@@ -235,8 +237,23 @@ export default function UnifiedDashboard() {
           throw error;
         }
         
+        // Check if Klaviyo returned an error
+        if (data?.errors) {
+          console.error('Klaviyo API error:', data.errors);
+          throw new Error(data.errors[0]?.detail || 'Klaviyo API error');
+        }
+        
         const pageSegments = data?.data || [];
         allFetchedSegments = [...allFetchedSegments, ...pageSegments];
+        
+        // Collect included tags from the response
+        if (data?.included) {
+          data.included.forEach((item: any) => {
+            if (item.type === 'tag') {
+              includedTags[item.id] = item.attributes?.name || '';
+            }
+          });
+        }
         
         // Check for next page
         nextPageUrl = data?.links?.next || null;
@@ -248,6 +265,7 @@ export default function UnifiedDashboard() {
       }
       
       console.log('Klaviyo segments fetched:', allFetchedSegments.length);
+      console.log('Tags collected:', Object.keys(includedTags).length);
       setAllSegments(allFetchedSegments);
       
       // Build stats from segment attributes
@@ -256,23 +274,39 @@ export default function UnifiedDashboard() {
       
       allFetchedSegments.forEach((segment: any) => {
         const profileCount = segment.attributes?.profile_count ?? 0;
+        const segmentName = segment.attributes?.name || 'Unnamed Segment';
+        
+        // Check if segment has Aderai tag (tag-based detection)
+        const segmentTagIds = segment.relationships?.tags?.data?.map((t: any) => t.id) || [];
+        const segmentTags = segmentTagIds.map((id: string) => includedTags[id]).filter(Boolean);
+        const hasAderaiTag = segmentTags.some((tag: string) => 
+          tag.toLowerCase().includes('aderai')
+        );
+        
+        // Check name-based detection
+        const hasAderaiName = segmentName.includes('| Aderai') || segmentName.toLowerCase().includes('aderai');
+        
         stats[segment.id] = {
           profileCount: profileCount,
-          name: segment.attributes?.name || 'Unnamed Segment',
+          name: segmentName,
           created: segment.attributes?.created || null,
           updated: segment.attributes?.updated || null,
           isStarred: segment.attributes?.is_starred || false,
           isActive: segment.attributes?.is_active !== false,
+          tags: segmentTags,
+          isAderai: hasAderaiTag || hasAderaiName,
         };
         
-        // Prepare historical data for trend tracking
-        historicalDataToInsert.push({
-          segment_klaviyo_id: segment.id,
-          segment_name: segment.attributes?.name || 'Unnamed Segment',
-          profile_count: profileCount,
-          klaviyo_key_id: activeKey.id,
-          user_id: currentUser?.id,
-        });
+        // Prepare historical data for trend tracking (only for segments with profiles)
+        if (profileCount > 0) {
+          historicalDataToInsert.push({
+            segment_klaviyo_id: segment.id,
+            segment_name: segmentName,
+            profile_count: profileCount,
+            klaviyo_key_id: activeKey.id,
+            user_id: currentUser?.id,
+          });
+        }
       });
 
       setSegmentStats(stats);
@@ -291,8 +325,11 @@ export default function UnifiedDashboard() {
           });
       }
       
+      // Count Aderai segments for toast
+      const aderaiCount = Object.values(stats).filter((s: any) => s.isAderai).length;
+      
       toast.success('Analytics loaded successfully', {
-        description: `${allFetchedSegments.length} segments fetched from Klaviyo`,
+        description: `${allFetchedSegments.length} segments fetched${aderaiCount > 0 ? ` (${aderaiCount} Aderai)` : ''}`,
       });
     } catch (error) {
       console.error('Error fetching segments:', error);

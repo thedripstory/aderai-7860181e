@@ -18,6 +18,10 @@ interface SegmentStats {
   membersRemoved?: number;
   netChange?: number;
   changePercent?: number;
+  tags?: string[];
+  isAderai?: boolean;
+  isStarred?: boolean;
+  isActive?: boolean;
 }
 
 interface AnalyticsDashboardProps {
@@ -58,12 +62,18 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     created?: string;
     updated?: string;
     isAderai?: boolean;
+    tags?: string[];
   } | null>(null);
 
-  // Check if segment is Aderai-created (name contains "| Aderai" or "Aderai")
-  const isAderaiSegment = (segment: any, stats?: SegmentStats): boolean => {
+  // Check if segment is Aderai-created (from stats isAderai flag, or fallback to name check)
+  const isAderaiSegment = (segment: any, stats?: any): boolean => {
+    // Use isAderai flag from stats if available (set by UnifiedDashboard from tag detection)
+    if (stats?.isAderai !== undefined) {
+      return stats.isAderai;
+    }
+    // Fallback to name-based detection
     const name = stats?.name || segment?.attributes?.name || '';
-    return name.includes('| Aderai') || name.includes('Aderai');
+    return name.includes('| Aderai') || name.toLowerCase().includes('aderai');
   };
 
   // Filter segments
@@ -487,6 +497,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   created: stats?.created,
                   updated: stats?.updated,
                   isAderai,
+                  tags: stats?.tags,
                 })}
                 className="group p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent/5 transition-all cursor-pointer animate-fade-in"
                 style={{ animationDelay: `${Math.min(index * 15, 300)}ms` }}
@@ -502,6 +513,19 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                           <Sparkles className="w-3 h-3 mr-1" />
                           Aderai
                         </Badge>
+                      )}
+                      {/* Show tags */}
+                      {stats?.tags && stats.tags.length > 0 && !isAderai && (
+                        <div className="flex items-center gap-1">
+                          {stats.tags.slice(0, 2).map((tag: string) => (
+                            <Badge key={tag} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                          {stats.tags.length > 2 && (
+                            <span className="text-xs text-muted-foreground">+{stats.tags.length - 2}</span>
+                          )}
+                        </div>
                       )}
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
