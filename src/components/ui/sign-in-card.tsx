@@ -62,8 +62,8 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
 
   return (
     <div className="min-h-screen w-screen bg-background relative overflow-hidden flex items-center justify-center">
-      {/* Background gradient effect - brand orange */}
-      <div className="absolute inset-0 bg-gradient-to-b from-accent/40 via-accent/50 to-background" />
+      {/* Background gradient effect - brand orange, lighter */}
+      <div className="absolute inset-0 bg-gradient-to-b from-accent/30 via-accent/20 to-background" />
       
       {/* Subtle noise texture overlay */}
       <div className="absolute inset-0 opacity-[0.03] mix-blend-soft-light" 
@@ -109,7 +109,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-sm relative z-10 px-4"
+        className="w-full max-w-md relative z-10 px-4"
         style={{ perspective: 1500 }}
       >
         <motion.div
@@ -231,8 +231,8 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
             {/* Card border glow */}
             <div className="absolute -inset-[0.5px] rounded-2xl bg-gradient-to-r from-foreground/3 via-foreground/7 to-foreground/3 opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
             
-            {/* Glass card background */}
-            <div className="relative bg-background/40 backdrop-blur-xl rounded-2xl p-6 border border-foreground/[0.05] shadow-2xl overflow-hidden">
+            {/* Glass card background - brighter */}
+            <div className="relative bg-card/70 backdrop-blur-xl rounded-2xl p-8 border border-foreground/10 shadow-2xl overflow-hidden">
               {/* Subtle card inner patterns */}
               <div className="absolute inset-0 opacity-[0.03]" 
                 style={{
@@ -242,14 +242,14 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
               />
 
               {/* Logo and header */}
-              <div className="text-center space-y-1 mb-5">
+              <div className="text-center space-y-2 mb-6">
                 <motion.div
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", duration: 0.8 }}
                 >
                   <Link to="/" className="inline-block group">
-                    <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
+                    <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
                       aderai<span className="text-accent group-hover:animate-pulse">.</span>
                     </div>
                   </Link>
@@ -259,7 +259,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80"
+                  className="text-2xl font-bold text-foreground"
                 >
                   {isSignUp ? "Create Account" : "Welcome Back"}
                 </motion.h1>
@@ -268,15 +268,15 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-muted-foreground text-xs"
+                  className="text-muted-foreground text-sm"
                 >
                   {isSignUp ? "Get started with Aderai for free" : "Sign in to continue to Aderai"}
                 </motion.p>
               </div>
 
               {/* Login form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <motion.div className="space-y-3">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <motion.div className="space-y-4">
                   {/* Account Name input (signup only) */}
                   <AnimatePresence>
                     {isSignUp && (
@@ -302,7 +302,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                             onChange={(e) => setAccountName(e.target.value)}
                             onFocus={() => setFocusedInput("accountName")}
                             onBlur={() => setFocusedInput(null)}
-                            className="w-full bg-foreground/5 border-transparent focus:border-foreground/20 text-foreground placeholder:text-muted-foreground h-10 transition-all duration-300 pl-10 pr-3 focus:bg-foreground/10"
+                            className="w-full bg-foreground/5 border-foreground/10 focus:border-accent/50 text-foreground placeholder:text-muted-foreground h-12 transition-all duration-300 pl-10 pr-3 focus:bg-foreground/10 text-base"
                           />
                           
                           {focusedInput === "accountName" && (
@@ -341,7 +341,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                         onFocus={() => setFocusedInput("email")}
                         onBlur={() => setFocusedInput(null)}
                         required
-                        className="w-full bg-foreground/5 border-transparent focus:border-foreground/20 text-foreground placeholder:text-muted-foreground h-10 transition-all duration-300 pl-10 pr-3 focus:bg-foreground/10"
+                        className="w-full bg-foreground/5 border-foreground/10 focus:border-accent/50 text-foreground placeholder:text-muted-foreground h-12 transition-all duration-300 pl-10 pr-3 focus:bg-foreground/10 text-base"
                       />
                       
                       {focusedInput === "email" && (
@@ -379,7 +379,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                         onBlur={() => setFocusedInput(null)}
                         required
                         minLength={8}
-                        className="w-full bg-foreground/5 border-transparent focus:border-foreground/20 text-foreground placeholder:text-muted-foreground h-10 transition-all duration-300 pl-10 pr-10 focus:bg-foreground/10"
+                        className="w-full bg-foreground/5 border-foreground/10 focus:border-accent/50 text-foreground placeholder:text-muted-foreground h-12 transition-all duration-300 pl-10 pr-10 focus:bg-foreground/10 text-base"
                       />
                       
                       {/* Toggle password visibility */}
@@ -433,12 +433,12 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                           </motion.div>
                         )}
                       </div>
-                      <label htmlFor="remember-me" className="text-xs text-muted-foreground hover:text-foreground/80 transition-colors duration-200">
+                      <label htmlFor="remember-me" className="text-sm text-muted-foreground hover:text-foreground/80 transition-colors duration-200">
                         Remember me
                       </label>
                     </div>
                     
-                    <div className="text-xs relative group/link">
+                    <div className="text-sm relative group/link">
                       <Link to="/forgot-password" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                         Forgot password?
                       </Link>
@@ -452,12 +452,12 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isLoading}
-                  className="w-full relative group/button mt-5"
+                  className="w-full relative group/button mt-6"
                 >
                   {/* Button glow effect */}
                   <div className="absolute inset-0 bg-accent/20 rounded-lg blur-lg opacity-0 group-hover/button:opacity-70 transition-opacity duration-300" />
                   
-                  <div className="relative overflow-hidden bg-accent text-accent-foreground font-medium h-10 rounded-lg transition-all duration-300 flex items-center justify-center">
+                  <div className="relative overflow-hidden bg-accent text-accent-foreground font-medium h-12 rounded-lg transition-all duration-300 flex items-center justify-center">
                     {/* Button background animation */}
                     <motion.div 
                       className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent-foreground/20 to-accent/0 -z-10"
@@ -494,14 +494,14 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                 </motion.button>
 
                 {isSignUp && (
-                  <p className="text-xs text-muted-foreground text-center">
+                  <p className="text-sm text-muted-foreground text-center">
                     Free forever • No credit card required
                   </p>
                 )}
 
                 {/* Sign up/in link */}
                 <motion.p 
-                  className="text-center text-xs text-muted-foreground mt-4"
+                  className="text-center text-sm text-muted-foreground mt-5"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
