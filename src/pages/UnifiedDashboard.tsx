@@ -267,16 +267,38 @@ export default function UnifiedDashboard() {
       console.log('Klaviyo segments fetched:', allFetchedSegments.length);
       console.log('Tags collected:', Object.keys(includedTags).length);
       
-      console.log('Profile counts included in list response');
+      // Fetch latest profile counts from historical data table
+      let historicalCounts: Record<string, number> = {};
+      if (currentUser?.id) {
+        const segmentIds = allFetchedSegments.map((s: any) => s.id);
+        
+        // Get the most recent profile count for each segment
+        const { data: historicalData } = await supabase
+          .from('segment_historical_data')
+          .select('segment_klaviyo_id, profile_count, recorded_at')
+          .eq('klaviyo_key_id', activeKey.id)
+          .in('segment_klaviyo_id', segmentIds)
+          .order('recorded_at', { ascending: false });
+        
+        if (historicalData) {
+          // Keep only the most recent entry for each segment
+          historicalData.forEach((record: any) => {
+            if (!historicalCounts[record.segment_klaviyo_id]) {
+              historicalCounts[record.segment_klaviyo_id] = record.profile_count;
+            }
+          });
+          console.log('Historical profile counts loaded for', Object.keys(historicalCounts).length, 'segments');
+        }
+      }
+      
       setAllSegments(allFetchedSegments);
       
-      // Build stats from segment attributes (profile_count comes directly from list response)
+      // Build stats from segment attributes + historical profile counts
       const stats: Record<string, any> = {};
-      const historicalDataToInsert: any[] = [];
       
       allFetchedSegments.forEach((segment: any) => {
-        // Get profile count directly from segment attributes (from fields[segment] parameter)
-        const profileCount = segment.attributes?.profile_count ?? null;
+        // Use historical profile count if available, otherwise null
+        const profileCount = historicalCounts[segment.id] ?? null;
         const segmentName = segment.attributes?.name || 'Unnamed Segment';
         
         // Check if segment has Aderai tag (tag-based detection)
@@ -299,34 +321,9 @@ export default function UnifiedDashboard() {
           tags: segmentTags,
           isAderai: hasAderaiTag || hasAderaiName,
         };
-        
-        // Prepare historical data for trend tracking (only for segments with known profile counts)
-        if (profileCount !== null && profileCount > 0) {
-          historicalDataToInsert.push({
-            segment_klaviyo_id: segment.id,
-            segment_name: segmentName,
-            profile_count: profileCount,
-            klaviyo_key_id: activeKey.id,
-            user_id: currentUser?.id,
-          });
-        }
       });
 
       setSegmentStats(stats);
-      
-      // Save historical data for trend visualization (don't wait for it)
-      if (currentUser?.id && historicalDataToInsert.length > 0) {
-        supabase
-          .from('segment_historical_data')
-          .insert(historicalDataToInsert)
-          .then(({ error: histError }) => {
-            if (histError) {
-              console.log('Historical data save skipped (may be duplicate):', histError.message);
-            } else {
-              console.log('Historical segment data recorded for', historicalDataToInsert.length, 'segments');
-            }
-          });
-      }
       
       // Count Aderai segments and segments with profile counts for toast
       const aderaiCount = Object.values(stats).filter((s: any) => s.isAderai).length;
