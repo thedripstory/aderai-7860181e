@@ -220,7 +220,7 @@ export default function UnifiedDashboard() {
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
       // Fetch segments with tags for Aderai detection
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&page[size]=100';
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags';
       
       // Fetch all pages of segments
       while (nextPageUrl) {
