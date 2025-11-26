@@ -219,8 +219,8 @@ export default function UnifiedDashboard() {
       
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
-      // Fetch segments with tags for Aderai detection
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags';
+      // Fetch segments with tags and profile_count in a single request
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,profile_count,is_active,is_starred';
       
       // Fetch all pages of segments
       while (nextPageUrl) {
@@ -267,20 +267,16 @@ export default function UnifiedDashboard() {
       console.log('Klaviyo segments fetched:', allFetchedSegments.length);
       console.log('Tags collected:', Object.keys(includedTags).length);
       
-      // Skip individual profile count fetching to avoid rate limits
-      // Profile counts will show as N/A - use daily cron job for historical tracking
-      const segmentProfileCounts: Record<string, number> = {};
-      
-      console.log('Skipped individual profile count fetching to avoid rate limits');
+      console.log('Profile counts included in list response');
       setAllSegments(allFetchedSegments);
       
-      // Build stats from segment attributes
+      // Build stats from segment attributes (profile_count comes directly from list response)
       const stats: Record<string, any> = {};
       const historicalDataToInsert: any[] = [];
       
       allFetchedSegments.forEach((segment: any) => {
-        // Use fetched profile count or fall back to null
-        const profileCount = segmentProfileCounts[segment.id] ?? null;
+        // Get profile count directly from segment attributes (from fields[segment] parameter)
+        const profileCount = segment.attributes?.profile_count ?? null;
         const segmentName = segment.attributes?.name || 'Unnamed Segment';
         
         // Check if segment has Aderai tag (tag-based detection)
