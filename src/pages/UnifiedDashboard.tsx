@@ -200,12 +200,21 @@ export default function UnifiedDashboard() {
   };
 
   const fetchAllSegments = async () => {
-    if (klaviyoKeys.length === 0) return;
+    if (klaviyoKeys.length === 0) {
+      console.log('No Klaviyo keys available');
+      return;
+    }
+
+    const activeKey = klaviyoKeys[activeKeyIndex];
+    if (!activeKey?.id) {
+      console.log('No active key ID available');
+      return;
+    }
 
     trackAction('fetch_analytics');
     setLoadingAnalytics(true);
     try {
-      const activeKey = klaviyoKeys[activeKeyIndex];
+      console.log('Fetching segments with keyId:', activeKey.id);
       
       // Fetch all segments - Klaviyo returns profile_count in segment attributes
       const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
@@ -216,7 +225,12 @@ export default function UnifiedDashboard() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+      
+      console.log('Klaviyo response:', data);
       const segments = data?.data || [];
       setAllSegments(segments);
       
@@ -240,14 +254,23 @@ export default function UnifiedDashboard() {
       await ErrorLogger.logKlaviyoError(
         'Fetch All Segments',
         error as Error,
-        klaviyoKeys[activeKeyIndex]?.id
+        activeKey?.id
       );
       
-      toast.error('Failed to load analytics');
+      toast.error('Failed to load analytics', {
+        description: 'Check your Klaviyo connection and try again',
+      });
     } finally {
       setLoadingAnalytics(false);
     }
   };
+
+  // Auto-fetch analytics when switching to the analytics tab
+  useEffect(() => {
+    if (activeTab === 'analytics' && klaviyoKeys.length > 0 && allSegments.length === 0 && !loadingAnalytics) {
+      fetchAllSegments();
+    }
+  }, [activeTab, klaviyoKeys]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -369,17 +392,18 @@ export default function UnifiedDashboard() {
               </div>
             ) : (
               <>
-                {allSegments.length === 0 && !loadingAnalytics && (
-                  <div className="bg-card border border-border rounded-lg p-8 text-center mb-4">
-                    <p className="text-muted-foreground mb-4">
-                      Load your segments to see analytics
-                    </p>
-                    <Button onClick={fetchAllSegments} disabled={loadingAnalytics}>
-                      <RefreshCw className={`w-4 h-4 mr-2 ${loadingAnalytics ? 'animate-spin' : ''}`} />
-                      Fetch Analytics
-                    </Button>
-                  </div>
-                )}
+                {/* Refresh button - always visible when Klaviyo is connected */}
+                <div className="flex justify-end mb-4">
+                  <Button 
+                    onClick={fetchAllSegments} 
+                    disabled={loadingAnalytics}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-2 ${loadingAnalytics ? 'animate-spin' : ''}`} />
+                    {loadingAnalytics ? 'Loading...' : 'Refresh Analytics'}
+                  </Button>
+                </div>
                 <AnalyticsDashboard
                   allSegments={allSegments}
                   segmentStats={segmentStats}
