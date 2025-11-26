@@ -75,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
       klaviyo_connected: "✅",
     };
 
-    const dashboardUrl = Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '.lovable.app') || 'https://app.lovable.app';
+    const dashboardUrl = 'https://aderai.io';
 
     // Handle klaviyo_connected template specially
     let subject = data.title;
@@ -175,7 +175,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "Aderai <onboarding@resend.dev>",
+      from: "Aderai <akshat@aderai.io>",
       to: [email],
       subject: subject,
       html: htmlContent,
