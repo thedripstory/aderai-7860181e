@@ -267,48 +267,54 @@ export default function UnifiedDashboard() {
       console.log('Klaviyo segments fetched:', allFetchedSegments.length);
       console.log('Tags collected:', Object.keys(includedTags).length);
       
-      // Now fetch profile counts for each segment in parallel batches
-      const BATCH_SIZE = 5; // Fetch 5 at a time to respect rate limits
+      // Fetch profile counts sequentially to respect Klaviyo rate limits
       const segmentProfileCounts: Record<string, number> = {};
       
-      for (let i = 0; i < allFetchedSegments.length; i += BATCH_SIZE) {
-        const batch = allFetchedSegments.slice(i, i + BATCH_SIZE);
+      for (let i = 0; i < allFetchedSegments.length; i++) {
+        const segment = allFetchedSegments[i];
         
-        const batchPromises = batch.map(async (segment) => {
-          try {
-            const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
+        // Update progress
+        setAnalyticsProgress({ 
+          current: i + 1, 
+          total: allFetchedSegments.length 
+        });
+        
+        try {
+          const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
+            body: {
+              keyId: activeKey.id,
+              endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/?additional-fields[segment]=profile_count`,
+              method: 'GET',
+            },
+          });
+          
+          if (!error && data?.data?.attributes?.profile_count !== undefined) {
+            segmentProfileCounts[segment.id] = data.data.attributes.profile_count;
+          }
+          
+          // Handle rate limiting - if we get a 429, wait and retry
+          if (data?.errors?.[0]?.status === 429) {
+            const waitTime = parseInt(data.errors[0]?.detail?.match(/(\d+) second/)?.[1] || '2') * 1000;
+            await new Promise(resolve => setTimeout(resolve, waitTime + 500));
+            // Retry once
+            const retryResult = await supabase.functions.invoke('klaviyo-proxy', {
               body: {
                 keyId: activeKey.id,
                 endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/?additional-fields[segment]=profile_count`,
                 method: 'GET',
               },
             });
-            
-            if (!error && data?.data?.attributes?.profile_count !== undefined) {
-              return { id: segment.id, count: data.data.attributes.profile_count };
+            if (!retryResult.error && retryResult.data?.data?.attributes?.profile_count !== undefined) {
+              segmentProfileCounts[segment.id] = retryResult.data.data.attributes.profile_count;
             }
-            return { id: segment.id, count: null };
-          } catch {
-            return { id: segment.id, count: null };
           }
-        });
+        } catch {
+          // Continue on error
+        }
         
-        const results = await Promise.all(batchPromises);
-        results.forEach(r => {
-          if (r.count !== null) {
-            segmentProfileCounts[r.id] = r.count;
-          }
-        });
-        
-        // Update progress
-        setAnalyticsProgress({ 
-          current: Math.min(i + BATCH_SIZE, allFetchedSegments.length), 
-          total: allFetchedSegments.length 
-        });
-        
-        // Small delay between batches for rate limiting
-        if (i + BATCH_SIZE < allFetchedSegments.length) {
-          await new Promise(resolve => setTimeout(resolve, 200));
+        // Delay between requests to respect rate limits (500ms)
+        if (i < allFetchedSegments.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
       
