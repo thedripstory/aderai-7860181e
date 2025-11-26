@@ -150,6 +150,12 @@ const KlaviyoSetup = () => {
       // Use the encrypted key returned from validation
       const encryptedKey = validationData.encryptedKey || apiKey;
 
+      // Deactivate any existing keys for this user first
+      await supabase
+        .from("klaviyo_keys")
+        .update({ is_active: false })
+        .eq("user_id", user.id);
+
       // Save Klaviyo configuration
       const { error: klaviyoError } = await supabase
         .from("klaviyo_keys")

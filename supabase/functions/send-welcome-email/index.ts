@@ -25,17 +25,6 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Verify JWT token - only service role can send welcome emails
-    const authHeader = req.headers.get('Authorization');
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    if (!authHeader || !authHeader.includes(serviceKey || '')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const { email, userName, accountType, userId }: WelcomeEmailRequest = await req.json();
     
     // Validate inputs

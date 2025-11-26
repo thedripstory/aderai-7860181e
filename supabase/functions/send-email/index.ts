@@ -26,17 +26,6 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Verify service role key
-    const authHeader = req.headers.get('Authorization');
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    if (!authHeader || !authHeader.includes(serviceKey || '')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const { to, template_name, template_data, userId }: SendEmailRequest = await req.json();
 
     if (!to || !template_name || !userId) {
