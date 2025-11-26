@@ -17,6 +17,7 @@ interface SegmentDetailModalProps {
     created?: string;
     updated?: string;
     isAderai?: boolean;
+    tags?: string[];
   } | null;
   klaviyoKeyId: string;
 }
@@ -140,13 +141,22 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <DialogTitle className="text-xl font-bold">{segment.name}</DialogTitle>
             {segment.isAderai && (
               <Badge className="bg-primary/10 border-primary/30 text-primary">
                 <Sparkles className="w-3 h-3 mr-1" />
                 Aderai
               </Badge>
+            )}
+            {segment.tags && segment.tags.length > 0 && (
+              <div className="flex items-center gap-1">
+                {segment.tags.map((tag) => (
+                  <Badge key={tag} variant="outline" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             )}
           </div>
           {segment.description && (
