@@ -3,13 +3,11 @@ import { SparklesCore } from "@/components/ui/sparkles";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AderaiPreloaderProps {
-  message?: string;
   minDisplayTime?: number;
   onComplete?: () => void;
 }
 
 export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({ 
-  message = "Loading...",
   minDisplayTime = 3000,
   onComplete
 }) => {
@@ -75,15 +73,6 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
               </div>
             </motion.div>
             
-            {/* Loading message */}
-            <motion.p 
-              className="text-muted-foreground text-sm mt-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              {message}
-            </motion.p>
           </motion.div>
 
           {/* Sparkles container below logo */}
