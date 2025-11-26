@@ -175,7 +175,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "Aderai <akshat@aderai.io>",
+      from: "Akshat from Aderai <akshat@updates.aderai.io>",
       to: [email],
       subject: subject,
       html: htmlContent,
