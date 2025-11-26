@@ -213,49 +213,90 @@ export default function UnifiedDashboard() {
 
     trackAction('fetch_analytics');
     setLoadingAnalytics(true);
+    
     try {
       console.log('Fetching segments with keyId:', activeKey.id);
       
-      // Fetch all segments - Klaviyo returns profile_count in segment attributes
-      const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
-        body: {
-          keyId: activeKey.id,
-          endpoint: 'https://a.klaviyo.com/api/segments/',
-          method: 'GET',
-        },
-      });
+      let allFetchedSegments: any[] = [];
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?fields[segment]=name,created,updated,profile_count,is_active,is_starred&page[size]=100';
+      
+      // Fetch all pages of segments
+      while (nextPageUrl) {
+        const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
+          body: {
+            keyId: activeKey.id,
+            endpoint: nextPageUrl,
+            method: 'GET',
+          },
+        });
 
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
+        if (error) {
+          console.error('Supabase function error:', error);
+          throw error;
+        }
+        
+        const pageSegments = data?.data || [];
+        allFetchedSegments = [...allFetchedSegments, ...pageSegments];
+        
+        // Check for next page
+        nextPageUrl = data?.links?.next || null;
+        
+        setAnalyticsProgress({ 
+          current: allFetchedSegments.length, 
+          total: allFetchedSegments.length + (nextPageUrl ? 100 : 0) 
+        });
       }
       
-      console.log('Klaviyo response:', data);
-      const segments = data?.data || [];
-      setAllSegments(segments);
+      console.log('Klaviyo segments fetched:', allFetchedSegments.length);
+      setAllSegments(allFetchedSegments);
       
-      // Build stats from segment attributes - no additional API calls needed
+      // Build stats from segment attributes
       const stats: Record<string, any> = {};
-      segments.forEach((segment: any, index: number) => {
+      const historicalDataToInsert: any[] = [];
+      
+      allFetchedSegments.forEach((segment: any) => {
+        const profileCount = segment.attributes?.profile_count ?? 0;
         stats[segment.id] = {
-          profileCount: segment.attributes?.profile_count || 0,
+          profileCount: profileCount,
           name: segment.attributes?.name || 'Unnamed Segment',
           created: segment.attributes?.created || null,
           updated: segment.attributes?.updated || null,
+          isStarred: segment.attributes?.is_starred || false,
+          isActive: segment.attributes?.is_active !== false,
         };
-        setAnalyticsProgress({ current: index + 1, total: segments.length });
+        
+        // Prepare historical data for trend tracking
+        historicalDataToInsert.push({
+          segment_klaviyo_id: segment.id,
+          segment_name: segment.attributes?.name || 'Unnamed Segment',
+          profile_count: profileCount,
+          klaviyo_key_id: activeKey.id,
+          user_id: currentUser?.id,
+        });
       });
 
       setSegmentStats(stats);
       
-      // Show success toast
+      // Save historical data for trend visualization (don't wait for it)
+      if (currentUser?.id && historicalDataToInsert.length > 0) {
+        supabase
+          .from('segment_historical_data')
+          .insert(historicalDataToInsert)
+          .then(({ error: histError }) => {
+            if (histError) {
+              console.log('Historical data save skipped (may be duplicate):', histError.message);
+            } else {
+              console.log('Historical segment data recorded for', historicalDataToInsert.length, 'segments');
+            }
+          });
+      }
+      
       toast.success('Analytics loaded successfully', {
-        description: `${segments.length} segments fetched from Klaviyo`,
+        description: `${allFetchedSegments.length} segments fetched from Klaviyo`,
       });
     } catch (error) {
       console.error('Error fetching segments:', error);
       
-      // Log Klaviyo API error
       await ErrorLogger.logKlaviyoError(
         'Fetch All Segments',
         error as Error,
