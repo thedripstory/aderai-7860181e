@@ -219,8 +219,8 @@ export default function UnifiedDashboard() {
       
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
-      // Use additional-fields for profile_count (not fields), and include tags for Aderai detection
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?additional-fields[segment]=profile_count&include=tags&page[size]=100';
+      // Fetch segments with tags for Aderai detection
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&page[size]=100';
       
       // Fetch all pages of segments
       while (nextPageUrl) {
@@ -273,7 +273,7 @@ export default function UnifiedDashboard() {
       const historicalDataToInsert: any[] = [];
       
       allFetchedSegments.forEach((segment: any) => {
-        const profileCount = segment.attributes?.profile_count ?? 0;
+        const profileCount = segment.attributes?.profile_count ?? null; // May not be available in API
         const segmentName = segment.attributes?.name || 'Unnamed Segment';
         
         // Check if segment has Aderai tag (tag-based detection)
@@ -297,8 +297,8 @@ export default function UnifiedDashboard() {
           isAderai: hasAderaiTag || hasAderaiName,
         };
         
-        // Prepare historical data for trend tracking (only for segments with profiles)
-        if (profileCount > 0) {
+        // Prepare historical data for trend tracking (only for segments with known profile counts)
+        if (profileCount !== null && profileCount > 0) {
           historicalDataToInsert.push({
             segment_klaviyo_id: segment.id,
             segment_name: segmentName,

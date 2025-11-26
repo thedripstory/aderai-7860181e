@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
       method,
       headers: {
         'Authorization': `Klaviyo-API-Key ${apiKey}`,
-        'revision': '2024-10-15',
+        'revision': '2025-07-15',
         'Content-Type': 'application/json',
       },
       body: body ? JSON.stringify(body) : undefined,
