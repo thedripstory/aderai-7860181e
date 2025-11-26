@@ -207,10 +207,11 @@ export default function UnifiedDashboard() {
     try {
       const activeKey = klaviyoKeys[activeKeyIndex];
       
+      // Fetch all segments - Klaviyo returns profile_count in segment attributes
       const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
         body: {
           keyId: activeKey.id,
-          endpoint: `https://a.klaviyo.com/api/segments/`,
+          endpoint: `https://a.klaviyo.com/api/segments/?page[size]=100`,
           method: 'GET',
         },
       });
@@ -219,30 +220,17 @@ export default function UnifiedDashboard() {
       const segments = data?.data || [];
       setAllSegments(segments);
       
-      // Fetch profile counts
+      // Build stats from segment attributes - no additional API calls needed
       const stats: Record<string, any> = {};
-      for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i];
-        try {
-          const { data: profileData } = await supabase.functions.invoke('klaviyo-proxy', {
-            body: {
-              keyId: activeKey.id,
-              endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/profiles`,
-              method: 'GET',
-            },
-          });
-
-          if (profileData) {
-            stats[segment.id] = {
-              profileCount: profileData.data?.length || 0,
-              name: segment.attributes?.name || 'Unnamed Segment',
-            };
-          }
-        } catch (err) {
-          console.error(`Error fetching segment ${segment.id}:`, err);
-        }
-        setAnalyticsProgress({ current: i + 1, total: segments.length });
-      }
+      segments.forEach((segment: any, index: number) => {
+        stats[segment.id] = {
+          profileCount: segment.attributes?.profile_count || 0,
+          name: segment.attributes?.name || 'Unnamed Segment',
+          created: segment.attributes?.created || null,
+          updated: segment.attributes?.updated || null,
+        };
+        setAnalyticsProgress({ current: index + 1, total: segments.length });
+      });
 
       setSegmentStats(stats);
     } catch (error) {
@@ -399,6 +387,7 @@ export default function UnifiedDashboard() {
                   analyticsProgress={analyticsProgress}
                   onShowHealthScore={() => {}}
                   calculateHealthScore={() => 0}
+                  klaviyoKeyId={klaviyoKeys[activeKeyIndex]?.id}
                 />
               </>
             )}
