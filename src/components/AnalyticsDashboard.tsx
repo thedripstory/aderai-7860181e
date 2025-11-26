@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { EmptyState } from '@/components/ui/empty-state';
 import { LoadingState } from '@/components/ui/loading-state';
 import { AnalyticsChartSkeleton } from '@/components/ui/skeleton-loader';
+import { SegmentDetailModal } from '@/components/SegmentDetailModal';
 import { toast } from 'sonner';
 
 interface SegmentStats {
@@ -24,6 +25,7 @@ interface AnalyticsDashboardProps {
   analyticsProgress: { current: number; total: number };
   onShowHealthScore: () => void;
   calculateHealthScore: () => number;
+  klaviyoKeyId?: string;
 }
 
 export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
@@ -33,6 +35,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   analyticsProgress,
   onShowHealthScore,
   calculateHealthScore,
+  klaviyoKeyId,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'size' | 'change'>('size');
@@ -40,6 +43,12 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [chartData, setChartData] = useState<any[]>([]);
   const [exportLoading, setExportLoading] = useState(false);
+  const [selectedSegment, setSelectedSegment] = useState<{
+    id: string;
+    name: string;
+    profileCount: number;
+    description?: string;
+  } | null>(null);
 
   const filteredSegments = allSegments.filter((segment) => {
     const name = segment.attributes?.name?.toLowerCase() || '';
@@ -291,11 +300,19 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             return (
               <div
                 key={segment.id}
-                className="p-4 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                onClick={() => setSelectedSegment({
+                  id: segment.id,
+                  name: stats?.name || 'Unknown',
+                  profileCount: stats?.profileCount || 0,
+                  description: segment.attributes?.description,
+                })}
+                className="p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent/5 transition-colors cursor-pointer"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="font-medium mb-1">{stats?.name || 'Unknown'}</div>
+                    <div className="font-medium mb-1 hover:text-primary transition-colors">
+                      {stats?.name || 'Unknown'}
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       {stats?.profileCount?.toLocaleString() || 0} profiles
                     </div>
@@ -320,6 +337,16 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           })}
         </div>
       </div>
+
+      {/* Segment Detail Modal */}
+      {klaviyoKeyId && (
+        <SegmentDetailModal
+          isOpen={!!selectedSegment}
+          onClose={() => setSelectedSegment(null)}
+          segment={selectedSegment}
+          klaviyoKeyId={klaviyoKeyId}
+        />
+      )}
     </>
   );
 };
