@@ -25,7 +25,7 @@ function SignInInput({ className, type, ...props }: React.ComponentProps<"input"
 interface SignInCardProps {
   isSignUp?: boolean;
   onToggleMode?: () => void;
-  onSubmit?: (email: string, password: string, accountName?: string) => Promise<void>;
+  onSubmit?: (email: string, password: string, firstName?: string, brandName?: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -33,7 +33,8 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [accountName, setAccountName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [brandName, setBrandName] = useState("");
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -57,7 +58,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (onSubmit) {
-      await onSubmit(email, password, isSignUp ? accountName : undefined);
+      await onSubmit(email, password, isSignUp ? firstName : undefined, isSignUp ? brandName : undefined);
     }
   };
 
@@ -236,14 +237,14 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
               {/* Login form */}
               <form onSubmit={handleSubmit} className="space-y-5">
                 <motion.div className="space-y-4">
-                  {/* Account Name input (signup only) */}
+                  {/* First Name input (signup only) */}
                   <AnimatePresence>
                     {isSignUp && (
                       <motion.div 
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className={`relative ${focusedInput === "accountName" ? 'z-10' : ''}`}
+                        className={`relative ${focusedInput === "firstName" ? 'z-10' : ''}`}
                         whileHover={{ scale: 1.01 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       >
@@ -251,22 +252,70 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                         
                         <div className="relative flex items-center overflow-hidden rounded-lg">
                           <User className={`absolute left-3 w-4 h-4 transition-all duration-300 ${
-                            focusedInput === "accountName" ? 'text-foreground' : 'text-muted-foreground'
+                            focusedInput === "firstName" ? 'text-foreground' : 'text-muted-foreground'
                           }`} />
                           
                           <SignInInput
                             type="text"
-                            placeholder="Account name"
-                            value={accountName}
-                            onChange={(e) => setAccountName(e.target.value)}
-                            onFocus={() => setFocusedInput("accountName")}
+                            placeholder="First name"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            onFocus={() => setFocusedInput("firstName")}
                             onBlur={() => setFocusedInput(null)}
+                            required
                             className="w-full bg-foreground/5 border-foreground/10 focus:border-accent/50 text-foreground placeholder:text-muted-foreground h-12 transition-all duration-300 pl-10 pr-3 focus:bg-foreground/10 text-base"
                           />
                           
-                          {focusedInput === "accountName" && (
+                          {focusedInput === "firstName" && (
                             <motion.div 
-                              layoutId="input-highlight"
+                              layoutId="input-highlight-firstName"
+                              className="absolute inset-0 bg-foreground/5 -z-10"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                            />
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Brand Name input (signup only) */}
+                  <AnimatePresence>
+                    {isSignUp && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className={`relative ${focusedInput === "brandName" ? 'z-10' : ''}`}
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      >
+                        <div className="absolute -inset-[0.5px] bg-gradient-to-r from-foreground/10 via-foreground/5 to-foreground/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                        
+                        <div className="relative flex items-center overflow-hidden rounded-lg">
+                          <svg className={`absolute left-3 w-4 h-4 transition-all duration-300 ${
+                            focusedInput === "brandName" ? 'text-foreground' : 'text-muted-foreground'
+                          }`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                          </svg>
+                          
+                          <SignInInput
+                            type="text"
+                            placeholder="Brand name"
+                            value={brandName}
+                            onChange={(e) => setBrandName(e.target.value)}
+                            onFocus={() => setFocusedInput("brandName")}
+                            onBlur={() => setFocusedInput(null)}
+                            required
+                            className="w-full bg-foreground/5 border-foreground/10 focus:border-accent/50 text-foreground placeholder:text-muted-foreground h-12 transition-all duration-300 pl-10 pr-3 focus:bg-foreground/10 text-base"
+                          />
+                          
+                          {focusedInput === "brandName" && (
+                            <motion.div 
+                              layoutId="input-highlight-brandName"
                               className="absolute inset-0 bg-foreground/5 -z-10"
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
