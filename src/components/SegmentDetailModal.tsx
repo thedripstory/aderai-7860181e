@@ -184,7 +184,13 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
                   <Users className="w-6 h-6 text-primary" />
                   <div>
                     <p className="text-xs text-muted-foreground">Current Profiles</p>
-                    <p className="text-2xl font-bold">{segment.profileCount.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {segment.profileCount != null && segment.profileCount > 0 
+                        ? segment.profileCount.toLocaleString() 
+                        : historicalData.length > 0 && historicalData[historicalData.length - 1]?.profileCount > 0
+                          ? historicalData[historicalData.length - 1].profileCount.toLocaleString()
+                          : <span className="text-muted-foreground text-lg">N/A</span>}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -215,45 +221,57 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
             {/* Performance Metrics Table */}
             <div>
               <h3 className="text-lg font-semibold mb-3">Growth Over Time</h3>
-              <div className="border border-border rounded-lg overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-muted/50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Period</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium">Profile Change</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium">% Change</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {timePeriodMetrics.map((metric, index) => (
-                      <tr key={metric.period} className={index % 2 === 0 ? 'bg-background' : 'bg-muted/20'}>
-                        <td className="px-4 py-3 text-sm">{metric.period}</td>
-                        <td className="px-4 py-3 text-right">
-                          <span className={`flex items-center justify-end gap-1 ${
-                            metric.profileChange > 0 ? 'text-green-500' : 
-                            metric.profileChange < 0 ? 'text-red-500' : 'text-muted-foreground'
-                          }`}>
-                            {metric.profileChange > 0 ? (
-                              <TrendingUp className="w-4 h-4" />
-                            ) : metric.profileChange < 0 ? (
-                              <TrendingDown className="w-4 h-4" />
-                            ) : null}
-                            {metric.profileChange > 0 ? '+' : ''}{metric.profileChange.toLocaleString()}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <span className={`font-medium ${
-                            metric.changePercent > 0 ? 'text-green-500' : 
-                            metric.changePercent < 0 ? 'text-red-500' : 'text-muted-foreground'
-                          }`}>
-                            {metric.changePercent > 0 ? '+' : ''}{metric.changePercent}%
-                          </span>
-                        </td>
+              {historicalData.length <= 1 ? (
+                <div className="border border-border rounded-lg p-6 text-center">
+                  <Calendar className="w-10 h-10 mx-auto mb-3 text-muted-foreground opacity-50" />
+                  <p className="text-sm text-muted-foreground">
+                    Not enough historical data yet
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Growth metrics will appear as data accumulates over time
+                  </p>
+                </div>
+              ) : (
+                <div className="border border-border rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-medium">Period</th>
+                        <th className="px-4 py-3 text-right text-sm font-medium">Profile Change</th>
+                        <th className="px-4 py-3 text-right text-sm font-medium">% Change</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {timePeriodMetrics.map((metric, index) => (
+                        <tr key={metric.period} className={index % 2 === 0 ? 'bg-background' : 'bg-muted/20'}>
+                          <td className="px-4 py-3 text-sm">{metric.period}</td>
+                          <td className="px-4 py-3 text-right">
+                            <span className={`flex items-center justify-end gap-1 ${
+                              metric.profileChange > 0 ? 'text-green-500' : 
+                              metric.profileChange < 0 ? 'text-red-500' : 'text-muted-foreground'
+                            }`}>
+                              {metric.profileChange > 0 ? (
+                                <TrendingUp className="w-4 h-4" />
+                              ) : metric.profileChange < 0 ? (
+                                <TrendingDown className="w-4 h-4" />
+                              ) : null}
+                              {metric.profileChange > 0 ? '+' : ''}{metric.profileChange.toLocaleString()}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className={`font-medium ${
+                              metric.changePercent > 0 ? 'text-green-500' : 
+                              metric.changePercent < 0 ? 'text-red-500' : 'text-muted-foreground'
+                            }`}>
+                              {metric.changePercent > 0 ? '+' : ''}{metric.changePercent}%
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
 
             {/* Profile Count Trend Chart */}
