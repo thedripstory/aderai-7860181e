@@ -10,12 +10,7 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
   message = "Loading..." 
 }) => {
   return (
-    <motion.div 
-      className="h-screen w-full bg-background flex flex-col items-center justify-center overflow-hidden relative fixed inset-0 z-50"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
+    <div className="h-screen w-full bg-background flex flex-col items-center justify-center overflow-hidden relative">
       {/* Full screen sparkles background */}
       <div className="w-full absolute inset-0 h-screen">
         <SparklesCore
@@ -35,7 +30,6 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
         className="relative z-20 flex flex-col items-center gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.5 }}
       >
         {/* Aderai logo with glow effect */}
@@ -77,7 +71,7 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
           />
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
