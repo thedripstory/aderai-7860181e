@@ -186,6 +186,10 @@ export default {
           "10%": { opacity: "1" },
           "100%": { transform: "translateY(460px) translateX(-20px) rotate(-240deg) scale(1)", opacity: "0" },
         },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -193,6 +197,7 @@ export default {
         "fade-in": "fade-in 0.6s ease-out",
         "slide-in": "slide-in 0.5s ease-out",
         "slide-in-left": "slide-in-left 0.8s ease-out",
+        "shimmer": "shimmer 2s linear infinite",
       },
     },
   },
