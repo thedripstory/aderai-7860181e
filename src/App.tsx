@@ -9,6 +9,7 @@ import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
+import { AderaiPreloader } from "@/components/AderaiPreloader";
 
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -28,24 +29,6 @@ const SegmentHealthDashboard = lazy(() => import("./pages/SegmentHealthDashboard
 const AIFeaturesDashboard = lazy(() => import("./pages/AIFeaturesDashboard"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="relative w-16 h-16">
-      <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
-      <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
-      </div>
-      <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
-      </div>
-      <div className="absolute inset-0 animate-[spin_2s_linear_infinite_reverse]">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-500" />
-      </div>
-    </div>
-  </div>
-);
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -61,7 +44,7 @@ const App = () => (
             closeButton
           />
           <BrowserRouter>
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={<AderaiPreloader />}>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<PublicRoute><Auth initialView="signin" /></PublicRoute>} />
