@@ -267,58 +267,11 @@ export default function UnifiedDashboard() {
       console.log('Klaviyo segments fetched:', allFetchedSegments.length);
       console.log('Tags collected:', Object.keys(includedTags).length);
       
-      // Fetch profile counts sequentially to respect Klaviyo rate limits
+      // Skip individual profile count fetching to avoid rate limits
+      // Profile counts will show as N/A - use daily cron job for historical tracking
       const segmentProfileCounts: Record<string, number> = {};
       
-      for (let i = 0; i < allFetchedSegments.length; i++) {
-        const segment = allFetchedSegments[i];
-        
-        // Update progress
-        setAnalyticsProgress({ 
-          current: i + 1, 
-          total: allFetchedSegments.length 
-        });
-        
-        try {
-          const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
-            body: {
-              keyId: activeKey.id,
-              endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/?additional-fields[segment]=profile_count`,
-              method: 'GET',
-            },
-          });
-          
-          if (!error && data?.data?.attributes?.profile_count !== undefined) {
-            segmentProfileCounts[segment.id] = data.data.attributes.profile_count;
-          }
-          
-          // Handle rate limiting - if we get a 429, wait and retry
-          if (data?.errors?.[0]?.status === 429) {
-            const waitTime = parseInt(data.errors[0]?.detail?.match(/(\d+) second/)?.[1] || '2') * 1000;
-            await new Promise(resolve => setTimeout(resolve, waitTime + 500));
-            // Retry once
-            const retryResult = await supabase.functions.invoke('klaviyo-proxy', {
-              body: {
-                keyId: activeKey.id,
-                endpoint: `https://a.klaviyo.com/api/segments/${segment.id}/?additional-fields[segment]=profile_count`,
-                method: 'GET',
-              },
-            });
-            if (!retryResult.error && retryResult.data?.data?.attributes?.profile_count !== undefined) {
-              segmentProfileCounts[segment.id] = retryResult.data.data.attributes.profile_count;
-            }
-          }
-        } catch {
-          // Continue on error
-        }
-        
-        // Delay between requests to respect rate limits (500ms)
-        if (i < allFetchedSegments.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-      }
-      
-      console.log('Profile counts fetched for', Object.keys(segmentProfileCounts).length, 'segments');
+      console.log('Skipped individual profile count fetching to avoid rate limits');
       setAllSegments(allFetchedSegments);
       
       // Build stats from segment attributes

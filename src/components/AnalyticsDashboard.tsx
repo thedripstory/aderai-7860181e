@@ -232,9 +232,12 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     );
   }
 
-  const totalProfiles = Object.values(segmentStats).reduce((sum, s) => sum + s.profileCount, 0);
-  const avgSegmentSize = Math.round(totalProfiles / (Object.keys(segmentStats).length || 1));
-  const largestSegment = Object.values(segmentStats).reduce((max, s) => s.profileCount > max.profileCount ? s : max, { profileCount: 0, name: '' });
+  const segmentsWithCounts = Object.values(segmentStats).filter(s => s.profileCount != null);
+  const totalProfiles = segmentsWithCounts.reduce((sum, s) => sum + (s.profileCount || 0), 0);
+  const avgSegmentSize = segmentsWithCounts.length > 0 ? Math.round(totalProfiles / segmentsWithCounts.length) : 0;
+  const largestSegment = segmentsWithCounts.length > 0 
+    ? segmentsWithCounts.reduce((max, s) => (s.profileCount || 0) > (max.profileCount || 0) ? s : max, { profileCount: 0, name: '' })
+    : { profileCount: 0, name: 'N/A' };
 
   return (
     <>
@@ -531,7 +534,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Users className="w-3.5 h-3.5" />
-                        {(stats?.profileCount || 0).toLocaleString()} profiles
+                        {stats?.profileCount != null ? `${stats.profileCount.toLocaleString()} profiles` : 'N/A'}
                       </span>
                       {stats?.created && (
                         <span className="flex items-center gap-1 hidden sm:flex">
