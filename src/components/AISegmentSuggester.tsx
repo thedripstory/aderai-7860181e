@@ -261,9 +261,13 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
                 <div className="flex-1">
                   <h4 className="text-lg font-bold mb-2">{suggestion.name}</h4>
                   <p className="text-sm text-muted-foreground mb-4">{suggestion.description}</p>
-                  <div className="bg-muted p-3 rounded-lg text-xs">
-                    <span className="font-medium">Definition: </span>
-                    {suggestion.definition || 'Custom AI-generated criteria'}
+                  <div className="bg-muted p-3 rounded-lg text-xs font-mono overflow-x-auto">
+                    <span className="font-medium font-sans">Definition: </span>
+                    <pre className="mt-1 whitespace-pre-wrap break-words">
+                      {typeof suggestion.definition === 'object' 
+                        ? JSON.stringify(suggestion.definition, null, 2)
+                        : suggestion.definition || 'Custom AI-generated criteria'}
+                    </pre>
                   </div>
                 </div>
               </div>
