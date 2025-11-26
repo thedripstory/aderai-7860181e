@@ -46,12 +46,12 @@ export function ErrorBoundaryFallback({ error, resetErrorBoundary }: ErrorBounda
               variant="outline"
               onClick={() => {
                 resetErrorBoundary();
-                navigate('/');
+                navigate('/dashboard');
               }}
               className="w-full"
             >
               <Home className="w-4 h-4 mr-2" />
-              Go Home
+              Go to Dashboard
             </Button>
           </div>
         </div>
