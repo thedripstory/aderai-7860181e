@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, TrendingUp, TrendingDown, Users, Mail, MousePointer, DollarSign, Loader } from 'lucide-react';
+import { TrendingUp, TrendingDown, Users, Calendar, Clock, Sparkles } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 interface SegmentDetailModalProps {
   isOpen: boolean;
@@ -13,6 +14,9 @@ interface SegmentDetailModalProps {
     name: string;
     profileCount: number;
     description?: string;
+    created?: string;
+    updated?: string;
+    isAderai?: boolean;
   } | null;
   klaviyoKeyId: string;
 }
@@ -22,10 +26,6 @@ interface TimePeriodMetrics {
   days: number;
   profileChange: number;
   changePercent: number;
-  openRate?: number;
-  clickRate?: number;
-  conversionRate?: number;
-  revenue?: number;
 }
 
 interface HistoricalDataPoint {
@@ -42,7 +42,6 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [timePeriodMetrics, setTimePeriodMetrics] = useState<TimePeriodMetrics[]>([]);
   const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
-  const [selectedPeriod, setSelectedPeriod] = useState('30');
 
   useEffect(() => {
     if (isOpen && segment) {
@@ -66,7 +65,7 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
 
       if (historicalRecords && historicalRecords.length > 0) {
         const chartData = historicalRecords.map(record => ({
-          date: new Date(record.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          date: format(new Date(record.recorded_at), 'MMM d'),
           profileCount: record.profile_count,
         }));
         setHistoricalData(chartData);
@@ -76,7 +75,6 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
           { period: 'Last 30 days', days: 30 },
           { period: 'Last 60 days', days: 60 },
           { period: 'Last 90 days', days: 90 },
-          { period: 'Last 120 days', days: 120 },
           { period: 'Last 180 days', days: 180 },
           { period: 'Last 365 days', days: 365 },
         ];
@@ -108,7 +106,7 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
       } else {
         // No historical data - show current state only
         setHistoricalData([{
-          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          date: format(new Date(), 'MMM d'),
           profileCount: segment.profileCount,
         }]);
         
@@ -116,7 +114,6 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
           { period: 'Last 30 days', days: 30, profileChange: 0, changePercent: 0 },
           { period: 'Last 60 days', days: 60, profileChange: 0, changePercent: 0 },
           { period: 'Last 90 days', days: 90, profileChange: 0, changePercent: 0 },
-          { period: 'Last 120 days', days: 120, profileChange: 0, changePercent: 0 },
           { period: 'Last 180 days', days: 180, profileChange: 0, changePercent: 0 },
           { period: 'Last 365 days', days: 365, profileChange: 0, changePercent: 0 },
         ]);
@@ -128,13 +125,30 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
     }
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    try {
+      return format(new Date(dateString), 'MMM d, yyyy \'at\' h:mm a');
+    } catch {
+      return 'N/A';
+    }
+  };
+
   if (!segment) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{segment.name}</DialogTitle>
+          <div className="flex items-center gap-3">
+            <DialogTitle className="text-xl font-bold">{segment.name}</DialogTitle>
+            {segment.isAderai && (
+              <Badge className="bg-primary/10 border-primary/30 text-primary">
+                <Sparkles className="w-3 h-3 mr-1" />
+                Aderai
+              </Badge>
+            )}
+          </div>
           {segment.description && (
             <p className="text-sm text-muted-foreground mt-1">{segment.description}</p>
           )}
@@ -152,20 +166,45 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Current Profile Count */}
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
-              <div className="flex items-center gap-3">
-                <Users className="w-8 h-8 text-primary" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Current Profile Count</p>
-                  <p className="text-3xl font-bold">{segment.profileCount.toLocaleString()}</p>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Current Profile Count */}
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <Users className="w-6 h-6 text-primary" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Current Profiles</p>
+                    <p className="text-2xl font-bold">{segment.profileCount.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Created Date */}
+              <div className="bg-muted/50 border border-border rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-6 h-6 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Created</p>
+                    <p className="text-sm font-medium">{formatDate(segment.created)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Updated Date */}
+              <div className="bg-muted/50 border border-border rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <Clock className="w-6 h-6 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Last Updated</p>
+                    <p className="text-sm font-medium">{formatDate(segment.updated)}</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Performance Metrics Table */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Performance by Time Period</h3>
+              <h3 className="text-lg font-semibold mb-3">Growth Over Time</h3>
               <div className="border border-border rounded-lg overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-muted/50">
@@ -214,15 +253,15 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
                 {historicalData.length > 1 ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <LineChart data={historicalData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis 
                         dataKey="date" 
                         tick={{ fontSize: 12 }}
-                        className="text-muted-foreground"
+                        stroke="hsl(var(--muted-foreground))"
                       />
                       <YAxis 
                         tick={{ fontSize: 12 }}
-                        className="text-muted-foreground"
+                        stroke="hsl(var(--muted-foreground))"
                         tickFormatter={(value) => value.toLocaleString()}
                       />
                       <Tooltip 
@@ -247,17 +286,10 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
                   <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                     <Users className="w-12 h-12 mb-3 opacity-50" />
                     <p className="text-sm">Not enough historical data to show trends</p>
-                    <p className="text-xs mt-1">Data will accumulate over time</p>
+                    <p className="text-xs mt-1">Data will accumulate over time as we track segment changes</p>
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Additional Metrics Placeholder */}
-            <div className="bg-muted/30 border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground text-center">
-                Email metrics (open rate, click rate, conversions) will be available when historical campaign data is tracked.
-              </p>
             </div>
           </div>
         )}
