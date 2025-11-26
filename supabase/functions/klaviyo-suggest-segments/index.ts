@@ -12,10 +12,14 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  console.log('[klaviyo-suggest-segments] Request received');
+
   try {
     let { apiKey, answers } = await req.json();
+    console.log('[klaviyo-suggest-segments] Parsed request body, has apiKey:', !!apiKey, ', has answers:', !!answers);
 
     if (!apiKey || !answers) {
+      console.error('[klaviyo-suggest-segments] Missing required fields');
       return new Response(
         JSON.stringify({ error: 'Missing apiKey or answers' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -24,10 +28,20 @@ serve(async (req) => {
 
     // Decrypt API key if encrypted
     if (isEncrypted(apiKey)) {
-      apiKey = await decryptApiKey(apiKey);
+      console.log('[klaviyo-suggest-segments] API key is encrypted, decrypting...');
+      try {
+        apiKey = await decryptApiKey(apiKey);
+        console.log('[klaviyo-suggest-segments] API key decrypted successfully');
+      } catch (decryptError) {
+        console.error('[klaviyo-suggest-segments] Decryption failed:', decryptError);
+        throw new Error(`Failed to decrypt API key: ${decryptError instanceof Error ? decryptError.message : 'Unknown error'}`);
+      }
+    } else {
+      console.log('[klaviyo-suggest-segments] API key is plaintext');
     }
 
     // Fetch available metrics from Klaviyo
+    console.log('[klaviyo-suggest-segments] Fetching metrics from Klaviyo...');
     const metricsResponse = await fetch('https://a.klaviyo.com/api/metrics/', {
       headers: {
         'Authorization': `Klaviyo-API-Key ${apiKey}`,
@@ -36,7 +50,9 @@ serve(async (req) => {
     });
 
     if (!metricsResponse.ok) {
-      throw new Error('Failed to fetch metrics from Klaviyo');
+      const errorText = await metricsResponse.text();
+      console.error('[klaviyo-suggest-segments] Klaviyo metrics API error:', metricsResponse.status, errorText);
+      throw new Error(`Failed to fetch metrics from Klaviyo: ${metricsResponse.status} - ${errorText}`);
     }
 
     const metricsData = await metricsResponse.json();
@@ -44,12 +60,15 @@ serve(async (req) => {
       id: m.id,
       name: m.attributes.name,
     }));
+    console.log('[klaviyo-suggest-segments] Found', availableMetrics.length, 'metrics');
 
     // Call OpenAI to suggest segments
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
-      throw new Error('OPENAI_API_KEY not configured');
+      console.error('[klaviyo-suggest-segments] OPENAI_API_KEY not configured');
+      throw new Error('OPENAI_API_KEY not configured. Please add this secret in your Supabase Edge Functions settings.');
     }
+    console.log('[klaviyo-suggest-segments] OpenAI API key found, calling OpenAI...');
 
     const systemPrompt = `You are a Klaviyo segmentation expert. Based on the user's brand information and available Klaviyo metrics, suggest 3-5 highly relevant customer segments.
 
@@ -127,21 +146,41 @@ Based on this information and the available Klaviyo metrics, suggest segments th
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error('Failed to get AI suggestions');
+      console.error('[klaviyo-suggest-segments] OpenAI API error:', aiResponse.status, errorText);
+      
+      // Parse error for more specific message
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.error?.code === 'insufficient_quota') {
+          throw new Error('OpenAI API quota exceeded. Please check your OpenAI billing and add credits.');
+        }
+        throw new Error(`OpenAI API error: ${errorJson.error?.message || errorText}`);
+      } catch (parseError) {
+        if (parseError instanceof Error && parseError.message.includes('OpenAI')) {
+          throw parseError;
+        }
+        throw new Error(`OpenAI API error: ${aiResponse.status} - ${errorText}`);
+      }
     }
 
+    console.log('[klaviyo-suggest-segments] OpenAI response received successfully');
     const aiData = await aiResponse.json();
     const suggestedSegments = JSON.parse(aiData.choices[0].message.content);
+    console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
 
     return new Response(
       JSON.stringify(suggestedSegments),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error in klaviyo-suggest-segments:', error);
+    console.error('[klaviyo-suggest-segments] Error:', error);
+    console.error('[klaviyo-suggest-segments] Stack:', error instanceof Error ? error.stack : 'No stack trace');
+    
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? error.stack : undefined
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
