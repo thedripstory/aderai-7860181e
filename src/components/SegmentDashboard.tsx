@@ -3,6 +3,7 @@ import { ChevronDown, HelpCircle, Search, CheckCircle2, Package, Sparkles, Star,
 import { Badge } from '@/components/ui/badge';
 import { SegmentPreviewModal } from './SegmentPreviewModal';
 import { EmptyState } from '@/components/ui/empty-state';
+import { SegmentListSkeleton } from '@/components/LoadingStates';
 import { toast } from 'sonner';
 
 export const SEGMENTS = [
