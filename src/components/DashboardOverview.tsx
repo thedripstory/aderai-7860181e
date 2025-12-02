@@ -20,6 +20,7 @@ import { LoadingState } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { useMemo } from 'react';
 
 const TOTAL_AVAILABLE_SEGMENTS = 70;
 
@@ -40,10 +41,14 @@ export const DashboardOverview = () => {
     return <LoadingState message="Loading your dashboard" description="Fetching your stats and recent activity..." />;
   }
 
-  const progressPercentage = (totalSegmentsCreated / TOTAL_AVAILABLE_SEGMENTS) * 100;
+  // Memoize expensive calculations
+  const progressPercentage = useMemo(() => 
+    (totalSegmentsCreated / TOTAL_AVAILABLE_SEGMENTS) * 100,
+    [totalSegmentsCreated]
+  );
 
-  // Determine suggested next actions
-  const getNextActions = () => {
+  // Determine suggested next actions (memoized to avoid recalculation)
+  const nextActions = useMemo(() => {
     const actions = [];
     
     if (!klaviyoConnected) {
@@ -87,9 +92,7 @@ export const DashboardOverview = () => {
     }
 
     return actions;
-  };
-
-  const nextActions = getNextActions();
+  }, [klaviyoConnected, totalSegmentsCreated, aiSuggestionsUsed, navigate]);
 
   return (
     <div className="space-y-6">

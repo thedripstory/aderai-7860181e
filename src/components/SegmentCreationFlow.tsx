@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { SegmentResult } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS } from '@/lib/segmentData';
@@ -23,12 +23,30 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
 }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
-  const failedResults = results.filter(r => r.status === 'error');
-  const hasFailures = failedResults.length > 0;
-  const successfulCount = results.filter(r => r.status === 'success').length;
+  
+  // Memoize computed values to avoid recalculation on every render
+  const failedResults = useMemo(() => 
+    results.filter(r => r.status === 'error'),
+    [results]
+  );
+  
+  const hasFailures = useMemo(() => 
+    failedResults.length > 0,
+    [failedResults]
+  );
+  
+  const successfulCount = useMemo(() => 
+    results.filter(r => r.status === 'success').length,
+    [results]
+  );
+  
   const totalCount = results.length;
   const completedCount = results.length; // All results in the array are complete (no pending state)
-  const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  
+  const progressPercent = useMemo(() => 
+    totalCount > 0 ? (completedCount / totalCount) * 100 : 0,
+    [totalCount, completedCount]
+  );
 
   // Show success animation when all segments complete successfully
   useEffect(() => {
