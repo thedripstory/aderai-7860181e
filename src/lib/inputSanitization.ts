@@ -1,14 +1,21 @@
 import DOMPurify from 'dompurify';
 
 /**
- * Input Sanitization Utilities
- * Prevents XSS attacks by sanitizing user inputs using DOMPurify
+ * Input sanitization utilities using DOMPurify
+ * Provides XSS protection for all user inputs across the application
+ * All functions remove potentially dangerous content while preserving safe data
  */
 
 /**
- * Sanitizes a string by removing potentially dangerous HTML/script content
+ * Sanitizes a string by removing all HTML tags and scripts
  * @param input - The string to sanitize
- * @returns Sanitized string safe for display/storage
+ * @returns Sanitized string with all HTML removed
+ * 
+ * @example
+ * ```typescript
+ * const safe = sanitizeString("<script>alert('xss')</script>Hello");
+ * // Returns: "Hello"
+ * ```
  */
 export function sanitizeString(input: string): string {
   if (!input) return '';
@@ -24,9 +31,15 @@ export function sanitizeString(input: string): string {
 }
 
 /**
- * Sanitizes an email address
- * @param email - The email to sanitize
- * @returns Sanitized email or empty string if invalid format
+ * Sanitizes email addresses and validates format
+ * @param email - Email string to sanitize
+ * @returns Sanitized lowercase email or empty string if invalid
+ * 
+ * @example
+ * ```typescript
+ * sanitizeEmail(" USER@EXAMPLE.COM "); // Returns: "user@example.com"
+ * sanitizeEmail("not-an-email"); // Returns: ""
+ * ```
  */
 export function sanitizeEmail(email: string): string {
   if (!email) return '';
@@ -43,9 +56,16 @@ export function sanitizeEmail(email: string): string {
 }
 
 /**
- * Sanitizes a numeric input
+ * Sanitizes numeric input, removing non-digit characters
  * @param input - The number as string
- * @returns Sanitized number string or default value
+ * @param defaultValue - Default value if input is invalid (default: '0')
+ * @returns Sanitized number string
+ * 
+ * @example
+ * ```typescript
+ * sanitizeNumber("$1,234.56"); // Returns: "1234.56"
+ * sanitizeNumber("abc"); // Returns: "0"
+ * ```
  */
 export function sanitizeNumber(input: string, defaultValue: string = '0'): string {
   if (!input) return defaultValue;
@@ -55,9 +75,16 @@ export function sanitizeNumber(input: string, defaultValue: string = '0'): strin
 }
 
 /**
- * Sanitizes a password (validates strength, no sanitization needed for storage)
+ * Validates password strength without sanitization
+ * Passwords should be hashed, not sanitized
  * @param password - The password to validate
- * @returns Object with isValid flag and error message if invalid
+ * @returns Object with isValid flag and optional error message
+ * 
+ * @example
+ * ```typescript
+ * const result = validatePassword("short");
+ * // Returns: { isValid: false, error: "Password must be at least 8 characters" }
+ * ```
  */
 export function validatePassword(password: string): { isValid: boolean; error?: string } {
   if (!password) {
@@ -72,8 +99,16 @@ export function validatePassword(password: string): { isValid: boolean; error?: 
 }
 
 /**
- * Sanitizes HTML content while allowing safe tags
- * Use this for rich text content where some formatting is needed
+ * Sanitizes HTML content while allowing safe formatting tags
+ * Use for rich text content where some formatting is needed (e.g., user bios, descriptions)
+ * @param html - HTML string to sanitize
+ * @returns Sanitized HTML with only safe tags (b, i, em, strong, p, br)
+ * 
+ * @example
+ * ```typescript
+ * const safe = sanitizeHTML("<p>Safe <b>content</b></p><script>alert('xss')</script>");
+ * // Returns: "<p>Safe <b>content</b></p>"
+ * ```
  */
 export function sanitizeHTML(html: string): string {
   if (!html) return '';
@@ -88,7 +123,16 @@ export function sanitizeHTML(html: string): string {
 }
 
 /**
- * Sanitize URL to prevent javascript: and data: URI schemes
+ * Validates and sanitizes URLs to prevent protocol-based attacks
+ * Blocks dangerous protocols like javascript:, data:, and vbscript:
+ * @param url - URL string to validate
+ * @returns Sanitized URL or empty string if dangerous protocol detected
+ * 
+ * @example
+ * ```typescript
+ * sanitizeURL("javascript:alert('xss')"); // Returns: ""
+ * sanitizeURL("https://example.com"); // Returns: "https://example.com"
+ * ```
  */
 export function sanitizeURL(url: string): string {
   const sanitized = sanitizeString(url);
@@ -106,7 +150,15 @@ export function sanitizeURL(url: string): string {
 }
 
 /**
- * Limit string length to prevent DoS attacks
+ * Limits string length to prevent DoS attacks via oversized inputs
+ * @param input - String to limit
+ * @param maxLength - Maximum allowed length
+ * @returns Truncated string
+ * 
+ * @example
+ * ```typescript
+ * limitLength("x".repeat(10000), 100); // Returns string of length 100
+ * ```
  */
 export function limitLength(input: string, maxLength: number): string {
   return input.slice(0, maxLength);
