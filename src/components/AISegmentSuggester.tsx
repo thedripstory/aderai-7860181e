@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Sparkles, Loader, CheckCircle, Lightbulb, AlertCircle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
@@ -24,7 +24,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
   const { trackAction } = useFeatureTracking('ai_segment_suggester');
   const { allowed, remaining, total_used, daily_limit, loading: limitsLoading, incrementUsage } = useAILimits();
 
-  const generateAiSuggestions = async () => {
+  const generateAiSuggestions = useCallback(async () => {
     if (!aiPrompt.trim()) {
       toast.warning('Please enter a description of your business goal', {
         description: 'Describe what you want to achieve with your segments',
@@ -110,9 +110,9 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
     } finally {
       setAiLoading(false);
     }
-  };
+  }, [aiPrompt, allowed, activeKey, trackAction, incrementUsage, daily_limit]);
 
-  const createAiSegment = async (suggestion: any) => {
+  const createAiSegment = useCallback(async (suggestion: any) => {
     trackAction('create_ai_segment', { segment_name: suggestion.name });
     setAiLoading(true);
 
@@ -152,7 +152,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
     } finally {
       setAiLoading(false);
     }
-  };
+  }, [activeKey, trackAction]);
 
   return (
     <div className="max-w-4xl mx-auto">

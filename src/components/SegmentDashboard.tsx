@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Sparkles, Package, HelpCircle } from 'lucide-react';
 import { SegmentPreviewModal } from './SegmentPreviewModal';
 import { SegmentFilters } from './segments/SegmentFilters';
@@ -79,12 +79,21 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
     });
   }, []);
 
-  const filteredSegments = SEGMENTS.filter(segment => 
-    segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    segment.description.toLowerCase().includes(searchQuery.toLowerCase())
+  // Memoize filtered segments to avoid recalculation on every render
+  const filteredSegments = useMemo(() => 
+    SEGMENTS.filter(segment => 
+      segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      segment.description.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    [searchQuery]
   );
 
-  const favoriteSegments = SEGMENTS.filter(s => favorites.includes(s.id));
+  // Memoize favorite segments
+  const favoriteSegments = useMemo(() => 
+    SEGMENTS.filter(s => favorites.includes(s.id)),
+    [favorites]
+  );
+
   const selectedCount = selectedSegments.length;
 
   return (
