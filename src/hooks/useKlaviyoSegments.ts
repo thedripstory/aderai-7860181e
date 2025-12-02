@@ -74,12 +74,6 @@ export const useKlaviyoSegments = () => {
     segmentsList: any[],
     jobId?: string
   ) => {
-    console.log('[useKlaviyoSegments] createSegments called with:', {
-      selectedSegmentsCount: selectedSegments.length,
-      selectedSegments: selectedSegments,
-      activeKeyId: activeKey.id,
-    });
-
     if (selectedSegments.length === 0) {
       throw new Error('Please select at least one segment to create');
     }
@@ -95,8 +89,6 @@ export const useKlaviyoSegments = () => {
     });
     // Remove duplicates
     expandedSegmentIds = [...new Set(expandedSegmentIds)];
-    
-    console.log('[useKlaviyoSegments] Expanded segment IDs:', expandedSegmentIds);
 
     setLoading(true);
     setResults([]);
@@ -118,12 +110,6 @@ export const useKlaviyoSegments = () => {
         aov: activeKey.aov || 100,
       };
 
-      // Use expanded segment IDs for API call
-      console.log('[useKlaviyoSegments] Sending to edge function:', {
-        segmentIdsCount: expandedSegmentIds.length,
-        segmentIds: expandedSegmentIds,
-      });
-
       // Save progress if jobId provided
       if (jobId) {
         await supabase
@@ -136,22 +122,16 @@ export const useKlaviyoSegments = () => {
           .eq('id', jobId);
       }
 
-      console.log('Creating segments:', expandedSegmentIds);
-
       const requestBody = {
         apiKey: activeKey.klaviyo_api_key_hash,
         segmentIds: expandedSegmentIds,
         currencySymbol,
         settings,
       };
-      
-      console.log('[useKlaviyoSegments] Request body:', JSON.stringify(requestBody, null, 2));
 
       const { data: response, error } = await supabase.functions.invoke('klaviyo-create-segments', {
         body: requestBody,
       });
-
-      console.log('[useKlaviyoSegments] Edge function response:', { response, error });
 
       if (error) {
         console.error('[useKlaviyoSegments] Supabase function error:', error);
@@ -165,7 +145,6 @@ export const useKlaviyoSegments = () => {
 
       // Handle case where response doesn't have results array
       const resultsArray = response.results || [];
-      console.log('[useKlaviyoSegments] Results array:', resultsArray);
 
       // Log metrics availability for debugging
       if (response.missingMetrics && response.missingMetrics.length > 0) {
@@ -186,14 +165,10 @@ export const useKlaviyoSegments = () => {
         }
       });
 
-      console.log('[useKlaviyoSegments] Results map keys:', Array.from(resultsMap.keys()));
-
       const newResults: SegmentResult[] = expandedSegmentIds.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
         const segmentName = segment?.name || segmentId;
         const result = resultsMap.get(segmentId);
-
-        console.log(`[useKlaviyoSegments] Processing segment ${segmentId}:`, { result, segmentName });
 
         if (!result) {
           return {
