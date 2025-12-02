@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { sanitizeString, sanitizeEmail, sanitizeNumber, validatePassword } from "@/lib/inputSanitization";
 import {
   Select,
   SelectContent,
@@ -180,13 +181,21 @@ export default function Settings() {
   };
 
   const handleSaveThresholds = async () => {
+    // Sanitize numeric inputs
+    const sanitizedAov = sanitizeNumber(aov, '100');
+    const sanitizedVipThreshold = sanitizeNumber(vipThreshold, '500');
+    const sanitizedHighValueThreshold = sanitizeNumber(highValueThreshold, '300');
+    const sanitizedNewCustomerDays = sanitizeNumber(newCustomerDays, '30');
+    const sanitizedLapsedDays = sanitizeNumber(lapsedDays, '60');
+    const sanitizedChurnedDays = sanitizeNumber(churnedDays, '180');
+    
     const numericValidation = {
-      aov: parseFloat(aov),
-      vipThreshold: parseFloat(vipThreshold),
-      highValueThreshold: parseFloat(highValueThreshold),
-      newCustomerDays: parseInt(newCustomerDays),
-      lapsedDays: parseInt(lapsedDays),
-      churnedDays: parseInt(churnedDays),
+      aov: parseFloat(sanitizedAov),
+      vipThreshold: parseFloat(sanitizedVipThreshold),
+      highValueThreshold: parseFloat(sanitizedHighValueThreshold),
+      newCustomerDays: parseInt(sanitizedNewCustomerDays),
+      lapsedDays: parseInt(sanitizedLapsedDays),
+      churnedDays: parseInt(sanitizedChurnedDays),
     };
 
     if (Object.values(numericValidation).some((v) => isNaN(v) || v <= 0)) {
@@ -242,10 +251,12 @@ export default function Settings() {
   };
 
   const handleChangePassword = async () => {
-    if (!newPassword || newPassword.length < 8) {
+    // Validate password
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
       toast({
-        title: "Password too short",
-        description: "Password must be at least 8 characters.",
+        title: "Invalid password",
+        description: passwordValidation.error,
         variant: "destructive",
       });
       return;
