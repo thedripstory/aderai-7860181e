@@ -5,12 +5,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-
-const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
 interface DashboardHeaderProps {
   onStartTour?: () => void;
@@ -31,92 +30,103 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/20 bg-background/98 backdrop-blur-xl shadow-sm">
-      <div className="max-w-[1400px] mx-auto px-6 sm:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo Section */}
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="container max-w-screen-2xl mx-auto">
+        <div className="flex h-20 items-center justify-between px-6 lg:px-8">
+          
+          {/* Brand */}
           <a 
             href="/dashboard" 
-            className="group flex items-center gap-4 hover:opacity-90 transition-opacity duration-200"
+            className="group flex items-center gap-3 transition-opacity hover:opacity-80"
           >
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-playfair font-bold tracking-tight text-foreground">
-                aderai
-              </span>
-              <span className="text-2xl font-playfair font-bold text-accent group-hover:scale-110 transition-transform duration-300">
-                .
-              </span>
+            <div className="relative">
+              <div className="text-3xl font-playfair font-bold tracking-tight">
+                <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  aderai
+                </span>
+                <span className="text-accent transition-transform duration-300 group-hover:scale-125 inline-block">
+                  .
+                </span>
+              </div>
             </div>
-            <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-border/40">
-              <Sparkles className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium text-muted-foreground">
-                AI-Powered Segmentation
+            
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/5 border border-accent/10">
+              <Sparkles className="w-3.5 h-3.5 text-accent" />
+              <span className="text-xs font-semibold text-accent/90 tracking-wide uppercase">
+                AI Segmentation
               </span>
             </div>
           </a>
 
-          {/* Right Section */}
-          <div className="flex items-center gap-2">
-            {/* Children (Klaviyo sync indicator, etc) */}
-            {children && (
-              <div className="mr-2">
-                {children}
-              </div>
-            )}
+          {/* Actions */}
+          <div className="flex items-center gap-3">
             
-            {/* Help Menu */}
+            {/* Dynamic content slot */}
+            {children}
+            
+            {/* Actions dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="rounded-lg hover:bg-accent/10 hover:text-accent transition-all"
+                  className="h-10 w-10 rounded-full hover:bg-muted"
                 >
-                  <HelpCircle className="w-5 h-5" />
+                  <div className="relative">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-accent/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                    <SettingsIcon className="relative w-5 h-5" />
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52 p-1">
+              <DropdownMenuContent 
+                align="end" 
+                className="w-56 bg-popover/95 backdrop-blur-xl border-border/50 shadow-xl"
+                sideOffset={8}
+              >
+                {showSettings && (
+                  <>
+                    <DropdownMenuItem 
+                      onClick={() => navigate('/settings')}
+                      data-tour="settings-button"
+                      className="cursor-pointer py-2.5"
+                    >
+                      <SettingsIcon className="w-4 h-4 mr-3 text-muted-foreground" />
+                      <span className="font-medium">Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-border/50" />
+                  </>
+                )}
+                
                 <DropdownMenuItem 
                   onClick={() => navigate('/help')}
-                  className="rounded-md cursor-pointer"
+                  className="cursor-pointer py-2.5"
                 >
                   <HelpCircle className="w-4 h-4 mr-3 text-muted-foreground" />
                   <span className="font-medium">Help Center</span>
                 </DropdownMenuItem>
+                
                 {onStartTour && (
                   <DropdownMenuItem 
                     onClick={onStartTour}
-                    className="rounded-md cursor-pointer"
+                    className="cursor-pointer py-2.5"
                   >
                     <Sparkles className="w-4 h-4 mr-3 text-accent" />
-                    <span className="font-medium">Restart Tour</span>
+                    <span className="font-medium">Product Tour</span>
                   </DropdownMenuItem>
                 )}
+                
+                <DropdownMenuSeparator className="bg-border/50" />
+                
+                <DropdownMenuItem 
+                  onClick={handleLogout}
+                  className="cursor-pointer py-2.5 text-destructive focus:text-destructive"
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  <span className="font-medium">Sign Out</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* Settings Button */}
-            {showSettings && (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => navigate('/settings')} 
-                data-tour="settings-button"
-                className="rounded-lg hover:bg-accent/10 hover:text-accent transition-all"
-              >
-                <SettingsIcon className="w-5 h-5" />
-              </Button>
-            )}
             
-            {/* Sign Out Button */}
-            <Button 
-              variant="ghost"
-              onClick={handleLogout}
-              className="ml-2 rounded-lg px-4 hover:bg-destructive/10 hover:text-destructive transition-all"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline font-medium">Sign Out</span>
-            </Button>
           </div>
         </div>
       </div>
