@@ -19,60 +19,80 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
       // Check if user has profile
       if (session?.user) {
-        const { data: profile, error } = await supabase
-          .from('users')
-          .select('id')
-          .eq('id', session.user.id)
-          .maybeSingle();
+        try {
+          const { data: profile, error } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-        if (error) {
-          console.error('Error checking user profile:', error);
+          if (error) {
+            console.error('Error checking user profile:', error);
+            setHasProfile(false);
+            
+            // Log orphan user detection
+            await supabase.from('analytics_events').insert({
+              user_id: session.user.id,
+              event_name: 'orphan_user_detected',
+              event_metadata: {
+                email: session.user.email,
+                detected_at: new Date().toISOString(),
+                error: error.message,
+              }
+            });
+
+            toast.error('Profile not found. Please contact support at akshat@aderai.io', {
+              duration: 10000,
+            });
+          } else {
+            setHasProfile(!!profile);
+          }
+        } catch (err) {
+          console.error('Profile check failed:', err);
           setHasProfile(false);
-          
-          // Log orphan user detection
-          await supabase.from('analytics_events').insert({
-            user_id: session.user.id,
-            event_name: 'orphan_user_detected',
-            event_metadata: {
-              email: session.user.email,
-              detected_at: new Date().toISOString(),
-            }
-          });
-
-          toast.error('Profile not found. Please contact support at akshat@aderai.io', {
-            duration: 10000,
-          });
-        } else {
-          setHasProfile(!!profile);
         }
       }
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-      
-      // Defer profile check to avoid Supabase deadlock
-      if (session?.user) {
-        queueMicrotask(async () => {
-          const { data: profile, error } = await supabase
-            .from('users')
-            .select('id')
-            .eq('id', session.user.id)
-            .maybeSingle();
-          
-          if (error) {
-            console.error('Profile check error:', error);
-            setHasProfile(false);
-          } else {
-            setHasProfile(!!profile);
-          }
-        });
-      } else {
-        setHasProfile(null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setIsAuthenticated(!!session);
+        
+        if (session?.user) {
+          // Use queueMicrotask to defer profile check and avoid Supabase auth deadlock
+          queueMicrotask(async () => {
+            try {
+              const { data: profile, error } = await supabase
+                .from('users')
+                .select('id')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+              if (error) {
+                console.error('Profile check error during auth change:', error);
+                await supabase.from('analytics_events').insert({
+                  user_id: session.user.id,
+                  event_name: 'orphan_user_auth_change',
+                  event_metadata: {
+                    email: session.user.email,
+                    error: error.message,
+                  }
+                });
+              }
+              
+              setHasProfile(!!profile);
+            } catch (err) {
+              console.error('Auth state change profile check failed:', err);
+              setHasProfile(false);
+            }
+          });
+        } else {
+          setHasProfile(null);
+        }
       }
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, []);
