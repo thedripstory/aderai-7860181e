@@ -44,15 +44,6 @@ export const AchievementCard = ({ name, description, icon, earned, earnedAt }: A
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-xl" />
                 </div>
 
-                {/* Shimmer effect on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                  <div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"
-                    style={{
-                      backgroundSize: '200% 100%',
-                    }}
-                  />
-                </div>
               </>
             )}
 
@@ -95,7 +86,6 @@ export const AchievementCard = ({ name, description, icon, earned, earnedAt }: A
                   <div
                     className={`
                       relative text-5xl transition-all duration-300
-                      ${earned ? 'animate-pulse' : ''}
                       ${isHovered && earned ? 'scale-110' : 'scale-100'}
                     `}
                     style={{
