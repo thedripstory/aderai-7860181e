@@ -52,8 +52,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate tracking pixel URL
     const trackingPixelUrl = `${supabaseUrl}/functions/v1/track-email-event?e=${emailLogId}&u=${userId}`;
     
-    // Dashboard URL
-    const dashboardUrl = 'https://aderai.io';
+    // Dashboard URL from environment variable
+    const dashboardUrl = Deno.env.get('SITE_URL') || 'https://aderai.io';
 
     // Render React Email template
     const html = await renderAsync(

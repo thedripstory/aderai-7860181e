@@ -53,18 +53,22 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
       
-      // Reset profile check on auth state change
+      // Defer profile check to avoid Supabase deadlock
       if (session?.user) {
-        setTimeout(() => {
-          supabase
+        queueMicrotask(async () => {
+          const { data: profile, error } = await supabase
             .from('users')
             .select('id')
             .eq('id', session.user.id)
-            .maybeSingle()
-            .then(({ data: profile }) => {
-              setHasProfile(!!profile);
-            });
-        }, 0);
+            .maybeSingle();
+          
+          if (error) {
+            console.error('Profile check error:', error);
+            setHasProfile(false);
+          } else {
+            setHasProfile(!!profile);
+          }
+        });
       } else {
         setHasProfile(null);
       }
