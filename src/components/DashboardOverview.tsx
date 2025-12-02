@@ -37,11 +37,7 @@ export const DashboardOverview = () => {
     loading 
   } = useDashboardStats();
 
-  if (loading) {
-    return <LoadingState message="Loading your dashboard" description="Fetching your stats and recent activity..." />;
-  }
-
-  // Memoize expensive calculations
+  // Memoize expensive calculations (must be before early return)
   const progressPercentage = useMemo(() => 
     (totalSegmentsCreated / TOTAL_AVAILABLE_SEGMENTS) * 100,
     [totalSegmentsCreated]
@@ -93,6 +89,10 @@ export const DashboardOverview = () => {
 
     return actions;
   }, [klaviyoConnected, totalSegmentsCreated, aiSuggestionsUsed, navigate]);
+
+  if (loading) {
+    return <LoadingState message="Loading your dashboard" description="Fetching your stats and recent activity..." />;
+  }
 
   return (
     <div className="space-y-6">
