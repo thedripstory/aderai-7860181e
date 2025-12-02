@@ -23,8 +23,6 @@ import { SegmentOperationHistory } from '@/components/SegmentOperationHistory';
 import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
 import { SegmentPerformance } from '@/components/SegmentPerformance';
 import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
-import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
-import { SegmentCloner } from '@/components/SegmentCloner';
 import { AchievementsPanel } from '@/components/AchievementsPanel';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
@@ -566,13 +564,6 @@ export default function UnifiedDashboard() {
                   <SegmentOperationHistory klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
                   <AderaiSegmentManager klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
                 </>
-              )}
-              <AutomationPlaybooks />
-              {klaviyoKeys.length > 0 && (
-                <SegmentCloner 
-                  currentKeyId={klaviyoKeys[activeKeyIndex].id}
-                  segments={allSegments}
-                />
               )}
             </div>
           </TabsContent>
