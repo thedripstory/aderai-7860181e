@@ -8,7 +8,26 @@ interface ErrorContext {
   metadata?: Record<string, any>;
 }
 
+/**
+ * Centralized error handling class for the application
+ * Provides consistent error handling, logging, and user messaging
+ */
 export class ErrorHandler {
+  /**
+   * Handles errors in a standardized way across the application
+   * @param error - The error object or message
+   * @param userMessage - User-friendly message to display
+   * @param context - Additional context for logging (userId, component, action, metadata)
+   * 
+   * @example
+   * ```typescript
+   * await ErrorHandler.handleError(
+   *   error,
+   *   'Failed to create segments',
+   *   { userId: user.id, component: 'SegmentCreator' }
+   * );
+   * ```
+   */
   static async handleError(
     error: any,
     userMessage: string,
@@ -41,6 +60,12 @@ export class ErrorHandler {
     }
   }
 
+  /**
+   * Handles API-specific errors with appropriate user messaging
+   * @param error - API error object
+   * @param endpoint - API endpoint that failed
+   * @param context - Additional context for logging
+   */
   static async handleAPIError(
     error: any,
     endpoint: string,
@@ -54,6 +79,11 @@ export class ErrorHandler {
     });
   }
 
+  /**
+   * Maps API error status codes to user-friendly messages
+   * @param error - API error object with status code
+   * @returns Human-readable error message
+   */
   static getAPIErrorMessage(error: any): string {
     if (error.status === 401) return 'Session expired. Please log in again.';
     if (error.status === 403) return 'You don\'t have permission to do that.';
@@ -63,6 +93,10 @@ export class ErrorHandler {
     return 'An error occurred. Please try again.';
   }
 
+  /**
+   * Handles form validation errors
+   * @param fieldErrors - Object mapping field names to error messages
+   */
   static handleValidationError(fieldErrors: Record<string, string>) {
     const firstError = Object.values(fieldErrors)[0];
     toast.error('Validation Error', {
@@ -71,6 +105,11 @@ export class ErrorHandler {
     });
   }
 
+  /**
+   * Handles network connectivity errors
+   * @param error - Network error object
+   * @param context - Additional context for logging
+   */
   static async handleNetworkError(error: any, context?: ErrorContext) {
     const isOffline = !navigator.onLine;
     const message = isOffline
@@ -84,6 +123,23 @@ export class ErrorHandler {
   }
 }
 
+/**
+ * Retries a function with exponential backoff
+ * @param fn - The async function to retry
+ * @param maxRetries - Maximum number of retry attempts (default: 3)
+ * @param delayMs - Initial delay in milliseconds (default: 1000)
+ * @returns Promise resolving to the function's result
+ * @throws The last error if all retries fail
+ * 
+ * @example
+ * ```typescript
+ * const result = await retryWithBackoff(
+ *   () => supabase.functions.invoke('my-function'),
+ *   3,
+ *   1000
+ * );
+ * ```
+ */
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
