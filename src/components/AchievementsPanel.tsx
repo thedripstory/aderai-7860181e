@@ -112,9 +112,9 @@ export const AchievementsPanel = () => {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-card/80 via-card/95 to-card backdrop-blur-xl shadow-2xl">
-      {/* Animated gradient orbs in background */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '4s' }} />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+      {/* Subtle gradient orbs in background */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-[120px]" />
       
       {/* Subtle grid pattern overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_0%,hsl(var(--border)/0.03)_50%,transparent_100%)] bg-[length:100px_100px]" />
@@ -124,7 +124,7 @@ export const AchievementsPanel = () => {
         <div className="flex items-start gap-6 mb-8">
           {/* Glowing trophy icon */}
           <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 animate-pulse" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500" />
             <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
               <Trophy className="w-10 h-10 text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.5)]" />
             </div>
@@ -135,7 +135,7 @@ export const AchievementsPanel = () => {
               <h2 className="text-3xl font-bold bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent">
                 Achievements
               </h2>
-              <Sparkles className="w-5 h-5 text-accent animate-pulse" />
+              <Sparkles className="w-5 h-5 text-accent" />
             </div>
             
             <div className="flex items-center gap-4 mb-4">
@@ -199,10 +199,10 @@ export const AchievementsPanel = () => {
 
         {earnedCount === totalCount && totalCount > 0 && (
           <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-2 border-primary/30 backdrop-blur-sm animate-scale-in relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 animate-pulse" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
             <div className="relative text-center">
               <div className="mb-2 flex justify-center">
-                <Trophy className="w-12 h-12 text-primary drop-shadow-[0_0_20px_hsl(var(--primary)/0.6)] animate-pulse" />
+                <Trophy className="w-12 h-12 text-primary drop-shadow-[0_0_20px_hsl(var(--primary)/0.6)]" />
               </div>
               <p className="text-lg font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 🎉 All Achievements Unlocked! 🎉
