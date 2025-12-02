@@ -30,7 +30,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-card/30 backdrop-blur-2xl supports-[backdrop-filter]:bg-card/30 shadow-lg">
       <div className="container max-w-screen-2xl mx-auto">
         <div className="flex h-20 items-center justify-between px-6 lg:px-8">
           
@@ -50,9 +50,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               </div>
             </div>
             
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/5 border border-accent/10">
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span className="text-xs font-semibold text-accent/90 tracking-wide uppercase">
+              <span className="text-xs font-semibold text-accent tracking-wide uppercase">
                 AI Segmentation
               </span>
             </div>
@@ -70,17 +70,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="h-10 w-10 rounded-full hover:bg-muted"
+                  className="h-10 w-10 rounded-full hover:bg-muted/50 border border-transparent hover:border-border/50 transition-all duration-200"
                 >
-                  <div className="relative">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-accent/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                    <SettingsIcon className="relative w-5 h-5" />
-                  </div>
+                  <SettingsIcon className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
                 align="end" 
-                className="w-56 bg-popover/95 backdrop-blur-xl border-border/50 shadow-xl"
+                className="w-56 bg-card/95 backdrop-blur-2xl border-border/50 shadow-2xl"
                 sideOffset={8}
               >
                 {showSettings && (
