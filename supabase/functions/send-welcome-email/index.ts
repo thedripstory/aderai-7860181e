@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 import React from "https://esm.sh/react@18.3.1";
 import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22";
 import { WelcomeEmail } from "./_templates/welcome.tsx";
+import { z } from "https://esm.sh/zod@3.22.4";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -25,7 +26,30 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, userName, accountType, userId }: WelcomeEmailRequest = await req.json();
+    // Validate request body
+    const WelcomeEmailSchema = z.object({
+      email: z.string().email('Invalid email').max(255),
+      userName: z.string().min(1).max(255),
+      accountType: z.enum(['brand', 'agency']).optional(),
+      userId: z.string().uuid('Invalid user ID'),
+    });
+
+    const validationResult = WelcomeEmailSchema.safeParse(await req.json());
+
+    if (!validationResult.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid request data',
+          details: validationResult.error.errors 
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const { email, userName, accountType, userId } = validationResult.data;
     
     // Validate inputs
     if (!email || typeof email !== 'string' || email.length > 255 || !email.includes('@')) {
