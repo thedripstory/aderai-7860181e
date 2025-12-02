@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { toast } from "sonner";
 
 export default function Onboarding() {
@@ -76,6 +77,7 @@ export default function Onboarding() {
   }
 
   return (
+    <PageErrorBoundary pageName="Onboarding">
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Header with Logo */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
@@ -99,5 +101,6 @@ export default function Onboarding() {
 
       <OnboardingFlow userId={userId} />
     </div>
+    </PageErrorBoundary>
   );
 }

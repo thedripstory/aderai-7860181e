@@ -4,11 +4,13 @@ import { ChurnPredictor } from "@/components/ChurnPredictor";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 export default function AIFeaturesDashboard() {
   const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
   
   return (
+    <PageErrorBoundary pageName="AI Features">
     <div className="min-h-screen bg-background">
       {showWarning && (
         <SessionTimeoutWarning
@@ -54,5 +56,6 @@ export default function AIFeaturesDashboard() {
         </Tabs>
       </main>
     </div>
+    </PageErrorBoundary>
   );
 }

@@ -30,9 +30,13 @@ import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import { SessionTimeoutWarning } from '@/components/SessionTimeoutWarning';
+import { PageErrorBoundary } from '@/components/PageErrorBoundary';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { ErrorHandler } from '@/lib/errorHandlers';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
+  useNetworkStatus();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -384,6 +388,7 @@ export default function UnifiedDashboard() {
   }
 
   return (
+    <PageErrorBoundary pageName="Dashboard">
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Session Timeout Warning */}
       {showWarning && (
@@ -559,5 +564,6 @@ export default function UnifiedDashboard() {
         </Tabs>
       </div>
     </div>
+    </PageErrorBoundary>
   );
 }

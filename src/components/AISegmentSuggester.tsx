@@ -5,6 +5,7 @@ import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useAILimits } from '@/hooks/useAILimits';
 import { ErrorLogger } from '@/lib/errorLogger';
+import { ErrorHandler } from '@/lib/errorHandlers';
 import { toast } from 'sonner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -95,15 +96,14 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
     } catch (error: any) {
       console.error('AI generation error:', error);
       
-      // Log AI error to database
-      await ErrorLogger.logAIError(error, 'Generate AI Suggestions');
+      // Get user for logging
+      const { data: { user } } = await supabase.auth.getUser();
       
-      toast.error('Failed to generate AI suggestions', {
-        description: error.message || 'Check your Klaviyo connection and try again',
-        action: {
-          label: 'Retry',
-          onClick: () => generateAiSuggestions(),
-        },
+      // Log AI error with standardized handler
+      await ErrorHandler.handleAPIError(error, 'klaviyo-suggest-segments', {
+        userId: user?.id,
+        component: 'AISegmentSuggester',
+        action: 'generate_ai_suggestions',
       });
     } finally {
       setAiLoading(false);
@@ -139,12 +139,15 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       }
     } catch (error: any) {
       console.error('Segment creation error:', error);
-      toast.error('Failed to create segment', {
-        description: error.message || 'Check your Klaviyo API key and try again',
-        action: {
-          label: 'Get Help',
-          onClick: () => window.open('/help?article=troubleshooting', '_blank'),
-        },
+      
+      // Get user for logging
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      await ErrorHandler.handleAPIError(error, 'klaviyo-create-custom-segment', {
+        userId: user?.id,
+        component: 'AISegmentSuggester',
+        action: 'create_ai_segment',
+        metadata: { segmentName: suggestion.name },
       });
     } finally {
       setAiLoading(false);

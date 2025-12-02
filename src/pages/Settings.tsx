@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { sanitizeString, sanitizeEmail, sanitizeNumber, validatePassword } from "@/lib/inputSanitization";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import {
   Select,
   SelectContent,
@@ -339,6 +340,7 @@ export default function Settings() {
   };
 
   return (
+    <PageErrorBoundary pageName="Settings">
     <div className="min-h-screen bg-background">
       {showWarning && (
         <SessionTimeoutWarning
@@ -677,5 +679,6 @@ export default function Settings() {
         />
       )}
     </div>
+    </PageErrorBoundary>
   );
 }
