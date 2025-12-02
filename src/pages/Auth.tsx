@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { SignInCard } from "@/components/ui/sign-in-card";
 import { ErrorLogger } from "@/lib/errorLogger";
+import { sanitizeEmail, sanitizeString, validatePassword } from "@/lib/inputSanitization";
 
 interface AuthProps {
   onComplete?: (user: any) => void;
@@ -20,16 +21,34 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
     setLoading(true);
 
     try {
+      // Sanitize inputs
+      const sanitizedEmail = sanitizeEmail(email);
+      const sanitizedFirstName = firstName ? sanitizeString(firstName) : '';
+      const sanitizedBrandName = brandName ? sanitizeString(brandName) : '';
+      
+      // Validate email format
+      if (!sanitizedEmail) {
+        throw new Error('Please enter a valid email address');
+      }
+      
+      // Validate password
+      if (isSignUp) {
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.isValid) {
+          throw new Error(passwordValidation.error);
+        }
+      }
+
       if (isSignUp) {
         // Sign up
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
-          email,
+          email: sanitizedEmail,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
             data: {
-              first_name: firstName || '',
-              account_name: brandName || email.split('@')[0],
+              first_name: sanitizedFirstName || '',
+              account_name: sanitizedBrandName || sanitizedEmail.split('@')[0],
             },
           },
         });
@@ -41,8 +60,8 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
           try {
             await supabase.functions.invoke('send-welcome-email', {
               body: {
-                email: email,
-                userName: firstName || email.split('@')[0],
+                email: sanitizedEmail,
+                userName: sanitizedFirstName || sanitizedEmail.split('@')[0],
                 accountType: 'brand',
                 userId: authData.user.id,
               },
@@ -80,7 +99,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
       } else {
         // Sign in
         const { data, error } = await supabase.auth.signInWithPassword({
-          email,
+          email: sanitizedEmail,
           password,
         });
 

@@ -21,6 +21,41 @@ serve(async (req) => {
   console.log('[klaviyo-suggest-segments] Request received');
 
   try {
+    // Get user ID from JWT
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check rate limit before processing
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    const limitCheckResponse = await fetch(`${supabaseUrl}/functions/v1/check-ai-limit`, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!limitCheckResponse.ok) {
+      const limitError = await limitCheckResponse.json();
+      console.error('[klaviyo-suggest-segments] Rate limit check failed:', limitError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          message: 'You have reached your daily limit for AI suggestions. Please try again tomorrow.',
+          limit: 10,
+          resetTime: 'midnight UTC'
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const body = await req.json();
     const validationResult = RequestSchema.safeParse(body);
     
@@ -179,6 +214,15 @@ Based on this information and the available Klaviyo metrics, suggest segments th
     const aiData = await aiResponse.json();
     const suggestedSegments = JSON.parse(aiData.choices[0].message.content);
     console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
+
+    // Increment AI usage counter after successful operation
+    await fetch(`${supabaseUrl}/functions/v1/increment-ai-usage`, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+    }).catch(err => console.error('[klaviyo-suggest-segments] Failed to increment usage:', err));
 
     return new Response(
       JSON.stringify(suggestedSegments),
