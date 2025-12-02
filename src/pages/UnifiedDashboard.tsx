@@ -212,13 +212,11 @@ export default function UnifiedDashboard() {
 
   const fetchAllSegments = async () => {
     if (klaviyoKeys.length === 0) {
-      console.log('No Klaviyo keys available');
       return;
     }
 
     const activeKey = klaviyoKeys[activeKeyIndex];
     if (!activeKey?.id) {
-      console.log('No active key ID available');
       return;
     }
 
@@ -226,8 +224,6 @@ export default function UnifiedDashboard() {
     setLoadingAnalytics(true);
     
     try {
-      console.log('Fetching segments with keyId:', activeKey.id);
-      
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
       // Fetch segments with tags (profile_count not available on list endpoint due to Klaviyo API limitations)
@@ -275,9 +271,6 @@ export default function UnifiedDashboard() {
         });
       }
       
-      console.log('Klaviyo segments fetched:', allFetchedSegments.length);
-      console.log('Tags collected:', Object.keys(includedTags).length);
-      
       // Fetch latest profile counts from historical data table
       let historicalCounts: Record<string, number> = {};
       if (currentUser?.id) {
@@ -298,7 +291,6 @@ export default function UnifiedDashboard() {
               historicalCounts[record.segment_klaviyo_id] = record.profile_count;
             }
           });
-          console.log('Historical profile counts loaded for', Object.keys(historicalCounts).length, 'segments');
         }
       }
       
