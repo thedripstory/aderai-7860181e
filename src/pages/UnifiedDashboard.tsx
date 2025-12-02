@@ -435,15 +435,18 @@ export default function UnifiedDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-8 bg-card/50 backdrop-blur-xl border border-border/50 shadow-lg">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
-            <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
-            <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="templates">Templates</TabsTrigger>
-            <TabsTrigger value="more">More</TabsTrigger>
-          </TabsList>
+          {/* Tubelight-style navigation */}
+          <div className="flex justify-center mb-8">
+            <TabsList className="w-auto">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
+              <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
+              <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
+              <TabsTrigger value="performance">Performance</TabsTrigger>
+              <TabsTrigger value="templates">Templates</TabsTrigger>
+              <TabsTrigger value="more">More</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview">
             <div data-tour="dashboard-stats" className="space-y-6">
