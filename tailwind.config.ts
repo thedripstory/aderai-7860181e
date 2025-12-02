@@ -191,6 +191,16 @@ export default {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        "scale-in": {
+          "0%": {
+            transform: "scale(0.95)",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+        },
         "aurora": {
           from: {
             backgroundPosition: "50% 50%, 50% 50%",
@@ -207,6 +217,7 @@ export default {
         "slide-in": "slide-in 0.5s ease-out",
         "slide-in-left": "slide-in-left 0.8s ease-out",
         "shimmer": "shimmer 2s linear infinite",
+        "scale-in": "scale-in 0.3s ease-out",
         "aurora": "aurora 60s linear infinite",
       },
     },
