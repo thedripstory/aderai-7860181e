@@ -161,9 +161,12 @@ export default function Settings() {
 
     setLoading(true);
     try {
+      // Sanitize account name before saving
+      const sanitizedAccountName = sanitizeString(accountName);
+      
       const { error } = await supabase
         .from("users")
-        .update({ account_name: accountName })
+        .update({ account_name: sanitizedAccountName })
         .eq("id", currentUser.id);
 
       if (error) throw error;

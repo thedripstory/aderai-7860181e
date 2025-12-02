@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { sanitizeString } from '@/lib/inputSanitization';
 
 const bugReportSchema = z.object({
   description: z.string().trim().min(10, 'Description must be at least 10 characters').max(1000, 'Description must be less than 1000 characters'),
@@ -80,14 +81,20 @@ export const FeedbackWidget: React.FC = () => {
         .eq('id', user.id)
         .single();
 
+      // Sanitize all user inputs before saving
+      const sanitizedData = {
+        title: data.title ? sanitizeString(data.title) : null,
+        description: sanitizeString(data.description),
+      };
+
       // Insert feedback into database
       const { error: insertError } = await supabase
         .from('user_feedback')
         .insert({
           user_id: user.id,
           feedback_type: type,
-          title: data.title || null,
-          description: data.description,
+          title: sanitizedData.title,
+          description: sanitizedData.description,
           metadata: metadata,
         });
 
