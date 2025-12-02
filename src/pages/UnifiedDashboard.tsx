@@ -383,7 +383,16 @@ export default function UnifiedDashboard() {
 
   return (
     <PageErrorBoundary pageName="Dashboard">
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+    <div className="min-h-screen relative bg-background overflow-hidden">
+      {/* Animated gradient orbs background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[150px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px]" />
+      </div>
+      
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 -z-10 bg-[linear-gradient(to_right,transparent_0%,hsl(var(--border)/0.02)_50%,transparent_100%)] bg-[length:100px_100px] pointer-events-none" />
       {/* Session Timeout Warning */}
       {showWarning && (
         <SessionTimeoutWarning
@@ -424,9 +433,9 @@ export default function UnifiedDashboard() {
         <FeedbackWidget />
       </DashboardHeader>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-8">
+          <TabsList className="grid w-full grid-cols-7 mb-8 bg-card/50 backdrop-blur-xl border border-border/50 shadow-lg">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
             <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
@@ -455,18 +464,27 @@ export default function UnifiedDashboard() {
             />
 
             {selectedSegments.length > 0 && (
-              <div className="mt-8 p-4 bg-card border border-border rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">
-                      {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
-                    </p>
-                    <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
+              <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-card/80 via-card/95 to-card backdrop-blur-xl border border-primary/30 shadow-2xl relative overflow-hidden">
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
+                
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center">
+                      <Target className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-lg">
+                        {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
+                      </p>
+                      <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
+                    </div>
                   </div>
                   <Button
                     onClick={() => handleCreateSegments()}
                     disabled={creatingSegments}
                     size="lg"
+                    className="shadow-lg shadow-primary/20"
                   >
                     {creatingSegments ? 'Creating...' : 'Create Segments'}
                   </Button>
