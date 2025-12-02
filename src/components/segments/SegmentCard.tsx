@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { CheckCircle2, Eye, Star } from 'lucide-react';
 import type { Segment } from '@/lib/segmentData';
 
@@ -11,7 +12,7 @@ interface SegmentCardProps {
   index: number;
 }
 
-export function SegmentCard({
+export const SegmentCard = memo(function SegmentCard({
   segment,
   isSelected,
   isFavorite,
@@ -83,4 +84,4 @@ export function SegmentCard({
       </div>
     </div>
   );
-}
+});

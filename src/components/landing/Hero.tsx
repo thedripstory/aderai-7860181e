@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles, Zap, Clock } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Clock, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CircleDoodle } from '@/components/CircleDoodle';
 import { AnimatedTimeCounter } from '@/components/AnimatedTimeCounter';
@@ -149,6 +149,3 @@ export function Hero({ variant, onGetStarted }: HeroProps) {
     </section>
   );
 }
-
-// Missing CheckCircle import
-import { CheckCircle } from 'lucide-react';

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { CheckCircle2, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { Bundle } from '@/lib/segmentData';
@@ -9,7 +10,7 @@ interface BundleCardProps {
   index: number;
 }
 
-export function BundleCard({ bundle, selectedFromBundle, onSelect, index }: BundleCardProps) {
+export const BundleCard = memo(function BundleCard({ bundle, selectedFromBundle, onSelect, index }: BundleCardProps) {
   const bundleSelected = selectedFromBundle === bundle.segments.length;
   const partiallySelected = selectedFromBundle > 0 && selectedFromBundle < bundle.segments.length;
   const progressPercent = (selectedFromBundle / bundle.segments.length) * 100;
@@ -88,4 +89,4 @@ export function BundleCard({ bundle, selectedFromBundle, onSelect, index }: Bund
       </div>
     </div>
   );
-}
+});
