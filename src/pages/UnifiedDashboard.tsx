@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Loader, RefreshCw, Target, Key, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
@@ -34,11 +35,13 @@ import { SessionTimeoutWarning } from '@/components/SessionTimeoutWarning';
 import { PageErrorBoundary } from '@/components/PageErrorBoundary';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { EmptyState } from '@/components/ui/empty-state';
+import { MobileMenu } from '@/components/MobileMenu';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
   useNetworkStatus();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [klaviyoKeys, setKlaviyoKeys] = useState<KlaviyoKey[]>([]);
@@ -118,16 +121,16 @@ export default function UnifiedDashboard() {
     }
   };
 
-  const toggleSegment = (segmentId: string) => {
+  const toggleSegment = useCallback((segmentId: string) => {
     setSelectedSegments(prev => {
       if (prev.includes(segmentId)) {
         return prev.filter(id => id !== segmentId);
       }
       return [...prev, segmentId];
     });
-  };
+  }, []);
 
-  const selectBundle = (bundleId: string) => {
+  const selectBundle = useCallback((bundleId: string) => {
     const bundle = BUNDLES.find(b => b.id === bundleId);
     if (bundle) {
       setSelectedSegments(prev => {
@@ -135,17 +138,17 @@ export default function UnifiedDashboard() {
         return Array.from(new Set(newSegments));
       });
     }
-  };
+  }, []);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     setSelectedSegments(SEGMENTS.map(s => s.id));
-  };
+  }, []);
 
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     setSelectedSegments([]);
-  };
+  }, []);
 
-  const handleCreateSegments = async (segmentIds?: string[]) => {
+  const handleCreateSegments = useCallback(async (segmentIds?: string[]) => {
     const segmentsToCreate = segmentIds || selectedSegments;
     if (segmentsToCreate.length === 0 || klaviyoKeys.length === 0) {
       return;
@@ -200,12 +203,12 @@ export default function UnifiedDashboard() {
     }
 
     setView('results');
-  };
+  }, [selectedSegments, klaviyoKeys, activeKeyIndex, trackAction, createSegments]);
 
-  const handleRetryFailed = async (failedSegmentIds: string[]) => {
+  const handleRetryFailed = useCallback(async (failedSegmentIds: string[]) => {
     setResults([]);
     await handleCreateSegments(failedSegmentIds);
-  };
+  }, [handleCreateSegments]);
 
   const fetchAllSegments = async () => {
     if (klaviyoKeys.length === 0) {
