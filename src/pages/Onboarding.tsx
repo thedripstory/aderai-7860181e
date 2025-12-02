@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { toast } from "sonner";
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -18,13 +19,27 @@ export default function Onboarding() {
       }
 
       // Check if user has already completed onboarding
-      const { data: userData } = await supabase
+      const { data: userData, error: userError } = await supabase
         .from('users')
         .select('onboarding_completed, klaviyo_setup_completed')
         .eq('id', session.user.id)
         .maybeSingle();
 
-      if (userData?.onboarding_completed && userData?.klaviyo_setup_completed) {
+      if (userError) {
+        console.error('Error fetching user data:', userError);
+        toast.error('Error loading onboarding status. Please refresh the page.');
+        setLoading(false);
+        return;
+      }
+
+      if (!userData) {
+        console.error('User profile not found in onboarding');
+        toast.error('Profile not found. Please contact support at akshat@aderai.io');
+        navigate('/login');
+        return;
+      }
+
+      if (userData.onboarding_completed && userData.klaviyo_setup_completed) {
         navigate('/dashboard');
         return;
       }
