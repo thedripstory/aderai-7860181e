@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import QRCode from "qrcode";
+import { ErrorLogger } from "@/lib/errorLogger";
 
 interface TwoFactorSetupProps {
   userId: string;
@@ -130,7 +131,7 @@ export function TwoFactorSetup({ userId, userEmail, onSetupComplete }: TwoFactor
         description: "Your account is now protected with two-factor authentication.",
       });
     } catch (error) {
-      console.error("Error enabling 2FA:", error);
+      ErrorLogger.logAuthError(error as Error, 'enable_2fa');
       toast({
         title: "Error",
         description: "Failed to enable 2FA. Please try again.",
@@ -383,7 +384,7 @@ export function TwoFactorDisable({ userId, onDisabled }: TwoFactorDisableProps) 
 
       onDisabled();
     } catch (error) {
-      console.error("Error disabling 2FA:", error);
+      ErrorLogger.logAuthError(error as Error, 'disable_2fa');
       toast({
         title: "Error",
         description: "Failed to disable 2FA",

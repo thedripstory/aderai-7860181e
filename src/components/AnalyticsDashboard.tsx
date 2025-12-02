@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { ErrorLogger } from '@/lib/errorLogger';
 
 interface SegmentStats {
   profileCount: number;
@@ -198,7 +199,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         duration: 3000,
       });
     } catch (error) {
-      console.error('Export error:', error);
+      ErrorLogger.logError(error as Error, { context: 'export_analytics' });
       toast.error('Failed to export analytics');
     } finally {
       setExportLoading(false);
