@@ -16,6 +16,7 @@ import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2 } from "lucid
 import { supabase } from "@/lib/supabase";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
@@ -279,6 +280,7 @@ const KlaviyoSetup = () => {
   }
 
   return (
+    <PageErrorBoundary pageName="Klaviyo Setup">
     <div className="min-h-screen bg-background relative overflow-hidden">
       {showWarning && (
         <SessionTimeoutWarning
@@ -553,6 +555,7 @@ const KlaviyoSetup = () => {
         </div>
       </main>
     </div>
+    </PageErrorBoundary>
   );
 };
 

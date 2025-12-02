@@ -39,6 +39,7 @@ import { exportUsersToCSV, exportFeedbackToCSV } from "@/lib/csvExport";
 import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -353,6 +354,7 @@ const AdminDashboard = () => {
   );
 
   return (
+    <PageErrorBoundary pageName="Admin Dashboard">
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b bg-card">
@@ -798,6 +800,7 @@ const AdminDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </PageErrorBoundary>
   );
 };
 

@@ -3,11 +3,13 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { Activity } from "lucide-react";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 export default function SegmentHealthDashboard() {
   const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
   
   return (
+    <PageErrorBoundary pageName="Segment Health">
     <div className="min-h-screen bg-background">
       {showWarning && (
         <SessionTimeoutWarning
@@ -42,5 +44,6 @@ export default function SegmentHealthDashboard() {
         <SegmentHealthMonitor />
       </main>
     </div>
+    </PageErrorBoundary>
   );
 }
