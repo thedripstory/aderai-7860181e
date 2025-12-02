@@ -1,6 +1,7 @@
 import { ArrowRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ErrorLogger } from "@/lib/errorLogger";
 
 interface TimeBasedPopupProps {
   onGetStarted: () => void;
@@ -42,7 +43,7 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
         return () => clearTimeout(timer);
       }
     } catch (error) {
-      console.error("Error checking popup status:", error);
+      ErrorLogger.logError(error as Error, { context: 'check_popup_status' });
     }
   };
 
@@ -59,7 +60,7 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
           .eq("id", user.id);
       }
     } catch (error) {
-      console.error("Error updating popup status:", error);
+      ErrorLogger.logError(error as Error, { context: 'update_popup_status' });
     }
   };
 

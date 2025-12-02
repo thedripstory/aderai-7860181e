@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import { ErrorLogger } from '@/lib/errorLogger';
 
 interface SegmentDetailModalProps {
   isOpen: boolean;
@@ -120,7 +121,7 @@ export const SegmentDetailModal: React.FC<SegmentDetailModalProps> = ({
         ]);
       }
     } catch (error) {
-      console.error('Error fetching segment details:', error);
+      ErrorLogger.logError(error as Error, { context: 'fetch_segment_details', segmentId: segment.id });
     } finally {
       setLoading(false);
     }
