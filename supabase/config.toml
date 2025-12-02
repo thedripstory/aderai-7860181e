@@ -39,23 +39,11 @@ verify_jwt = false
 [functions.calculate-segment-performance]
 verify_jwt = true
 
-# DEPRECATED: Use -secure versions instead
-# [functions.performance-metrics]
-# verify_jwt = false
-
 [functions.performance-metrics-secure]
 verify_jwt = true
 
-# DEPRECATED: Use -secure versions instead
-# [functions.performance-flows]
-# verify_jwt = false
-
 [functions.performance-flows-secure]
 verify_jwt = true
-
-# DEPRECATED: Use -secure versions instead
-# [functions.performance-campaigns]
-# verify_jwt = false
 
 [functions.performance-campaigns-secure]
 verify_jwt = true
