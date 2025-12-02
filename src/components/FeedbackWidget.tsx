@@ -46,7 +46,7 @@ export const FeedbackWidget: React.FC = () => {
 
   // General Feedback State
   const [generalFeedback, setGeneralFeedback] = useState('');
-  const [satisfaction, setSatisfaction] = useState(3);
+  const [satisfaction, setSatisfaction] = useState(5);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -65,7 +65,7 @@ export const FeedbackWidget: React.FC = () => {
     setFeatureDescription('');
     setFeatureImportance(3);
     setGeneralFeedback('');
-    setSatisfaction(3);
+    setSatisfaction(5);
   };
 
   const submitFeedback = async (type: 'bug_report' | 'feature_request' | 'general', data: any, metadata: any) => {
