@@ -98,8 +98,6 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
         duration: 3000,
       });
     } catch (error: any) {
-      console.error('AI generation error:', error);
-      
       // Get user for logging
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -142,8 +140,6 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
         setAiSuggestions(prev => prev.filter(s => s.name !== suggestion.name));
       }
     } catch (error: any) {
-      console.error('Segment creation error:', error);
-      
       // Get user for logging
       const { data: { user } } = await supabase.auth.getUser();
       
