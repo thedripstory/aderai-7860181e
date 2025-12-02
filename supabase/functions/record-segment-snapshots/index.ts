@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
             method: 'GET',
             headers: {
               'Authorization': `Klaviyo-API-Key ${apiKey}`,
-              'revision': '2024-10-15',
+              'revision': '2025-07-15',
               'Content-Type': 'application/json',
             },
           });
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
                 method: 'GET',
                 headers: {
                   'Authorization': `Klaviyo-API-Key ${apiKey}`,
-                  'revision': '2024-10-15',
+                  'revision': '2025-07-15',
                   'Content-Type': 'application/json',
                 },
               }

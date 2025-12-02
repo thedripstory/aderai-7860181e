@@ -26,23 +26,7 @@ export function useAILimits() {
     setLimitStatus(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      // Check if user is authenticated first
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        setLimitStatus(prev => ({
-          ...prev,
-          loading: false,
-          error: 'Not authenticated',
-        }));
-        return false;
-      }
-
-      const { data, error } = await supabase.functions.invoke('check-ai-limit', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      const { data, error } = await supabase.functions.invoke('check-ai-limit');
       
       if (error) throw error;
 
@@ -70,19 +54,7 @@ export function useAILimits() {
 
   const incrementUsage = async () => {
     try {
-      // Check if user is authenticated first
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        console.error('Not authenticated');
-        return;
-      }
-
-      const { error } = await supabase.functions.invoke('increment-ai-usage', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      const { error } = await supabase.functions.invoke('increment-ai-usage');
       if (error) throw error;
       
       // Refresh the limit status after incrementing
@@ -93,20 +65,7 @@ export function useAILimits() {
   };
 
   useEffect(() => {
-    // Wait for auth session to be established before checking limits
-    const initLimits = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        await checkLimit();
-      } else {
-        setLimitStatus(prev => ({
-          ...prev,
-          loading: false,
-        }));
-      }
-    };
-
-    initLimits();
+    checkLimit();
   }, []);
 
   return {

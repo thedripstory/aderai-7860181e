@@ -10,8 +10,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { sanitizeString } from '@/lib/inputSanitization';
-import { ErrorLogger } from '@/lib/errorLogger';
 
 const bugReportSchema = z.object({
   description: z.string().trim().min(10, 'Description must be at least 10 characters').max(1000, 'Description must be less than 1000 characters'),
@@ -46,7 +44,7 @@ export const FeedbackWidget: React.FC = () => {
 
   // General Feedback State
   const [generalFeedback, setGeneralFeedback] = useState('');
-  const [satisfaction, setSatisfaction] = useState(5);
+  const [satisfaction, setSatisfaction] = useState(3);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -65,7 +63,7 @@ export const FeedbackWidget: React.FC = () => {
     setFeatureDescription('');
     setFeatureImportance(3);
     setGeneralFeedback('');
-    setSatisfaction(5);
+    setSatisfaction(3);
   };
 
   const submitFeedback = async (type: 'bug_report' | 'feature_request' | 'general', data: any, metadata: any) => {
@@ -82,20 +80,14 @@ export const FeedbackWidget: React.FC = () => {
         .eq('id', user.id)
         .single();
 
-      // Sanitize all user inputs before saving
-      const sanitizedData = {
-        title: data.title ? sanitizeString(data.title) : null,
-        description: sanitizeString(data.description),
-      };
-
       // Insert feedback into database
       const { error: insertError } = await supabase
         .from('user_feedback')
         .insert({
           user_id: user.id,
           feedback_type: type,
-          title: sanitizedData.title,
-          description: sanitizedData.description,
+          title: data.title || null,
+          description: data.description,
           metadata: metadata,
         });
 
@@ -114,9 +106,7 @@ export const FeedbackWidget: React.FC = () => {
       });
 
       if (emailError) {
-        await ErrorLogger.logError(emailError, {
-          context: 'Failed to send feedback email notification',
-        });
+        console.error('Failed to send email notification:', emailError);
       }
 
       trackAction('feedback_submitted', { type });
@@ -150,9 +140,7 @@ export const FeedbackWidget: React.FC = () => {
 
       handleClose();
     } catch (error: any) {
-      await ErrorLogger.logError(error, {
-        context: 'Error submitting feedback',
-      });
+      console.error('Error submitting feedback:', error);
       toast.error('Failed to submit feedback', {
         description: error.message || 'Please try again later',
       });

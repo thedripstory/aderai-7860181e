@@ -20,6 +20,8 @@ export function useAnalyticsTracking() {
         page_url: window.location.href,
         user_agent: navigator.userAgent,
       });
+
+      console.log(`📊 Event tracked: ${eventName}`, metadata);
     } catch (error) {
       console.error('Failed to track event:', error);
     }

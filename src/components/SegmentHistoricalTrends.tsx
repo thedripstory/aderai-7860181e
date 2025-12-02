@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { EmptyState } from '@/components/ui/empty-state';
 import { TrendingUp, TrendingDown, Minus, Calendar, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -220,11 +219,11 @@ export const SegmentHistoricalTrends: React.FC<SegmentHistoricalTrendsProps> = (
               ))}
             </div>
           ) : trends.length === 0 ? (
-            <EmptyState
-              icon={Calendar}
-              title="No historical data yet"
-              description="Segment trends will appear as data is tracked over time. Check back in a few days to see how your segments are growing."
-            />
+            <div className="text-center py-8 text-muted-foreground">
+              <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No historical data available yet.</p>
+              <p className="text-sm">Data will appear as segments are tracked over time.</p>
+            </div>
           ) : (
             <div className="space-y-2">
               {trends.map((trend) => (

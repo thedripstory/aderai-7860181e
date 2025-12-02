@@ -1,13 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
-import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const RequestSchema = z.object({
-  apiKey: z.string().min(1).max(500),
-  segmentName: z.string().min(1).max(200),
-  segmentDescription: z.string().max(1000).optional(),
-});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,20 +13,14 @@ serve(async (req) => {
   }
 
   try {
-    const body = await req.json();
-    const validationResult = RequestSchema.safeParse(body);
-    
-    if (!validationResult.success) {
+    let { apiKey, segmentName, segmentDescription } = await req.json();
+
+    if (!apiKey || !segmentName) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Invalid input', 
-          details: validationResult.error.issues 
-        }),
+        JSON.stringify({ error: 'Missing apiKey or segmentName' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
-    let { apiKey, segmentName, segmentDescription } = validationResult.data;
 
     // Decrypt API key if encrypted
     if (isEncrypted(apiKey)) {

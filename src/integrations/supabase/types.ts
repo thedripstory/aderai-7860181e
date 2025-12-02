@@ -599,30 +599,6 @@ export type Database = {
         }
         Relationships: []
       }
-      rate_limits: {
-        Row: {
-          count: number | null
-          created_at: string | null
-          id: string
-          identifier: string
-          operation: string
-        }
-        Insert: {
-          count?: number | null
-          created_at?: string | null
-          id?: string
-          identifier: string
-          operation: string
-        }
-        Update: {
-          count?: number | null
-          created_at?: string | null
-          id?: string
-          identifier?: string
-          operation?: string
-        }
-        Relationships: []
-      }
       segment_analytics_cache: {
         Row: {
           cached_at: string | null
@@ -991,7 +967,6 @@ export type Database = {
           current_challenges: string | null
           email: string
           email_verified: boolean | null
-          first_name: string | null
           id: string
           industry: string | null
           klaviyo_setup_completed: boolean | null
@@ -1012,7 +987,6 @@ export type Database = {
           current_challenges?: string | null
           email: string
           email_verified?: boolean | null
-          first_name?: string | null
           id?: string
           industry?: string | null
           klaviyo_setup_completed?: boolean | null
@@ -1033,7 +1007,6 @@ export type Database = {
           current_challenges?: string | null
           email?: string
           email_verified?: boolean | null
-          first_name?: string | null
           id?: string
           industry?: string | null
           klaviyo_setup_completed?: boolean | null

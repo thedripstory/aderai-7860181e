@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { ErrorLogger } from '@/lib/errorLogger';
 
 interface SegmentStats {
   profileCount: number;
@@ -199,7 +198,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         duration: 3000,
       });
     } catch (error) {
-      ErrorLogger.logError(error as Error, { context: 'export_analytics' });
+      console.error('Export error:', error);
       toast.error('Failed to export analytics');
     } finally {
       setExportLoading(false);
@@ -220,17 +219,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   }
 
   if (allSegments.length === 0) {
-    return (
-      <EmptyState
-        icon={Target}
-        title="No segments found"
-        description="Connect your Klaviyo account to start viewing segment analytics. Once connected, your segments will appear here with detailed performance metrics."
-        actionLabel="Go to Settings"
-        onAction={() => window.location.href = '/settings'}
-        secondaryActionLabel="Learn More"
-        onSecondaryAction={() => window.open('/help?article=klaviyo-setup', '_blank')}
-      />
-    );
+    return null;
   }
 
   if (Object.keys(segmentStats).length === 0) {
@@ -574,24 +563,15 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         </div>
 
         {filteredSegments.length === 0 && (
-          <EmptyState
-            icon={Search}
-            title={filterBy === 'aderai' ? "No Aderai segments found" : "No segments match your search"}
-            description={
-              filterBy === 'aderai'
-                ? "You haven't created any segments with Aderai yet. Head to the Segments tab to create your first segment!"
-                : "Try adjusting your search query or filters to find what you're looking for."
-            }
-            actionLabel={filterBy === 'aderai' ? "Create Segments" : "Clear Filters"}
-            onAction={() => {
-              if (filterBy === 'aderai') {
-                window.location.href = '/dashboard?tab=segments';
-              } else {
-                setSearchQuery('');
-                setFilterBy('all');
-              }
-            }}
-          />
+          <div className="text-center py-12 text-muted-foreground">
+            <Search className="w-12 h-12 mx-auto mb-4 opacity-30" />
+            <p className="text-lg font-medium">No segments found</p>
+            <p className="text-sm">
+              {filterBy === 'aderai' 
+                ? "No Aderai segments found. Create some segments first!" 
+                : "Try adjusting your search query"}
+            </p>
+          </div>
         )}
       </div>
 

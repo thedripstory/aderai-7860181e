@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { EmptyState } from '@/components/ui/empty-state';
 import { 
   History, 
   CheckCircle, 
@@ -195,21 +194,11 @@ export const SegmentOperationHistory: React.FC<SegmentOperationHistoryProps> = (
             ))}
           </div>
         ) : filteredOperations.length === 0 ? (
-          <EmptyState
-            icon={History}
-            title={searchQuery || filterType !== 'all' || filterStatus !== 'all' ? "No operations match your filters" : "No operations yet"}
-            description={
-              searchQuery || filterType !== 'all' || filterStatus !== 'all'
-                ? "Try adjusting your search or filters to find what you're looking for."
-                : "Segment operations will appear here after you create, modify, or delete segments."
-            }
-            actionLabel={searchQuery || filterType !== 'all' || filterStatus !== 'all' ? "Clear Filters" : undefined}
-            onAction={searchQuery || filterType !== 'all' || filterStatus !== 'all' ? () => {
-              setSearchQuery('');
-              setFilterType('all');
-              setFilterStatus('all');
-            } : undefined}
-          />
+          <div className="text-center py-12 text-muted-foreground">
+            <History className="w-16 h-16 mx-auto mb-4 opacity-50" />
+            <p className="font-medium">No operations found</p>
+            <p className="text-sm">Segment operations will appear here after you create segments.</p>
+          </div>
         ) : (
           <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
             {filteredOperations.map((op) => (

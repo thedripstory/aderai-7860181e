@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Loader, RefreshCw, Target, Key, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Loader, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
@@ -11,8 +10,7 @@ import { FeedbackWidget } from '@/components/FeedbackWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { OnboardingTour } from '@/components/OnboardingTour';
-import { SegmentDashboard } from '@/components/SegmentDashboard';
-import { BUNDLES, SEGMENTS } from '@/lib/segmentData';
+import { SegmentDashboard, BUNDLES, SEGMENTS } from '@/components/SegmentDashboard';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { AISegmentSuggester } from '@/components/AISegmentSuggester';
@@ -23,23 +21,17 @@ import { SegmentOperationHistory } from '@/components/SegmentOperationHistory';
 import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
 import { SegmentPerformance } from '@/components/SegmentPerformance';
 import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
+import { AutomationPlaybooks } from '@/components/AutomationPlaybooks';
+import { SegmentCloner } from '@/components/SegmentCloner';
 import { AchievementsPanel } from '@/components/AchievementsPanel';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
-import { useSessionTimeout } from '@/hooks/useSessionTimeout';
-import { SessionTimeoutWarning } from '@/components/SessionTimeoutWarning';
-import { PageErrorBoundary } from '@/components/PageErrorBoundary';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { EmptyState } from '@/components/ui/empty-state';
-import { MobileMenu } from '@/components/MobileMenu';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
-  useNetworkStatus();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [klaviyoKeys, setKlaviyoKeys] = useState<KlaviyoKey[]>([]);
@@ -48,7 +40,6 @@ export default function UnifiedDashboard() {
   const [view, setView] = useState<'creating' | 'results' | null>(null);
   const [emailVerified, setEmailVerified] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
 
   // Analytics state
   const [allSegments, setAllSegments] = useState<any[]>([]);
@@ -119,16 +110,16 @@ export default function UnifiedDashboard() {
     }
   };
 
-  const toggleSegment = useCallback((segmentId: string) => {
+  const toggleSegment = (segmentId: string) => {
     setSelectedSegments(prev => {
       if (prev.includes(segmentId)) {
         return prev.filter(id => id !== segmentId);
       }
       return [...prev, segmentId];
     });
-  }, []);
+  };
 
-  const selectBundle = useCallback((bundleId: string) => {
+  const selectBundle = (bundleId: string) => {
     const bundle = BUNDLES.find(b => b.id === bundleId);
     if (bundle) {
       setSelectedSegments(prev => {
@@ -136,17 +127,17 @@ export default function UnifiedDashboard() {
         return Array.from(new Set(newSegments));
       });
     }
-  }, []);
+  };
 
-  const handleSelectAll = useCallback(() => {
+  const handleSelectAll = () => {
     setSelectedSegments(SEGMENTS.map(s => s.id));
-  }, []);
+  };
 
-  const handleClearAll = useCallback(() => {
+  const handleClearAll = () => {
     setSelectedSegments([]);
-  }, []);
+  };
 
-  const handleCreateSegments = useCallback(async (segmentIds?: string[]) => {
+  const handleCreateSegments = async (segmentIds?: string[]) => {
     const segmentsToCreate = segmentIds || selectedSegments;
     if (segmentsToCreate.length === 0 || klaviyoKeys.length === 0) {
       return;
@@ -201,20 +192,22 @@ export default function UnifiedDashboard() {
     }
 
     setView('results');
-  }, [selectedSegments, klaviyoKeys, activeKeyIndex, trackAction, createSegments]);
+  };
 
-  const handleRetryFailed = useCallback(async (failedSegmentIds: string[]) => {
+  const handleRetryFailed = async (failedSegmentIds: string[]) => {
     setResults([]);
     await handleCreateSegments(failedSegmentIds);
-  }, [handleCreateSegments]);
+  };
 
   const fetchAllSegments = async () => {
     if (klaviyoKeys.length === 0) {
+      console.log('No Klaviyo keys available');
       return;
     }
 
     const activeKey = klaviyoKeys[activeKeyIndex];
     if (!activeKey?.id) {
+      console.log('No active key ID available');
       return;
     }
 
@@ -222,6 +215,8 @@ export default function UnifiedDashboard() {
     setLoadingAnalytics(true);
     
     try {
+      console.log('Fetching segments with keyId:', activeKey.id);
+      
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
       // Fetch segments with tags (profile_count not available on list endpoint due to Klaviyo API limitations)
@@ -269,6 +264,9 @@ export default function UnifiedDashboard() {
         });
       }
       
+      console.log('Klaviyo segments fetched:', allFetchedSegments.length);
+      console.log('Tags collected:', Object.keys(includedTags).length);
+      
       // Fetch latest profile counts from historical data table
       let historicalCounts: Record<string, number> = {};
       if (currentUser?.id) {
@@ -289,6 +287,7 @@ export default function UnifiedDashboard() {
               historicalCounts[record.segment_klaviyo_id] = record.profile_count;
             }
           });
+          console.log('Historical profile counts loaded for', Object.keys(historicalCounts).length, 'segments');
         }
       }
       
@@ -382,26 +381,7 @@ export default function UnifiedDashboard() {
   }
 
   return (
-    <PageErrorBoundary pageName="Dashboard">
-    <div className="min-h-screen relative bg-background overflow-hidden">
-      {/* Animated gradient orbs background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[150px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px]" />
-      </div>
-      
-      {/* Grid pattern overlay */}
-      <div className="fixed inset-0 -z-10 bg-[linear-gradient(to_right,transparent_0%,hsl(var(--border)/0.02)_50%,transparent_100%)] bg-[length:100px_100px] pointer-events-none" />
-      {/* Session Timeout Warning */}
-      {showWarning && (
-        <SessionTimeoutWarning
-          onRefresh={refreshSession}
-          onDismiss={dismissWarning}
-          expiresAt={sessionExpiresAt}
-        />
-      )}
-
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Onboarding Tour */}
       {!tourLoading && (
         <OnboardingTour
@@ -433,20 +413,17 @@ export default function UnifiedDashboard() {
         <FeedbackWidget />
       </DashboardHeader>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Tubelight-style navigation */}
-          <div className="flex justify-center mb-8">
-            <TabsList className="w-auto">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
-              <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
-              <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="templates">Templates</TabsTrigger>
-              <TabsTrigger value="more">More</TabsTrigger>
-            </TabsList>
-          </div>
+          <TabsList className="grid w-full grid-cols-7 mb-8">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
+            <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
+            <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="more">More</TabsTrigger>
+          </TabsList>
 
           <TabsContent value="overview">
             <div data-tour="dashboard-stats" className="space-y-6">
@@ -467,27 +444,18 @@ export default function UnifiedDashboard() {
             />
 
             {selectedSegments.length > 0 && (
-              <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-card/80 via-card/95 to-card backdrop-blur-xl border border-primary/30 shadow-2xl relative overflow-hidden">
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
-                
-                <div className="relative flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center">
-                      <Target className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-lg">
-                        {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
-                      </p>
-                      <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
-                    </div>
+              <div className="mt-8 p-4 bg-card border border-border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">
+                      {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
+                    </p>
+                    <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
                   </div>
                   <Button
                     onClick={() => handleCreateSegments()}
                     disabled={creatingSegments}
                     size="lg"
-                    className="shadow-lg shadow-primary/20"
                   >
                     {creatingSegments ? 'Creating...' : 'Create Segments'}
                   </Button>
@@ -498,15 +466,14 @@ export default function UnifiedDashboard() {
 
           <TabsContent value="analytics">
             {klaviyoKeys.length === 0 ? (
-              <EmptyState
-                icon={Target}
-                title="Connect Klaviyo to view analytics"
-                description="Analytics show segment performance, profile counts, and growth trends. Connect your Klaviyo account to start tracking your audience data."
-                actionLabel="Connect Klaviyo"
-                onAction={() => navigate('/klaviyo-setup')}
-                secondaryActionLabel="Learn More"
-                onSecondaryAction={() => window.open('/help?article=klaviyo-setup', '_blank')}
-              />
+              <div className="bg-card border border-border rounded-lg p-8 text-center">
+                <p className="text-muted-foreground mb-4">
+                  Connect your Klaviyo account to view analytics
+                </p>
+                <Button onClick={() => navigate('/klaviyo-setup')}>
+                  Connect Klaviyo
+                </Button>
+              </div>
             ) : (
               <>
                 {/* Refresh button - always visible when Klaviyo is connected */}
@@ -535,17 +502,7 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="ai">
-            {klaviyoKeys.length === 0 ? (
-              <EmptyState
-                icon={Sparkles}
-                title="Connect Klaviyo to use AI"
-                description="AI segment suggestions analyze your Klaviyo data to recommend custom audience segments tailored to your business goals. Connect your account to get started."
-                actionLabel="Connect Klaviyo"
-                onAction={() => navigate('/klaviyo-setup')}
-                secondaryActionLabel="Learn about AI"
-                onSecondaryAction={() => window.open('/help?article=ai-features', '_blank')}
-              />
-            ) : (
+            {klaviyoKeys.length > 0 && (
               <AISegmentSuggester
                 activeKey={klaviyoKeys[activeKeyIndex]}
               />
@@ -553,15 +510,7 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="performance">
-            {klaviyoKeys.length === 0 ? (
-              <EmptyState
-                icon={Target}
-                title="Connect Klaviyo to view performance"
-                description="Track how your segments perform over time with detailed metrics on engagement, conversions, and growth. Connect your Klaviyo account to start."
-                actionLabel="Connect Klaviyo"
-                onAction={() => navigate('/klaviyo-setup')}
-              />
-            ) : (
+            {klaviyoKeys.length > 0 && (
               <SegmentPerformance 
                 klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
                 apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
@@ -586,11 +535,17 @@ export default function UnifiedDashboard() {
                   <AderaiSegmentManager klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
                 </>
               )}
+              <AutomationPlaybooks />
+              {klaviyoKeys.length > 0 && (
+                <SegmentCloner 
+                  currentKeyId={klaviyoKeys[activeKeyIndex].id}
+                  segments={allSegments}
+                />
+              )}
             </div>
           </TabsContent>
         </Tabs>
       </div>
     </div>
-    </PageErrorBoundary>
   );
 }

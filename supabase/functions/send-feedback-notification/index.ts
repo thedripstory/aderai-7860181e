@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { z } from "https://esm.sh/zod@3.22.4";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -23,32 +22,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Validate request body
-    const FeedbackSchema = z.object({
-      feedbackType: z.enum(['bug_report', 'feature_request', 'general', 'complaint']),
-      userName: z.string().min(1).max(255),
-      userEmail: z.string().email('Invalid email').max(255),
-      title: z.string().max(500).optional(),
-      description: z.string().min(1).max(5000),
-      metadata: z.record(z.any()),
-    });
-
-    const validationResult = FeedbackSchema.safeParse(await req.json());
-
-    if (!validationResult.success) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'Invalid feedback data',
-          details: validationResult.error.errors 
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
-    }
-
-    const { feedbackType, userName, userEmail, title, description, metadata } = validationResult.data;
+    const { feedbackType, userName, userEmail, title, description, metadata }: FeedbackNotificationRequest = await req.json();
 
     // Format the feedback type for display
     const typeDisplay = feedbackType === 'bug_report' ? 'Bug Report' 

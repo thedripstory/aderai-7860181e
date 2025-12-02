@@ -75,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
       klaviyo_connected: "✅",
     };
 
-    const dashboardUrl = Deno.env.get('SITE_URL') || 'https://aderai.io';
+    const dashboardUrl = 'https://aderai.io';
 
     // Handle klaviyo_connected template specially
     let subject = data.title;

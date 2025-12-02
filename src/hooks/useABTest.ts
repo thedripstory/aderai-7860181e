@@ -34,7 +34,7 @@ export function useABTest(testName: string): ABVariant {
     // Assign new variant based on weights
     const test = AB_TESTS[testName];
     if (!test) {
-      // Test not found, default to variant A
+      console.warn(`AB test "${testName}" not found`);
       return;
     }
 
@@ -63,7 +63,7 @@ async function trackABTestView(testName: string, variant: ABVariant) {
       page_url: window.location.href
     });
   } catch (error) {
-    // Silently fail - AB test tracking is not critical
+    console.error('Failed to track AB test view:', error);
   }
 }
 
@@ -84,6 +84,6 @@ export async function trackABTestConversion(testName: string) {
       page_url: window.location.href
     });
   } catch (error) {
-    // Silently fail - AB test tracking is not critical
+    console.error('Failed to track AB test conversion:', error);
   }
 }

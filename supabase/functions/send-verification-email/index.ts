@@ -3,7 +3,6 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 import React from "https://esm.sh/react@18.3.1";
 import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22";
 import { EmailVerification } from "./_templates/email-verification.tsx";
-import { z } from "https://esm.sh/zod@3.22.4";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -23,27 +22,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Validate request body
-    const VerificationEmailSchema = z.object({
-      email: z.string().email('Invalid email').max(255),
-    });
-
-    const validationResult = VerificationEmailSchema.safeParse(await req.json());
-
-    if (!validationResult.success) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'Invalid request data',
-          details: validationResult.error.errors 
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
-    }
-
-    const { email } = validationResult.data;
+    const { email }: VerificationEmailRequest = await req.json();
 
     if (!email) {
       throw new Error("Email is required");
@@ -51,8 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Generate verification token (in production, store this in database)
     const verificationToken = crypto.randomUUID();
-    const siteUrl = Deno.env.get('SITE_URL') || 'https://aderai.io';
-    const verificationUrl = `${siteUrl}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${Deno.env.get("VITE_SUPABASE_URL")}/verify-email?token=${verificationToken}`;
 
     // Render React Email template
     const html = await renderAsync(

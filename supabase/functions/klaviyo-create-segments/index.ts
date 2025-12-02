@@ -1927,12 +1927,6 @@ serve(async (req) => {
 
     console.log(`[klaviyo-create-segments] Creating ${segmentIds.length} segments...`);
 
-    // Rate limiting for bulk operations to prevent API abuse
-    if (segmentIds.length > 10) {
-      console.log(`[klaviyo-create-segments] Bulk operation detected: ${segmentIds.length} segments - adding rate limit delay`);
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
     // Step 1: Detect available metrics
     const metricMap = await detectAvailableMetrics(apiKey);
 
