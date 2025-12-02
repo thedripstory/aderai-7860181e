@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader, RefreshCw } from 'lucide-react';
+import { Loader, RefreshCw, Target, Key, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,7 +32,7 @@ import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import { SessionTimeoutWarning } from '@/components/SessionTimeoutWarning';
 import { PageErrorBoundary } from '@/components/PageErrorBoundary';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { ErrorHandler } from '@/lib/errorHandlers';
+import { EmptyState } from '@/components/ui/empty-state';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
@@ -483,14 +483,15 @@ export default function UnifiedDashboard() {
 
           <TabsContent value="analytics">
             {klaviyoKeys.length === 0 ? (
-              <div className="bg-card border border-border rounded-lg p-8 text-center">
-                <p className="text-muted-foreground mb-4">
-                  Connect your Klaviyo account to view analytics
-                </p>
-                <Button onClick={() => navigate('/klaviyo-setup')}>
-                  Connect Klaviyo
-                </Button>
-              </div>
+              <EmptyState
+                icon={Target}
+                title="Connect Klaviyo to view analytics"
+                description="Analytics show segment performance, profile counts, and growth trends. Connect your Klaviyo account to start tracking your audience data."
+                actionLabel="Connect Klaviyo"
+                onAction={() => navigate('/klaviyo-setup')}
+                secondaryActionLabel="Learn More"
+                onSecondaryAction={() => window.open('/help?article=klaviyo-setup', '_blank')}
+              />
             ) : (
               <>
                 {/* Refresh button - always visible when Klaviyo is connected */}
@@ -519,7 +520,17 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="ai">
-            {klaviyoKeys.length > 0 && (
+            {klaviyoKeys.length === 0 ? (
+              <EmptyState
+                icon={Sparkles}
+                title="Connect Klaviyo to use AI"
+                description="AI segment suggestions analyze your Klaviyo data to recommend custom audience segments tailored to your business goals. Connect your account to get started."
+                actionLabel="Connect Klaviyo"
+                onAction={() => navigate('/klaviyo-setup')}
+                secondaryActionLabel="Learn about AI"
+                onSecondaryAction={() => window.open('/help?article=ai-features', '_blank')}
+              />
+            ) : (
               <AISegmentSuggester
                 activeKey={klaviyoKeys[activeKeyIndex]}
               />
@@ -527,7 +538,15 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="performance">
-            {klaviyoKeys.length > 0 && (
+            {klaviyoKeys.length === 0 ? (
+              <EmptyState
+                icon={Target}
+                title="Connect Klaviyo to view performance"
+                description="Track how your segments perform over time with detailed metrics on engagement, conversions, and growth. Connect your Klaviyo account to start."
+                actionLabel="Connect Klaviyo"
+                onAction={() => navigate('/klaviyo-setup')}
+              />
+            ) : (
               <SegmentPerformance 
                 klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
                 apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}

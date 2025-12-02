@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
+import { sanitizeString } from '@/lib/inputSanitization';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -45,11 +46,14 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
     setAiLoading(true);
 
     try {
+      // Sanitize user input before sending to AI
+      const sanitizedPrompt = sanitizeString(aiPrompt);
+      
       const { data: response, error } = await supabase.functions.invoke('klaviyo-suggest-segments', {
         body: {
           apiKey: activeKey.klaviyo_api_key_hash,
           answers: {
-            businessGoal: aiPrompt,
+            businessGoal: sanitizedPrompt,
             currency: activeKey.currency,
             aov: activeKey.aov,
             vipThreshold: activeKey.vip_threshold,

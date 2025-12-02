@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, HelpCircle, Search, CheckCircle2, Package, Sparkles, Star, Eye, Keyboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SegmentPreviewModal } from './SegmentPreviewModal';
+import { EmptyState } from '@/components/ui/empty-state';
 import { toast } from 'sonner';
 
 export const SEGMENTS = [
@@ -1110,19 +1111,18 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
 
         {/* Empty State for Search */}
         {searchQuery && filteredSegments.length === 0 && (
-          <div className="text-center py-16 bg-muted/20 rounded-2xl border-2 border-dashed border-border">
-            <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">No segments found</h3>
-            <p className="text-muted-foreground mb-4">
-              Try adjusting your search term or browse by category
-            </p>
-            <button
-              onClick={() => setSearchQuery('')}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all"
-            >
-              Clear Search
-            </button>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="No segments match your search"
+            description="Try adjusting your search term or browse segments by category above"
+            actionLabel="Clear Search"
+            onAction={() => setSearchQuery('')}
+            secondaryActionLabel="View All Segments"
+            onSecondaryAction={() => {
+              setSearchQuery('');
+              setExpandedCategory(null);
+            }}
+          />
         )}
       </div>
     </div>

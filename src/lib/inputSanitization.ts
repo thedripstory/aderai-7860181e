@@ -1,6 +1,8 @@
+import DOMPurify from 'dompurify';
+
 /**
  * Input Sanitization Utilities
- * Prevents XSS attacks by sanitizing user inputs
+ * Prevents XSS attacks by sanitizing user inputs using DOMPurify
  */
 
 /**
@@ -11,11 +13,14 @@
 export function sanitizeString(input: string): string {
   if (!input) return '';
   
-  return input
-    .replace(/[<>]/g, '') // Remove < and > to prevent HTML injection
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+\s*=/gi, '') // Remove event handlers like onclick=
-    .trim();
+  // Use DOMPurify to strip all HTML tags
+  const clean = DOMPurify.sanitize(input, {
+    ALLOWED_TAGS: [], // No HTML tags allowed
+    ALLOWED_ATTR: [], // No attributes allowed
+    KEEP_CONTENT: true, // Keep text content
+  });
+  
+  return clean.trim();
 }
 
 /**
@@ -67,6 +72,47 @@ export function validatePassword(password: string): { isValid: boolean; error?: 
 }
 
 /**
+ * Sanitizes HTML content while allowing safe tags
+ * Use this for rich text content where some formatting is needed
+ */
+export function sanitizeHTML(html: string): string {
+  if (!html) return '';
+  
+  const clean = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
+    ALLOWED_ATTR: [],
+    KEEP_CONTENT: true,
+  });
+  
+  return clean;
+}
+
+/**
+ * Sanitize URL to prevent javascript: and data: URI schemes
+ */
+export function sanitizeURL(url: string): string {
+  const sanitized = sanitizeString(url);
+  
+  // Block dangerous protocols
+  if (
+    sanitized.toLowerCase().startsWith('javascript:') ||
+    sanitized.toLowerCase().startsWith('data:') ||
+    sanitized.toLowerCase().startsWith('vbscript:')
+  ) {
+    return '';
+  }
+  
+  return sanitized;
+}
+
+/**
+ * Limit string length to prevent DoS attacks
+ */
+export function limitLength(input: string, maxLength: number): string {
+  return input.slice(0, maxLength);
+}
+
+/**
  * Sanitizes form data object by applying appropriate sanitization to each field
  * @param data - Object containing form data
  * @returns Sanitized data object
@@ -88,7 +134,7 @@ export function sanitizeFormData<T extends Record<string, any>>(data: T): T {
         // If it looks like a number, sanitize as number
         sanitized[key] = sanitizeNumber(value) as any;
       } else {
-        // Generic string sanitization
+        // Generic string sanitization using DOMPurify
         sanitized[key] = sanitizeString(value) as any;
       }
     }
