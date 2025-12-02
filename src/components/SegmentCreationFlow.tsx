@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { SegmentResult } from '@/hooks/useKlaviyoSegments';
-import { SEGMENTS } from './SegmentDashboard';
+import { SEGMENTS } from '@/lib/segmentData';
 import { supabase } from "@/integrations/supabase/client";
 import { ErrorHandler } from '@/lib/errorHandlers';
 import { Progress } from '@/components/ui/progress';
