@@ -281,7 +281,7 @@ const KlaviyoSetup = () => {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <a href="/" className="group flex items-center gap-3">
+            <a href="/dashboard" className="group flex items-center gap-3">
               <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
                 aderai<span className="text-accent group-hover:animate-pulse">.</span>
               </div>

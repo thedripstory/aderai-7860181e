@@ -22,7 +22,7 @@ export default function Onboarding() {
         .from('users')
         .select('onboarding_completed, klaviyo_setup_completed')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
       if (userData?.onboarding_completed && userData?.klaviyo_setup_completed) {
         navigate('/dashboard');

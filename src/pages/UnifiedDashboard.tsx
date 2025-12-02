@@ -28,6 +28,8 @@ import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+import { SessionTimeoutWarning } from '@/components/SessionTimeoutWarning';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
@@ -40,6 +42,7 @@ export default function UnifiedDashboard() {
   const [view, setView] = useState<'creating' | 'results' | null>(null);
   const [emailVerified, setEmailVerified] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
 
   // Analytics state
   const [allSegments, setAllSegments] = useState<any[]>([]);
@@ -382,6 +385,15 @@ export default function UnifiedDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      {/* Session Timeout Warning */}
+      {showWarning && (
+        <SessionTimeoutWarning
+          onRefresh={refreshSession}
+          onDismiss={dismissWarning}
+          expiresAt={sessionExpiresAt}
+        />
+      )}
+
       {/* Onboarding Tour */}
       {!tourLoading && (
         <OnboardingTour

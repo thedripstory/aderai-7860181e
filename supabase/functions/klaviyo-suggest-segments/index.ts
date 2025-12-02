@@ -1,6 +1,12 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+
+const RequestSchema = z.object({
+  apiKey: z.string().min(1).max(500),
+  answers: z.record(z.string()).optional(),
+});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,16 +21,22 @@ serve(async (req) => {
   console.log('[klaviyo-suggest-segments] Request received');
 
   try {
-    let { apiKey, answers } = await req.json();
-    console.log('[klaviyo-suggest-segments] Parsed request body, has apiKey:', !!apiKey, ', has answers:', !!answers);
-
-    if (!apiKey || !answers) {
-      console.error('[klaviyo-suggest-segments] Missing required fields');
+    const body = await req.json();
+    const validationResult = RequestSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      console.error('[klaviyo-suggest-segments] Validation failed:', validationResult.error.issues);
       return new Response(
-        JSON.stringify({ error: 'Missing apiKey or answers' }),
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validationResult.error.issues 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    let { apiKey, answers } = validationResult.data;
+    console.log('[klaviyo-suggest-segments] Parsed request body, has apiKey:', !!apiKey, ', has answers:', !!answers);
 
     // Decrypt API key if encrypted
     if (isEncrypted(apiKey)) {
@@ -123,7 +135,7 @@ RULES:
 9. Always append " | Aderai" to segment names`;
 
     const userPrompt = `Brand Information:
-${Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n')}
+${answers ? Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n') : 'No additional information provided'}
 
 Based on this information and the available Klaviyo metrics, suggest segments that will help this brand achieve their goals.`;
 
