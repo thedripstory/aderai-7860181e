@@ -11,6 +11,7 @@ import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { sanitizeString } from '@/lib/inputSanitization';
+import { ErrorLogger } from '@/lib/errorLogger';
 
 const bugReportSchema = z.object({
   description: z.string().trim().min(10, 'Description must be at least 10 characters').max(1000, 'Description must be less than 1000 characters'),
@@ -113,7 +114,9 @@ export const FeedbackWidget: React.FC = () => {
       });
 
       if (emailError) {
-        console.error('Failed to send email notification:', emailError);
+        await ErrorLogger.logError(emailError, {
+          context: 'Failed to send feedback email notification',
+        });
       }
 
       trackAction('feedback_submitted', { type });
@@ -147,7 +150,9 @@ export const FeedbackWidget: React.FC = () => {
 
       handleClose();
     } catch (error: any) {
-      console.error('Error submitting feedback:', error);
+      await ErrorLogger.logError(error, {
+        context: 'Error submitting feedback',
+      });
       toast.error('Failed to submit feedback', {
         description: error.message || 'Please try again later',
       });

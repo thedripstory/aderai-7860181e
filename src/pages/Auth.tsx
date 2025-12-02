@@ -79,7 +79,10 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
 
           // If profile still doesn't exist after retries, create it manually
           if (!profileExists) {
-            console.warn('Profile not created by trigger, creating manually');
+            await ErrorLogger.logWarning('Profile not created by trigger, creating manually', {
+              userId: authData.user.id,
+              email: sanitizedEmail,
+            });
             
             const { error: createError } = await supabase
               .from('users')
@@ -93,7 +96,10 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
               });
 
             if (createError) {
-              console.error('Manual profile creation failed:', createError);
+              await ErrorLogger.logError(createError, {
+                context: 'Manual profile creation',
+                userId: authData.user.id,
+              });
               
               // Log to analytics
               await supabase.from('analytics_events').insert({
@@ -119,7 +125,10 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
                 user_id: authData.user.id,
               });
             } catch (notifErr) {
-              console.error('Failed to create notification preferences:', notifErr);
+              await ErrorLogger.logError(notifErr as Error, {
+                context: 'Failed to create notification preferences',
+                userId: authData.user.id,
+              });
             }
           }
 
@@ -134,7 +143,10 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
               },
             });
           } catch (emailError) {
-            console.error('Error sending welcome email:', emailError);
+            await ErrorLogger.logError(emailError as Error, {
+              context: 'Error sending welcome email',
+              userId: authData.user.id,
+            });
           }
 
           // Award "Beta Pioneer" achievement
@@ -154,7 +166,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
                 });
             }
           } catch (achievementError) {
-            console.error('Error awarding beta achievement:', achievementError);
+            // Silently handle - achievement might already be earned
           }
 
           toast({

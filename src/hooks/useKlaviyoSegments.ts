@@ -134,13 +134,18 @@ export const useKlaviyoSegments = () => {
       });
 
       if (error) {
-        console.error('[useKlaviyoSegments] Supabase function error:', error);
+        await ErrorLogger.logError(error, {
+          context: 'Supabase function error in segment creation',
+        });
         throw error;
       }
 
       if (!response) {
-        console.error('[useKlaviyoSegments] No response from edge function');
-        throw new Error('No response from segment creation service');
+        const err = new Error('No response from segment creation service');
+        await ErrorLogger.logError(err, {
+          context: 'Empty response from klaviyo-create-segments',
+        });
+        throw err;
       }
 
       // Handle case where response doesn't have results array
@@ -148,8 +153,10 @@ export const useKlaviyoSegments = () => {
 
       // Log metrics availability for debugging
       if (response.missingMetrics && response.missingMetrics.length > 0) {
-        console.warn('[useKlaviyoSegments] Missing Klaviyo metrics:', response.missingMetrics);
-        console.warn('[useKlaviyoSegments]', response.metricsNote);
+        await ErrorLogger.logWarning('Missing Klaviyo metrics detected', {
+          missingMetrics: response.missingMetrics,
+          note: response.metricsNote,
+        });
       }
 
       // Notify user about missing metrics
@@ -231,7 +238,9 @@ export const useKlaviyoSegments = () => {
 
       return newResults;
     } catch (error: any) {
-      console.error('Segment creation error:', error);
+      await ErrorLogger.logSegmentError(error, 'create_segments', {
+        segmentCount: expandedSegmentIds.length,
+      });
       
       // Log error to database for production monitoring
       await ErrorLogger.logSegmentError(
@@ -304,6 +313,8 @@ async function logSegmentOperation(
       metadata: { segmentId },
     });
   } catch (err) {
-    console.error('Failed to log segment operation:', err);
+    await ErrorLogger.logError(err as Error, {
+      context: 'Failed to log segment operation',
+    });
   }
 }

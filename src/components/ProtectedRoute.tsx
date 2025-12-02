@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ErrorLogger } from '@/lib/errorLogger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -27,7 +28,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             .maybeSingle();
 
           if (error) {
-            console.error('Error checking user profile:', error);
+            await ErrorLogger.logError(error, {
+              context: 'Error checking user profile',
+              userId: session.user.id,
+            });
             setHasProfile(false);
             
             // Log orphan user detection
@@ -48,7 +52,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             setHasProfile(!!profile);
           }
         } catch (err) {
-          console.error('Profile check failed:', err);
+          await ErrorLogger.logError(err as Error, {
+            context: 'Profile check failed',
+          });
           setHasProfile(false);
         }
       }
@@ -71,7 +77,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
                 .maybeSingle();
 
               if (error) {
-                console.error('Profile check error during auth change:', error);
+                await ErrorLogger.logError(error, {
+                  context: 'Profile check error during auth change',
+                  userId: session.user.id,
+                });
                 await supabase.from('analytics_events').insert({
                   user_id: session.user.id,
                   event_name: 'orphan_user_auth_change',
@@ -84,7 +93,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               
               setHasProfile(!!profile);
             } catch (err) {
-              console.error('Auth state change profile check failed:', err);
+              await ErrorLogger.logError(err as Error, {
+                context: 'Auth state change profile check failed',
+              });
               setHasProfile(false);
             }
           });

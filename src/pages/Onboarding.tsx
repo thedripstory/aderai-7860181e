@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { toast } from "sonner";
+import { ErrorLogger } from "@/lib/errorLogger";
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -27,14 +28,19 @@ export default function Onboarding() {
         .maybeSingle();
 
       if (userError) {
-        console.error('Error fetching user data:', userError);
+        await ErrorLogger.logError(userError, {
+          context: 'Error fetching user data in onboarding',
+        });
         toast.error('Error loading onboarding status. Please refresh the page.');
         setLoading(false);
         return;
       }
 
       if (!userData) {
-        console.error('User profile not found in onboarding');
+        await ErrorLogger.logError(new Error('User profile not found'), {
+          context: 'Onboarding',
+          userId: session.user.id,
+        });
         toast.error('Profile not found. Please contact support at akshat@aderai.io');
         navigate('/login');
         return;
@@ -83,7 +89,7 @@ export default function Onboarding() {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <a href="/" className="group flex items-center gap-3">
+            <a href="/dashboard" className="group flex items-center gap-3">
               <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
                 aderai<span className="text-accent group-hover:animate-pulse">.</span>
               </div>
