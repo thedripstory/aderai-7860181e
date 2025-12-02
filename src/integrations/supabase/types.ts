@@ -967,6 +967,7 @@ export type Database = {
           current_challenges: string | null
           email: string
           email_verified: boolean | null
+          first_name: string | null
           id: string
           industry: string | null
           klaviyo_setup_completed: boolean | null
@@ -987,6 +988,7 @@ export type Database = {
           current_challenges?: string | null
           email: string
           email_verified?: boolean | null
+          first_name?: string | null
           id?: string
           industry?: string | null
           klaviyo_setup_completed?: boolean | null
@@ -1007,6 +1009,7 @@ export type Database = {
           current_challenges?: string | null
           email?: string
           email_verified?: boolean | null
+          first_name?: string | null
           id?: string
           industry?: string | null
           klaviyo_setup_completed?: boolean | null

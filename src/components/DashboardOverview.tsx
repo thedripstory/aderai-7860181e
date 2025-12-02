@@ -19,6 +19,7 @@ import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { LoadingState } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { HelpTooltip } from '@/components/HelpTooltip';
 
 const TOTAL_AVAILABLE_SEGMENTS = 70;
 
@@ -127,7 +128,10 @@ export const DashboardOverview = () => {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Segments Created</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-sm font-medium">Segments Created</CardTitle>
+              <HelpTooltip content="Total number of segments you've deployed to your Klaviyo account using Aderai" />
+            </div>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -140,7 +144,10 @@ export const DashboardOverview = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">AI Suggestions Used</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-sm font-medium">AI Suggestions Used</CardTitle>
+              <HelpTooltip content="Number of times you've used AI to generate custom segment recommendations based on your business goals" />
+            </div>
             <Sparkles className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -153,7 +160,10 @@ export const DashboardOverview = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Days Active</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-sm font-medium">Days Active</CardTitle>
+              <HelpTooltip content="Number of days since you created your Aderai account" />
+            </div>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -166,7 +176,10 @@ export const DashboardOverview = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Klaviyo Status</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-sm font-medium">Klaviyo Status</CardTitle>
+              <HelpTooltip content="Shows whether your Klaviyo account is connected. You need an active connection to create and manage segments" />
+            </div>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
