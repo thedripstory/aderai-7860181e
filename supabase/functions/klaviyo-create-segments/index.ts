@@ -97,8 +97,7 @@ function buildMetricCondition(
     }
   };
 
-  // FIXED: For "over all time", omit timeframe_filter entirely (don't set to null)
-  // Only add timeframe_filter when using specific time ranges
+  // Klaviyo API REQUIRES timeframe_filter for profile-metric conditions
   if (timeframe.type === 'in-the-last') {
     condition.timeframe_filter = {
       type: 'date',
@@ -112,8 +111,13 @@ function buildMetricCondition(
       operator: 'after',
       value: timeframe.date
     };
+  } else {
+    // For 'over-all-time', use preset type
+    condition.timeframe_filter = {
+      type: 'preset',
+      preset: 'over-all-time'
+    };
   }
-  // For 'over-all-time', we simply don't add timeframe_filter at all
 
   return condition;
 }
