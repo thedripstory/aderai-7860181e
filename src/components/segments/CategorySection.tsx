@@ -83,7 +83,7 @@ export function CategorySection({
                 e.stopPropagation();
                 onClearAllInCategory();
               }}
-              className="px-4 py-2 text-sm font-medium border-2 border-destructive/50 text-destructive rounded-lg hover:bg-destructive/10 transition-all"
+              className="px-4 py-2 text-sm font-medium border-2 border-primary/50 text-primary rounded-lg hover:bg-primary/10 transition-all"
             >
               Clear All
             </button>
