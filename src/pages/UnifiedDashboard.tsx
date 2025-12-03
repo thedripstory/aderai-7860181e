@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
@@ -434,11 +435,20 @@ export default function UnifiedDashboard() {
               <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
               <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
               <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
-              <TabsTrigger value="performance" className="relative group/perf">
+              <TabsTrigger value="performance" className="relative">
                 Performance
-                <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-600 rounded-full border border-amber-500/30 cursor-help" title="Under maintenance - Some features may be incomplete">
-                  🔧
-                </span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-600 rounded-full border border-amber-500/30 cursor-help">
+                        🔧
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      <p>Under maintenance - Some features may be incomplete</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </TabsTrigger>
               <TabsTrigger value="more">More</TabsTrigger>
             </TabsList>
