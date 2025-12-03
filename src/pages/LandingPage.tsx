@@ -562,9 +562,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-        {/* Segment Flow Effect Section */}
-        <SegmentFlowEffect />
-
         {/* Comparison Chart Section */}
         <ScrollReveal>
           <ComparisonChart />
@@ -762,6 +759,9 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+
+          {/* Segment Flow Effect Section */}
+          <SegmentFlowEffect />
 
           {/* Newsletter Section - Unique Element */}
           <div className="py-16 border-b border-border/50">
