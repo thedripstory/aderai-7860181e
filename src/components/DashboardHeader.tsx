@@ -126,7 +126,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 
                 <DropdownMenuItem 
                   onClick={handleLogout}
-                  className="cursor-pointer py-2.5 text-destructive focus:text-destructive"
+                  className="cursor-pointer py-2.5 text-destructive focus:text-destructive hover:!bg-destructive hover:!text-white [&:hover_svg]:text-white"
                 >
                   <LogOut className="w-4 h-4 mr-3" />
                   <span className="font-medium">Sign Out</span>
