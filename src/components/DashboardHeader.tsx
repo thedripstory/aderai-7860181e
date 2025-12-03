@@ -41,15 +41,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <div className="flex items-center gap-3">
             <a 
               href="/dashboard" 
-              className="group flex items-center gap-3 transition-opacity hover:opacity-80"
+              className="group flex flex-col transition-opacity hover:opacity-80"
             >
               <AderaiLogo size="lg" />
-              
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-accent" />
-                <span className="text-xs font-semibold text-accent tracking-wide uppercase">
-                  AI Segmentation
-                </span>
+              <div className="flex items-center gap-1.5 mt-0.5 opacity-60">
+                <span className="text-[10px] text-muted-foreground">Powered by</span>
+                <img 
+                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png" 
+                  alt="Klaviyo" 
+                  className="h-3 w-auto"
+                />
               </div>
             </a>
           </div>
