@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Sparkles, Loader, CheckCircle, Lightbulb, AlertCircle, HelpCircle } from 'lucide-react';
+import { Sparkles, Loader, CheckCircle, Lightbulb, AlertCircle, HelpCircle, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
 import { sanitizeString } from '@/lib/inputSanitization';
 import { SegmentCreationModal } from '@/components/SegmentCreationModal';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -314,14 +315,21 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
                 <div className="flex-1">
                   <h4 className="text-lg font-bold mb-2">{suggestion.name}</h4>
                   <p className="text-sm text-muted-foreground mb-4">{suggestion.description}</p>
-                  <div className="bg-muted p-3 rounded-lg text-xs font-mono overflow-x-auto">
-                    <span className="font-medium font-sans">Definition: </span>
-                    <pre className="mt-1 whitespace-pre-wrap break-words">
-                      {typeof suggestion.definition === 'object'
-                        ? JSON.stringify(suggestion.definition, null, 2)
-                        : suggestion.definition || 'Custom AI-generated criteria'}
-                    </pre>
-                  </div>
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors group">
+                      <ChevronDown className="w-3 h-3 transition-transform group-data-[state=open]:rotate-180" />
+                      <span>View technical definition</span>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="bg-muted p-3 rounded-lg text-xs font-mono overflow-x-auto mt-2">
+                        <pre className="whitespace-pre-wrap break-words">
+                          {typeof suggestion.definition === 'object'
+                            ? JSON.stringify(suggestion.definition, null, 2)
+                            : suggestion.definition || 'Custom AI-generated criteria'}
+                        </pre>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
               </div>
               <button
