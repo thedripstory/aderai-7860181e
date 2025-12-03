@@ -28,8 +28,6 @@ import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
-import { useSessionTimeout } from '@/hooks/useSessionTimeout';
-import { SessionTimeoutWarning } from '@/components/SessionTimeoutWarning';
 import { PageErrorBoundary } from '@/components/PageErrorBoundary';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -48,7 +46,6 @@ export default function UnifiedDashboard() {
   const [view, setView] = useState<'creating' | 'results' | null>(null);
   const [emailVerified, setEmailVerified] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
 
   // Analytics state
   const [allSegments, setAllSegments] = useState<any[]>([]);
@@ -393,14 +390,6 @@ export default function UnifiedDashboard() {
       
       {/* Grid pattern overlay */}
       <div className="fixed inset-0 -z-10 bg-[linear-gradient(to_right,transparent_0%,hsl(var(--border)/0.02)_50%,transparent_100%)] bg-[length:100px_100px] pointer-events-none" />
-      {/* Session Timeout Warning */}
-      {showWarning && (
-        <SessionTimeoutWarning
-          onRefresh={refreshSession}
-          onDismiss={dismissWarning}
-          expiresAt={sessionExpiresAt}
-        />
-      )}
 
       {/* Onboarding Tour */}
       {!tourLoading && (
