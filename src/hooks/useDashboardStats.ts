@@ -79,17 +79,15 @@ export function useDashboardStats() {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      // Get segments created count
-      const { data: aiSuggestions } = await supabase
-        .from('ai_suggestions')
-        .select('created_segments')
-        .eq('user_id', user.id);
+      // Get segments created count from segment_operations (successful creates)
+      const { data: segmentOps, count: segmentCount } = await supabase
+        .from('segment_operations')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id)
+        .eq('operation_type', 'create')
+        .eq('operation_status', 'success');
 
-      let totalSegmentsCreated = 0;
-      aiSuggestions?.forEach(suggestion => {
-        const segments = suggestion.created_segments as any[];
-        totalSegmentsCreated += segments?.length || 0;
-      });
+      const totalSegmentsCreated = segmentCount || 0;
 
       // Get recent activity from analytics_events
       const { data: recentEvents } = await supabase
