@@ -481,34 +481,6 @@ export default function UnifiedDashboard() {
               } : DEFAULT_SEGMENT_SETTINGS}
             />
 
-            {selectedSegments.length > 0 && (
-              <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-card/80 via-card/95 to-card backdrop-blur-xl border border-primary/30 shadow-2xl relative overflow-hidden">
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
-                
-                <div className="relative flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center">
-                      <Target className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-lg">
-                        {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
-                      </p>
-                      <p className="text-sm text-muted-foreground">Ready to create in Klaviyo</p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => handleCreateSegments()}
-                    disabled={creatingSegments}
-                    size="lg"
-                    className="shadow-lg shadow-primary/20"
-                  >
-                    {creatingSegments ? 'Creating...' : 'Create Segments'}
-                  </Button>
-                </div>
-              </div>
-            )}
           </TabsContent>
 
           <TabsContent value="analytics">
@@ -602,6 +574,37 @@ export default function UnifiedDashboard() {
         </Tabs>
       </div>
     </div>
+    
+    {/* Floating sticky segment selection bar */}
+    {selectedSegments.length > 0 && (
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
+        <div className="p-4 rounded-2xl bg-card/95 backdrop-blur-xl border border-primary/30 shadow-2xl shadow-primary/10 relative overflow-hidden">
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
+          
+          <div className="relative flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                <Target className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-bold">
+                  {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
+                </p>
+                <p className="text-xs text-muted-foreground">Ready to create in Klaviyo</p>
+              </div>
+            </div>
+            <Button
+              onClick={() => handleCreateSegments()}
+              disabled={creatingSegments}
+              className="shadow-lg shadow-primary/20 flex-shrink-0"
+            >
+              {creatingSegments ? 'Creating...' : 'Create Segments'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
     </PageErrorBoundary>
   );
 }
