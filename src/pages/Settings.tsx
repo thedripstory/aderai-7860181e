@@ -59,6 +59,7 @@ export default function Settings() {
 
   // Account settings
   const [accountName, setAccountName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
 
   // Threshold settings
@@ -87,12 +88,13 @@ export default function Settings() {
 
       const { data: userData } = await supabase
         .from("users")
-        .select("account_name, email, email_verified")
+        .select("account_name, first_name, email, email_verified")
         .eq("id", user.id)
         .single();
 
       if (userData) {
         setAccountName(userData.account_name);
+        setFirstName(userData.first_name || "");
         setEmail(userData.email);
         setEmailVerified(userData.email_verified || false);
       }
@@ -159,14 +161,27 @@ export default function Settings() {
       return;
     }
 
+    if (!firstName.trim()) {
+      toast({
+        title: "First name required",
+        description: "Please enter your first name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // Sanitize account name before saving
+      // Sanitize inputs before saving
       const sanitizedAccountName = sanitizeString(accountName);
+      const sanitizedFirstName = sanitizeString(firstName);
       
       const { error } = await supabase
         .from("users")
-        .update({ account_name: sanitizedAccountName })
+        .update({ 
+          account_name: sanitizedAccountName,
+          first_name: sanitizedFirstName
+        })
         .eq("id", currentUser.id);
 
       if (error) throw error;
@@ -404,7 +419,19 @@ export default function Settings() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="accountName">Account Name</Label>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Enter your first name"
+                    className="max-w-md"
+                  />
+                  <p className="text-xs text-muted-foreground">This is how we'll greet you in the dashboard</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="accountName">Account Name / Brand Name</Label>
                   <Input
                     id="accountName"
                     value={accountName}

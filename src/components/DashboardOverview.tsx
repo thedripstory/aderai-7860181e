@@ -32,7 +32,7 @@ export const DashboardOverview = () => {
     daysSinceSignup, 
     klaviyoConnected,
     recentActivity,
-    accountName,
+    firstName,
     tipOfTheDay,
     loading 
   } = useDashboardStats();
@@ -106,7 +106,7 @@ export const DashboardOverview = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-3xl font-bold mb-2 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent">
-                {accountName ? `Welcome back, ${accountName}!` : 'Welcome back!'}
+                {firstName ? `Welcome back, ${firstName}!` : 'Welcome back!'}
               </CardTitle>
               <CardDescription className="flex items-center gap-2 text-base">
                 <Calendar className="w-4 h-4" />

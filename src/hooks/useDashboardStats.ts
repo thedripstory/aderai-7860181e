@@ -12,7 +12,7 @@ interface DashboardStats {
     timestamp: string;
     metadata?: any;
   }>;
-  accountName: string;
+  firstName: string;
   loading: boolean;
 }
 
@@ -34,7 +34,7 @@ export function useDashboardStats() {
     daysSinceSignup: 0,
     klaviyoConnected: false,
     recentActivity: [],
-    accountName: '',
+    firstName: '',
     loading: true,
   });
 
@@ -112,7 +112,7 @@ export function useDashboardStats() {
         daysSinceSignup,
         klaviyoConnected: (klaviyoKeys?.length || 0) > 0,
         recentActivity,
-        accountName: userData?.first_name || 'User',
+        firstName: userData?.first_name || 'User',
         loading: false,
       });
     } catch (error) {
