@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
@@ -13,6 +14,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const DAILY_LIMIT = 10;
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -21,7 +24,7 @@ serve(async (req) => {
   console.log('[klaviyo-suggest-segments] Request received');
 
   try {
-    // Get user ID from JWT
+    // Get user from JWT
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       return new Response(
@@ -30,26 +33,85 @@ serve(async (req) => {
       );
     }
 
-    // Check rate limit before processing
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    const limitCheckResponse = await fetch(`${supabaseUrl}/functions/v1/check-ai-limit`, {
-      method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json',
-      },
-    });
+    // Create Supabase client with user's auth
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
 
-    if (!limitCheckResponse.ok) {
-      const limitError = await limitCheckResponse.json();
-      console.error('[klaviyo-suggest-segments] Rate limit check failed:', limitError);
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('[klaviyo-suggest-segments] Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('[klaviyo-suggest-segments] User authenticated:', user.id);
+
+    // Check rate limit directly from database
+    const today = new Date().toISOString().split('T')[0];
+    let { data: limits, error: fetchError } = await supabaseClient
+      .from('usage_limits')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error('[klaviyo-suggest-segments] Error fetching limits:', fetchError);
+      throw fetchError;
+    }
+
+    // Create limits record if doesn't exist
+    if (!limits) {
+      const { data: newLimits, error: insertError } = await supabaseClient
+        .from('usage_limits')
+        .insert({
+          user_id: user.id,
+          ai_suggestions_today: 0,
+          ai_suggestions_total: 0,
+          last_reset_date: today,
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('[klaviyo-suggest-segments] Error creating limits:', insertError);
+        throw insertError;
+      }
+      limits = newLimits;
+    }
+
+    // Reset daily counter if needed
+    if (limits.last_reset_date !== today) {
+      const { data: updatedLimits, error: updateError } = await supabaseClient
+        .from('usage_limits')
+        .update({
+          ai_suggestions_today: 0,
+          last_reset_date: today,
+        })
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('[klaviyo-suggest-segments] Error resetting limits:', updateError);
+        throw updateError;
+      }
+      limits = updatedLimits;
+    }
+
+    // Check if user has remaining suggestions
+    if (limits.ai_suggestions_today >= DAILY_LIMIT) {
+      console.log('[klaviyo-suggest-segments] Rate limit exceeded for user:', user.id);
       return new Response(
         JSON.stringify({ 
           error: 'Rate limit exceeded',
           message: 'You have reached your daily limit for AI suggestions. Please try again tomorrow.',
-          limit: 10,
+          limit: DAILY_LIMIT,
+          remaining: 0,
           resetTime: 'midnight UTC'
         }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -109,13 +171,13 @@ serve(async (req) => {
     }));
     console.log('[klaviyo-suggest-segments] Found', availableMetrics.length, 'metrics');
 
-    // Call OpenAI to suggest segments
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      console.error('[klaviyo-suggest-segments] OPENAI_API_KEY not configured');
-      throw new Error('OPENAI_API_KEY not configured. Please add this secret in your Supabase Edge Functions settings.');
+    // Use Lovable AI Gateway instead of OpenAI directly
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) {
+      console.error('[klaviyo-suggest-segments] LOVABLE_API_KEY not configured');
+      throw new Error('LOVABLE_API_KEY not configured');
     }
-    console.log('[klaviyo-suggest-segments] OpenAI API key found, calling OpenAI...');
+    console.log('[klaviyo-suggest-segments] Using Lovable AI Gateway...');
 
     const systemPrompt = `You are a Klaviyo segmentation expert. Based on the user's brand information and available Klaviyo metrics, suggest 3-5 highly relevant customer segments.
 
@@ -169,60 +231,66 @@ RULES:
 8. For conditions where ANY can be true (OR logic), use separate condition_groups
 9. Always append " | Aderai" to segment names`;
 
-    const userPrompt = `Brand Information:
+    const userPrompt = `User's goal: ${answers?.goal || 'Create useful customer segments'}
+
+Brand Information:
 ${answers ? Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n') : 'No additional information provided'}
 
 Based on this information and the available Klaviyo metrics, suggest segments that will help this brand achieve their goals.`;
 
-    const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.7,
         response_format: { type: "json_object" },
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('[klaviyo-suggest-segments] OpenAI API error:', aiResponse.status, errorText);
+      console.error('[klaviyo-suggest-segments] AI Gateway error:', aiResponse.status, errorText);
       
-      // Parse error for more specific message
-      try {
-        const errorJson = JSON.parse(errorText);
-        if (errorJson.error?.code === 'insufficient_quota') {
-          throw new Error('OpenAI API quota exceeded. Please check your OpenAI billing and add credits.');
-        }
-        throw new Error(`OpenAI API error: ${errorJson.error?.message || errorText}`);
-      } catch (parseError) {
-        if (parseError instanceof Error && parseError.message.includes('OpenAI')) {
-          throw parseError;
-        }
-        throw new Error(`OpenAI API error: ${aiResponse.status} - ${errorText}`);
+      if (aiResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'AI rate limit exceeded. Please try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
+      if (aiResponse.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'AI credits exhausted. Please contact support.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      throw new Error(`AI Gateway error: ${aiResponse.status} - ${errorText}`);
     }
 
-    console.log('[klaviyo-suggest-segments] OpenAI response received successfully');
+    console.log('[klaviyo-suggest-segments] AI response received successfully');
     const aiData = await aiResponse.json();
     const suggestedSegments = JSON.parse(aiData.choices[0].message.content);
     console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
 
     // Increment AI usage counter after successful operation
-    await fetch(`${supabaseUrl}/functions/v1/increment-ai-usage`, {
-      method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json',
-      },
-    }).catch(err => console.error('[klaviyo-suggest-segments] Failed to increment usage:', err));
+    const { error: incrementError } = await supabaseClient
+      .from('usage_limits')
+      .update({
+        ai_suggestions_today: limits.ai_suggestions_today + 1,
+        ai_suggestions_total: limits.ai_suggestions_total + 1,
+      })
+      .eq('user_id', user.id);
+
+    if (incrementError) {
+      console.error('[klaviyo-suggest-segments] Failed to increment usage:', incrementError);
+    }
 
     return new Response(
       JSON.stringify(suggestedSegments),
