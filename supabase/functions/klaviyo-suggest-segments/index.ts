@@ -6,7 +6,7 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RequestSchema = z.object({
   apiKey: z.string().min(1).max(500),
-  answers: z.record(z.string()).optional(),
+  answers: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
 });
 
 const corsHeaders = {
@@ -56,79 +56,6 @@ serve(async (req) => {
     }
 
     console.log('[klaviyo-suggest-segments] User ID:', userId);
-
-    // Use service role for database operations
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Check rate limit directly from database
-    const today = new Date().toISOString().split('T')[0];
-    let { data: limits, error: fetchError } = await supabaseAdmin
-      .from('usage_limits')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (fetchError) {
-      console.error('[klaviyo-suggest-segments] Error fetching limits:', fetchError);
-      throw fetchError;
-    }
-
-    // Create limits record if doesn't exist
-    if (!limits) {
-      const { data: newLimits, error: insertError } = await supabaseAdmin
-        .from('usage_limits')
-        .insert({
-          user_id: userId,
-          ai_suggestions_today: 0,
-          ai_suggestions_total: 0,
-          last_reset_date: today,
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error('[klaviyo-suggest-segments] Error creating limits:', insertError);
-        throw insertError;
-      }
-      limits = newLimits;
-    }
-
-    // Reset daily counter if needed
-    if (limits.last_reset_date !== today) {
-      const { data: updatedLimits, error: updateError } = await supabaseAdmin
-        .from('usage_limits')
-        .update({
-          ai_suggestions_today: 0,
-          last_reset_date: today,
-        })
-        .eq('user_id', userId)
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error('[klaviyo-suggest-segments] Error resetting limits:', updateError);
-        throw updateError;
-      }
-      limits = updatedLimits;
-    }
-
-    // Check if user has remaining suggestions
-    if (limits.ai_suggestions_today >= DAILY_LIMIT) {
-      console.log('[klaviyo-suggest-segments] Rate limit exceeded for user:', userId);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Rate limit exceeded',
-          message: 'You have reached your daily limit for AI suggestions. Please try again tomorrow.',
-          limit: DAILY_LIMIT,
-          remaining: 0,
-          resetTime: 'midnight UTC'
-        }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
 
     const body = await req.json();
     const validationResult = RequestSchema.safeParse(body);
@@ -299,19 +226,6 @@ Based on this information and the available Klaviyo metrics, suggest segments th
     }
     
     console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
-
-    // Increment AI usage counter after successful operation
-    const { error: incrementError } = await supabaseAdmin
-      .from('usage_limits')
-      .update({
-        ai_suggestions_today: limits.ai_suggestions_today + 1,
-        ai_suggestions_total: limits.ai_suggestions_total + 1,
-      })
-      .eq('user_id', userId);
-
-    if (incrementError) {
-      console.error('[klaviyo-suggest-segments] Failed to increment usage:', incrementError);
-    }
 
     return new Response(
       JSON.stringify(suggestedSegments),
