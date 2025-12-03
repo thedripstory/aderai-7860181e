@@ -197,8 +197,21 @@ body {
     offset-path: path("M 124 10 v 10 q 0 5 -5 5 h -14 q -5 0 -5 5 v 25");
   }
 
-  .db-light-4 {
+.db-light-4 {
     offset-path: path("M 170 10 v 15 q 0 5 -5 5 h -60 q -5 0 -5 5 v 25");
+  }
+
+  .db-badge-group {
+    cursor: pointer;
+    transition: filter 0.2s ease;
+  }
+
+  .db-badge-group:hover .db-badge-rect {
+    filter: drop-shadow(0 0 8px hsl(5, 77%, 66%, 0.6));
+  }
+
+  .db-badge-group:hover {
+    filter: brightness(1.2);
   }
 
   @keyframes database-animation-path {
