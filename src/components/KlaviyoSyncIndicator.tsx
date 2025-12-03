@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Activity, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface KlaviyoSyncIndicatorProps {
@@ -14,7 +14,12 @@ export const KlaviyoSyncIndicator: React.FC<KlaviyoSyncIndicatorProps> = ({
   const [status, setStatus] = useState<'checking' | 'connected' | 'error'>('checking');
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
 
-  const checkKlaviyoHealth = async () => {
+  const checkKlaviyoHealth = useCallback(async () => {
+    if (!klaviyoKeyId || !apiKey) {
+      setStatus('error');
+      return;
+    }
+
     setStatus('checking');
     
     try {
@@ -26,18 +31,34 @@ export const KlaviyoSyncIndicator: React.FC<KlaviyoSyncIndicatorProps> = ({
         },
       });
 
-      if (error || !data) {
+      // Check if we got actual error data or rate limiting
+      if (error) {
+        // Network or function error
         setStatus('error');
-      } else {
+      } else if (data?.errors) {
+        // Klaviyo returned errors - check if it's just rate limiting
+        const isRateLimited = data.errors.some((e: any) => e.status === 429 || e.code === 'throttled');
+        if (isRateLimited) {
+          // Rate limited means we're connected, just throttled temporarily
+          setStatus('connected');
+        } else {
+          // Actual API error (auth, etc)
+          setStatus('error');
+        }
+      } else if (data?.data || data) {
+        // Successful response
         setStatus('connected');
+      } else {
+        setStatus('error');
       }
+      
       setLastChecked(new Date());
     } catch (error) {
       console.error('Klaviyo health check failed:', error);
       setStatus('error');
       setLastChecked(new Date());
     }
-  };
+  }, [klaviyoKeyId, apiKey]);
 
   useEffect(() => {
     // Initial check
@@ -47,7 +68,7 @@ export const KlaviyoSyncIndicator: React.FC<KlaviyoSyncIndicatorProps> = ({
     const interval = setInterval(checkKlaviyoHealth, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [klaviyoKeyId]);
+  }, [checkKlaviyoHealth]);
 
   const getStatusColor = () => {
     switch (status) {
@@ -65,13 +86,13 @@ export const KlaviyoSyncIndicator: React.FC<KlaviyoSyncIndicatorProps> = ({
   const getStatusIcon = () => {
     switch (status) {
       case 'connected':
-        return <CheckCircle className="w-4 h-4" />;
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'error':
-        return <AlertCircle className="w-4 h-4" />;
+        return <AlertCircle className="w-4 h-4 text-red-500" />;
       case 'checking':
-        return <Loader className="w-4 h-4 animate-spin" />;
+        return <Loader className="w-4 h-4 animate-spin text-yellow-500" />;
       default:
-        return <Activity className="w-4 h-4" />;
+        return null;
     }
   };
 
