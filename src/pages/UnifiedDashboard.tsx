@@ -21,7 +21,7 @@ import { KlaviyoHealthDashboard } from '@/components/KlaviyoHealthDashboard';
 import { SegmentHistoricalTrends } from '@/components/SegmentHistoricalTrends';
 import { SegmentOperationHistory } from '@/components/SegmentOperationHistory';
 import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
-import { SegmentPerformance } from '@/components/SegmentPerformance';
+import { PerformanceDashboard } from '@/components/performance';
 
 import { AchievementsPanel } from '@/components/AchievementsPanel';
 import { ErrorLogger } from '@/lib/errorLogger';
@@ -557,12 +557,12 @@ export default function UnifiedDashboard() {
               <EmptyState
                 icon={Target}
                 title="Connect Klaviyo to view performance"
-                description="Track how your segments perform over time with detailed metrics on engagement, conversions, and growth. Connect your Klaviyo account to start."
+                description="Track segments, campaigns, flows, and get AI-powered insights. Connect your Klaviyo account to unlock comprehensive marketing analytics."
                 actionLabel="Connect Klaviyo"
                 onAction={() => navigate('/klaviyo-setup')}
               />
             ) : (
-              <SegmentPerformance 
+              <PerformanceDashboard 
                 klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
                 apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
               />
