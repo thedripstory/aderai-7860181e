@@ -302,10 +302,12 @@ const KlaviyoSetup = () => {
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">Dashboard</span>
               </Button>
-              <a href="/dashboard" className="group flex items-center gap-3">
-                <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-                  aderai<span className="text-accent group-hover:animate-pulse">.</span>
-                </div>
+              <a href="/dashboard" className="flex items-center hover:scale-105 transition-transform duration-300">
+                <img 
+                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/black-logo-png.png" 
+                  alt="Aderai" 
+                  className="h-8 w-auto dark:invert"
+                />
               </a>
             </div>
           </div>

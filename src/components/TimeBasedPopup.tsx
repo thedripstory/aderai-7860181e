@@ -83,9 +83,11 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
 
         <div className="text-center space-y-6">
           <div className="mx-auto flex items-center justify-center mb-2">
-            <span className="text-4xl font-playfair font-bold">
-              aderai<span className="text-accent">.</span>
-            </span>
+            <img 
+              src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/black-logo-png.png" 
+              alt="Aderai" 
+              className="h-10 w-auto dark:invert"
+            />
           </div>
 
           <div className="space-y-3">

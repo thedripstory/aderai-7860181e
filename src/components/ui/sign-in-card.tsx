@@ -208,10 +208,12 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", duration: 0.8 }}
                 >
-                  <Link to="/" className="inline-block group">
-                    <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-                      aderai<span className="text-accent group-hover:animate-pulse">.</span>
-                    </div>
+                  <Link to="/" className="inline-block hover:scale-105 transition-transform duration-300">
+                    <img 
+                      src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/black-logo-png.png" 
+                      alt="Aderai" 
+                      className="h-10 w-auto dark:invert"
+                    />
                   </Link>
                 </motion.div>
 
