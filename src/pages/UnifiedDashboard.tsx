@@ -577,27 +577,30 @@ export default function UnifiedDashboard() {
     
     {/* Floating sticky segment selection bar */}
     {selectedSegments.length > 0 && (
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
-        <div className="p-4 rounded-2xl bg-card/95 backdrop-blur-xl border border-primary/30 shadow-2xl shadow-primary/10 relative overflow-hidden">
-          {/* Glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 animate-fade-in">
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/95 to-primary/85 backdrop-blur-xl border border-primary-foreground/20 shadow-2xl shadow-primary/40 relative overflow-hidden">
+          {/* Animated glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-white/10" />
+          <div className="absolute -inset-1 bg-primary/30 blur-xl -z-10" />
           
           <div className="relative flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0">
-                <Target className="w-5 h-5 text-primary" />
+              <div className="w-11 h-11 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center flex-shrink-0">
+                <Target className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
-                <p className="font-bold">
+                <p className="font-bold text-primary-foreground text-lg">
                   {selectedSegments.length} segment{selectedSegments.length !== 1 ? 's' : ''} selected
                 </p>
-                <p className="text-xs text-muted-foreground">Ready to create in Klaviyo</p>
+                <p className="text-sm text-primary-foreground/80">Ready to create in Klaviyo</p>
               </div>
             </div>
             <Button
               onClick={() => handleCreateSegments()}
               disabled={creatingSegments}
-              className="shadow-lg shadow-primary/20 flex-shrink-0"
+              variant="secondary"
+              size="lg"
+              className="bg-white text-primary hover:bg-white/90 font-semibold shadow-lg flex-shrink-0"
             >
               {creatingSegments ? 'Creating...' : 'Create Segments'}
             </Button>
