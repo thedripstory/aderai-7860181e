@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle } from "lucide-react";
 import { TubelightNavbar } from "@/components/TubelightNavbar";
 import { useABTest, trackABTestConversion } from "@/hooks/useABTest";
@@ -601,39 +601,54 @@ export default function LandingPage() {
             </ScrollReveal>
 
             <div className="relative min-h-[550px] md:min-h-[700px]">
-              {/* LIVE USERS badge - centered above globe */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20">
-                <span className="inline-block bg-gradient-to-b from-black to-gray-500 bg-clip-text text-3xl md:text-4xl font-bold leading-none text-transparent tracking-wider">
-                  LIVE USERS
-                </span>
-              </div>
+              {/* SVG Connecting Lines */}
+              <svg className="absolute inset-0 w-full h-full z-10 pointer-events-none hidden md:block" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="line-gradient-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(251, 100, 21, 0.3)" />
+                    <stop offset="100%" stopColor="rgba(251, 100, 21, 0)" />
+                  </linearGradient>
+                  <linearGradient id="line-gradient-2" x1="100%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(251, 100, 21, 0.3)" />
+                    <stop offset="100%" stopColor="rgba(251, 100, 21, 0)" />
+                  </linearGradient>
+                </defs>
+                {/* Top left card to center */}
+                <path d="M 180 140 Q 350 200 50% 50%" stroke="url(#line-gradient-1)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
+                {/* Top right card to center */}
+                <path d="M calc(100% - 180px) 160 Q calc(100% - 350px) 220 50% 50%" stroke="url(#line-gradient-2)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
+              </svg>
               
               {/* Floating Stat Cards */}
               <div className="absolute left-4 md:left-16 top-20 md:top-32 z-20 animate-[float_6s_ease-in-out_infinite]">
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
-                  <div className="text-2xl md:text-3xl font-bold text-black">2,847</div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-black">{(2500 + Math.floor(Math.random() * 500)).toLocaleString()}</div>
                   <div className="text-xs md:text-sm text-gray-600">segments deployed today</div>
+                  <div className="absolute -right-2 top-1/2 w-4 h-px bg-gradient-to-r from-primary/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
               <div className="absolute right-4 md:right-16 top-28 md:top-40 z-20 animate-[float_6s_ease-in-out_infinite_1s]">
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
-                  <div className="text-2xl md:text-3xl font-bold text-primary">47</div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-primary">{42 + Math.floor(Math.random() * 15)}</div>
                   <div className="text-xs md:text-sm text-gray-600">countries active</div>
+                  <div className="absolute -left-2 top-1/2 w-4 h-px bg-gradient-to-l from-primary/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
               <div className="absolute left-8 md:left-24 bottom-16 md:bottom-24 z-20 animate-[float_6s_ease-in-out_infinite_2s]">
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
-                  <div className="text-2xl md:text-3xl font-bold text-green-600">+127%</div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-green-600">+{115 + Math.floor(Math.random() * 25)}%</div>
                   <div className="text-xs md:text-sm text-gray-600">avg. engagement lift</div>
+                  <div className="absolute -right-2 top-1/2 w-4 h-px bg-gradient-to-r from-green-500/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
               <div className="absolute right-8 md:right-20 bottom-24 md:bottom-32 z-20 animate-[float_6s_ease-in-out_infinite_3s]">
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
-                  <div className="text-2xl md:text-3xl font-bold text-black">1.2M+</div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-black">{(1.1 + Math.random() * 0.3).toFixed(1)}M+</div>
                   <div className="text-xs md:text-sm text-gray-600">profiles segmented</div>
+                  <div className="absolute -left-2 top-1/2 w-4 h-px bg-gradient-to-l from-primary/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
