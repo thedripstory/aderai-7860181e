@@ -19,6 +19,7 @@ import { ComparisonChart } from "@/components/ComparisonChart";
 import { RevenueTestimonials } from "@/components/RevenueTestimonials";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Testimonials3D } from "@/components/landing/Testimonials3D";
+import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -578,6 +579,38 @@ export default function LandingPage() {
 
         {/* 3D Testimonials Wall */}
         <Testimonials3D />
+
+        {/* Live Aderai Users Globe Section */}
+        <section className="py-20 px-4 bg-background relative overflow-hidden">
+          <div className="max-w-7xl mx-auto">
+            <ScrollReveal>
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-sm font-semibold text-green-600 uppercase tracking-wider">
+                    Live Activity
+                  </span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                  Aderai Users <span className="text-primary">Worldwide</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Join marketers across the globe deploying expert-grade segments in seconds
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.2}>
+              <div className="relative flex items-center justify-center overflow-hidden rounded-3xl border-2 border-black bg-white px-10 pb-40 pt-8 md:pb-60 max-w-2xl mx-auto shadow-xl">
+                <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-400 bg-clip-text text-center text-6xl md:text-7xl font-bold leading-none text-transparent">
+                  LIVE
+                </span>
+                <Globe className="top-28" />
+                <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_200%,rgba(251,100,21,0.15),rgba(255,255,255,0))]" />
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
 
         {/* Features Section */}
         <section className="py-20 px-4 bg-background">
