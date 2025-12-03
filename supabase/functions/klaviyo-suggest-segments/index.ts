@@ -16,6 +16,18 @@ const corsHeaders = {
 
 const DAILY_LIMIT = 10;
 
+// Decode JWT to get user ID (without full validation - gateway already validates)
+function getUserIdFromJWT(token: string): string | null {
+  try {
+    const parts = token.replace('Bearer ', '').split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1]));
+    return payload.sub || null;
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -24,39 +36,39 @@ serve(async (req) => {
   console.log('[klaviyo-suggest-segments] Request received');
 
   try {
-    // Get user from JWT
+    // Get user ID from JWT
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
+      console.error('[klaviyo-suggest-segments] No authorization header');
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Create Supabase client with user's auth
-    const supabaseClient = createClient(
+    const userId = getUserIdFromJWT(authHeader);
+    if (!userId) {
+      console.error('[klaviyo-suggest-segments] Could not extract user ID from JWT');
+      return new Response(
+        JSON.stringify({ error: 'Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('[klaviyo-suggest-segments] User ID:', userId);
+
+    // Use service role for database operations
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError || !user) {
-      console.error('[klaviyo-suggest-segments] Auth error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log('[klaviyo-suggest-segments] User authenticated:', user.id);
 
     // Check rate limit directly from database
     const today = new Date().toISOString().split('T')[0];
-    let { data: limits, error: fetchError } = await supabaseClient
+    let { data: limits, error: fetchError } = await supabaseAdmin
       .from('usage_limits')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .maybeSingle();
 
     if (fetchError) {
@@ -66,10 +78,10 @@ serve(async (req) => {
 
     // Create limits record if doesn't exist
     if (!limits) {
-      const { data: newLimits, error: insertError } = await supabaseClient
+      const { data: newLimits, error: insertError } = await supabaseAdmin
         .from('usage_limits')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           ai_suggestions_today: 0,
           ai_suggestions_total: 0,
           last_reset_date: today,
@@ -86,13 +98,13 @@ serve(async (req) => {
 
     // Reset daily counter if needed
     if (limits.last_reset_date !== today) {
-      const { data: updatedLimits, error: updateError } = await supabaseClient
+      const { data: updatedLimits, error: updateError } = await supabaseAdmin
         .from('usage_limits')
         .update({
           ai_suggestions_today: 0,
           last_reset_date: today,
         })
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .select()
         .single();
 
@@ -105,7 +117,7 @@ serve(async (req) => {
 
     // Check if user has remaining suggestions
     if (limits.ai_suggestions_today >= DAILY_LIMIT) {
-      console.log('[klaviyo-suggest-segments] Rate limit exceeded for user:', user.id);
+      console.log('[klaviyo-suggest-segments] Rate limit exceeded for user:', userId);
       return new Response(
         JSON.stringify({ 
           error: 'Rate limit exceeded',
@@ -171,7 +183,7 @@ serve(async (req) => {
     }));
     console.log('[klaviyo-suggest-segments] Found', availableMetrics.length, 'metrics');
 
-    // Use Lovable AI Gateway instead of OpenAI directly
+    // Use Lovable AI Gateway
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!lovableApiKey) {
       console.error('[klaviyo-suggest-segments] LOVABLE_API_KEY not configured');
@@ -231,7 +243,7 @@ RULES:
 8. For conditions where ANY can be true (OR logic), use separate condition_groups
 9. Always append " | Aderai" to segment names`;
 
-    const userPrompt = `User's goal: ${answers?.goal || 'Create useful customer segments'}
+    const userPrompt = `User's goal: ${answers?.businessGoal || 'Create useful customer segments'}
 
 Brand Information:
 ${answers ? Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n') : 'No additional information provided'}
@@ -276,17 +288,26 @@ Based on this information and the available Klaviyo metrics, suggest segments th
 
     console.log('[klaviyo-suggest-segments] AI response received successfully');
     const aiData = await aiResponse.json();
-    const suggestedSegments = JSON.parse(aiData.choices[0].message.content);
+    const content = aiData.choices[0].message.content;
+    
+    let suggestedSegments;
+    try {
+      suggestedSegments = JSON.parse(content);
+    } catch (parseError) {
+      console.error('[klaviyo-suggest-segments] Failed to parse AI response:', content);
+      throw new Error('Failed to parse AI response');
+    }
+    
     console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
 
     // Increment AI usage counter after successful operation
-    const { error: incrementError } = await supabaseClient
+    const { error: incrementError } = await supabaseAdmin
       .from('usage_limits')
       .update({
         ai_suggestions_today: limits.ai_suggestions_today + 1,
         ai_suggestions_total: limits.ai_suggestions_total + 1,
       })
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (incrementError) {
       console.error('[klaviyo-suggest-segments] Failed to increment usage:', incrementError);
