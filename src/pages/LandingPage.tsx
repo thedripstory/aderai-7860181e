@@ -14,7 +14,7 @@ import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
-import { ValueCalculator } from "@/components/ValueCalculator";
+import { SegmentFlowEffect } from "@/components/SegmentFlowEffect";
 import { ComparisonChart } from "@/components/ComparisonChart";
 import { RevenueTestimonials } from "@/components/RevenueTestimonials";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -562,10 +562,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-        {/* Value Calculator Section */}
-        <ScrollReveal>
-          <ValueCalculator />
-        </ScrollReveal>
+        {/* Segment Flow Effect Section */}
+        <SegmentFlowEffect />
 
         {/* Comparison Chart Section */}
         <ScrollReveal>
