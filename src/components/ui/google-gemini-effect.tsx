@@ -32,7 +32,7 @@ export const GoogleGeminiEffect = ({
       <div className="w-full h-[890px] -top-60 md:-top-40 flex items-center justify-center absolute">
         <a 
           href="/signup"
-          className="font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-full md:px-6 md:py-3 px-4 py-2 mt-[280px] md:mt-[320px] z-30 md:text-lg text-sm w-fit mx-auto transition-all hover:scale-105 shadow-lg hover:shadow-xl hover:shadow-primary/30 flex items-center gap-2"
+          className="font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-full md:px-6 md:py-3 px-4 py-2 mt-[140px] md:mt-[160px] z-30 md:text-lg text-sm w-fit mx-auto transition-all hover:scale-105 shadow-lg hover:shadow-xl hover:shadow-primary/30 flex items-center gap-2"
         >
           <span className="text-2xl md:text-3xl font-playfair font-bold tracking-tight">
             aderai<span className="text-primary-foreground/80">.</span>
