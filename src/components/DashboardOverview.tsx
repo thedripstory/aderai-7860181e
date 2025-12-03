@@ -43,51 +43,34 @@ export const DashboardOverview = () => {
     [totalSegmentsCreated]
   );
 
-  // Determine suggested next actions (memoized to avoid recalculation)
-  const nextActions = useMemo(() => {
-    const actions = [];
-    
-    if (!klaviyoConnected) {
-      actions.push({
-        title: 'Connect Klaviyo to get started',
+  // Define all onboarding steps with completion status
+  const onboardingSteps = useMemo(() => {
+    return [
+      {
+        title: 'Connect Klaviyo',
         description: 'Link your Klaviyo account to start creating segments',
         action: 'Connect Now',
         onClick: () => navigate('/klaviyo-setup'),
         icon: Target,
-        variant: 'default' as const,
-      });
-    } else if (totalSegmentsCreated === 0) {
-      actions.push({
+        completed: klaviyoConnected,
+      },
+      {
         title: 'Create your first segment',
         description: 'Start building your audience with pre-built templates',
         action: 'View Segments',
         onClick: () => navigate('/dashboard?tab=segments'),
         icon: Target,
-        variant: 'default' as const,
-      });
-    } else if (totalSegmentsCreated < 10) {
-      actions.push({
-        title: 'Try the Core Essentials bundle',
-        description: 'Get the most important segments for your business',
-        action: 'View Bundle',
-        onClick: () => navigate('/dashboard?tab=segments'),
-        icon: TrendingUp,
-        variant: 'default' as const,
-      });
-    }
-
-    if (aiSuggestionsUsed === 0) {
-      actions.push({
-        title: 'Get personalized segment suggestions with AI',
-        description: 'Describe your goals and get custom segment recommendations',
-        action: 'Try AI Suggestions',
+        completed: totalSegmentsCreated > 0,
+      },
+      {
+        title: 'Try AI-powered suggestions',
+        description: 'Get custom segment recommendations based on your goals',
+        action: 'Try AI',
         onClick: () => navigate('/dashboard?tab=ai'),
         icon: Sparkles,
-        variant: 'secondary' as const,
-      });
-    }
-
-    return actions;
+        completed: aiSuggestionsUsed > 0,
+      },
+    ];
   }, [klaviyoConnected, totalSegmentsCreated, aiSuggestionsUsed, navigate]);
 
   if (loading) {
@@ -332,50 +315,66 @@ export const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Suggested Next Actions */}
-      {nextActions.length > 0 && (
-        <div className="relative overflow-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-br from-card/80 via-card/95 to-card backdrop-blur-xl shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
-          
-          <CardHeader className="relative">
-            <CardTitle className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-primary" />
-              Suggested Next Actions
-            </CardTitle>
-            <CardDescription>
-              Quick steps to get the most out of Aderai
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="relative space-y-3">
-            {nextActions.map((action, idx) => {
-              const Icon = action.icon;
-              return (
-                <div 
-                  key={idx}
-                  className="flex items-center justify-between p-4 rounded-xl bg-accent/10 border border-accent/20 hover:bg-accent/20 hover:border-accent/30 transition-all duration-300"
-                >
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{action.title}</p>
-                      <p className="text-sm text-muted-foreground">{action.description}</p>
-                    </div>
+      {/* Getting Started Steps */}
+      <div className="relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-card/80 via-card/95 to-card backdrop-blur-xl shadow-lg">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5" />
+        
+        <CardHeader className="relative">
+          <CardTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            Getting Started
+          </CardTitle>
+          <CardDescription>
+            Complete these steps to get the most out of Aderai
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="relative space-y-3">
+          {onboardingSteps.map((step, idx) => {
+            const Icon = step.icon;
+            return (
+              <div 
+                key={idx}
+                className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
+                  step.completed 
+                    ? 'bg-primary/5 border-primary/20' 
+                    : 'bg-muted/30 border-border/30 hover:bg-muted/50 hover:border-border/50'
+                }`}
+              >
+                <div className="flex items-start gap-3 flex-1">
+                  <div className={`w-10 h-10 rounded-lg border flex items-center justify-center flex-shrink-0 ${
+                    step.completed 
+                      ? 'bg-primary/20 border-primary/40' 
+                      : 'bg-muted/50 border-border/30'
+                  }`}>
+                    {step.completed ? (
+                      <CheckCircle2 className="w-5 h-5 text-primary" />
+                    ) : (
+                      <Icon className="w-5 h-5 text-muted-foreground" />
+                    )}
                   </div>
-                  <Button 
-                    variant={action.variant}
-                    onClick={action.onClick}
-                    className="ml-4 shadow-md"
-                  >
-                    {action.action}
-                  </Button>
+                  <div>
+                    <p className={`font-semibold ${step.completed ? 'text-primary' : ''}`}>
+                      {step.title}
+                      {step.completed && <span className="ml-2 text-xs font-normal text-primary/70">Completed</span>}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                  </div>
                 </div>
-              );
-            })}
-          </CardContent>
-        </div>
-      )}
+                {!step.completed && (
+                  <Button 
+                    variant="default"
+                    size="sm"
+                    onClick={step.onClick}
+                    className="ml-4"
+                  >
+                    {step.action}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </CardContent>
+      </div>
     </div>
   );
 };
