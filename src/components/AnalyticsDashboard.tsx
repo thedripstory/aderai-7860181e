@@ -367,8 +367,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         </div>
 
         {/* Distribution Pie Chart */}
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="bg-card border border-border rounded-xl p-6 flex flex-col justify-center h-full">
+          <div className="flex items-center gap-3 mb-4">
             <div className="p-2 rounded-lg bg-accent/10">
               <Activity className="w-5 h-5 text-accent" />
             </div>
@@ -378,35 +378,37 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             </div>
           </div>
 
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie
-                data={sizeDistribution}
-                cx="50%"
-                cy="50%"
-                innerRadius={50}
-                outerRadius={80}
-                paddingAngle={3}
-                dataKey="count"
-                nameKey="name"
-              >
-                {sizeDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))', 
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  fontSize: '12px'
-                }}
-                formatter={(value: number, name: string) => [`${value} segments`, name]}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="flex-1 flex items-center justify-center">
+            <ResponsiveContainer width="100%" height={180}>
+              <PieChart>
+                <Pie
+                  data={sizeDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={45}
+                  outerRadius={70}
+                  paddingAngle={3}
+                  dataKey="count"
+                  nameKey="name"
+                >
+                  {sizeDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value: number, name: string) => [`${value} segments`, name]}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-          <div className="flex flex-wrap gap-2 mt-4 justify-center">
+          <div className="flex flex-wrap gap-2 justify-center">
             {sizeDistribution.map((entry, index) => (
               <div key={entry.name} className="flex items-center gap-1.5 text-xs">
                 <div 
