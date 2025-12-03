@@ -236,8 +236,8 @@ export default function UnifiedDashboard() {
     try {
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
-      // Fetch segments with tags and profile_count using proper fields parameter
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,profile_count,is_active,is_starred';
+      // Fetch segments with tags (profile_count requires individual segment fetches)
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,is_active,is_starred';
       
       // Fetch all pages of segments
       while (nextPageUrl) {
