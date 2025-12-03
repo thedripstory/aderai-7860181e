@@ -68,11 +68,9 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
               }}
             >
               <div className="absolute inset-0 blur-3xl bg-accent/20 rounded-full scale-150" />
-              <img 
-                src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/black-logo-png.png" 
-                alt="Aderai" 
-                className="h-14 md:h-16 w-auto relative z-10 dark:invert"
-              />
+              <div className="text-5xl md:text-6xl font-playfair font-bold tracking-tight relative z-10">
+                aderai<span className="text-accent animate-pulse">.</span>
+              </div>
             </motion.div>
             
           </motion.div>

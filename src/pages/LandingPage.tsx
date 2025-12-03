@@ -50,12 +50,10 @@ export default function LandingPage() {
       <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           {/* Logo */}
-          <a href="/" className="group flex items-center hover:scale-105 transition-transform duration-300">
-            <img 
-              src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/black-logo-png.png" 
-              alt="Aderai" 
-              className="h-10 w-auto dark:invert"
-            />
+          <a href="/" className="group flex items-center">
+            <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
+              aderai<span className="text-accent group-hover:animate-pulse">.</span>
+            </div>
           </a>
 
           {/* CTA Buttons */}

@@ -204,11 +204,7 @@ export const AnimatedSegmentVisual = () => {
                 30 sec
               </div>
               <p className="text-sm text-muted-foreground mt-2 flex items-center justify-center gap-1">
-                <img 
-                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/black-logo-png.png" 
-                  alt="Aderai" 
-                  className="h-4 w-auto dark:invert"
-                />
+                <span className="font-playfair font-bold">aderai<span className="text-accent">.</span></span>
               </p>
             </motion.div>
           </div>

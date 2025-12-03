@@ -42,11 +42,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               href="/dashboard" 
               className="group flex items-center gap-3 transition-opacity hover:opacity-80"
             >
-              <img 
-                src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/black-logo-png.png" 
-                alt="Aderai" 
-                className="h-8 w-auto dark:invert"
-              />
+              <div className="relative">
+                <div className="text-3xl font-playfair font-bold tracking-tight">
+                  <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    aderai
+                  </span>
+                  <span className="text-accent transition-transform duration-300 group-hover:scale-125 inline-block">
+                    .
+                  </span>
+                </div>
+              </div>
               
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-accent" />
