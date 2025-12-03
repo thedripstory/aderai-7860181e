@@ -209,6 +209,14 @@ export default {
             backgroundPosition: "350% 50%, 350% 50%",
           },
         },
+        "marquee": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(calc(-100% - var(--gap)))" },
+        },
+        "marquee-vertical": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(calc(-100% - var(--gap)))" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -219,6 +227,8 @@ export default {
         "shimmer": "shimmer 2s linear infinite",
         "scale-in": "scale-in 0.3s ease-out",
         "aurora": "aurora 60s linear infinite",
+        "marquee": "marquee var(--duration) infinite linear",
+        "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
       },
     },
   },
