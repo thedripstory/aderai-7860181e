@@ -25,8 +25,8 @@ export function SessionTimeoutWarning({
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50 max-w-md animate-in slide-in-from-top-4">
-      <Alert className="border-yellow-500/20 bg-yellow-500/10">
+    <div className="fixed top-4 right-4 z-[9999] max-w-md animate-in slide-in-from-top-4">
+      <Alert className="border-yellow-500 bg-card shadow-xl">
         <div className="flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
