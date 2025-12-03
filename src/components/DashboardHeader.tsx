@@ -38,17 +38,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           
           {/* Brand */}
           <div className="flex items-center gap-3">
-            {showBackButton && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="gap-2 text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Dashboard</span>
-              </Button>
-            )}
             <a 
               href="/dashboard" 
               className="group flex items-center gap-3 transition-opacity hover:opacity-80"
@@ -75,6 +64,19 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            
+            {/* Back to Dashboard button */}
+            {showBackButton && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Button>
+            )}
             
             {/* Dynamic content slot */}
             {children}
