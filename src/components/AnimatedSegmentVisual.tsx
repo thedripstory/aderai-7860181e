@@ -29,7 +29,7 @@ export const AnimatedSegmentVisual = () => {
             <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block relative top-[0.05em]" />
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Deploy 70+ expert-grade segments directly into your Klaviyo account with a single click
+            One click. 70+ segments. Instant deployment.
           </p>
         </motion.div>
 
