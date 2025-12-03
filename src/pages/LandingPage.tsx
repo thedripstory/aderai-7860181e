@@ -732,30 +732,6 @@ export default function LandingPage() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
         
         <div className="max-w-7xl mx-auto px-6 relative">
-          {/* Stats Bar - Unique Element */}
-          <div className="py-12 border-b border-border/50">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="group">
-                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
-                  10,000+
-                </div>
-                <div className="text-sm text-muted-foreground">Happy Brands</div>
-              </div>
-              <div className="group">
-                <div className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
-                  70+
-                </div>
-                <div className="text-sm text-muted-foreground">Pre-built Segments</div>
-              </div>
-              <div className="group">
-                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
-                  99%
-                </div>
-                <div className="text-sm text-muted-foreground">Time Saved</div>
-              </div>
-            </div>
-          </div>
-
           {/* Segment Flow Effect Section */}
           <SegmentFlowEffect />
 
