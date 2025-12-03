@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useMemo } from 'react';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -20,12 +20,13 @@ import { LoadingState } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { HelpTooltip } from '@/components/HelpTooltip';
-import { useMemo } from 'react';
+import { ActivityHistoryModal } from '@/components/ActivityHistoryModal';
 
 const TOTAL_AVAILABLE_SEGMENTS = 70;
 
 export const DashboardOverview = () => {
   const navigate = useNavigate();
+  const [activityModalOpen, setActivityModalOpen] = useState(false);
   const { 
     totalSegmentsCreated, 
     aiSuggestionsUsed, 
@@ -299,16 +300,14 @@ export const DashboardOverview = () => {
                     </div>
                   </div>
                 ))}
-                {recentActivity.length > 0 && (
-                  <Button 
-                    variant="ghost" 
-                    className="w-full text-sm group"
-                    onClick={() => navigate('/dashboard?tab=analytics')}
-                  >
-                    View all activity
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                )}
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-sm group"
+                  onClick={() => setActivityModalOpen(true)}
+                >
+                  View all activity
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </div>
             )}
           </CardContent>
@@ -375,6 +374,11 @@ export const DashboardOverview = () => {
           })}
         </CardContent>
       </div>
+
+      <ActivityHistoryModal 
+        open={activityModalOpen} 
+        onOpenChange={setActivityModalOpen} 
+      />
     </div>
   );
 };

@@ -89,11 +89,23 @@ export function useDashboardStats() {
 
       const totalSegmentsCreated = segmentCount || 0;
 
-      // Get recent activity from analytics_events
+      // Get recent activity from analytics_events - only major events
+      const majorEvents = [
+        'create_segments',
+        'ai_suggestion_used',
+        'klaviyo_connected',
+        'segment_created',
+        'bundle_created',
+        'settings_updated',
+        'api_key_added',
+        'feedback_submitted',
+      ];
+      
       const { data: recentEvents } = await supabase
         .from('analytics_events')
         .select('id, event_name, created_at, event_metadata')
         .eq('user_id', user.id)
+        .in('event_name', majorEvents)
         .order('created_at', { ascending: false })
         .limit(5);
 
