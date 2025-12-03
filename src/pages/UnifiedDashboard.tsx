@@ -22,7 +22,7 @@ import { SegmentHistoricalTrends } from '@/components/SegmentHistoricalTrends';
 import { SegmentOperationHistory } from '@/components/SegmentOperationHistory';
 import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
 import { SegmentPerformance } from '@/components/SegmentPerformance';
-import { SegmentTemplateManager } from '@/components/SegmentTemplateManager';
+
 import { AchievementsPanel } from '@/components/AchievementsPanel';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
@@ -443,7 +443,6 @@ export default function UnifiedDashboard() {
               <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
               <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
               <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="templates">Templates</TabsTrigger>
               <TabsTrigger value="more">More</TabsTrigger>
             </TabsList>
           </div>
@@ -576,10 +575,6 @@ export default function UnifiedDashboard() {
                 apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
               />
             )}
-          </TabsContent>
-
-          <TabsContent value="templates">
-            <SegmentTemplateManager />
           </TabsContent>
 
           <TabsContent value="more">
