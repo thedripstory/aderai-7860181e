@@ -104,6 +104,14 @@ export default {
         "fade-in": {
           "0%": {
             opacity: "0",
+          },
+          "100%": {
+            opacity: "1",
+          },
+        },
+        "fade-in-up": {
+          "0%": {
+            opacity: "0",
             transform: "translateY(10px) scale(0.95)",
           },
           "100%": {
