@@ -53,6 +53,30 @@ export const AchievementsPanel = () => {
           earnedMap.set(ua.achievement_id, ua.earned_at);
         });
         setEarnedAchievements(earnedMap);
+
+        // Check for Power User achievement
+        const powerUserAchievement = allAchievements?.find(a => a.criteria_type === 'power_user');
+        if (powerUserAchievement && !earnedMap.has(powerUserAchievement.id)) {
+          // Check if user has used all major features
+          const { data: events } = await supabase
+            .from('analytics_events')
+            .select('event_name')
+            .eq('user_id', user.id)
+            .in('event_name', ['create_segments', 'ai_suggestion_used', 'fetch_analytics']);
+
+          const eventTypes = new Set(events?.map(e => e.event_name) || []);
+          if (eventTypes.has('create_segments') && eventTypes.has('ai_suggestion_used') && eventTypes.has('fetch_analytics')) {
+            // Award the achievement
+            const { error: awardError } = await supabase
+              .from('user_achievements')
+              .insert({ user_id: user.id, achievement_id: powerUserAchievement.id });
+            
+            if (!awardError) {
+              earnedMap.set(powerUserAchievement.id, new Date().toISOString());
+              setEarnedAchievements(new Map(earnedMap));
+            }
+          }
+        }
       } catch (error) {
         console.error('Error fetching achievements:', error);
       } finally {

@@ -149,25 +149,6 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             });
           }
 
-          // Award "Beta Pioneer" achievement
-          try {
-            const { data: achievement } = await supabase
-              .from('achievements')
-              .select('id')
-              .eq('criteria_type', 'beta_user')
-              .single();
-
-            if (achievement) {
-              await supabase
-                .from('user_achievements')
-                .insert({
-                  user_id: authData.user.id,
-                  achievement_id: achievement.id
-                });
-            }
-          } catch (achievementError) {
-            // Silently handle - achievement might already be earned
-          }
 
           toast({
             title: "Account created!",
