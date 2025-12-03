@@ -24,8 +24,6 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
-    
     // Log error to database for monitoring
     ErrorLogger.logError(error, {
       componentStack: errorInfo.componentStack,

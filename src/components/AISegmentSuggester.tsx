@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Sparkles, Loader, CheckCircle, Lightbulb, AlertCircle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useAILimits } from '@/hooks/useAILimits';
-import { ErrorLogger } from '@/lib/errorLogger';
+import { ErrorHandler } from '@/lib/errorHandlers';
 import { toast } from 'sonner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
+import { sanitizeString } from '@/lib/inputSanitization';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -22,7 +23,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
   const { trackAction } = useFeatureTracking('ai_segment_suggester');
   const { allowed, remaining, total_used, daily_limit, loading: limitsLoading, incrementUsage } = useAILimits();
 
-  const generateAiSuggestions = async () => {
+  const generateAiSuggestions = useCallback(async () => {
     if (!aiPrompt.trim()) {
       toast.warning('Please enter a description of your business goal', {
         description: 'Describe what you want to achieve with your segments',
@@ -33,7 +34,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
     // Check if user has reached their limit
     if (!allowed) {
-      toast.error("Daily AI suggestion limit reached", {
+      toast.error('Daily AI suggestion limit reached', {
         description: `You've used all ${daily_limit} AI suggestions for today. Limits reset at midnight UTC.`,
         duration: 6000,
       });
@@ -44,11 +45,14 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
     setAiLoading(true);
 
     try {
+      // Sanitize user input before sending to AI
+      const sanitizedPrompt = sanitizeString(aiPrompt);
+
       const { data: response, error } = await supabase.functions.invoke('klaviyo-suggest-segments', {
         body: {
           apiKey: activeKey.klaviyo_api_key_hash,
           answers: {
-            businessGoal: aiPrompt,
+            businessGoal: sanitizedPrompt,
             currency: activeKey.currency,
             aov: activeKey.aov,
             vipThreshold: activeKey.vip_threshold,
@@ -59,7 +63,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
       if (error) throw error;
       setAiSuggestions(response.segments || []);
-      
+
       // Increment usage counter after successful generation
       await incrementUsage();
 
@@ -78,81 +82,114 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
               .from('user_achievements')
               .insert({
                 user_id: user.id,
-                achievement_id: achievements.id
+                achievement_id: achievements.id,
               })
               .select()
               .single();
           }
         }
-      } catch (achievementError) {
+      } catch {
         // Silently handle - achievement might already be earned
       }
-      
+
       toast.success('AI suggestions generated successfully!', {
         description: `Created ${response.segments?.length || 0} segment suggestions for you`,
         duration: 3000,
       });
     } catch (error: any) {
-      console.error('AI generation error:', error);
-      
-      // Log AI error to database
-      await ErrorLogger.logAIError(error, 'Generate AI Suggestions');
-      
-      toast.error('Failed to generate AI suggestions', {
-        description: error.message || 'Check your Klaviyo connection and try again',
-        action: {
-          label: 'Retry',
-          onClick: () => generateAiSuggestions(),
-        },
+      // Get user for logging
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Log AI error with standardized handler
+      await ErrorHandler.handleAPIError(error, 'klaviyo-suggest-segments', {
+        userId: user?.id,
+        component: 'AISegmentSuggester',
+        action: 'generate_ai_suggestions',
       });
     } finally {
       setAiLoading(false);
     }
-  };
+  }, [aiPrompt, allowed, activeKey, trackAction, incrementUsage, daily_limit]);
 
-  const createAiSegment = async (suggestion: any) => {
-    trackAction('create_ai_segment', { segment_name: suggestion.name });
-    setAiLoading(true);
+  const createAiSegment = useCallback(
+    async (suggestion: any) => {
+      trackAction('create_ai_segment', { segment_name: suggestion.name });
+      setAiLoading(true);
 
-    try {
-      const { data: response, error } = await supabase.functions.invoke('klaviyo-create-custom-segment', {
-        body: {
-          apiKey: activeKey.klaviyo_api_key_hash,
-          segmentName: suggestion.name,
-          segmentDescription: suggestion.description,
-        },
-      });
-
-      if (error) throw error;
-
-      if (response.status === 'exists') {
-        toast.info(`Segment "${suggestion.name}" already exists`, {
-          description: 'This segment is already in your Klaviyo account',
-          duration: 4000,
+      try {
+        const { data: response, error } = await supabase.functions.invoke('klaviyo-create-custom-segment', {
+          body: {
+            apiKey: activeKey.klaviyo_api_key_hash,
+            segmentName: suggestion.name,
+            segmentDescription: suggestion.description,
+          },
         });
-      } else if (response.status === 'created') {
-        toast.success(`Created segment "${suggestion.name}"!`, {
-          description: 'Segment is now live in your Klaviyo account',
-          duration: 3000,
+
+        if (error) throw error;
+
+        if (response.status === 'exists') {
+          toast.info(`Segment "${suggestion.name}" already exists`, {
+            description: 'This segment is already in your Klaviyo account',
+            duration: 4000,
+          });
+        } else if (response.status === 'created') {
+          toast.success(`Created segment "${suggestion.name}"!`, {
+            description: 'Segment is now live in your Klaviyo account',
+            duration: 3000,
+          });
+          setAiSuggestions(prev => prev.filter(s => s.name !== suggestion.name));
+        }
+      } catch (error: any) {
+        // Get user for logging
+        const { data: { user } } = await supabase.auth.getUser();
+
+        await ErrorHandler.handleAPIError(error, 'klaviyo-create-custom-segment', {
+          userId: user?.id,
+          component: 'AISegmentSuggester',
+          action: 'create_ai_segment',
+          metadata: { segmentName: suggestion.name },
         });
-        setAiSuggestions(prev => prev.filter(s => s.name !== suggestion.name));
+      } finally {
+        setAiLoading(false);
       }
-    } catch (error: any) {
-      console.error('Segment creation error:', error);
-      toast.error('Failed to create segment', {
-        description: error.message || 'Check your Klaviyo API key and try again',
-        action: {
-          label: 'Get Help',
-          onClick: () => window.open('/help?article=troubleshooting', '_blank'),
-        },
-      });
-    } finally {
-      setAiLoading(false);
-    }
-  };
+    },
+    [activeKey, trackAction]
+  );
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* AI Limit Loading Indicator */}
+      {limitsLoading && (
+        <div className="bg-card border border-border rounded-lg p-4 mb-6 flex items-center gap-3">
+          {/* Aggressive rotating loader */}
+          <div className="relative w-8 h-8">
+            {/* Outer rotating ring */}
+            <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+
+            {/* Middle counter-rotating ring */}
+            <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+
+            {/* Inner pulsing core */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+            </div>
+
+            {/* Orbiting particles */}
+            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
+            </div>
+            <div className="absolute inset-0 animate-[spin_2s_linear_infinite_reverse]">
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-foreground">Checking your AI suggestion limits…</p>
+            <p className="text-xs text-muted-foreground">This only takes a moment and keeps usage fair for everyone.</p>
+          </div>
+        </div>
+      )}
+
       {/* Usage Limit Indicator */}
       {!limitsLoading && (
         <div className="bg-card border border-border rounded-lg p-4 mb-6">
@@ -169,17 +206,15 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
                 </span>
               )}
             </span>
-            <span className="text-xs text-muted-foreground">
-              Resets at midnight UTC
-            </span>
+            <span className="text-xs text-muted-foreground">Resets automatically at midnight UTC</span>
           </div>
-          <Progress value={(total_used / daily_limit) * 100} className="h-2" />
+          <Progress value={daily_limit ? (total_used / daily_limit) * 100 : 0} className="h-2" />
           {!allowed && (
             <div className="mt-4 p-3 bg-muted rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">
                 You've used all {daily_limit} AI suggestions for today. While you wait for the reset, explore our 70+ pre-built segments!
               </p>
-              <Link 
+              <Link
                 to="/dashboard?tab=segments"
                 className="text-sm font-medium text-primary hover:underline"
               >
@@ -198,8 +233,8 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
               Tell us what you're trying to achieve, and our AI will suggest custom segments tailored to your needs.
             </p>
           </div>
-          <a 
-            href="/help?article=ai-features" 
+          <a
+            href="/help?article=ai-features"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors"
@@ -211,14 +246,14 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
         <textarea
           value={aiPrompt}
-          onChange={(e) => setAiPrompt(e.target.value)}
+          onChange={e => setAiPrompt(e.target.value)}
           placeholder="Example: I want to identify customers who are likely to make a repeat purchase in the next 30 days..."
           className="w-full px-4 py-3 rounded-lg border border-input bg-background min-h-[120px] mb-4"
         />
 
         <button
           onClick={generateAiSuggestions}
-          disabled={aiLoading || !aiPrompt.trim() || !allowed}
+          disabled={aiLoading || limitsLoading || !aiPrompt.trim() || !allowed}
           className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {aiLoading ? (
@@ -233,6 +268,14 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
             </>
           )}
         </button>
+
+        {!limitsLoading && (
+          <p className="mt-2 text-xs text-muted-foreground text-right">
+            {allowed
+              ? `${remaining} of ${daily_limit} AI suggestions remaining today`
+              : `You've reached today's limit of ${daily_limit} AI suggestions.`}
+          </p>
+        )}
       </div>
 
       {aiLoading && (
@@ -264,7 +307,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
                   <div className="bg-muted p-3 rounded-lg text-xs font-mono overflow-x-auto">
                     <span className="font-medium font-sans">Definition: </span>
                     <pre className="mt-1 whitespace-pre-wrap break-words">
-                      {typeof suggestion.definition === 'object' 
+                      {typeof suggestion.definition === 'object'
                         ? JSON.stringify(suggestion.definition, null, 2)
                         : suggestion.definition || 'Custom AI-generated criteria'}
                     </pre>

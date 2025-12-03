@@ -34,11 +34,11 @@ import { AdminUserHealth } from "@/components/AdminUserHealth";
 import { AdminAdvancedFeatureUsage } from "@/components/AdminAdvancedFeatureUsage";
 import { AdminSystemHealthMetrics } from "@/components/AdminSystemHealthMetrics";
 import { ABTestResults } from "@/components/ABTestResults";
-import { TestErrorButton } from "@/components/TestErrorButton";
 import { exportUsersToCSV, exportFeedbackToCSV } from "@/lib/csvExport";
 import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -353,6 +353,7 @@ const AdminDashboard = () => {
   );
 
   return (
+    <PageErrorBoundary pageName="Admin Dashboard">
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b bg-card">
@@ -366,7 +367,6 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <TestErrorButton />
               <Button variant="outline" size="icon" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -798,6 +798,7 @@ const AdminDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </PageErrorBoundary>
   );
 };
 

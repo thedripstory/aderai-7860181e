@@ -55,7 +55,7 @@ export function useDashboardStats() {
       // Get user data
       const { data: userData } = await supabase
         .from('users')
-        .select('account_name, created_at')
+        .select('first_name, created_at')
         .eq('id', user.id)
         .single();
 
@@ -112,7 +112,7 @@ export function useDashboardStats() {
         daysSinceSignup,
         klaviyoConnected: (klaviyoKeys?.length || 0) > 0,
         recentActivity,
-        accountName: userData?.account_name || '',
+        accountName: userData?.first_name || 'User',
         loading: false,
       });
     } catch (error) {

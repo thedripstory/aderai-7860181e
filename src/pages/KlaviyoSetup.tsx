@@ -12,8 +12,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2 } from "lucide-react";
+import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
+import { cn } from "@/lib/utils";
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
@@ -23,6 +27,7 @@ const KlaviyoSetup = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
 
   // Form fields
   const [apiKey, setApiKey] = useState("");
@@ -35,6 +40,12 @@ const KlaviyoSetup = () => {
   const [newCustomerDays, setNewCustomerDays] = useState("60");
   const [lapsedDays, setLapsedDays] = useState("90");
   const [churnedDays, setChurnedDays] = useState("180");
+  
+  // Validation state
+  const [validationState, setValidationState] = useState<{
+    apiKey: 'idle' | 'validating' | 'valid' | 'invalid';
+    message?: string;
+  }>({ apiKey: 'idle' });
 
   const checkAuth = async () => {
     try {
@@ -276,12 +287,21 @@ const KlaviyoSetup = () => {
   }
 
   return (
+    <PageErrorBoundary pageName="Klaviyo Setup">
     <div className="min-h-screen bg-background relative overflow-hidden">
+      {showWarning && (
+        <SessionTimeoutWarning
+          onRefresh={refreshSession}
+          onDismiss={dismissWarning}
+          expiresAt={sessionExpiresAt}
+        />
+      )}
+      
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <a href="/" className="group flex items-center gap-3">
+            <a href="/dashboard" className="group flex items-center gap-3">
               <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
                 aderai<span className="text-accent group-hover:animate-pulse">.</span>
               </div>
@@ -333,18 +353,91 @@ const KlaviyoSetup = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="apiKey">Klaviyo Private API Key *</Label>
-                    <Input
-                      id="apiKey"
-                      type="password"
-                      placeholder="pk_..."
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      className="h-12"
-                      required
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Find your API key in Klaviyo → Settings → API Keys
-                    </p>
+                    <div className="relative">
+                      <Input
+                        id="apiKey"
+                        type="password"
+                        placeholder="pk_..."
+                        value={apiKey}
+                        onChange={(e) => {
+                          setApiKey(e.target.value);
+                          if (validationState.apiKey !== 'idle') {
+                            setValidationState({ apiKey: 'idle' });
+                          }
+                        }}
+                        onBlur={async (e) => {
+                          const value = e.target.value;
+                          if (!value || value.length < 10) {
+                            setValidationState({
+                              apiKey: 'invalid',
+                              message: 'API key is too short',
+                            });
+                            return;
+                          }
+
+                          if (!value.startsWith("pk_")) {
+                            setValidationState({
+                              apiKey: 'invalid',
+                              message: 'API key must start with "pk_"',
+                            });
+                            return;
+                          }
+
+                          setValidationState({ apiKey: 'validating' });
+
+                          try {
+                            const { data, error } = await supabase.functions.invoke('klaviyo-validate-key', {
+                              body: { apiKey: value },
+                            });
+
+                            if (error || !data?.valid) {
+                              setValidationState({
+                                apiKey: 'invalid',
+                                message: data?.error || 'Invalid API key',
+                              });
+                            } else {
+                              setValidationState({
+                                apiKey: 'valid',
+                                message: 'API key is valid!',
+                              });
+                            }
+                          } catch (error) {
+                            setValidationState({
+                              apiKey: 'invalid',
+                              message: 'Failed to validate API key',
+                            });
+                          }
+                        }}
+                        className={cn(
+                          "h-12 pr-10",
+                          validationState.apiKey === 'valid' && "border-green-500",
+                          validationState.apiKey === 'invalid' && "border-red-500"
+                        )}
+                        required
+                      />
+                      {validationState.apiKey === 'validating' && (
+                        <Loader2 className="absolute right-3 top-3.5 h-5 w-5 animate-spin text-primary" />
+                      )}
+                      {validationState.apiKey === 'valid' && (
+                        <CheckCircle2 className="absolute right-3 top-3.5 h-5 w-5 text-green-500" />
+                      )}
+                      {validationState.apiKey === 'invalid' && (
+                        <AlertCircle className="absolute right-3 top-3.5 h-5 w-5 text-red-500" />
+                      )}
+                    </div>
+                    {validationState.message && (
+                      <p className={cn(
+                        "text-sm mt-1",
+                        validationState.apiKey === 'valid' ? "text-green-600" : "text-red-600"
+                      )}>
+                        {validationState.message}
+                      </p>
+                    )}
+                    {!validationState.message && (
+                      <p className="text-sm text-muted-foreground">
+                        Find your API key in Klaviyo → Settings → API Keys
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -542,6 +635,7 @@ const KlaviyoSetup = () => {
         </div>
       </main>
     </div>
+    </PageErrorBoundary>
   );
 };
 

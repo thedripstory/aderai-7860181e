@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ErrorLogger } from '@/lib/errorLogger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -19,56 +20,90 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
       // Check if user has profile
       if (session?.user) {
-        const { data: profile, error } = await supabase
-          .from('users')
-          .select('id')
-          .eq('id', session.user.id)
-          .maybeSingle();
+        try {
+          const { data: profile, error } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-        if (error) {
-          console.error('Error checking user profile:', error);
+          if (error) {
+            await ErrorLogger.logError(error, {
+              context: 'Error checking user profile',
+              userId: session.user.id,
+            });
+            setHasProfile(false);
+            
+            // Log orphan user detection
+            await supabase.from('analytics_events').insert({
+              user_id: session.user.id,
+              event_name: 'orphan_user_detected',
+              event_metadata: {
+                email: session.user.email,
+                detected_at: new Date().toISOString(),
+                error: error.message,
+              }
+            });
+
+            toast.error('Profile not found. Please contact support at akshat@aderai.io', {
+              duration: 10000,
+            });
+          } else {
+            setHasProfile(!!profile);
+          }
+        } catch (err) {
+          await ErrorLogger.logError(err as Error, {
+            context: 'Profile check failed',
+          });
           setHasProfile(false);
-          
-          // Log orphan user detection
-          await supabase.from('analytics_events').insert({
-            user_id: session.user.id,
-            event_name: 'orphan_user_detected',
-            event_metadata: {
-              email: session.user.email,
-              detected_at: new Date().toISOString(),
-            }
-          });
-
-          toast.error('Profile not found. Please contact support at akshat@aderai.io', {
-            duration: 10000,
-          });
-        } else {
-          setHasProfile(!!profile);
         }
       }
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-      
-      // Reset profile check on auth state change
-      if (session?.user) {
-        setTimeout(() => {
-          supabase
-            .from('users')
-            .select('id')
-            .eq('id', session.user.id)
-            .maybeSingle()
-            .then(({ data: profile }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setIsAuthenticated(!!session);
+        
+        if (session?.user) {
+          // Use queueMicrotask to defer profile check and avoid Supabase auth deadlock
+          queueMicrotask(async () => {
+            try {
+              const { data: profile, error } = await supabase
+                .from('users')
+                .select('id')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+              if (error) {
+                await ErrorLogger.logError(error, {
+                  context: 'Profile check error during auth change',
+                  userId: session.user.id,
+                });
+                await supabase.from('analytics_events').insert({
+                  user_id: session.user.id,
+                  event_name: 'orphan_user_auth_change',
+                  event_metadata: {
+                    email: session.user.email,
+                    error: error.message,
+                  }
+                });
+              }
+              
               setHasProfile(!!profile);
-            });
-        }, 0);
-      } else {
-        setHasProfile(null);
+            } catch (err) {
+              await ErrorLogger.logError(err as Error, {
+                context: 'Auth state change profile check failed',
+              });
+              setHasProfile(false);
+            }
+          });
+        } else {
+          setHasProfile(null);
+        }
       }
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, []);

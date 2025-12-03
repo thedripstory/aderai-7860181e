@@ -1,6 +1,12 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+
+const RequestSchema = z.object({
+  apiKey: z.string().min(1).max(500),
+  answers: z.record(z.string()).optional(),
+});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,16 +21,57 @@ serve(async (req) => {
   console.log('[klaviyo-suggest-segments] Request received');
 
   try {
-    let { apiKey, answers } = await req.json();
-    console.log('[klaviyo-suggest-segments] Parsed request body, has apiKey:', !!apiKey, ', has answers:', !!answers);
-
-    if (!apiKey || !answers) {
-      console.error('[klaviyo-suggest-segments] Missing required fields');
+    // Get user ID from JWT
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
       return new Response(
-        JSON.stringify({ error: 'Missing apiKey or answers' }),
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check rate limit before processing
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    const limitCheckResponse = await fetch(`${supabaseUrl}/functions/v1/check-ai-limit`, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!limitCheckResponse.ok) {
+      const limitError = await limitCheckResponse.json();
+      console.error('[klaviyo-suggest-segments] Rate limit check failed:', limitError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          message: 'You have reached your daily limit for AI suggestions. Please try again tomorrow.',
+          limit: 10,
+          resetTime: 'midnight UTC'
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const body = await req.json();
+    const validationResult = RequestSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      console.error('[klaviyo-suggest-segments] Validation failed:', validationResult.error.issues);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validationResult.error.issues 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    let { apiKey, answers } = validationResult.data;
+    console.log('[klaviyo-suggest-segments] Parsed request body, has apiKey:', !!apiKey, ', has answers:', !!answers);
 
     // Decrypt API key if encrypted
     if (isEncrypted(apiKey)) {
@@ -123,7 +170,7 @@ RULES:
 9. Always append " | Aderai" to segment names`;
 
     const userPrompt = `Brand Information:
-${Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n')}
+${answers ? Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n') : 'No additional information provided'}
 
 Based on this information and the available Klaviyo metrics, suggest segments that will help this brand achieve their goals.`;
 
@@ -167,6 +214,15 @@ Based on this information and the available Klaviyo metrics, suggest segments th
     const aiData = await aiResponse.json();
     const suggestedSegments = JSON.parse(aiData.choices[0].message.content);
     console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
+
+    // Increment AI usage counter after successful operation
+    await fetch(`${supabaseUrl}/functions/v1/increment-ai-usage`, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+    }).catch(err => console.error('[klaviyo-suggest-segments] Failed to increment usage:', err));
 
     return new Response(
       JSON.stringify(suggestedSegments),
