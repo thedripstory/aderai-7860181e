@@ -3,6 +3,7 @@ import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, S
 import { TubelightNavbar } from "@/components/TubelightNavbar";
 import { useABTest, trackABTestConversion } from "@/hooks/useABTest";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
+import { AnimatedSignUpCTA } from "@/components/AnimatedSignUpCTA";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
@@ -720,7 +721,7 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-16 text-center">
-              <PoweredByBadge />
+              <AnimatedSignUpCTA />
             </div>
           </div>
         </section>
