@@ -1,3 +1,55 @@
+export interface UserSegmentSettings {
+  currencySymbol: string;
+  highValueThreshold: number;
+  vipThreshold: number;
+  aov: number;
+  lapsedDays: number;
+  churnedDays: number;
+  newCustomerDays: number;
+}
+
+export const DEFAULT_SEGMENT_SETTINGS: UserSegmentSettings = {
+  currencySymbol: '$',
+  highValueThreshold: 500,
+  vipThreshold: 1000,
+  aov: 100,
+  lapsedDays: 90,
+  churnedDays: 180,
+  newCustomerDays: 60,
+};
+
+// Transform a segment's text fields with user settings
+export function applySegmentSettings(segment: Segment, settings: UserSegmentSettings): Segment {
+  const replacements: Record<string, string> = {
+    '{currencySymbol}': settings.currencySymbol,
+    '{highValueThreshold}': settings.highValueThreshold.toString(),
+    '{vipThreshold}': settings.vipThreshold.toString(),
+    '{aov}': settings.aov.toString(),
+    '{lapsedDays}': settings.lapsedDays.toString(),
+    '{churnedDays}': settings.churnedDays.toString(),
+    '{newCustomerDays}': settings.newCustomerDays.toString(),
+  };
+
+  let description = segment.description;
+  let definition = segment.definition;
+
+  Object.entries(replacements).forEach(([placeholder, value]) => {
+    description = description.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+    definition = definition.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+  });
+
+  return {
+    ...segment,
+    description,
+    definition,
+  };
+}
+
+// Transform all segments with user settings
+export function applySettingsToSegments(segments: Segment[], settings: UserSegmentSettings): Segment[] {
+  return segments.map(segment => applySegmentSettings(segment, settings));
+}
+
 export const SEGMENTS = [
   // ENGAGEMENT & ACTIVITY (14 segments)
   {
@@ -183,18 +235,18 @@ export const SEGMENTS = [
   {
     id: "new-subscribers",
     name: "New Subscribers",
-    description: "Joined list recently, never purchased",
+    description: "Joined list in last {newCustomerDays} days, never purchased",
     category: "Customer Lifecycle & Value",
     icon: "🌱",
-    definition: "Subscribed recently, 0 purchases",
+    definition: "Subscribed within {newCustomerDays}d, 0 purchases",
   },
   {
     id: "recent-first-time",
     name: "Recent First-Time Customers",
-    description: "Made first purchase in last 30 days",
+    description: "Made first purchase in last {newCustomerDays} days",
     category: "Customer Lifecycle & Value",
     icon: "🎉",
-    definition: "First purchase within 30 days",
+    definition: "First purchase within {newCustomerDays} days",
   },
   {
     id: "repeat-customers",
@@ -215,26 +267,26 @@ export const SEGMENTS = [
   {
     id: "active-customers",
     name: "Active Customers",
-    description: "Purchased in last 90 days",
+    description: "Purchased in last {lapsedDays} days",
     category: "Customer Lifecycle & Value",
     icon: "⚡",
-    definition: "Purchase within 90 days",
+    definition: "Purchase within {lapsedDays} days",
   },
   {
     id: "lapsed-customers",
     name: "Lapsed Customers",
-    description: "Purchased before but not in last 180 days",
+    description: "Last purchase {lapsedDays}-{churnedDays} days ago",
     category: "Customer Lifecycle & Value",
     icon: "😴",
-    definition: "Last purchase 90-180 days ago",
+    definition: "Last purchase {lapsedDays}-{churnedDays} days ago",
   },
   {
     id: "churned-customers",
     name: "Churned Customers",
-    description: "No purchase in 365+ days",
+    description: "No purchase in {churnedDays}+ days",
     category: "Customer Lifecycle & Value",
     icon: "💔",
-    definition: "No purchase in 365+ days",
+    definition: "No purchase in {churnedDays}+ days",
   },
   {
     id: "vip-customers",
@@ -247,18 +299,18 @@ export const SEGMENTS = [
   {
     id: "big-spenders",
     name: "Big Spenders",
-    description: "Historic CLV greater than threshold",
+    description: "Historic CLV greater than {currencySymbol}{vipThreshold}",
     category: "Customer Lifecycle & Value",
     icon: "💰",
-    definition: "CLV > threshold",
+    definition: "CLV > {currencySymbol}{vipThreshold}",
   },
   {
     id: "bargain-shoppers",
     name: "Bargain Shoppers",
-    description: "Historic CLV less than threshold",
+    description: "Historic CLV less than {currencySymbol}{aov}",
     category: "Customer Lifecycle & Value",
     icon: "🏷️",
-    definition: "CLV < threshold",
+    definition: "CLV < {currencySymbol}{aov}",
   },
   {
     id: "high-churn-risk",
@@ -287,18 +339,18 @@ export const SEGMENTS = [
   {
     id: "high-aov",
     name: "High AOV",
-    description: "Average order value greater than threshold",
+    description: "Average order value greater than {currencySymbol}{highValueThreshold}",
     category: "Customer Lifecycle & Value",
     icon: "📈",
-    definition: "AOV > threshold",
+    definition: "AOV > {currencySymbol}{highValueThreshold}",
   },
   {
     id: "low-aov",
     name: "Low AOV",
-    description: "Average order value less than threshold",
+    description: "Average order value less than {currencySymbol}{aov}",
     category: "Customer Lifecycle & Value",
     icon: "📉",
-    definition: "AOV < threshold",
+    definition: "AOV < {currencySymbol}{aov}",
   },
 
   // SHOPPING BEHAVIOR & PURCHASE HISTORY (18 segments)
@@ -337,10 +389,10 @@ export const SEGMENTS = [
   {
     id: "abandoned-cart-high-value",
     name: "Abandoned Cart - High Value",
-    description: "Cart value $400+ but no purchase",
+    description: "Cart value {currencySymbol}{highValueThreshold}+ but no purchase",
     category: "Shopping Behavior & Purchase History",
     icon: "💎",
-    definition: "Cart value $400+, no purchase",
+    definition: "Cart value {currencySymbol}{highValueThreshold}+, no purchase",
   },
   {
     id: "abandoned-checkout",
@@ -353,10 +405,10 @@ export const SEGMENTS = [
   {
     id: "abandoned-checkout-high-value",
     name: "Abandoned Checkout - High Value",
-    description: "Checkout value $400+ but no complete",
+    description: "Checkout value {currencySymbol}{highValueThreshold}+ but no complete",
     category: "Shopping Behavior & Purchase History",
     icon: "💵",
-    definition: "Checkout $400+, no complete",
+    definition: "Checkout {currencySymbol}{highValueThreshold}+, no complete",
   },
   {
     id: "browse-abandonment",

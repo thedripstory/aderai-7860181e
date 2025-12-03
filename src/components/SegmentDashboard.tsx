@@ -5,7 +5,7 @@ import { SegmentFilters } from './segments/SegmentFilters';
 import { FavoritesSection } from './segments/FavoritesSection';
 import { BundlesSection } from './segments/BundlesSection';
 import { SegmentCategories } from './segments/SegmentCategories';
-import { SEGMENTS } from '@/lib/segmentData';
+import { SEGMENTS, applySettingsToSegments, DEFAULT_SEGMENT_SETTINGS, UserSegmentSettings } from '@/lib/segmentData';
 import { toast } from 'sonner';
 
 interface SegmentDashboardProps {
@@ -16,6 +16,7 @@ interface SegmentDashboardProps {
   onClearAll?: () => void;
   segmentLimit?: number;
   currentTier?: string;
+  userSettings?: UserSegmentSettings;
 }
 
 export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
@@ -26,6 +27,7 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
   onClearAll,
   segmentLimit = 999,
   currentTier = 'professional',
+  userSettings = DEFAULT_SEGMENT_SETTINGS,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -34,6 +36,12 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
   });
   const [previewSegment, setPreviewSegment] = useState<typeof SEGMENTS[0] | null>(null);
   const [showShortcutsHint, setShowShortcutsHint] = useState(true);
+
+  // Apply user settings to all segments
+  const segmentsWithSettings = useMemo(() => 
+    applySettingsToSegments(SEGMENTS, userSettings),
+    [userSettings]
+  );
 
   // Persist favorites to localStorage
   useEffect(() => {
@@ -81,17 +89,17 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
 
   // Memoize filtered segments to avoid recalculation on every render
   const filteredSegments = useMemo(() => 
-    SEGMENTS.filter(segment => 
+    segmentsWithSettings.filter(segment => 
       segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       segment.description.toLowerCase().includes(searchQuery.toLowerCase())
     ),
-    [searchQuery]
+    [searchQuery, segmentsWithSettings]
   );
 
   // Memoize favorite segments
   const favoriteSegments = useMemo(() => 
-    SEGMENTS.filter(s => favorites.includes(s.id)),
-    [favorites]
+    segmentsWithSettings.filter(s => favorites.includes(s.id)),
+    [favorites, segmentsWithSettings]
   );
 
   const selectedCount = selectedSegments.length;
@@ -114,10 +122,10 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <h2 className="text-4xl font-bold tracking-tight">Create Segments</h2>
-            <p className="text-muted-foreground flex items-center gap-2 text-base">
-              <Sparkles className="w-4 h-4 text-primary" />
-              {SEGMENTS.length} professional segments at your fingertips
-            </p>
+          <p className="text-muted-foreground flex items-center gap-2 text-base">
+            <Sparkles className="w-4 h-4 text-primary" />
+            {segmentsWithSettings.length} professional segments at your fingertips
+          </p>
           </div>
           
           {/* Selection Counter */}
@@ -203,6 +211,7 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
         onPreviewSegment={setPreviewSegment}
         onToggleFavorite={toggleFavorite}
         onClearSearch={() => setSearchQuery('')}
+        segments={segmentsWithSettings}
       />
     </div>
   );
