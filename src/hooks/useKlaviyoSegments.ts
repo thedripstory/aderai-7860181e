@@ -189,7 +189,7 @@ export const useKlaviyoSegments = () => {
 
         if (resultStatus === 'created') {
           // Log the operation for audit trail
-          logSegmentOperation(segmentId, segmentName, 'create', 'success', activeKey.id, result.klaviyoId);
+          logSegmentOperation(segmentId, segmentName, 'created', 'success', activeKey.id, result.klaviyoId);
           return {
             segmentId,
             status: "success" as const,
@@ -210,7 +210,7 @@ export const useKlaviyoSegments = () => {
           };
         } else {
           // Log failed operations
-          logSegmentOperation(segmentId, segmentName, 'create', 'failed', activeKey.id, undefined, result.error);
+          logSegmentOperation(segmentId, segmentName, 'created', 'failed', activeKey.id, undefined, result.error);
           return {
             segmentId,
             status: "error" as const,
