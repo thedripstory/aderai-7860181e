@@ -11,6 +11,7 @@ import { LoadingState } from '@/components/ui/loading-state';
 import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
 import { sanitizeString } from '@/lib/inputSanitization';
+import { SegmentCreationModal } from '@/components/SegmentCreationModal';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -20,6 +21,8 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const [creatingSegment, setCreatingSegment] = useState<{ name: string; description: string } | null>(null);
+  const [segmentCreationComplete, setSegmentCreationComplete] = useState(false);
   const { trackAction } = useFeatureTracking('ai_segment_suggester');
   const { allowed, remaining, total_used, daily_limit, loading: limitsLoading, incrementUsage } = useAILimits();
 
@@ -114,7 +117,8 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
   const createAiSegment = useCallback(
     async (suggestion: any) => {
       trackAction('create_ai_segment', { segment_name: suggestion.name });
-      setAiLoading(true);
+      setCreatingSegment({ name: suggestion.name, description: suggestion.description });
+      setSegmentCreationComplete(false);
 
       try {
         const { data: response, error } = await supabase.functions.invoke('klaviyo-create-custom-segment', {
@@ -127,20 +131,28 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
 
         if (error) throw error;
 
+        setSegmentCreationComplete(true);
+
         if (response.status === 'exists') {
-          toast.info(`Segment "${suggestion.name}" already exists`, {
-            description: 'This segment is already in your Klaviyo account',
-            duration: 4000,
-          });
+          setTimeout(() => {
+            setCreatingSegment(null);
+            toast.info(`Segment "${suggestion.name}" already exists`, {
+              description: 'This segment is already in your Klaviyo account',
+              duration: 4000,
+            });
+          }, 1500);
         } else if (response.status === 'created') {
-          toast.success(`Created segment "${suggestion.name}"!`, {
-            description: 'Segment is now live in your Klaviyo account',
-            duration: 3000,
-          });
-          setAiSuggestions(prev => prev.filter(s => s.name !== suggestion.name));
+          setTimeout(() => {
+            setCreatingSegment(null);
+            toast.success(`Created segment "${suggestion.name}"!`, {
+              description: 'Segment is now live in your Klaviyo account',
+              duration: 3000,
+            });
+            setAiSuggestions(prev => prev.filter(s => s.name !== suggestion.name));
+          }, 1500);
         }
       } catch (error: any) {
-        // Get user for logging
+        setCreatingSegment(null);
         const { data: { user } } = await supabase.auth.getUser();
 
         await ErrorHandler.handleAPIError(error, 'klaviyo-create-custom-segment', {
@@ -149,8 +161,6 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
           action: 'create_ai_segment',
           metadata: { segmentName: suggestion.name },
         });
-      } finally {
-        setAiLoading(false);
       }
     },
     [activeKey, trackAction]
@@ -316,22 +326,24 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
               </div>
               <button
                 onClick={() => createAiSegment(suggestion)}
-                disabled={aiLoading}
+                disabled={!!creatingSegment}
                 className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {aiLoading ? (
-                  <Loader className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <CheckCircle className="w-4 h-4" />
-                    Create This Segment
-                  </>
-                )}
+                <CheckCircle className="w-4 h-4" />
+                Create This Segment
               </button>
             </div>
           ))}
         </div>
       )}
+
+      {/* Segment Creation Modal */}
+      <SegmentCreationModal
+        isOpen={!!creatingSegment}
+        segmentName={creatingSegment?.name || ''}
+        segmentDescription={creatingSegment?.description || ''}
+        isComplete={segmentCreationComplete}
+      />
     </div>
   );
 };
