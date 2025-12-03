@@ -592,18 +592,18 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  Aderai Users <span className="text-primary">Worldwide</span>
+                  Trusted by Marketers <span className="text-primary">Everywhere</span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Join marketers across the globe deploying expert-grade segments in seconds
+                  Real brands. Real results. Deploying segments right now.
                 </p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal delay={0.2}>
               <div className="relative flex items-center justify-center overflow-hidden rounded-3xl border-2 border-black bg-white px-10 pb-40 pt-8 md:pb-60 max-w-2xl mx-auto shadow-xl">
-                <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-400 bg-clip-text text-center text-6xl md:text-7xl font-bold leading-none text-transparent">
-                  LIVE
+                <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-400 bg-clip-text text-center text-5xl md:text-6xl font-bold leading-none text-transparent">
+                  LIVE USERS
                 </span>
                 <Globe className="top-28" />
                 <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_200%,rgba(251,100,21,0.15),rgba(255,255,255,0))]" />
