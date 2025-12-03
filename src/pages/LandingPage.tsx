@@ -16,7 +16,7 @@ import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { SegmentFlowEffect } from "@/components/SegmentFlowEffect";
 import { ComparisonChart } from "@/components/ComparisonChart";
-import { RevenueTestimonials } from "@/components/RevenueTestimonials";
+
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Testimonials3D } from "@/components/landing/Testimonials3D";
 import { Globe } from "@/components/ui/globe";
@@ -567,10 +567,6 @@ export default function LandingPage() {
           <ComparisonChart />
         </ScrollReveal>
 
-        {/* Revenue Testimonials Section */}
-        <ScrollReveal>
-          <RevenueTestimonials />
-        </ScrollReveal>
 
         {/* 3D Testimonials Wall */}
         <Testimonials3D />
