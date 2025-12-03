@@ -1,27 +1,12 @@
-export const TrustLogos = () => {
-  const logos = [
-    { name: "TechCrunch", width: "w-32" },
-    { name: "Forbes", width: "w-24" },
-    { name: "Entrepreneur", width: "w-36" },
-    { name: "Business Insider", width: "w-40" },
-    { name: "Inc.", width: "w-16" }
-  ];
+import { LogoCloud } from "@/components/ui/logo-cloud-2";
 
+export const TrustLogos = () => {
   return (
-    <div className="py-12 border-y border-border">
-      <p className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-wider">
+    <section className="relative mx-auto w-full max-w-5xl px-4">
+      <h2 className="mb-6 text-center font-medium text-lg text-muted-foreground tracking-tight md:text-xl">
         As featured in
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-        {logos.map((logo) => (
-          <div
-            key={logo.name}
-            className={`${logo.width} h-8 bg-muted-foreground/10 rounded flex items-center justify-center`}
-          >
-            <span className="text-xs font-semibold text-muted-foreground">{logo.name}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+      </h2>
+      <LogoCloud />
+    </section>
   );
 };
