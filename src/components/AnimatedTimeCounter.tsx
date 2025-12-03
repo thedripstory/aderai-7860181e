@@ -1,17 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export const AnimatedTimeCounter = () => {
   const [timeInSeconds, setTimeInSeconds] = useState(36000); // 10 hours in seconds
   const [isAnimating, setIsAnimating] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
 
+  // Use Intersection Observer to start animation when visible
   useEffect(() => {
-    // Start animation after a brief delay
-    const startDelay = setTimeout(() => {
-      setIsAnimating(true);
-    }, 500);
+    if (hasAnimated) return;
 
-    return () => clearTimeout(startDelay);
-  }, []);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimated) {
+            // Small delay after becoming visible
+            setTimeout(() => {
+              setIsAnimating(true);
+              setHasAnimated(true);
+            }, 300);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasAnimated]);
 
   useEffect(() => {
     if (!isAnimating) return;
@@ -76,7 +95,7 @@ export const AnimatedTimeCounter = () => {
   };
 
   return (
-    <span className="inline-block min-w-[200px] text-center tabular-nums">
+    <span ref={ref} className="inline-block min-w-[200px] text-center tabular-nums">
       {formatTime(timeInSeconds)}
     </span>
   );
