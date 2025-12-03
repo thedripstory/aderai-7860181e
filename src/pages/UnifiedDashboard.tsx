@@ -579,7 +579,7 @@ export default function UnifiedDashboard() {
     {/* Floating sticky segment selection bar */}
     {selectedSegments.length > 0 && (
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 animate-fade-in">
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/95 to-primary/85 backdrop-blur-xl border border-primary-foreground/20 shadow-2xl shadow-primary/40 relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/95 to-primary/85 backdrop-blur-xl border border-primary-foreground/20 shadow-2xl shadow-primary/40 relative overflow-hidden animate-[pulse_2s_ease-in-out_2]">
           {/* Animated glow effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-white/10" />
           <div className="absolute -inset-1 bg-primary/30 blur-xl -z-10" />
