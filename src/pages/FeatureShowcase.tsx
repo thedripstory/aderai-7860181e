@@ -1,7 +1,6 @@
 import { BarChart3, Activity, Layers } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ComparisonChart } from "@/components/ComparisonChart";
-import { RevenueTestimonials } from "@/components/RevenueTestimonials";
 import { SegmentHealthMonitor } from "@/components/SegmentHealthMonitor";
 import { DashboardHeader } from "@/components/DashboardHeader";
 
@@ -31,14 +30,10 @@ export default function FeatureShowcase() {
         </div>
 
         <Tabs defaultValue="comparison" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-card border border-border mb-8">
+          <TabsList className="grid w-full grid-cols-2 bg-card border border-border mb-8">
             <TabsTrigger value="comparison" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Comparison</span>
-            </TabsTrigger>
-            <TabsTrigger value="testimonials" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
-              <Activity className="w-4 h-4" />
-              <span className="hidden sm:inline">Results</span>
             </TabsTrigger>
             <TabsTrigger value="health" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               <Activity className="w-4 h-4" />
@@ -48,10 +43,6 @@ export default function FeatureShowcase() {
 
           <TabsContent value="comparison">
             <ComparisonChart />
-          </TabsContent>
-
-          <TabsContent value="testimonials">
-            <RevenueTestimonials />
           </TabsContent>
 
           <TabsContent value="health">
