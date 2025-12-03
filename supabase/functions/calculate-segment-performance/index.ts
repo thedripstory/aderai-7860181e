@@ -31,8 +31,11 @@ serve(async (req) => {
       }
     );
 
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    // Extract JWT token and get user
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !user) {
+      console.error("Auth error:", userError?.message);
       return new Response(
         JSON.stringify({ error: "Unauthorized", details: userError?.message }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
