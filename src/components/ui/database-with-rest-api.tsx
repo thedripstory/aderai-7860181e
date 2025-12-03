@@ -250,7 +250,7 @@ const DatabaseWithRestApi = ({
           transition={{ duration: 0.2 }}
         >
           <SparklesIcon className="size-4 text-primary" />
-          <span className="ml-2 text-sm font-medium">
+          <span className="ml-2 text-sm font-medium text-white">
             {title ? title : "Data exchange using a customized REST API"}
           </span>
         </motion.div>
@@ -271,7 +271,7 @@ const DatabaseWithRestApi = ({
             transition={{ duration: 0.2 }}
           >
             <HeartHandshakeIcon className="size-4 text-primary" />
-            <span className="font-medium">{buttonTexts?.first || "LegionDev"}</span>
+            <span className="font-medium text-white">{buttonTexts?.first || "LegionDev"}</span>
           </motion.div>
           <motion.div 
             className="absolute right-16 top-10 z-10 hidden h-9 rounded-full bg-[#101112] px-4 text-sm sm:flex border border-accent/20 items-center gap-2 cursor-pointer"
@@ -279,7 +279,7 @@ const DatabaseWithRestApi = ({
             transition={{ duration: 0.2 }}
           >
             <Folder className="size-4 text-accent" />
-            <span className="font-medium">{buttonTexts?.second || "v2_updates"}</span>
+            <span className="font-medium text-white">{buttonTexts?.second || "v2_updates"}</span>
           </motion.div>
           {/* Circles */}
           <motion.div
