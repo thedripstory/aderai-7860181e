@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, DollarSign, Users, RefreshCw, ArrowUp, ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { PerformanceLoadingState } from "@/components/PerformanceLoadingState";
+import { ErrorLogger } from "@/lib/errorLogger";
 
 interface PerformanceData {
   segment_id: string;
@@ -33,17 +35,35 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
 
   const loadPerformance = async () => {
     try {
+      // Try to load cached performance data
       const { data, error } = await supabase
-        .from("segment_performance" as any)
+        .from("segment_historical_data")
         .select("*")
         .eq("klaviyo_key_id", klaviyoKeyId)
-        .order("revenue", { ascending: false })
+        .order("profile_count", { ascending: false })
         .limit(10);
 
-      if (error) throw error;
-      setPerformance((data as any) || []);
+      if (error) {
+        // Table might not exist or other error - just show empty state
+        ErrorLogger.logError(error as any, { context: 'load_performance_data' });
+      }
+      
+      // Transform historical data to performance format
+      if (data && data.length > 0) {
+        const performanceData: PerformanceData[] = data.map((item: any) => ({
+          segment_id: item.segment_klaviyo_id,
+          segment_name: item.segment_name,
+          revenue: 0, // Not available from historical data
+          conversion_rate: 0,
+          average_order_value: 0,
+          total_orders: 0,
+          active_profiles: item.profile_count || 0,
+          calculated_at: item.recorded_at,
+        }));
+        setPerformance(performanceData);
+      }
     } catch (error) {
-      console.error("Error loading performance:", error);
+      ErrorLogger.logError(error as Error, { context: 'load_performance' });
     } finally {
       setLoading(false);
     }
@@ -52,20 +72,31 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
+      // Get auth session for JWT
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error("Please sign in to refresh performance data");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("calculate-segment-performance", {
         body: {
           klaviyoKeyId,
-          apiKey,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       toast.success("Performance data updated");
-      loadPerformance();
+      await loadPerformance();
     } catch (error: any) {
-      console.error("Error refreshing performance:", error);
-      toast.error(error.message || "Failed to refresh performance data");
+      ErrorLogger.logError(error, { context: 'refresh_performance' });
+      toast.error("Failed to refresh performance data", {
+        description: "This feature requires additional setup. Please try again later.",
+      });
     } finally {
       setRefreshing(false);
     }
@@ -83,21 +114,7 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
   };
 
   if (loading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center">
-            <div className="relative w-8 h-8">
-              <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
-              <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <PerformanceLoadingState />;
   }
 
   return (
@@ -150,7 +167,7 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
                       </p>
                     </div>
                   </div>
-                  {item.revenue_change_percent !== undefined && (
+                  {item.revenue_change_percent !== undefined && item.revenue_change_percent !== 0 && (
                     <div className={`flex items-center gap-1 text-sm ${
                       item.revenue_change_percent >= 0 ? "text-green-500" : "text-red-500"
                     }`}>
@@ -166,24 +183,31 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground mb-1">Revenue</p>
+                    <p className="text-muted-foreground mb-1">Profiles</p>
                     <p className="font-semibold flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      {formatCurrency(item.revenue)}
+                      <Users className="w-4 h-4" />
+                      {item.active_profiles.toLocaleString()}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-muted-foreground mb-1">Orders</p>
-                    <p className="font-semibold">{item.total_orders.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground mb-1">AOV</p>
-                    <p className="font-semibold">{formatCurrency(item.average_order_value)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground mb-1">Conv. Rate</p>
-                    <p className="font-semibold">{formatPercent(item.conversion_rate)}</p>
-                  </div>
+                  {item.revenue > 0 && (
+                    <>
+                      <div>
+                        <p className="text-muted-foreground mb-1">Revenue</p>
+                        <p className="font-semibold flex items-center gap-1">
+                          <DollarSign className="w-4 h-4" />
+                          {formatCurrency(item.revenue)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground mb-1">AOV</p>
+                        <p className="font-semibold">{formatCurrency(item.average_order_value)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground mb-1">Conv. Rate</p>
+                        <p className="font-semibold">{formatPercent(item.conversion_rate)}</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

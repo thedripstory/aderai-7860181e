@@ -13,32 +13,54 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "No authorization header" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       {
         global: {
-          headers: { Authorization: req.headers.get("Authorization")! },
+          headers: { Authorization: authHeader },
         },
       }
     );
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) {
-      throw new Error("Unauthorized");
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized", details: userError?.message }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
     }
 
     const { klaviyoKeyId } = await req.json();
+
+    if (!klaviyoKeyId) {
+      return new Response(
+        JSON.stringify({ error: "klaviyoKeyId is required" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
 
     // Get Klaviyo API key
     const { data: keyData, error: keyError } = await supabaseClient
       .from("klaviyo_keys")
       .select("klaviyo_api_key_hash")
       .eq("id", klaviyoKeyId)
+      .eq("user_id", user.id)
       .single();
 
     if (keyError || !keyData) {
-      throw new Error("Klaviyo key not found");
+      return new Response(
+        JSON.stringify({ error: "Klaviyo key not found" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
+      );
     }
 
     // Decrypt API key if encrypted
@@ -47,7 +69,7 @@ serve(async (req) => {
       apiKey = await decryptApiKey(apiKey);
     }
 
-    // Fetch segments and their metrics from Klaviyo
+    // Fetch segments from Klaviyo
     const segmentsResponse = await fetch(
       "https://a.klaviyo.com/api/segments/",
       {
@@ -59,57 +81,47 @@ serve(async (req) => {
     );
 
     if (!segmentsResponse.ok) {
-      throw new Error("Failed to fetch segments from Klaviyo");
+      const errorText = await segmentsResponse.text();
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch segments from Klaviyo", details: errorText }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 502 }
+      );
     }
 
     const segmentsData = await segmentsResponse.json();
+    const segments = segmentsData.data || [];
+    
+    // Record segment snapshots in historical data table
+    const snapshots = segments.map((segment: any) => ({
+      klaviyo_key_id: klaviyoKeyId,
+      user_id: user.id,
+      segment_klaviyo_id: segment.id,
+      segment_name: segment.attributes?.name || "Unknown",
+      profile_count: 0, // Profile count not available from list endpoint
+      recorded_at: new Date().toISOString(),
+    }));
 
-    // Calculate performance for each segment
-    for (const segment of segmentsData.data || []) {
-      // Fetch metrics for this segment
-      const metricsResponse = await fetch(
-        `https://a.klaviyo.com/api/segments/${segment.id}/metrics/`,
-        {
-          headers: {
-            Authorization: `Klaviyo-API-Key ${apiKey}`,
-            revision: "2024-10-15",
-          },
-        }
-      );
-
-      let revenueGenerated = 0;
-      let conversionRate = 0;
-      let engagementScore = 0;
-
-      if (metricsResponse.ok) {
-        const metricsData = await metricsResponse.json();
-        
-        // Calculate metrics (simplified)
-        const totalRevenue = metricsData.data?.reduce((sum: number, metric: any) => {
-          return sum + (metric.attributes?.total_value || 0);
-        }, 0) || 0;
-
-        revenueGenerated = totalRevenue;
-        conversionRate = (metricsData.data?.length || 0) > 0 ? 0.05 : 0; // Placeholder
-        engagementScore = segment.attributes?.profile_count || 0;
-      }
-
-      // Upsert performance data
-      await supabaseClient
-        .from("segment_performance")
-        .upsert({
-          klaviyo_key_id: klaviyoKeyId,
-          segment_id: segment.id,
-          segment_name: segment.attributes?.name || "Unknown",
-          revenue_generated: revenueGenerated,
-          conversion_rate: conversionRate,
-          engagement_score: engagementScore,
-          last_calculated: new Date().toISOString(),
+    if (snapshots.length > 0) {
+      // Upsert snapshots - update if same segment already recorded today
+      const { error: insertError } = await supabaseClient
+        .from("segment_historical_data")
+        .upsert(snapshots, {
+          onConflict: "segment_klaviyo_id,klaviyo_key_id",
+          ignoreDuplicates: false,
         });
+
+      if (insertError) {
+        console.error("Error saving snapshots:", insertError);
+        // Continue even if insert fails
+      }
     }
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ 
+        success: true, 
+        segmentsProcessed: segments.length,
+        message: `Processed ${segments.length} segments`
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -118,10 +130,10 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error calculating segment performance:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "Internal server error" }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
+        status: 500,
       }
     );
   }
