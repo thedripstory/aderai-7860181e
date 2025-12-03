@@ -189,6 +189,19 @@ export default function Settings() {
         title: "Account updated",
         description: "Your account settings have been saved.",
       });
+
+      // Track settings updated event
+      try {
+        await supabase.from('analytics_events').insert({
+          user_id: currentUser.id,
+          event_name: 'settings_updated',
+          event_metadata: { section: 'account' },
+          page_url: window.location.href,
+          user_agent: navigator.userAgent,
+        });
+      } catch (trackError) {
+        console.error('Failed to track settings update:', trackError);
+      }
     } catch (error) {
       console.error("Error updating account:", error);
       toast({
@@ -259,6 +272,19 @@ export default function Settings() {
         title: "Thresholds updated",
         description: "Your segmentation settings have been saved.",
       });
+
+      // Track settings updated event
+      try {
+        await supabase.from('analytics_events').insert({
+          user_id: currentUser.id,
+          event_name: 'settings_updated',
+          event_metadata: { section: 'thresholds' },
+          page_url: window.location.href,
+          user_agent: navigator.userAgent,
+        });
+      } catch (trackError) {
+        console.error('Failed to track settings update:', trackError);
+      }
     } catch (error) {
       console.error("Error updating thresholds:", error);
       toast({
@@ -344,6 +370,19 @@ export default function Settings() {
         title: "Preferences updated",
         description: "Your notification settings have been saved.",
       });
+
+      // Track settings updated event
+      try {
+        await supabase.from('analytics_events').insert({
+          user_id: currentUser.id,
+          event_name: 'settings_updated',
+          event_metadata: { section: 'notifications' },
+          page_url: window.location.href,
+          user_agent: navigator.userAgent,
+        });
+      } catch (trackError) {
+        console.error('Failed to track settings update:', trackError);
+      }
     } catch (error) {
       console.error("Error updating notifications:", error);
       toast({

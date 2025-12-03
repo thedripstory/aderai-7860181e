@@ -121,6 +121,22 @@ export const FeedbackWidget: React.FC = () => {
 
       trackAction('feedback_submitted', { type });
 
+      // Track feedback submitted event
+      try {
+        await supabase.from('analytics_events').insert({
+          user_id: user.id,
+          event_name: 'feedback_submitted',
+          event_metadata: {
+            feedback_type: type,
+            title: data.title || null,
+          },
+          page_url: window.location.href,
+          user_agent: navigator.userAgent,
+        });
+      } catch (trackError) {
+        console.error('Failed to track feedback event:', trackError);
+      }
+
       // Award "Feedback Champion" achievement
       try {
         const { data: achievements } = await supabase

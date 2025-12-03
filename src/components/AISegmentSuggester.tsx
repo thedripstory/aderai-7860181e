@@ -71,6 +71,25 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       // Increment usage counter after successful generation
       await incrementUsage();
 
+      // Track AI suggestion used event
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('analytics_events').insert({
+            user_id: user.id,
+            event_name: 'ai_suggestion_used',
+            event_metadata: {
+              suggestions_count: response.segments?.length || 0,
+              prompt_length: aiPrompt.length,
+            },
+            page_url: window.location.href,
+            user_agent: navigator.userAgent,
+          });
+        }
+      } catch (trackError) {
+        console.error('Failed to track AI suggestion event:', trackError);
+      }
+
       // Award "AI Explorer" achievement
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -143,6 +162,25 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
             });
           }, 1500);
         } else if (response.status === 'created') {
+          // Track segment created event
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              await supabase.from('analytics_events').insert({
+                user_id: user.id,
+                event_name: 'segment_created',
+                event_metadata: {
+                  segment_name: suggestion.name,
+                  source: 'ai_suggestion',
+                },
+                page_url: window.location.href,
+                user_agent: navigator.userAgent,
+              });
+            }
+          } catch (trackError) {
+            console.error('Failed to track segment creation:', trackError);
+          }
+
           setTimeout(() => {
             setCreatingSegment(null);
             toast.success(`Created segment "${suggestion.name}"!`, {
