@@ -1,11 +1,13 @@
+import { AderaiLogo } from "@/components/AderaiLogo";
+
 export const EmailFooter = () => {
   return (
     <footer className="px-4 py-8 border-t border-border bg-muted">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-playfair font-bold mb-2">
-            aderai<span className="text-accent">.</span>
-          </h3>
+          <div className="flex justify-center mb-2">
+            <AderaiLogo size="lg" showHoverEffect={false} />
+          </div>
           <p className="text-sm text-muted-foreground">
             AI-powered segmentation for Klaviyo
           </p>

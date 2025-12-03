@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-mo
 import { Mail, Lock, Eye, EyeClosed, ArrowRight, User } from 'lucide-react';
 import { cn } from "@/lib/utils"
 import { AuroraBackground } from "@/components/ui/aurora-background"
+import { AderaiLogo } from "@/components/AderaiLogo"
 
 function SignInInput({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -208,10 +209,8 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", duration: 0.8 }}
                 >
-                  <Link to="/" className="inline-block group">
-                    <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-                      aderai<span className="text-accent group-hover:animate-pulse">.</span>
-                    </div>
+                  <Link to="/" className="inline-block">
+                    <AderaiLogo size="xl" />
                   </Link>
                 </motion.div>
 

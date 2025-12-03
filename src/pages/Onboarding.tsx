@@ -5,6 +5,7 @@ import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { toast } from "sonner";
 import { ErrorLogger } from "@/lib/errorLogger";
+import { AderaiLogo } from "@/components/AderaiLogo";
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -90,9 +91,7 @@ export default function Onboarding() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <a href="/dashboard" className="group flex items-center gap-3">
-              <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-                aderai<span className="text-accent group-hover:animate-pulse">.</span>
-              </div>
+              <AderaiLogo size="lg" />
             </a>
           </div>
         </div>

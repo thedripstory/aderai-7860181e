@@ -2,6 +2,7 @@ import { ArrowRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ErrorLogger } from "@/lib/errorLogger";
+import { AderaiLogo } from "@/components/AderaiLogo";
 
 interface TimeBasedPopupProps {
   onGetStarted: () => void;
@@ -83,9 +84,7 @@ export const TimeBasedPopup = ({ onGetStarted }: TimeBasedPopupProps) => {
 
         <div className="text-center space-y-6">
           <div className="mx-auto flex items-center justify-center mb-2">
-            <span className="text-4xl font-playfair font-bold">
-              aderai<span className="text-accent">.</span>
-            </span>
+            <AderaiLogo size="xl" showHoverEffect={false} />
           </div>
 
           <div className="space-y-3">

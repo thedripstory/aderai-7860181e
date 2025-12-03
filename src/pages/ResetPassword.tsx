@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AderaiLogo } from "@/components/AderaiLogo";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -104,11 +105,7 @@ export default function ResetPassword() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <a href="/" className="inline-block group">
-            <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-              aderai<span className="text-accent group-hover:animate-pulse">.</span>
-            </div>
-          </a>
+          <AderaiLogo href="/" size="xl" />
         </div>
 
         <Card className="border-border/50 shadow-2xl bg-card/80 backdrop-blur-sm">

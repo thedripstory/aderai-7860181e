@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { AderaiLogo } from "@/components/AderaiLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -54,11 +55,7 @@ export default function ForgotPassword() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <a href="/" className="inline-block group">
-            <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-              aderai<span className="text-accent group-hover:animate-pulse">.</span>
-            </div>
-          </a>
+          <AderaiLogo href="/" size="xl" />
         </div>
 
         <Card className="border-border/50 shadow-2xl bg-card/80 backdrop-blur-sm">

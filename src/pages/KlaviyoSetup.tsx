@@ -17,6 +17,7 @@ import { supabase } from "@/lib/supabase";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 import { cn } from "@/lib/utils";
+import { AderaiLogo } from "@/components/AderaiLogo";
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
@@ -303,9 +304,7 @@ const KlaviyoSetup = () => {
                 <span className="hidden sm:inline">Dashboard</span>
               </Button>
               <a href="/dashboard" className="group flex items-center gap-3">
-                <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-                  aderai<span className="text-accent group-hover:animate-pulse">.</span>
-                </div>
+                <AderaiLogo size="lg" />
               </a>
             </div>
           </div>

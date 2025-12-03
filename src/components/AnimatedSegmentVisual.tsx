@@ -1,6 +1,7 @@
 import DatabaseWithRestApi from "@/components/ui/database-with-rest-api";
 import { Zap, ArrowRight, Clock, Rocket, Users, Target, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { AderaiLogo } from "@/components/AderaiLogo";
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
@@ -204,7 +205,7 @@ export const AnimatedSegmentVisual = () => {
                 30 sec
               </div>
               <p className="text-sm text-muted-foreground mt-2 flex items-center justify-center gap-1">
-                <span className="font-playfair font-bold">aderai<span className="text-accent">.</span></span>
+                <AderaiLogo size="sm" showHoverEffect={false} />
               </p>
             </motion.div>
           </div>
