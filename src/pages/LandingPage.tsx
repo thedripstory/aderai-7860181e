@@ -18,6 +18,7 @@ import { ValueCalculator } from "@/components/ValueCalculator";
 import { ComparisonChart } from "@/components/ComparisonChart";
 import { RevenueTestimonials } from "@/components/RevenueTestimonials";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { Testimonials3D } from "@/components/landing/Testimonials3D";
 import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -643,6 +644,9 @@ export default function LandingPage() {
         <ScrollReveal>
           <RevenueTestimonials />
         </ScrollReveal>
+
+        {/* 3D Testimonials Wall */}
+        <Testimonials3D />
 
         {/* Features Section */}
         <section className="py-20 px-4 bg-background">
