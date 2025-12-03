@@ -14,7 +14,7 @@ export function LogoCloud({ className, ...props }: LogoCloudProps) {
   const logos: Logo[] = [
     { src: "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Magazines/TechCrunch-min.png", alt: "TechCrunch Logo" },
     { src: "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Magazines/Forbes-min.png", alt: "Forbes Logo" },
-    { src: "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Magazines/Entrepreneur-min.png", alt: "Entrepreneur Logo" },
+    { src: "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Magazines/Entrepreneur_logo.png", alt: "Entrepreneur Logo" },
     { src: "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Magazines/Business_Insider-min.png", alt: "Business Insider Logo" },
     { src: "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Magazines/Inc.-min.png", alt: "Inc. Logo" },
   ];
