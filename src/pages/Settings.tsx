@@ -359,7 +359,7 @@ export default function Settings() {
   return (
     <PageErrorBoundary pageName="Settings">
     <div className="min-h-screen bg-background">
-      <DashboardHeader showSettings={false} />
+      <DashboardHeader showSettings={false} showBackButton={true} />
       
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10 overflow-hidden">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, Settings as SettingsIcon, HelpCircle, Sparkles } from 'lucide-react';
+import { LogOut, Settings as SettingsIcon, HelpCircle, Sparkles, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,12 +14,14 @@ import { supabase } from '@/integrations/supabase/client';
 interface DashboardHeaderProps {
   onStartTour?: () => void;
   showSettings?: boolean;
+  showBackButton?: boolean;
   children?: React.ReactNode;
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onStartTour,
   showSettings = true,
+  showBackButton = false,
   children,
 }) => {
   const navigate = useNavigate();
@@ -35,28 +37,41 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <div className="flex h-20 items-center justify-between px-6 lg:px-8">
           
           {/* Brand */}
-          <a 
-            href="/dashboard" 
-            className="group flex items-center gap-3 transition-opacity hover:opacity-80"
-          >
-            <div className="relative">
-              <div className="text-3xl font-playfair font-bold tracking-tight">
-                <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  aderai
-                </span>
-                <span className="text-accent transition-transform duration-300 group-hover:scale-125 inline-block">
-                  .
+          <div className="flex items-center gap-3">
+            {showBackButton && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Button>
+            )}
+            <a 
+              href="/dashboard" 
+              className="group flex items-center gap-3 transition-opacity hover:opacity-80"
+            >
+              <div className="relative">
+                <div className="text-3xl font-playfair font-bold tracking-tight">
+                  <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    aderai
+                  </span>
+                  <span className="text-accent transition-transform duration-300 group-hover:scale-125 inline-block">
+                    .
+                  </span>
+                </div>
+              </div>
+              
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-accent" />
+                <span className="text-xs font-semibold text-accent tracking-wide uppercase">
+                  AI Segmentation
                 </span>
               </div>
-            </div>
-            
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span className="text-xs font-semibold text-accent tracking-wide uppercase">
-                AI Segmentation
-              </span>
-            </div>
-          </a>
+            </a>
+          </div>
 
           {/* Actions */}
           <div className="flex items-center gap-3">
