@@ -17,6 +17,7 @@ import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { ValueCalculator } from "@/components/ValueCalculator";
 import { ComparisonChart } from "@/components/ComparisonChart";
 import { RevenueTestimonials } from "@/components/RevenueTestimonials";
+import { ScrollReveal } from "@/components/ScrollReveal";
 import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -275,6 +276,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
+            <ScrollReveal direction="left">
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -337,11 +339,14 @@ export default function LandingPage() {
                 Get Started
               </button>
             </div>
+            </ScrollReveal>
 
             {/* Right Workflow Visual */}
-            <div className="relative">
-              <AutomationFlow />
-            </div>
+            <ScrollReveal direction="right" delay={0.2}>
+              <div className="relative">
+                <AutomationFlow />
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -349,25 +354,28 @@ export default function LandingPage() {
       {/* Discover Hidden Segments */}
       <section id="how-it-works" className="py-20 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Segment Discovery
-              </span>
+          <ScrollReveal>
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                  Segment Discovery
+                </span>
+              </div>
             </div>
-          </div>
 
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-center">
-            Segments you didn't know existed
-          </h2>
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 text-center">
+              Segments you didn't know existed
+            </h2>
 
-          <p className="text-xl text-muted-foreground text-center mb-16 max-w-3xl mx-auto">
-            Access expert-grade audience segments that top brands use to drive 40%+ revenue increases
-          </p>
+            <p className="text-xl text-muted-foreground text-center mb-16 max-w-3xl mx-auto">
+              Access expert-grade audience segments that top brands use to drive 40%+ revenue increases
+            </p>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {/* Card 1 - VIP Reactivation */}
+            <ScrollReveal delay={0}>
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
               {/* EXPLOSIVE Confetti Effect */}
               <div className="absolute inset-0 pointer-events-none z-50">
@@ -416,8 +424,10 @@ export default function LandingPage() {
                 Target high-value customers before they churn with AI-powered win-back campaigns.
               </p>
             </div>
+            </ScrollReveal>
 
             {/* Card 2 - Browse Abandoners */}
+            <ScrollReveal delay={0.1}>
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-600 hover:shadow-2xl hover:shadow-orange-600/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
               {/* EXPLOSIVE Confetti Effect */}
               <div className="absolute inset-0 pointer-events-none z-50">
@@ -472,8 +482,10 @@ export default function LandingPage() {
                 Convert window shoppers into buyers with behavior-triggered nudges and social proof.
               </p>
             </div>
+            </ScrollReveal>
 
             {/* Card 3 - Category Champions */}
+            <ScrollReveal delay={0.2}>
             <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
               {/* EXPLOSIVE Confetti Effect */}
               <div className="absolute inset-0 pointer-events-none z-50">
@@ -522,14 +534,17 @@ export default function LandingPage() {
                 Identify category lovers and cross-sell with laser precision based on purchase patterns.
               </p>
             </div>
+            </ScrollReveal>
           </div>
 
-          <div className="text-center">
-            <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-full text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3">
-              <span>Unlock All 70 Segments</span>
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
+          <ScrollReveal delay={0.3}>
+            <div className="text-center">
+              <button onClick={handleGetStarted} className="group relative bg-primary text-primary-foreground px-12 py-6 rounded-full text-xl font-bold hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-primary/30 inline-flex items-center gap-3">
+                <span>Unlock All 70 Segments</span>
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -564,17 +579,20 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto relative">
           {/* Header Section */}
-          <div className="text-center mb-6">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              Success Stories that <span className="text-[#ff6b6b] font-bold">INSPIRE</span>
-            </h2>
+          <ScrollReveal>
+            <div className="text-center mb-6">
+              <h2 className="text-4xl md:text-6xl font-bold mb-6">
+                Success Stories that <span className="text-[#ff6b6b] font-bold">INSPIRE</span>
+              </h2>
 
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Discover how brands and agencies achieve results.
-            </p>
-          </div>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Discover how brands and agencies achieve results.
+              </p>
+            </div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
+            <ScrollReveal delay={0}>
             <FlipTestimonialCard name="Sophia" role="Marketing Lead" company="Trendify" story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships." metrics={[{
             label: "gain in retention",
             value: "40%"
@@ -582,7 +600,9 @@ export default function LandingPage() {
             label: "surge in profits",
             value: "50%"
           }]} delay="0s" />
+            </ScrollReveal>
 
+            <ScrollReveal delay={0.1}>
             <FlipTestimonialCard name="Marcus" role="Head of Growth" company="Premium Beauty Co." story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy." metrics={[{
             label: "email revenue increase",
             value: "+42%"
@@ -590,7 +610,9 @@ export default function LandingPage() {
             label: "deployment time",
             value: "60 sec"
           }]} delay="0.1s" />
+            </ScrollReveal>
 
+            <ScrollReveal delay={0.2}>
             <FlipTestimonialCard name="Sarah" role="Founder" company="Growth Labs Agency" story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue." metrics={[{
             label: "time saved",
             value: "99%"
@@ -598,6 +620,7 @@ export default function LandingPage() {
             label: "revenue increase",
             value: "+$200K"
           }]} delay="0.2s" />
+            </ScrollReveal>
           </div>
 
           <div className="mt-16 text-center">
@@ -607,17 +630,24 @@ export default function LandingPage() {
       </section>
 
         {/* Value Calculator Section */}
-        <ValueCalculator />
+        <ScrollReveal>
+          <ValueCalculator />
+        </ScrollReveal>
 
         {/* Comparison Chart Section */}
-        <ComparisonChart />
+        <ScrollReveal>
+          <ComparisonChart />
+        </ScrollReveal>
 
         {/* Revenue Testimonials Section */}
-        <RevenueTestimonials />
+        <ScrollReveal>
+          <RevenueTestimonials />
+        </ScrollReveal>
 
         {/* Features Section */}
         <section className="py-20 px-4 bg-background">
           <div className="max-w-7xl mx-auto">
+            <ScrollReveal>
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border-2 border-primary/20 mb-8">
                 <Sparkles className="w-5 h-5 text-primary" />
@@ -633,8 +663,10 @@ export default function LandingPage() {
                 </span>
               </h3>
             </div>
+            </ScrollReveal>
 
             <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+              <ScrollReveal delay={0}>
               <div className="text-center">
                 <div className="flex justify-center mb-6">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
@@ -646,7 +678,9 @@ export default function LandingPage() {
                   Create once, auto-update forever. Segments sync with your <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.85em] inline-block align-text-bottom mx-0.5" loading="lazy" /> data in real-time.
                 </p>
               </div>
+              </ScrollReveal>
 
+              <ScrollReveal delay={0.1}>
               <div className="text-center">
                 <div className="flex justify-center mb-6">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
@@ -658,7 +692,9 @@ export default function LandingPage() {
                   Monitor segment health, track metrics, and optimize campaigns with built-in analytics.
                 </p>
               </div>
+              </ScrollReveal>
 
+              <ScrollReveal delay={0.2}>
               <div className="text-center">
                 <div className="flex justify-center mb-6">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
@@ -670,6 +706,7 @@ export default function LandingPage() {
                   Select segments, customize thresholds, deploy. All 70 segments created instantly in Klaviyo.
                 </p>
               </div>
+              </ScrollReveal>
             </div>
 
             <div className="mt-16 text-center">
