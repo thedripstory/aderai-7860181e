@@ -80,24 +80,111 @@ serve(async (req: Request) => {
       apiKey = await decryptApiKey(apiKey);
     }
 
-    // Call Klaviyo API
-    const response = await fetch("https://a.klaviyo.com/api/flows/", {
+    const headers = {
+      "Authorization": `Klaviyo-API-Key ${apiKey}`,
+      "revision": "2024-10-15",
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    };
+
+    // Fetch flows
+    const flowsResponse = await fetch("https://a.klaviyo.com/api/flows/", {
       method: "GET",
-      headers: {
-        "Authorization": `Klaviyo-API-Key ${apiKey}`,
-        "revision": "2024-10-15",
-        "Accept": "application/json",
-      },
+      headers,
     });
+    const flowsData = await flowsResponse.json();
 
-    const data = await response.json();
+    if (flowsData.errors) {
+      return new Response(JSON.stringify(flowsData), {
+        status: flowsResponse.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    return new Response(JSON.stringify(data), {
-      status: response.status,
+    // Fetch flow values (metrics) for live flows
+    const flowsWithMetrics = await Promise.all(
+      (flowsData.data || []).map(async (flow: any) => {
+        const status = flow.attributes?.status?.toLowerCase();
+        
+        // Only fetch metrics for live flows (they have activity)
+        if (status === 'live' || status === 'manual') {
+          try {
+            // Fetch flow values using the reporting endpoint
+            const valuesResponse = await fetch(
+              `https://a.klaviyo.com/api/flow-values-reports/`,
+              {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                  data: {
+                    type: "flow-values-report",
+                    attributes: {
+                      statistics: [
+                        "recipients",
+                        "opens",
+                        "open_rate",
+                        "clicks",
+                        "click_rate",
+                        "bounces",
+                        "bounce_rate",
+                        "unsubscribes",
+                        "unsubscribe_rate",
+                        "revenue",
+                        "unique_opens",
+                        "unique_clicks"
+                      ],
+                      timeframe: {
+                        key: "last_365_days"
+                      },
+                      conversion_metric_id: "Placed Order"
+                    },
+                    relationships: {
+                      flows: {
+                        data: [{ type: "flow", id: flow.id }]
+                      }
+                    }
+                  }
+                })
+              }
+            );
+
+            if (valuesResponse.ok) {
+              const valuesData = await valuesResponse.json();
+              const results = valuesData.data?.attributes?.results?.[0];
+              
+              return {
+                ...flow,
+                metrics: {
+                  recipients: results?.statistics?.recipients || 0,
+                  opens: results?.statistics?.opens || 0,
+                  unique_opens: results?.statistics?.unique_opens || 0,
+                  open_rate: results?.statistics?.open_rate || 0,
+                  clicks: results?.statistics?.clicks || 0,
+                  unique_clicks: results?.statistics?.unique_clicks || 0,
+                  click_rate: results?.statistics?.click_rate || 0,
+                  bounces: results?.statistics?.bounces || 0,
+                  bounce_rate: results?.statistics?.bounce_rate || 0,
+                  unsubscribes: results?.statistics?.unsubscribes || 0,
+                  unsubscribe_rate: results?.statistics?.unsubscribe_rate || 0,
+                  revenue: results?.statistics?.revenue || 0,
+                }
+              };
+            }
+          } catch (err) {
+            console.error(`Failed to fetch metrics for flow ${flow.id}:`, err);
+          }
+        }
+        
+        return { ...flow, metrics: null };
+      })
+    );
+
+    return new Response(JSON.stringify({ data: flowsWithMetrics }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("Flows error");
+    console.error("Flows error:", err);
     return new Response(
       JSON.stringify({ error: "Operation failed" }),
       {

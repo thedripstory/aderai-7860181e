@@ -22,7 +22,6 @@ serve(async (req: Request) => {
       });
     }
 
-    // Verify JWT token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -37,13 +36,11 @@ serve(async (req: Request) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // Extract JWT token and get user
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
     
     if (authError || !user) {
-      console.error("Auth error:", authError?.message);
-      return new Response(JSON.stringify({ error: 'Unauthorized', details: authError?.message }), {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -58,7 +55,6 @@ serve(async (req: Request) => {
       });
     }
 
-    // Verify user owns this API key
     const { data: apiKeyData, error: keyError } = await supabaseClient
       .from('klaviyo_keys')
       .select('klaviyo_api_key_hash')
@@ -74,26 +70,91 @@ serve(async (req: Request) => {
     }
 
     let apiKey = apiKeyData.klaviyo_api_key_hash;
-    
-    // Decrypt API key if it's encrypted
     if (isEncrypted(apiKey)) {
       apiKey = await decryptApiKey(apiKey);
     }
 
-    // Call Klaviyo API - must include channel filter as required by API
-    const response = await fetch("https://a.klaviyo.com/api/campaigns/?filter=equals(messages.channel,'email')", {
-      method: "GET",
-      headers: {
-        "Authorization": `Klaviyo-API-Key ${apiKey}`,
-        "revision": "2024-10-15",
-        "Accept": "application/json",
-      },
-    });
+    const headers = {
+      "Authorization": `Klaviyo-API-Key ${apiKey}`,
+      "revision": "2024-10-15",
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    };
 
-    const data = await response.json();
+    // Fetch campaigns
+    const campaignsResponse = await fetch(
+      "https://a.klaviyo.com/api/campaigns/?filter=equals(messages.channel,'email')",
+      { method: "GET", headers }
+    );
+    const campaignsData = await campaignsResponse.json();
 
-    return new Response(JSON.stringify(data), {
-      status: response.status,
+    if (campaignsData.errors) {
+      return new Response(JSON.stringify(campaignsData), {
+        status: campaignsResponse.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // For sent campaigns, fetch metrics
+    const campaignsWithMetrics = await Promise.all(
+      (campaignsData.data || []).map(async (campaign: any) => {
+        const status = campaign.attributes?.status?.toLowerCase();
+        
+        if (status === 'sent') {
+          try {
+            const valuesResponse = await fetch(
+              `https://a.klaviyo.com/api/campaign-values-reports/`,
+              {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                  data: {
+                    type: "campaign-values-report",
+                    attributes: {
+                      statistics: ["opens", "open_rate", "clicks", "click_rate", "recipients", "bounces", "bounce_rate", "unsubscribes", "unsubscribe_rate", "spam_complaints", "revenue", "unique_opens", "unique_clicks"],
+                      timeframe: { key: "last_365_days" },
+                      conversion_metric_id: "Placed Order"
+                    },
+                    relationships: {
+                      campaigns: { data: [{ type: "campaign", id: campaign.id }] }
+                    }
+                  }
+                })
+              }
+            );
+
+            if (valuesResponse.ok) {
+              const valuesData = await valuesResponse.json();
+              const results = valuesData.data?.attributes?.results?.[0];
+              return {
+                ...campaign,
+                metrics: {
+                  recipients: results?.statistics?.recipients || 0,
+                  opens: results?.statistics?.opens || 0,
+                  unique_opens: results?.statistics?.unique_opens || 0,
+                  open_rate: results?.statistics?.open_rate || 0,
+                  clicks: results?.statistics?.clicks || 0,
+                  unique_clicks: results?.statistics?.unique_clicks || 0,
+                  click_rate: results?.statistics?.click_rate || 0,
+                  bounces: results?.statistics?.bounces || 0,
+                  bounce_rate: results?.statistics?.bounce_rate || 0,
+                  unsubscribes: results?.statistics?.unsubscribes || 0,
+                  unsubscribe_rate: results?.statistics?.unsubscribe_rate || 0,
+                  spam_complaints: results?.statistics?.spam_complaints || 0,
+                  revenue: results?.statistics?.revenue || 0,
+                }
+              };
+            }
+          } catch (err) {
+            console.error(`Metrics fetch failed for ${campaign.id}`);
+          }
+        }
+        return { ...campaign, metrics: null };
+      })
+    );
+
+    return new Response(JSON.stringify({ data: campaignsWithMetrics }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
