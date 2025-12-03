@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 interface KlaviyoSyncIndicatorProps {
   klaviyoKeyId: string;
@@ -121,6 +122,15 @@ export const KlaviyoSyncIndicator: React.FC<KlaviyoSyncIndicatorProps> = ({
           {lastChecked.toLocaleTimeString()}
         </span>
       )}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 ml-1"
+        onClick={checkKlaviyoHealth}
+        disabled={status === 'checking'}
+      >
+        <RefreshCw className={`h-3 w-3 ${status === 'checking' ? 'animate-spin' : ''}`} />
+      </Button>
     </div>
   );
 };
