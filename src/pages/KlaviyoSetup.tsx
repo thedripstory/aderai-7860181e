@@ -14,8 +14,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useSessionTimeout } from "@/hooks/useSessionTimeout";
-import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +25,6 @@ const KlaviyoSetup = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
 
   // Form fields
   const [apiKey, setApiKey] = useState("");
@@ -289,14 +286,6 @@ const KlaviyoSetup = () => {
   return (
     <PageErrorBoundary pageName="Klaviyo Setup">
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {showWarning && (
-        <SessionTimeoutWarning
-          onRefresh={refreshSession}
-          onDismiss={dismissWarning}
-          expiresAt={sessionExpiresAt}
-        />
-      )}
-      
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-4">

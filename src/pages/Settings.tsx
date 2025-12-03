@@ -11,8 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { sanitizeString, sanitizeEmail, sanitizeNumber, validatePassword } from "@/lib/inputSanitization";
-import { useSessionTimeout } from "@/hooks/useSessionTimeout";
-import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import {
   Select,
@@ -44,7 +42,6 @@ export default function Settings() {
   const [emailVerified, setEmailVerified] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { showWarning, sessionExpiresAt, refreshSession, dismissWarning } = useSessionTimeout();
 
   // Notification preferences
   const [emailOnSegmentCreation, setEmailOnSegmentCreation] = useState(true);
@@ -360,14 +357,6 @@ export default function Settings() {
   return (
     <PageErrorBoundary pageName="Settings">
     <div className="min-h-screen bg-background">
-      {showWarning && (
-        <SessionTimeoutWarning
-          onRefresh={refreshSession}
-          onDismiss={dismissWarning}
-          expiresAt={sessionExpiresAt}
-        />
-      )}
-      
       <DashboardHeader showSettings={false} />
       
       {/* Animated Background */}
