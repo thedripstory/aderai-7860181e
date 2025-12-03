@@ -111,19 +111,19 @@ const DatabaseWithRestApi = ({
             <rect
               className="db-badge-rect"
               fill="#18181B"
-              x="8"
+              x="4"
               y="5"
-              width="38"
+              width="42"
               height="10"
               rx="5"
             ></rect>
-            <DatabaseIcon x="12" y="7.5"></DatabaseIcon>
+            <DatabaseIcon x="8" y="7.5"></DatabaseIcon>
             <text
-              x="21"
-              y="11.5"
+              x="17"
+              y="12"
               fill="white"
               stroke="none"
-              fontSize="4"
+              fontSize="5"
               fontWeight="500"
             >
               {badgeTexts?.first || "GET"}
@@ -134,19 +134,19 @@ const DatabaseWithRestApi = ({
             <rect
               className="db-badge-rect"
               fill="#18181B"
-              x="56"
+              x="54"
               y="5"
-              width="32"
+              width="36"
               height="10"
               rx="5"
             ></rect>
-            <DatabaseIcon x="60" y="7.5"></DatabaseIcon>
+            <DatabaseIcon x="58" y="7.5"></DatabaseIcon>
             <text
-              x="68"
-              y="11.5"
+              x="67"
+              y="12"
               fill="white"
               stroke="none"
-              fontSize="4"
+              fontSize="5"
               fontWeight="500"
             >
               {badgeTexts?.second || "POST"}
@@ -157,19 +157,19 @@ const DatabaseWithRestApi = ({
             <rect
               className="db-badge-rect"
               fill="#18181B"
-              x="112"
+              x="108"
               y="5"
-              width="34"
+              width="38"
               height="10"
               rx="5"
             ></rect>
-            <DatabaseIcon x="116" y="7.5"></DatabaseIcon>
+            <DatabaseIcon x="112" y="7.5"></DatabaseIcon>
             <text
-              x="124"
-              y="11.5"
+              x="121"
+              y="12"
               fill="white"
               stroke="none"
-              fontSize="4"
+              fontSize="5"
               fontWeight="500"
             >
               {badgeTexts?.third || "PUT"}
@@ -182,17 +182,17 @@ const DatabaseWithRestApi = ({
               fill="#18181B"
               x="156"
               y="5"
-              width="34"
+              width="38"
               height="10"
               rx="5"
             ></rect>
             <DatabaseIcon x="160" y="7.5"></DatabaseIcon>
             <text
-              x="168"
-              y="11.5"
+              x="169"
+              y="12"
               fill="white"
               stroke="none"
-              fontSize="4"
+              fontSize="5"
               fontWeight="500"
             >
               {badgeTexts?.fourth || "DELETE"}
