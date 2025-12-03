@@ -15,11 +15,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
+import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 import { cn } from "@/lib/utils";
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
 const KlaviyoSetup = () => {
+  useInactivityLogout();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);

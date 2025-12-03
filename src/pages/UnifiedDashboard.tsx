@@ -30,12 +30,14 @@ import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { PageErrorBoundary } from '@/components/PageErrorBoundary';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useInactivityLogout } from '@/hooks/useInactivityLogout';
 import { EmptyState } from '@/components/ui/empty-state';
 import { MobileMenu } from '@/components/MobileMenu';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
   useNetworkStatus();
+  useInactivityLogout();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
