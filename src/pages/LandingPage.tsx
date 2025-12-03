@@ -601,12 +601,21 @@ export default function LandingPage() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.2}>
-              <div className="relative flex items-center justify-center overflow-hidden rounded-3xl border-2 border-black bg-white px-10 pb-60 pt-8 md:pb-80 max-w-3xl mx-auto shadow-xl min-h-[500px] md:min-h-[600px]">
-                <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-400 bg-clip-text text-center text-5xl md:text-6xl font-bold leading-none text-transparent z-10">
-                  LIVE USERS
-                </span>
-                <Globe className="top-16 md:top-20 scale-125 md:scale-150" />
-                <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_200%,rgba(251,100,21,0.15),rgba(255,255,255,0))]" />
+              <div className="relative flex items-center justify-center min-h-[500px] md:min-h-[650px]">
+                {/* LIVE USERS badge - top left */}
+                <div className="absolute top-0 left-0 md:left-10 z-20">
+                  <span className="inline-block bg-gradient-to-r from-black to-gray-600 bg-clip-text text-4xl md:text-5xl font-bold leading-none text-transparent">
+                    LIVE USERS
+                  </span>
+                </div>
+                
+                {/* Floating Globe */}
+                <div className="relative w-full max-w-[700px] md:max-w-[800px] aspect-square">
+                  <Globe className="inset-0 scale-110 md:scale-125" />
+                </div>
+                
+                {/* Subtle glow underneath */}
+                <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-32 bg-gradient-to-t from-primary/10 to-transparent blur-3xl" />
               </div>
             </ScrollReveal>
           </div>
