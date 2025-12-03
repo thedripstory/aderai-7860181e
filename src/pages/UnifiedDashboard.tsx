@@ -6,6 +6,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
 import { FeedbackWidget } from '@/components/FeedbackWidget';
@@ -595,15 +596,17 @@ export default function UnifiedDashboard() {
                 <p className="text-sm text-primary-foreground/80">Ready to create in Klaviyo</p>
               </div>
             </div>
-            <Button
+            <ShimmerButton
               onClick={() => handleCreateSegments()}
               disabled={creatingSegments}
-              variant="secondary"
-              size="lg"
-              className="bg-white text-primary hover:bg-white/90 font-semibold shadow-lg flex-shrink-0"
+              shimmerColor="#ffffff"
+              background="hsl(var(--background))"
+              className="shadow-2xl text-foreground"
             >
-              {creatingSegments ? 'Creating...' : 'Create Segments'}
-            </Button>
+              <span className="whitespace-pre-wrap text-center text-sm font-semibold leading-none tracking-tight lg:text-base">
+                {creatingSegments ? 'Creating...' : 'Create Segments'}
+              </span>
+            </ShimmerButton>
           </div>
         </div>
       </div>
