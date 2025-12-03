@@ -434,9 +434,9 @@ export default function UnifiedDashboard() {
               <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
               <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
               <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
-              <TabsTrigger value="performance" className="relative">
+              <TabsTrigger value="performance" className="relative group/perf">
                 Performance
-                <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-600 rounded-full border border-amber-500/30">
+                <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-600 rounded-full border border-amber-500/30 cursor-help" title="Under maintenance - Some features may be incomplete">
                   🔧
                 </span>
               </TabsTrigger>
