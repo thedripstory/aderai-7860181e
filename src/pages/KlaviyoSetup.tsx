@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useInactivityLogout } from "@/hooks/useInactivityLogout";
@@ -292,11 +292,22 @@ const KlaviyoSetup = () => {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <a href="/dashboard" className="group flex items-center gap-3">
-              <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-                aderai<span className="text-accent group-hover:animate-pulse">.</span>
-              </div>
-            </a>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Button>
+              <a href="/dashboard" className="group flex items-center gap-3">
+                <div className="text-3xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
+                  aderai<span className="text-accent group-hover:animate-pulse">.</span>
+                </div>
+              </a>
+            </div>
           </div>
         </div>
       </header>
