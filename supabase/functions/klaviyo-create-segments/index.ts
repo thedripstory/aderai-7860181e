@@ -254,18 +254,12 @@ function getSegmentDefinition(
     'engaged-non-buyers': (openedEmailId && placedOrderId) ? {
       name: `Engaged Non-Buyers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [
-          {
-            conditions: [
-              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
-            ]
-          },
-          {
-            conditions: [
-              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
-            ]
-          }
-        ]
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' }),
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
+          ]
+        }]
       }
     } : null,
     
@@ -446,7 +440,7 @@ function getSegmentDefinition(
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 4, { type: 'over-all-time' })
+            buildMetricCondition(placedOrderId, 'sum', 'greater-than', vipThreshold, { type: 'over-all-time' })
           ]
         }]
       }
@@ -942,38 +936,38 @@ function getSegmentDefinition(
     // VALUE-BASED SEGMENTS
     // =====================================
 
-    'high-aov': {
+    'high-aov': placedOrderId ? {
       name: `High AOV Customers (${currencySymbol}${aov * 2}+)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildPredictiveCondition('average_order_value', 'numeric', 'greater-or-equal', aov * 2)
+            buildMetricCondition(placedOrderId, 'sum', 'greater-than', aov * 2, { type: 'over-all-time' })
           ]
         }]
       }
-    },
+    } : null,
 
-    'low-aov': {
+    'low-aov': placedOrderId ? {
       name: `Low AOV Customers (Under ${currencySymbol}${aov / 2})${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildPredictiveCondition('average_order_value', 'numeric', 'less-than', aov / 2)
+            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov / 2, { type: 'over-all-time' })
           ]
         }]
       }
-    },
+    } : null,
 
-    'bargain-shoppers': {
+    'bargain-shoppers': placedOrderId ? {
       name: `Bargain Shoppers (Low AOV)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildPredictiveCondition('average_order_value', 'numeric', 'less-than', aov * 0.75)
+            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov * 0.75, { type: 'over-all-time' })
           ]
         }]
       }
-    },
+    } : null,
 
     // =====================================
     // PROFILE PROPERTY SEGMENTS
