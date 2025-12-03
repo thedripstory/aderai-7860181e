@@ -377,164 +377,95 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {/* Card 1 - VIP Reactivation */}
             <ScrollReveal delay={0}>
-            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
-              {/* EXPLOSIVE Confetti Effect */}
-              <div className="absolute inset-0 pointer-events-none z-50">
-                <span className="absolute top-0 left-[5%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out]">💵</span>
-                <span className="absolute top-0 left-[15%] text-7xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.05s]">💵</span>
-                <span className="absolute top-0 left-[25%] text-9xl opacity-0 group-hover:animate-[confetti-3_2.1s_ease-out_0.1s]">💵</span>
-                <span className="absolute top-0 left-[35%] text-8xl opacity-0 group-hover:animate-[confetti-4_2.3s_ease-out_0.15s]">💵</span>
-                <span className="absolute top-0 left-[45%] text-7xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.2s]">💵</span>
-                <span className="absolute top-0 left-[55%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.25s]">💵</span>
-                <span className="absolute top-0 left-[65%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.3s]">💵</span>
-                <span className="absolute top-0 left-[75%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.35s]">💵</span>
-                <span className="absolute top-0 left-[85%] text-9xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.4s]">💵</span>
-                <span className="absolute top-0 left-[95%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.45s]">💵</span>
-                <span className="absolute top-0 left-[10%] text-7xl opacity-0 group-hover:animate-[confetti-4_2.1s_ease-out_0.5s]">💵</span>
-                <span className="absolute top-0 left-[20%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.3s_ease-out_0.55s]">💵</span>
-                <span className="absolute top-0 left-[30%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out_0.6s]">💵</span>
-                <span className="absolute top-0 left-[40%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.2s_ease-out_0.65s]">💵</span>
-                <span className="absolute top-0 left-[50%] text-9xl opacity-0 group-hover:animate-[confetti-5_2.1s_ease-out_0.7s]">💵</span>
-                <span className="absolute top-0 left-[60%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.3s_ease-out_0.75s]">💵</span>
-                <span className="absolute top-0 left-[70%] text-7xl opacity-0 group-hover:animate-[confetti-4_2s_ease-out_0.8s]">💵</span>
-                <span className="absolute top-0 left-[80%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.85s]">💵</span>
-                <span className="absolute top-0 left-[90%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.9s]">💵</span>
-                <span className="absolute top-0 left-[12%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.95s]">💵</span>
-              </div>
-              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-500">
-                <div className="relative w-full space-y-3">
-                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-black font-medium">VIP At-Risk</span>
-                      <span className="text-xs font-bold text-black">2,847 profiles</span>
+              <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative">
+                <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-500">
+                  <div className="relative w-full space-y-3">
+                    <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-black font-medium">VIP At-Risk</span>
+                        <span className="text-xs font-bold text-black">2,847 profiles</span>
+                      </div>
+                      <div className="text-sm font-semibold text-black">LTV &gt; $5k, no purchase 60d</div>
                     </div>
-                    <div className="text-sm font-semibold text-black">LTV &gt; $5k, no purchase 60d</div>
-                  </div>
-                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
-                    <div className="text-xs text-black mb-1">Suggested action</div>
-                    <div className="text-sm font-semibold text-black">Exclusive 20% VIP comeback</div>
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
-                    Hidden gem
+                    <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
+                      <div className="text-xs text-black mb-1">Suggested action</div>
+                      <div className="text-sm font-semibold text-black">Exclusive 20% VIP comeback</div>
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                      Hidden gem
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <h3 className="text-xl font-bold mb-2 text-black">VIP Reactivation</h3>
-              <p className="text-sm text-gray-700">
-                Target high-value customers before they churn with AI-powered win-back campaigns.
-              </p>
-            </div>
+                <h3 className="text-xl font-bold mb-2 text-black">VIP Reactivation</h3>
+                <p className="text-sm text-gray-700">
+                  Target high-value customers before they churn with AI-powered win-back campaigns.
+                </p>
+              </div>
             </ScrollReveal>
 
             {/* Card 2 - Browse Abandoners */}
             <ScrollReveal delay={0.1}>
-            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-600 hover:shadow-2xl hover:shadow-orange-600/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
-              {/* EXPLOSIVE Confetti Effect */}
-              <div className="absolute inset-0 pointer-events-none z-50">
-                <span className="absolute top-0 left-[5%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out]">💵</span>
-                <span className="absolute top-0 left-[15%] text-7xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.05s]">💵</span>
-                <span className="absolute top-0 left-[25%] text-9xl opacity-0 group-hover:animate-[confetti-3_2.1s_ease-out_0.1s]">💵</span>
-                <span className="absolute top-0 left-[35%] text-8xl opacity-0 group-hover:animate-[confetti-4_2.3s_ease-out_0.15s]">💵</span>
-                <span className="absolute top-0 left-[45%] text-7xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.2s]">💵</span>
-                <span className="absolute top-0 left-[55%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.25s]">💵</span>
-                <span className="absolute top-0 left-[65%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.3s]">💵</span>
-                <span className="absolute top-0 left-[75%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.35s]">💵</span>
-                <span className="absolute top-0 left-[85%] text-9xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.4s]">💵</span>
-                <span className="absolute top-0 left-[95%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.45s]">💵</span>
-                <span className="absolute top-0 left-[10%] text-7xl opacity-0 group-hover:animate-[confetti-4_2.1s_ease-out_0.5s]">💵</span>
-                <span className="absolute top-0 left-[20%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.3s_ease-out_0.55s]">💵</span>
-                <span className="absolute top-0 left-[30%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out_0.6s]">💵</span>
-                <span className="absolute top-0 left-[40%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.2s_ease-out_0.65s]">💵</span>
-                <span className="absolute top-0 left-[50%] text-9xl opacity-0 group-hover:animate-[confetti-5_2.1s_ease-out_0.7s]">💵</span>
-                <span className="absolute top-0 left-[60%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.3s_ease-out_0.75s]">💵</span>
-                <span className="absolute top-0 left-[70%] text-7xl opacity-0 group-hover:animate-[confetti-4_2s_ease-out_0.8s]">💵</span>
-                <span className="absolute top-0 left-[80%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.85s]">💵</span>
-                <span className="absolute top-0 left-[90%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.9s]">💵</span>
-                <span className="absolute top-0 left-[12%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.95s]">💵</span>
-              </div>
-              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-600 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-red-50 transition-all duration-500">
-                <div className="relative w-full space-y-3">
-                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-black font-medium">Intent Buyers</span>
-                      <span className="text-xs font-bold text-black">12,493 profiles</span>
+              <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative">
+                <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-500">
+                  <div className="relative w-full space-y-3">
+                    <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-black font-medium">Intent Buyers</span>
+                        <span className="text-xs font-bold text-black">12,493 profiles</span>
+                      </div>
+                      <div className="text-sm font-semibold text-black">3+ views, $0 cart, 7d</div>
                     </div>
-                    <div className="text-sm font-semibold text-black">3+ views, $0 cart, 7d</div>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
-                      <div className="text-xs font-bold text-black">42%</div>
-                      <div className="text-[10px] text-gray-700">Conversion rate</div>
+                    <div className="flex gap-2">
+                      <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
+                        <div className="text-xs font-bold text-black">42%</div>
+                        <div className="text-[10px] text-gray-700">Conversion rate</div>
+                      </div>
+                      <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
+                        <div className="text-xs font-bold text-black">$127</div>
+                        <div className="text-[10px] text-gray-700">Avg order</div>
+                      </div>
                     </div>
-                    <div className="flex-1 bg-white backdrop-blur-sm rounded-lg p-2 border-2 border-black">
-                      <div className="text-xs font-bold text-black">$127</div>
-                      <div className="text-[10px] text-gray-700">Avg order</div>
+                    <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                      Top performer
                     </div>
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                    Top performer
                   </div>
                 </div>
-              </div>
 
-              <h3 className="text-xl font-bold mb-2 text-black">Browse Abandoners</h3>
-              <p className="text-sm text-gray-700">
-                Convert window shoppers into buyers with behavior-triggered nudges and social proof.
-              </p>
-            </div>
+                <h3 className="text-xl font-bold mb-2 text-black">Browse Abandoners</h3>
+                <p className="text-sm text-gray-700">
+                  Convert window shoppers into buyers with behavior-triggered nudges and social proof.
+                </p>
+              </div>
             </ScrollReveal>
 
             {/* Card 3 - Category Champions */}
             <ScrollReveal delay={0.2}>
-            <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative overflow-visible">
-              {/* EXPLOSIVE Confetti Effect */}
-              <div className="absolute inset-0 pointer-events-none z-50">
-                <span className="absolute top-0 left-[5%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out]">💵</span>
-                <span className="absolute top-0 left-[15%] text-7xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.05s]">💵</span>
-                <span className="absolute top-0 left-[25%] text-9xl opacity-0 group-hover:animate-[confetti-3_2.1s_ease-out_0.1s]">💵</span>
-                <span className="absolute top-0 left-[35%] text-8xl opacity-0 group-hover:animate-[confetti-4_2.3s_ease-out_0.15s]">💵</span>
-                <span className="absolute top-0 left-[45%] text-7xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.2s]">💵</span>
-                <span className="absolute top-0 left-[55%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.25s]">💵</span>
-                <span className="absolute top-0 left-[65%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.3s]">💵</span>
-                <span className="absolute top-0 left-[75%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.35s]">💵</span>
-                <span className="absolute top-0 left-[85%] text-9xl opacity-0 group-hover:animate-[confetti-5_2s_ease-out_0.4s]">💵</span>
-                <span className="absolute top-0 left-[95%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.2s_ease-out_0.45s]">💵</span>
-                <span className="absolute top-0 left-[10%] text-7xl opacity-0 group-hover:animate-[confetti-4_2.1s_ease-out_0.5s]">💵</span>
-                <span className="absolute top-0 left-[20%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.3s_ease-out_0.55s]">💵</span>
-                <span className="absolute top-0 left-[30%] text-8xl opacity-0 group-hover:animate-[confetti-1_2s_ease-out_0.6s]">💵</span>
-                <span className="absolute top-0 left-[40%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.2s_ease-out_0.65s]">💵</span>
-                <span className="absolute top-0 left-[50%] text-9xl opacity-0 group-hover:animate-[confetti-5_2.1s_ease-out_0.7s]">💵</span>
-                <span className="absolute top-0 left-[60%] text-8xl opacity-0 group-hover:animate-[confetti-2_2.3s_ease-out_0.75s]">💵</span>
-                <span className="absolute top-0 left-[70%] text-7xl opacity-0 group-hover:animate-[confetti-4_2s_ease-out_0.8s]">💵</span>
-                <span className="absolute top-0 left-[80%] text-9xl opacity-0 group-hover:animate-[confetti-6_2.2s_ease-out_0.85s]">💵</span>
-                <span className="absolute top-0 left-[90%] text-8xl opacity-0 group-hover:animate-[confetti-1_2.1s_ease-out_0.9s]">💵</span>
-                <span className="absolute top-0 left-[12%] text-7xl opacity-0 group-hover:animate-[confetti-3_2.3s_ease-out_0.95s]">💵</span>
-              </div>
-              <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-yellow-50 group-hover:to-orange-50 transition-all duration-500">
-                <div className="relative w-full space-y-3">
-                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-black font-medium">Skincare Enthusiasts</span>
-                      <span className="text-xs font-bold text-black">8,234 profiles</span>
+              <div className="group bg-white rounded-3xl p-6 border-2 border-black hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-[1.02] relative">
+                <div className="bg-white rounded-2xl p-6 mb-6 min-h-[280px] flex items-center justify-center relative overflow-hidden border-2 border-black group-hover:border-orange-500 group-hover:bg-gradient-to-br group-hover:from-orange-50 group-hover:to-orange-100 transition-all duration-500">
+                  <div className="relative w-full space-y-3">
+                    <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-black shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-black font-medium">Skincare Enthusiasts</span>
+                        <span className="text-xs font-bold text-black">8,234 profiles</span>
+                      </div>
+                      <div className="text-sm font-semibold text-black">70%+ orders in category</div>
                     </div>
-                    <div className="text-sm font-semibold text-black">70%+ orders in category</div>
-                  </div>
-                  <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
-                    <div className="text-xs text-black mb-1">Cross-sell opportunity</div>
-                    <div className="text-sm font-semibold text-black">New arrivals + bundles</div>
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                    High intent
+                    <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
+                      <div className="text-xs text-black mb-1">Cross-sell opportunity</div>
+                      <div className="text-sm font-semibold text-black">New arrivals + bundles</div>
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                      High intent
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <h3 className="text-xl font-bold mb-2 text-black">Category Champions</h3>
-              <p className="text-sm text-gray-700">
-                Identify category lovers and cross-sell with laser precision based on purchase patterns.
-              </p>
-            </div>
+                <h3 className="text-xl font-bold mb-2 text-black">Category Champions</h3>
+                <p className="text-sm text-gray-700">
+                  Identify category lovers and cross-sell with laser precision based on purchase patterns.
+                </p>
+              </div>
             </ScrollReveal>
           </div>
 
