@@ -27,27 +27,69 @@ const TIPS = [
   "Use the performance tab to identify which segments drive the most revenue.",
 ];
 
-const formatEventName = (eventName: string): string => {
+const formatEventName = (eventName: string, metadata?: any): string => {
+  // Handle segment operations with specific segment names
+  if (metadata?.segment_name) {
+    if (metadata.status === 'success' || eventName.includes('created')) {
+      return `Created segment: ${metadata.segment_name}`;
+    }
+    return `Segment: ${metadata.segment_name}`;
+  }
+
+  // Handle create_segments with count
+  if (eventName === 'create_segments' && metadata?.segments_created) {
+    return `Created ${metadata.segments_created} segment${metadata.segments_created > 1 ? 's' : ''}`;
+  }
+
+  // Handle AI suggestions with context
+  if (eventName === 'ai_suggestion_used' && metadata?.total_count) {
+    return `Generated AI suggestions (#${metadata.total_count})`;
+  }
+
+  // Handle feature actions with specific feature names
+  if (eventName === 'feature_action' && metadata?.feature) {
+    return `Used ${metadata.feature.replace(/_/g, ' ')}`;
+  }
+  if (eventName === 'feature_action' && metadata?.action) {
+    return `${metadata.action.replace(/_/g, ' ')}`;
+  }
+
+  // Handle settings updates with specific setting
+  if (eventName === 'settings_updated' && metadata?.setting_type) {
+    return `Updated ${metadata.setting_type.replace(/_/g, ' ')} settings`;
+  }
+
+  // Handle feedback with type
+  if (eventName === 'feedback_submitted' && metadata?.feedback_type) {
+    return `Submitted ${metadata.feedback_type.replace(/_/g, ' ')}`;
+  }
+
+  // Handle onboarding steps
+  if (eventName === 'onboarding_step_completed' && metadata?.step) {
+    return `Completed onboarding: ${metadata.step}`;
+  }
+
   const eventMap: Record<string, string> = {
-    'feature_viewed': 'Viewed feature',
-    'feature_action': 'Performed action',
+    'feature_viewed': 'Viewed dashboard',
+    'feature_action': 'Dashboard activity',
     'create_segments': 'Created segments',
-    'ai_suggestion_used': 'Used AI suggestion',
+    'ai_suggestion_used': 'Generated AI suggestions',
     'segment_created': 'Created segment',
-    'klaviyo_connected': 'Connected Klaviyo',
-    'settings_updated': 'Updated settings',
+    'klaviyo_connected': 'Connected Klaviyo account',
+    'settings_updated': 'Updated account settings',
     'feedback_submitted': 'Submitted feedback',
-    'api_key_added': 'Added API key',
-    'bundle_created': 'Created bundle',
-    'page_view': 'Visited page',
-    'banner_clicked': 'Clicked banner',
+    'api_key_added': 'Added Klaviyo API key',
+    'bundle_created': 'Created segment bundle',
+    'page_view': 'Viewed page',
+    'banner_clicked': 'Clicked setup banner',
     'banner_dismissed': 'Dismissed banner',
     'onboarding_completed': 'Completed onboarding',
-    'onboarding_step_completed': 'Completed onboarding step',
+    'onboarding_step_completed': 'Completed setup step',
     'onboarding_flow_started': 'Started onboarding',
+    'onboarding_klaviyo_connect_clicked': 'Started Klaviyo setup',
     'tour_completed': 'Completed product tour',
     'tour_skipped': 'Skipped product tour',
-    'tour_step_completed': 'Completed tour step',
+    'tour_step_completed': 'Viewed tour step',
   };
 
   return eventMap[eventName] || eventName.replace(/_/g, ' ');
@@ -141,7 +183,7 @@ export function useDashboardStats() {
       if (recentEvents && recentEvents.length > 0) {
         recentActivity = recentEvents.map(event => ({
           id: event.id,
-          action: formatEventName(event.event_name),
+          action: formatEventName(event.event_name, event.event_metadata),
           timestamp: event.created_at || '',
           metadata: event.event_metadata,
         }));
