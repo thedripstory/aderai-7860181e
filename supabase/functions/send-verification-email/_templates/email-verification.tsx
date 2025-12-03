@@ -26,15 +26,12 @@ export const EmailVerification = ({
       <Container style={container}>
         {/* Header with Aderai Logo */}
         <Section style={header}>
-          <div style={logoContainer}>
-            <span style={logoText}>aderai</span>
-            <span style={logoDot}>.</span>
-          </div>
+          <Text style={logoText}>aderai<Text style={logoDot}>.</Text></Text>
         </Section>
 
         {/* Main Content */}
         <Section style={content}>
-          <Heading style={h1}>✨ Welcome to Aderai!</Heading>
+          <Heading style={h1}>Welcome to Aderai!</Heading>
           
           <Text style={text}>Hi there!</Text>
           
@@ -53,13 +50,11 @@ export const EmailVerification = ({
           </Section>
 
           <Section style={featureBox}>
-            <Text style={featureTitle}>🚀 What you'll get:</Text>
-            <ul style={featureList}>
-              <li style={featureItem}>70+ pre-built Klaviyo segments</li>
-              <li style={featureItem}>Deploy segments in 30 seconds</li>
-              <li style={featureItem}>AI-powered segment suggestions</li>
-              <li style={featureItem}>Performance analytics & insights</li>
-            </ul>
+            <Text style={featureTitle}>What you'll get:</Text>
+            <Text style={featureItem}>• 70+ pre-built Klaviyo segments</Text>
+            <Text style={featureItem}>• Deploy segments in 30 seconds</Text>
+            <Text style={featureItem}>• AI-powered segment suggestions</Text>
+            <Text style={featureItem}>• Performance analytics & insights</Text>
           </Section>
 
           <Text style={smallText}>
@@ -70,14 +65,14 @@ export const EmailVerification = ({
           <Hr style={hr} />
 
           <Text style={footerText}>
-            Need help getting started? Check out our <Link href="https://aderai.lovable.app/help" style={link}>Help Center</Link>
+            Need help getting started? Check out our Help Center at https://aderai.io/help
           </Text>
         </Section>
 
         {/* Footer */}
         <Section style={footer}>
           <Text style={footerText}>
-            © {new Date().getFullYear()} Aderai. All rights reserved.
+            © 2025 Aderai. All rights reserved.
           </Text>
           <Text style={footerSmallText}>
             If you didn't create an account, you can safely ignore this email.
@@ -111,23 +106,20 @@ const header = {
   borderBottom: '3px solid #FF6B35',
 };
 
-const logoContainer = {
-  display: 'inline-block',
-};
-
 const logoText = {
   fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
   fontWeight: 'bold',
   color: '#1a1a1a',
   letterSpacing: '-0.5px',
+  margin: '0',
+  display: 'inline',
 };
 
 const logoDot = {
   fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
   fontWeight: 'bold',
   color: '#FF6B35',
+  display: 'inline',
 };
 
 const content = {
@@ -200,26 +192,17 @@ const featureTitle = {
   margin: '0 0 12px',
 };
 
-const featureList = {
-  margin: '0',
-  padding: '0 0 0 20px',
-  color: '#333333',
-};
-
 const featureItem = {
   fontSize: '14px',
   lineHeight: '24px',
-  marginBottom: '8px',
+  marginBottom: '4px',
+  marginTop: '0',
+  color: '#333333',
 };
 
 const hr = {
   borderColor: '#e5e5e5',
   margin: '30px 0',
-};
-
-const link = {
-  color: '#FF6B35',
-  textDecoration: 'underline',
 };
 
 const footer = {
