@@ -603,9 +603,9 @@ export default function LandingPage() {
                   </linearGradient>
                 </defs>
                 {/* Top left card to center */}
-                <path d="M 180 140 Q 350 200 50% 50%" stroke="url(#line-gradient-1)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
+                <path d="M 180 140 Q 350 200 400 300" stroke="url(#line-gradient-1)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
                 {/* Top right card to center */}
-                <path d="M calc(100% - 180px) 160 Q calc(100% - 350px) 220 50% 50%" stroke="url(#line-gradient-2)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
+                <path d="M 620 160 Q 500 220 400 300" stroke="url(#line-gradient-2)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
               </svg>
               
               {/* Floating Stat Cards */}
