@@ -3,7 +3,6 @@ import { Settings as SettingsIcon, User, Lock, AlertCircle, Bell } from "lucide-
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { TwoFactorSetup, TwoFactorDisable } from "@/components/TwoFactorSetup";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,9 +37,6 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeKey, setActiveKey] = useState<any>(null);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
-  const [showTwoFactorDisable, setShowTwoFactorDisable] = useState(false);
   const [emailVerified, setEmailVerified] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -137,14 +133,6 @@ export default function Settings() {
         setEmailMarketing(notifPrefs.email_marketing ?? false);
       }
 
-      // Load 2FA status
-      const { data: twoFactorData } = await supabase
-        .from("two_factor_auth")
-        .select("enabled")
-        .eq("user_id", user.id)
-        .single();
-
-      setTwoFactorEnabled(twoFactorData?.enabled ?? false);
     };
 
     loadSettings();
@@ -624,33 +612,6 @@ export default function Settings() {
                   </Button>
                 </CardContent>
               </Card>
-
-              <Card className="border-border/50 shadow-lg">
-                <CardHeader>
-                  <CardTitle>Two-Factor Authentication</CardTitle>
-                  <CardDescription>Add an extra layer of security to your account</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">
-                        {twoFactorEnabled ? "2FA is enabled" : "2FA is disabled"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {twoFactorEnabled
-                          ? "Your account is protected with two-factor authentication"
-                          : "Enable 2FA for enhanced security"}
-                      </p>
-                    </div>
-                    <Button
-                      variant={twoFactorEnabled ? "destructive" : "default"}
-                      onClick={() => twoFactorEnabled ? setShowTwoFactorDisable(true) : setShowTwoFactorSetup(true)}
-                    >
-                      {twoFactorEnabled ? "Disable 2FA" : "Enable 2FA"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </TabsContent>
 
@@ -708,36 +669,6 @@ export default function Settings() {
           </TabsContent>
         </Tabs>
       </main>
-
-      {/* 2FA Modals */}
-      {showTwoFactorSetup && currentUser && (
-        <TwoFactorSetup
-          userId={currentUser.id}
-          userEmail={email}
-          onSetupComplete={() => {
-            setShowTwoFactorSetup(false);
-            setTwoFactorEnabled(true);
-            toast({
-              title: "2FA enabled",
-              description: "Two-factor authentication is now active",
-            });
-          }}
-        />
-      )}
-
-      {showTwoFactorDisable && currentUser && (
-        <TwoFactorDisable
-          userId={currentUser.id}
-          onDisabled={() => {
-            setShowTwoFactorDisable(false);
-            setTwoFactorEnabled(false);
-            toast({
-              title: "2FA disabled",
-              description: "Two-factor authentication has been disabled",
-            });
-          }}
-        />
-      )}
     </div>
     </PageErrorBoundary>
   );
