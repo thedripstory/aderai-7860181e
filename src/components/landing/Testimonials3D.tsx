@@ -174,45 +174,34 @@ export function Testimonials3D() {
         </ScrollReveal>
 
         <ScrollReveal delay={0.2}>
-          <div 
-            className="relative flex h-[600px] w-full flex-row items-center justify-center overflow-hidden [perspective:300px]"
-            style={{
-              transform: 'translateZ(0)',
-              willChange: 'transform',
-            }}
-          >
-            <div
-              className="flex flex-row items-center gap-6 absolute left-1/2"
-              style={{
-                transform: 'translateX(-50%) translateY(0) translateZ(-50px) rotateX(15deg) rotateY(-8deg) rotateZ(15deg)',
-              }}
-            >
-              <Marquee vertical pauseOnHover repeat={4} className="[--duration:30s]">
+          <div className="relative flex h-[600px] w-full flex-row items-center justify-center overflow-hidden">
+            <div className="flex flex-row items-center gap-6">
+              <Marquee vertical repeat={4} className="[--duration:30s]">
                 {col1.map((review, i) => (
                   <TestimonialCard key={`col1-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical reverse pauseOnHover repeat={4} className="[--duration:35s]">
+              <Marquee vertical reverse repeat={4} className="[--duration:35s]">
                 {col2.map((review, i) => (
                   <TestimonialCard key={`col2-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical pauseOnHover repeat={4} className="[--duration:28s]">
+              <Marquee vertical repeat={4} className="[--duration:28s]">
                 {col3.map((review, i) => (
                   <TestimonialCard key={`col3-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical reverse pauseOnHover repeat={4} className="[--duration:32s]">
+              <Marquee vertical reverse repeat={4} className="[--duration:32s]">
                 {col4.map((review, i) => (
                   <TestimonialCard key={`col4-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical pauseOnHover repeat={4} className="[--duration:27s]">
+              <Marquee vertical repeat={4} className="[--duration:27s]">
                 {col5.map((review, i) => (
                   <TestimonialCard key={`col5-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical reverse pauseOnHover repeat={4} className="[--duration:33s]">
+              <Marquee vertical reverse repeat={4} className="[--duration:33s]">
                 {col6.map((review, i) => (
                   <TestimonialCard key={`col6-${i}`} {...review} />
                 ))}
