@@ -143,6 +143,16 @@ body {
     transform: rotateY(180deg);
   }
 
+  /* Floating animation for stat cards */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
   /* Database API Animation */
   .database {
     offset-anchor: 10px 0px;

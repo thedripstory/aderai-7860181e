@@ -600,24 +600,51 @@ export default function LandingPage() {
               </div>
             </ScrollReveal>
 
-            <ScrollReveal delay={0.2}>
-              <div className="relative flex items-center justify-center min-h-[500px] md:min-h-[650px]">
-                {/* LIVE USERS badge - top left */}
-                <div className="absolute top-0 left-0 md:left-10 z-20">
-                  <span className="inline-block bg-gradient-to-r from-black to-gray-600 bg-clip-text text-4xl md:text-5xl font-bold leading-none text-transparent">
-                    LIVE USERS
-                  </span>
-                </div>
-                
-                {/* Floating Globe */}
-                <div className="relative w-full max-w-[700px] md:max-w-[800px] aspect-square">
-                  <Globe className="inset-0 scale-110 md:scale-125" />
-                </div>
-                
-                {/* Subtle glow underneath */}
-                <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-32 bg-gradient-to-t from-primary/10 to-transparent blur-3xl" />
+            <div className="relative min-h-[550px] md:min-h-[700px]">
+              {/* LIVE USERS badge - centered above globe */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20">
+                <span className="inline-block bg-gradient-to-b from-black to-gray-500 bg-clip-text text-3xl md:text-4xl font-bold leading-none text-transparent tracking-wider">
+                  LIVE USERS
+                </span>
               </div>
-            </ScrollReveal>
+              
+              {/* Floating Stat Cards */}
+              <div className="absolute left-4 md:left-16 top-20 md:top-32 z-20 animate-[float_6s_ease-in-out_infinite]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
+                  <div className="text-2xl md:text-3xl font-bold text-black">2,847</div>
+                  <div className="text-xs md:text-sm text-gray-600">segments deployed today</div>
+                </div>
+              </div>
+              
+              <div className="absolute right-4 md:right-16 top-28 md:top-40 z-20 animate-[float_6s_ease-in-out_infinite_1s]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
+                  <div className="text-2xl md:text-3xl font-bold text-primary">47</div>
+                  <div className="text-xs md:text-sm text-gray-600">countries active</div>
+                </div>
+              </div>
+              
+              <div className="absolute left-8 md:left-24 bottom-16 md:bottom-24 z-20 animate-[float_6s_ease-in-out_infinite_2s]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
+                  <div className="text-2xl md:text-3xl font-bold text-green-600">+127%</div>
+                  <div className="text-xs md:text-sm text-gray-600">avg. engagement lift</div>
+                </div>
+              </div>
+              
+              <div className="absolute right-8 md:right-20 bottom-24 md:bottom-32 z-20 animate-[float_6s_ease-in-out_infinite_3s]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200">
+                  <div className="text-2xl md:text-3xl font-bold text-black">1.2M+</div>
+                  <div className="text-xs md:text-sm text-gray-600">profiles segmented</div>
+                </div>
+              </div>
+              
+              {/* Floating Globe with parallax */}
+              <div className="relative w-full max-w-[650px] md:max-w-[750px] aspect-square mx-auto transform-gpu hover:scale-[1.02] transition-transform duration-700">
+                <Globe className="inset-0 scale-100 md:scale-110" />
+              </div>
+              
+              {/* Subtle glow underneath */}
+              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-3xl" />
+            </div>
           </div>
         </section>
 
