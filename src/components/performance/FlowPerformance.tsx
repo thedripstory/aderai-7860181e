@@ -14,16 +14,33 @@ import {
   ExternalLink,
   Clock,
   FileText,
-  ArrowRight,
-  Activity,
+  Eye,
+  MousePointer,
+  DollarSign,
+  Users,
   Mail,
-  MessageSquare
+  TrendingUp
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { PerformanceLoadingState } from '@/components/PerformanceLoadingState';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { format } from 'date-fns';
+
+interface FlowMetrics {
+  recipients: number;
+  opens: number;
+  unique_opens: number;
+  open_rate: number;
+  clicks: number;
+  unique_clicks: number;
+  click_rate: number;
+  bounces: number;
+  bounce_rate: number;
+  unsubscribes: number;
+  unsubscribe_rate: number;
+  revenue: number;
+}
 
 interface Flow {
   id: string;
@@ -33,6 +50,7 @@ interface Flow {
   created_at: string;
   updated_at: string;
   archived: boolean;
+  metrics: FlowMetrics | null;
 }
 
 interface FlowPerformanceProps {
@@ -50,6 +68,7 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'open_rate' | 'click_rate' | 'revenue'>('revenue');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
@@ -85,6 +104,7 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
         created_at: f.attributes?.created || f.attributes?.created_at,
         updated_at: f.attributes?.updated || f.attributes?.updated_at,
         archived: f.attributes?.archived || false,
+        metrics: f.metrics || null,
       }));
 
       setFlows(formattedFlows);
@@ -108,9 +128,7 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
       draft: { color: 'bg-muted text-muted-foreground border-border', icon: <FileText className="w-3 h-3" />, label: 'Draft' },
       manual: { color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: <Pause className="w-3 h-3" />, label: 'Manual' },
     };
-
     const config = statusConfig[status.toLowerCase()] || statusConfig.draft;
-
     return (
       <Badge variant="outline" className={`${config.color} flex items-center gap-1`}>
         {config.icon}
@@ -119,18 +137,9 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
     );
   };
 
-  const getTriggerInfo = (triggerType: string) => {
-    const triggers: Record<string, { label: string; description: string; icon: React.ReactNode }> = {
-      'list': { label: 'List Trigger', description: 'When someone is added to a list', icon: <Mail className="w-4 h-4" /> },
-      'segment': { label: 'Segment Trigger', description: 'When someone enters a segment', icon: <Activity className="w-4 h-4" /> },
-      'metric': { label: 'Metric Trigger', description: 'When someone performs an action', icon: <Zap className="w-4 h-4" /> },
-      'price-drop': { label: 'Price Drop', description: 'When a viewed item drops in price', icon: <ArrowRight className="w-4 h-4" /> },
-      'date-property': { label: 'Date Property', description: 'Based on a date property', icon: <Clock className="w-4 h-4" /> },
-      'low-inventory': { label: 'Low Inventory', description: 'When inventory runs low', icon: <MessageSquare className="w-4 h-4" /> },
-    };
-
-    return triggers[triggerType] || { label: triggerType, description: 'Custom trigger', icon: <Zap className="w-4 h-4" /> };
-  };
+  const formatPercent = (value: number) => `${(value * 100).toFixed(1)}%`;
+  const formatCurrency = (value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatNumber = (value: number) => value.toLocaleString();
 
   const filteredFlows = flows
     .filter(f => {
@@ -139,14 +148,36 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
       return matchesSearch && matchesStatus && !f.archived;
     })
     .sort((a, b) => {
-      const dateA = new Date(a.updated_at || a.created_at).getTime();
-      const dateB = new Date(b.updated_at || b.created_at).getTime();
-      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+      if (sortBy === 'date') {
+        const dateA = new Date(a.updated_at || a.created_at).getTime();
+        const dateB = new Date(b.updated_at || b.created_at).getTime();
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+      } else if (sortBy === 'open_rate') {
+        const rateA = a.metrics?.open_rate || 0;
+        const rateB = b.metrics?.open_rate || 0;
+        return sortOrder === 'desc' ? rateB - rateA : rateA - rateB;
+      } else if (sortBy === 'click_rate') {
+        const rateA = a.metrics?.click_rate || 0;
+        const rateB = b.metrics?.click_rate || 0;
+        return sortOrder === 'desc' ? rateB - rateA : rateA - rateB;
+      } else if (sortBy === 'revenue') {
+        const revA = a.metrics?.revenue || 0;
+        const revB = b.metrics?.revenue || 0;
+        return sortOrder === 'desc' ? revB - revA : revA - revB;
+      }
+      return 0;
     });
 
-  const liveCount = flows.filter(f => f.status.toLowerCase() === 'live' && !f.archived).length;
-  const draftCount = flows.filter(f => f.status.toLowerCase() === 'draft' && !f.archived).length;
-  const manualCount = flows.filter(f => f.status.toLowerCase() === 'manual' && !f.archived).length;
+  // Calculate aggregate stats
+  const activeFlows = flows.filter(f => (f.status.toLowerCase() === 'live' || f.status.toLowerCase() === 'manual') && !f.archived && f.metrics);
+  const totalRevenue = activeFlows.reduce((sum, f) => sum + (f.metrics?.revenue || 0), 0);
+  const avgOpenRate = activeFlows.length > 0 
+    ? activeFlows.reduce((sum, f) => sum + (f.metrics?.open_rate || 0), 0) / activeFlows.length 
+    : 0;
+  const avgClickRate = activeFlows.length > 0 
+    ? activeFlows.reduce((sum, f) => sum + (f.metrics?.click_rate || 0), 0) / activeFlows.length 
+    : 0;
+  const totalRecipients = activeFlows.reduce((sum, f) => sum + (f.metrics?.recipients || 0), 0);
 
   if (loading) {
     return <PerformanceLoadingState />;
@@ -154,54 +185,65 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Flow Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* Performance Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-emerald-500/5 to-card border-emerald-500/20">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-emerald-500/10">
-              <Play className="w-5 h-5 text-emerald-500" />
+              <DollarSign className="w-5 h-5 text-emerald-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{liveCount}</p>
-              <p className="text-sm text-muted-foreground">Live & Running</p>
+              <p className="text-xl font-bold">{formatCurrency(totalRevenue)}</p>
+              <p className="text-xs text-muted-foreground">Total Revenue</p>
             </div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/5 to-card border-blue-500/20">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-blue-500/10">
-              <Pause className="w-5 h-5 text-blue-500" />
+              <Eye className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{manualCount}</p>
-              <p className="text-sm text-muted-foreground">Manual Mode</p>
+              <p className="text-xl font-bold">{formatPercent(avgOpenRate)}</p>
+              <p className="text-xs text-muted-foreground">Avg Open Rate</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-muted/20 to-card">
+        <Card className="bg-gradient-to-br from-purple-500/5 to-card border-purple-500/20">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-muted">
-              <FileText className="w-5 h-5 text-muted-foreground" />
+            <div className="p-2 rounded-lg bg-purple-500/10">
+              <MousePointer className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{draftCount}</p>
-              <p className="text-sm text-muted-foreground">In Draft</p>
+              <p className="text-xl font-bold">{formatPercent(avgClickRate)}</p>
+              <p className="text-xs text-muted-foreground">Avg Click Rate</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-orange-500/5 to-card border-orange-500/20">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-orange-500/10">
+              <Users className="w-5 h-5 text-orange-500" />
+            </div>
+            <div>
+              <p className="text-xl font-bold">{formatNumber(totalRecipients)}</p>
+              <p className="text-xs text-muted-foreground">Total Recipients</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Flow List */}
       <Card>
         <CardHeader className="pb-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-primary" />
-                Automated Flows
+                Flow Performance
               </CardTitle>
               <CardDescription>
-                {flows.filter(f => !f.archived).length} automation flows in your account
+                {activeFlows.length} active flows with performance data
               </CardDescription>
             </div>
             <Button variant="outline" size="sm" onClick={fetchFlows}>
@@ -233,6 +275,17 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
                 <SelectItem value="draft">Draft</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="revenue">Revenue</SelectItem>
+                <SelectItem value="open_rate">Open Rate</SelectItem>
+                <SelectItem value="click_rate">Click Rate</SelectItem>
+                <SelectItem value="date">Date</SelectItem>
+              </SelectContent>
+            </Select>
             <Button 
               variant="outline" 
               size="icon"
@@ -255,37 +308,22 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredFlows.map((flow) => {
-                const triggerInfo = getTriggerInfo(flow.trigger_type);
-                return (
-                  <div
-                    key={flow.id}
-                    className="p-4 rounded-lg border border-border/50 bg-card/50 hover:border-primary/30 hover:bg-card/80 transition-all duration-200 group"
-                  >
+              {filteredFlows.map((flow) => (
+                <div
+                  key={flow.id}
+                  className="p-4 rounded-lg border border-border/50 bg-card/50 hover:border-primary/30 hover:bg-card/80 transition-all duration-200 group"
+                >
+                  <div className="flex flex-col gap-3">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <h4 className="font-semibold truncate">{flow.name}</h4>
                           {getStatusBadge(flow.status)}
                         </div>
-                        
-                        {/* Trigger Info */}
-                        <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 mb-2">
-                          <div className="p-1.5 rounded bg-primary/10 text-primary">
-                            {triggerInfo.icon}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">{triggerInfo.label}</p>
-                            <p className="text-xs text-muted-foreground">{triggerInfo.description}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            Updated {format(new Date(flow.updated_at || flow.created_at), 'MMM d, yyyy')}
-                          </span>
-                        </div>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          Updated {format(new Date(flow.updated_at || flow.created_at), 'MMM d, yyyy')}
+                        </p>
                       </div>
                       <Button 
                         variant="outline" 
@@ -294,12 +332,55 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
                         onClick={() => window.open(`https://www.klaviyo.com/flow/${flow.id}`, '_blank')}
                       >
                         <ExternalLink className="w-4 h-4 mr-1" />
-                        Open in Klaviyo
+                        Open
                       </Button>
                     </div>
+
+                    {/* Metrics Row */}
+                    {flow.metrics ? (
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 p-3 rounded-lg bg-muted/30">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Recipients</p>
+                          <p className="font-semibold">{formatNumber(flow.metrics.recipients)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Open Rate</p>
+                          <p className="font-semibold flex items-center gap-1">
+                            <Eye className="w-3 h-3 text-blue-500" />
+                            {formatPercent(flow.metrics.open_rate)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Click Rate</p>
+                          <p className="font-semibold flex items-center gap-1">
+                            <MousePointer className="w-3 h-3 text-purple-500" />
+                            {formatPercent(flow.metrics.click_rate)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Unsubscribes</p>
+                          <p className="font-semibold">{formatNumber(flow.metrics.unsubscribes)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Revenue</p>
+                          <p className="font-semibold flex items-center gap-1 text-emerald-600">
+                            <DollarSign className="w-3 h-3" />
+                            {formatCurrency(flow.metrics.revenue).replace('$', '')}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-lg bg-muted/30 text-center">
+                        <p className="text-sm text-muted-foreground">
+                          {flow.status.toLowerCase() === 'draft' 
+                            ? 'Metrics available after activating flow' 
+                            : 'No performance data yet'}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
