@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { CheckCircle, AlertCircle, Target } from 'lucide-react';
 import { SegmentResult } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS } from '@/lib/segmentData';
-import { supabase } from "@/integrations/supabase/client";
-import { ErrorHandler } from '@/lib/errorHandlers';
 import { Progress } from '@/components/ui/progress';
 import { SuccessAnimation } from '@/components/SuccessAnimation';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SegmentCreationFlowProps {
   loading: boolean;
@@ -23,8 +22,8 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
 }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Memoize computed values to avoid recalculation on every render
   const failedResults = useMemo(() => 
     results.filter(r => r.status === 'error'),
     [results]
@@ -41,12 +40,20 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   );
   
   const totalCount = results.length;
-  const completedCount = results.length; // All results in the array are complete (no pending state)
   
   const progressPercent = useMemo(() => 
-    totalCount > 0 ? (completedCount / totalCount) * 100 : 0,
-    [totalCount, completedCount]
+    totalCount > 0 ? (results.length / Math.max(totalCount, 1)) * 100 : 0,
+    [totalCount, results.length]
   );
+
+  // Get current segment being processed
+  const currentSegment = useMemo(() => {
+    if (results.length > 0) {
+      const lastResult = results[results.length - 1];
+      return SEGMENTS.find(s => s.id === lastResult.segmentId);
+    }
+    return null;
+  }, [results]);
 
   // Show success animation when all segments complete successfully
   useEffect(() => {
@@ -54,6 +61,7 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
       setShowSuccess(true);
     }
   }, [loading, results, hasFailures]);
+
   return (
     <>
       <SuccessAnimation
@@ -66,102 +74,122 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
         }}
       />
       
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
-          <div className="bg-card rounded-lg shadow-lg p-8 border border-border">
-            <div className="text-center mb-8">
-              <div className="relative w-8 h-8 mx-auto mb-4">
-                {/* Aggressive rotating loader */}
-                <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
-                
-                {/* Middle counter-rotating ring */}
-                <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
-                
-                {/* Inner pulsing core */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
-                </div>
-                
-                {/* Orbiting particles */}
-                <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
-                </div>
-                <div className="absolute inset-0 animate-[spin_2s_linear_infinite_reverse]">
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-500" />
+      <div className="min-h-screen bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden">
+            {/* Header with icon */}
+            <div className="pt-8 pb-4 flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Target className="w-5 h-5 text-primary" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold mb-2">Creating Your Segments</h2>
-              <p className="text-muted-foreground">
-                {loading ? "Please wait while we create your segments..." : "Segment creation complete"}
-              </p>
+              <h2 className="text-xl font-semibold text-foreground">
+                {loading ? 'Creating Segment...' : hasFailures ? 'Some Segments Failed' : 'Segments Created!'}
+              </h2>
             </div>
 
-            {/* Progress Bar */}
-            {loading && totalCount > 0 && (
-              <div className="mb-6">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="font-medium">Progress</span>
-                  <span className="text-muted-foreground">
-                    {completedCount} of {totalCount}
-                  </span>
+            {/* Current segment card */}
+            <div className="px-6 pb-4">
+              <AnimatePresence mode="wait">
+                {currentSegment && (
+                  <motion.div
+                    key={currentSegment.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="bg-muted/50 rounded-xl p-4 border border-border/50"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Target className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-foreground truncate">
+                          {currentSegment.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                          {currentSegment.description}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Progress section */}
+            <div className="px-6 pb-6">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Syncing with Klaviyo</span>
+                <span className="text-primary font-medium">
+                  {loading ? 'Processing...' : `${successfulCount} of ${totalCount} complete`}
+                </span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercent}%` }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                />
+              </div>
+            </div>
+
+            {/* Results list (collapsed view) */}
+            {!loading && results.length > 0 && (
+              <div className="px-6 pb-4 max-h-48 overflow-y-auto">
+                <div className="space-y-2">
+                  {results.map((result, idx) => {
+                    const segment = SEGMENTS.find((s) => s.id === result.segmentId);
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex items-center gap-2 p-2 rounded-lg text-sm ${
+                          result.status === "success"
+                            ? "bg-green-500/10 text-green-600"
+                            : "bg-red-500/10 text-red-600"
+                        }`}
+                      >
+                        {result.status === "success" ? (
+                          <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                        )}
+                        <span className="truncate">{segment?.name || result.segmentId}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <Progress value={progressPercent} className="h-2" />
               </div>
             )}
 
-          <div className="space-y-3 mb-6">
-            {results.map((result, idx) => {
-              const segment = SEGMENTS.find((s) => s.id === result.segmentId);
-              return (
-                <div
-                  key={idx}
-                  className={`p-4 rounded-lg border ${
-                    result.status === "success"
-                      ? "border-green-500/50 bg-green-500/5"
-                      : result.status === "error"
-                      ? "border-red-500/50 bg-red-500/5"
-                      : "border-border"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {result.status === "success" ? (
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                    ) : result.status === "error" ? (
-                      <AlertCircle className="w-5 h-5 text-red-500" />
-                    ) : (
-                      <Loader className="w-5 h-5 animate-spin" />
-                    )}
-                    <div className="flex-1">
-                      <div className="font-medium">{segment?.name}</div>
-                      <div className="text-sm text-muted-foreground">{result.message}</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {!loading && (
-            <div className="space-y-3 mt-6">
-              {hasFailures && onRetryFailed && (
+            {/* Action buttons */}
+            {!loading && (
+              <div className="px-6 pb-6 space-y-2">
+                {hasFailures && onRetryFailed && (
+                  <button
+                    onClick={() => onRetryFailed(failedResults.map(r => r.segmentId))}
+                    className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition-colors"
+                  >
+                    Retry Failed ({failedResults.length})
+                  </button>
+                )}
                 <button
-                  onClick={() => onRetryFailed(failedResults.map(r => r.segmentId))}
-                  className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+                  onClick={onViewResults}
+                  className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
                 >
-                  Retry Failed Segments ({failedResults.length})
+                  {hasFailures ? 'Continue' : 'Done'}
                 </button>
-              )}
-              <button
-                onClick={onViewResults}
-                className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90"
-              >
-                {hasFailures ? 'Continue with Successful Segments' : 'View Results'}
-              </button>
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
       </div>
-    </div>
     </>
   );
 };
