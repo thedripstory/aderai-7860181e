@@ -24,19 +24,17 @@ export const EmailVerification = ({
     <Preview>Verify your Aderai email address</Preview>
     <Body style={main}>
       <Container style={container}>
-        {/* Header with Aderai Logo */}
         <Section style={header}>
-          <Text style={logoText}>aderai<Text style={logoDot}>.</Text></Text>
+          <Heading style={logoHeading}>aderai.</Heading>
         </Section>
 
-        {/* Main Content */}
         <Section style={content}>
           <Heading style={h1}>Welcome to Aderai!</Heading>
           
           <Text style={text}>Hi there!</Text>
           
           <Text style={text}>
-            Thank you for signing up! We're excited to help you create powerful Klaviyo segments in seconds.
+            Thank you for signing up! We are excited to help you create powerful Klaviyo segments in seconds.
           </Text>
 
           <Text style={text}>
@@ -50,32 +48,31 @@ export const EmailVerification = ({
           </Section>
 
           <Section style={featureBox}>
-            <Text style={featureTitle}>What you'll get:</Text>
-            <Text style={featureItem}>• 70+ pre-built Klaviyo segments</Text>
-            <Text style={featureItem}>• Deploy segments in 30 seconds</Text>
-            <Text style={featureItem}>• AI-powered segment suggestions</Text>
-            <Text style={featureItem}>• Performance analytics & insights</Text>
+            <Text style={featureTitle}>What you will get:</Text>
+            <Text style={featureItem}>70+ pre-built Klaviyo segments</Text>
+            <Text style={featureItem}>Deploy segments in 30 seconds</Text>
+            <Text style={featureItem}>AI-powered segment suggestions</Text>
+            <Text style={featureItem}>Performance analytics and insights</Text>
           </Section>
 
           <Text style={smallText}>
-            If the button doesn't work, copy and paste this link into your browser:
+            If the button does not work, copy and paste this link into your browser:
           </Text>
           <Text style={urlText}>{verificationUrl}</Text>
 
           <Hr style={hr} />
 
           <Text style={footerText}>
-            Need help getting started? Check out our Help Center at https://aderai.io/help
+            Need help getting started? Visit our Help Center at https://aderai.io/help
           </Text>
         </Section>
 
-        {/* Footer */}
         <Section style={footer}>
           <Text style={footerText}>
-            © 2025 Aderai. All rights reserved.
+            2025 Aderai. All rights reserved.
           </Text>
           <Text style={footerSmallText}>
-            If you didn't create an account, you can safely ignore this email.
+            If you did not create an account, you can safely ignore this email.
           </Text>
         </Section>
       </Container>
@@ -85,11 +82,9 @@ export const EmailVerification = ({
 
 export default EmailVerification;
 
-// Styles
 const main = {
   backgroundColor: '#f6f6f6',
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
 };
 
 const container = {
@@ -106,20 +101,11 @@ const header = {
   borderBottom: '3px solid #FF6B35',
 };
 
-const logoText = {
+const logoHeading = {
   fontSize: '32px',
   fontWeight: 'bold',
   color: '#1a1a1a',
-  letterSpacing: '-0.5px',
   margin: '0',
-  display: 'inline',
-};
-
-const logoDot = {
-  fontSize: '32px',
-  fontWeight: 'bold',
-  color: '#FF6B35',
-  display: 'inline',
 };
 
 const content = {
