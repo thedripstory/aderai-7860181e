@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut, Settings as SettingsIcon, HelpCircle, Sparkles, ArrowLeft } from 'lucide-react';
+import { AderaiLogo } from '@/components/AderaiLogo';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -42,16 +43,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               href="/dashboard" 
               className="group flex items-center gap-3 transition-opacity hover:opacity-80"
             >
-              <div className="relative">
-                <div className="text-3xl font-playfair font-bold tracking-tight">
-                  <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    aderai
-                  </span>
-                  <span className="text-accent transition-transform duration-300 group-hover:scale-125 inline-block">
-                    .
-                  </span>
-                </div>
-              </div>
+              <AderaiLogo size="lg" />
               
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-accent" />

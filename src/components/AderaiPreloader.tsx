@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { motion, AnimatePresence } from "framer-motion";
+import { AderaiLogo } from "@/components/AderaiLogo";
 
 interface AderaiPreloaderProps {
   minDisplayTime?: number;
@@ -68,9 +69,7 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
               }}
             >
               <div className="absolute inset-0 blur-3xl bg-accent/20 rounded-full scale-150" />
-              <div className="text-5xl md:text-6xl font-playfair font-bold tracking-tight relative z-10">
-                aderai<span className="text-accent animate-pulse">.</span>
-              </div>
+              <AderaiLogo size="2xl" showHoverEffect={false} className="relative z-10" />
             </motion.div>
             
           </motion.div>

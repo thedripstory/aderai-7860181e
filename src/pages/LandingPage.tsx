@@ -17,6 +17,7 @@ import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { SegmentFlowEffect } from "@/components/SegmentFlowEffect";
 import { ComparisonChart } from "@/components/ComparisonChart";
+import { AderaiLogo } from "@/components/AderaiLogo";
 
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Testimonials3D } from "@/components/landing/Testimonials3D";
@@ -50,11 +51,7 @@ export default function LandingPage() {
       <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           {/* Logo */}
-          <a href="/" className="group flex items-center">
-            <div className="text-4xl font-playfair font-bold tracking-tight hover:scale-105 transition-transform duration-300">
-              aderai<span className="text-accent group-hover:animate-pulse">.</span>
-            </div>
-          </a>
+          <AderaiLogo href="/" size="lg" />
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-4">
@@ -778,8 +775,8 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-5 gap-8 mb-12">
               {/* Brand Column - Larger */}
               <div className="md:col-span-2">
-                <div className="text-3xl font-playfair font-bold mb-4">
-                  aderai<span className="text-accent">.</span>
+                <div className="mb-4">
+                  <AderaiLogo size="lg" showHoverEffect={false} />
                 </div>
                 <p className="text-sm text-muted-foreground mb-6 flex flex-col items-start gap-1">
                   <span>AI-powered segmentation</span>
