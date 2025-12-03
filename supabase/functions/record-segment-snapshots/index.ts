@@ -94,15 +94,14 @@ Deno.serve(async (req) => {
               const segmentData = await segmentResponse.json();
               const profileCount = segmentData.data?.attributes?.profile_count ?? 0;
               
-              if (profileCount > 0) {
-                historicalData.push({
-                  segment_klaviyo_id: segment.id,
-                  segment_name: segment.attributes?.name || 'Unnamed',
-                  profile_count: profileCount,
-                  klaviyo_key_id: key.id,
-                  user_id: key.user_id,
-                });
-              }
+              // Record all segments including those with 0 profiles
+              historicalData.push({
+                segment_klaviyo_id: segment.id,
+                segment_name: segment.attributes?.name || 'Unnamed',
+                profile_count: profileCount,
+                klaviyo_key_id: key.id,
+                user_id: key.user_id,
+              });
             }
             
             // Rate limiting: 250ms between requests
