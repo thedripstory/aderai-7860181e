@@ -17,28 +17,13 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check if specific keyId was provided (for single-user fetch)
-    let specificKeyId: string | null = null;
-    try {
-      const body = await req.json();
-      specificKeyId = body?.keyId || null;
-    } catch {
-      // No body or invalid JSON - process all keys (for cron job)
-    }
+    console.log('Starting daily segment snapshot recording...');
 
-    console.log('Starting segment snapshot recording...', specificKeyId ? `for key ${specificKeyId}` : 'for all keys');
-
-    // Get Klaviyo keys - either specific one or all active
-    let keysQuery = supabaseClient
+    // Get all active Klaviyo keys
+    const { data: klaviyoKeys, error: keysError } = await supabaseClient
       .from('klaviyo_keys')
       .select('id, user_id, klaviyo_api_key_hash')
       .eq('is_active', true);
-    
-    if (specificKeyId) {
-      keysQuery = keysQuery.eq('id', specificKeyId);
-    }
-
-    const { data: klaviyoKeys, error: keysError } = await keysQuery;
 
     if (keysError) {
       console.error('Error fetching Klaviyo keys:', keysError);
