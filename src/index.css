@@ -185,20 +185,20 @@ body {
     animation-delay: 1s;
   }
 
-  .db-light-1 {
-    offset-path: path("M 31 10 v 15 q 0 5 5 5 h 59 q 5 0 5 5 v 25");
+.db-light-1 {
+    offset-path: path("M 28 10 v 15 q 0 5 5 5 h 62 q 5 0 5 5 v 25");
   }
 
   .db-light-2 {
-    offset-path: path("M 77 10 v 10 q 0 5 5 5 h 13 q 5 0 5 5 v 25");
+    offset-path: path("M 72 10 v 10 q 0 5 5 5 h 18 q 5 0 5 5 v 25");
   }
 
   .db-light-3 {
-    offset-path: path("M 124 10 v 10 q 0 5 -5 5 h -14 q -5 0 -5 5 v 25");
+    offset-path: path("M 128 10 v 10 q 0 5 -5 5 h -18 q -5 0 -5 5 v 25");
   }
 
-.db-light-4 {
-    offset-path: path("M 170 10 v 15 q 0 5 -5 5 h -60 q -5 0 -5 5 v 25");
+  .db-light-4 {
+    offset-path: path("M 172 10 v 15 q 0 5 -5 5 h -62 q -5 0 -5 5 v 25");
   }
 
   .db-badge-group {

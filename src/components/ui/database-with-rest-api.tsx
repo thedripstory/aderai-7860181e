@@ -2,8 +2,10 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { Folder, HeartHandshakeIcon, SparklesIcon } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
 interface DatabaseWithRestApiProps {
   className?: string;
@@ -51,10 +53,10 @@ const DatabaseWithRestApi = ({
           strokeDasharray="100 100"
           pathLength="100"
         >
-          <path d="M 31 10 v 15 q 0 5 5 5 h 59 q 5 0 5 5 v 10" />
-          <path d="M 77 10 v 10 q 0 5 5 5 h 13 q 5 0 5 5 v 10" />
-          <path d="M 124 10 v 10 q 0 5 -5 5 h -14 q -5 0 -5 5 v 10" />
-          <path d="M 170 10 v 15 q 0 5 -5 5 h -60 q -5 0 -5 5 v 10" />
+          <path d="M 28 10 v 15 q 0 5 5 5 h 62 q 5 0 5 5 v 10" />
+          <path d="M 72 10 v 10 q 0 5 5 5 h 18 q 5 0 5 5 v 10" />
+          <path d="M 128 10 v 10 q 0 5 -5 5 h -18 q -5 0 -5 5 v 10" />
+          <path d="M 172 10 v 15 q 0 5 -5 5 h -62 q -5 0 -5 5 v 10" />
           {/* Animation For Path Starting */}
           <animate
             attributeName="stroke-dashoffset"
@@ -104,130 +106,127 @@ const DatabaseWithRestApi = ({
             fill="url(#db-blue-grad)"
           />
         </g>
-        {/* Buttons */}
+        {/* Buttons - Wider boxes for text */}
         <g stroke="currentColor" fill="none" strokeWidth="0.4">
-          {/* First Button */}
+          {/* First Button - Connect */}
           <g className="db-badge-group">
             <rect
               className="db-badge-rect"
               fill="#18181B"
-              x="14"
-              y="5"
-              width="34"
-              height="10"
-              rx="5"
+              x="6"
+              y="4"
+              width="44"
+              height="12"
+              rx="6"
             ></rect>
-            <DatabaseIcon x="18" y="7.5"></DatabaseIcon>
+            <SegmentIcon x="10" y="7"></SegmentIcon>
             <text
-              x="28"
+              x="20"
               y="12"
               fill="white"
               stroke="none"
               fontSize="5"
               fontWeight="500"
             >
-              {badgeTexts?.first || "GET"}
+              {badgeTexts?.first || "Connect"}
             </text>
           </g>
-          {/* Second Button */}
+          {/* Second Button - Select */}
           <g className="db-badge-group">
             <rect
               className="db-badge-rect"
               fill="#18181B"
-              x="60"
-              y="5"
-              width="34"
-              height="10"
-              rx="5"
+              x="53"
+              y="4"
+              width="38"
+              height="12"
+              rx="6"
             ></rect>
-            <DatabaseIcon x="64" y="7.5"></DatabaseIcon>
+            <SegmentIcon x="57" y="7"></SegmentIcon>
             <text
-              x="74"
+              x="67"
               y="12"
               fill="white"
               stroke="none"
               fontSize="5"
               fontWeight="500"
             >
-              {badgeTexts?.second || "POST"}
+              {badgeTexts?.second || "Select"}
             </text>
           </g>
-          {/* Third Button */}
+          {/* Third Button - Deploy */}
           <g className="db-badge-group">
             <rect
               className="db-badge-rect"
               fill="#18181B"
-              x="108"
-              y="5"
-              width="34"
-              height="10"
-              rx="5"
+              x="109"
+              y="4"
+              width="38"
+              height="12"
+              rx="6"
             ></rect>
-            <DatabaseIcon x="112" y="7.5"></DatabaseIcon>
+            <SegmentIcon x="113" y="7"></SegmentIcon>
             <text
-              x="122"
+              x="123"
               y="12"
               fill="white"
               stroke="none"
               fontSize="5"
               fontWeight="500"
             >
-              {badgeTexts?.third || "PUT"}
+              {badgeTexts?.third || "Deploy"}
             </text>
           </g>
-          {/* Fourth Button */}
+          {/* Fourth Button - Target */}
           <g className="db-badge-group">
             <rect
               className="db-badge-rect"
               fill="#18181B"
               x="150"
-              y="5"
-              width="40"
-              height="10"
-              rx="5"
+              y="4"
+              width="44"
+              height="12"
+              rx="6"
             ></rect>
-            <DatabaseIcon x="154" y="7.5"></DatabaseIcon>
+            <SegmentIcon x="154" y="7"></SegmentIcon>
             <text
-              x="165"
+              x="164"
               y="12"
               fill="white"
               stroke="none"
               fontSize="5"
               fontWeight="500"
             >
-              {badgeTexts?.fourth || "DELETE"}
+              {badgeTexts?.fourth || "Target"}
             </text>
           </g>
         </g>
         <defs>
-          {/* 1 -  user list */}
+          {/* Updated mask paths to match new badge positions */}
           <mask id="db-mask-1">
             <path
-              d="M 31 10 v 15 q 0 5 5 5 h 59 q 5 0 5 5 v 10"
+              d="M 28 10 v 15 q 0 5 5 5 h 62 q 5 0 5 5 v 10"
               strokeWidth="0.5"
               stroke="white"
             />
           </mask>
-          {/* 2 - task list */}
           <mask id="db-mask-2">
             <path
-              d="M 77 10 v 10 q 0 5 5 5 h 13 q 5 0 5 5 v 10"
+              d="M 72 10 v 10 q 0 5 5 5 h 18 q 5 0 5 5 v 10"
               strokeWidth="0.5"
               stroke="white"
             />
           </mask>
-          {/* 3 - backlogs */}
           <mask id="db-mask-3">
             <path
-              d="M 124 10 v 10 q 0 5 -5 5 h -14 q -5 0 -5 5 v 10"
+              d="M 128 10 v 10 q 0 5 -5 5 h -18 q -5 0 -5 5 v 10"
               strokeWidth="0.5"
               stroke="white"
             />
           </mask>
-          {/* 4 - misc */}
           <mask id="db-mask-4">
             <path
-              d="M 170 10 v 15 q 0 5 -5 5 h -60 q -5 0 -5 5 v 10"
+              d="M 172 10 v 15 q 0 5 -5 5 h -62 q -5 0 -5 5 v 10"
               strokeWidth="0.5"
               stroke="white"
             />
@@ -249,7 +248,7 @@ const DatabaseWithRestApi = ({
           whileHover={{ scale: 1.05, boxShadow: "0 0 30px hsl(5, 77%, 66%, 0.3)" }}
           transition={{ duration: 0.2 }}
         >
-          <SparklesIcon className="size-4 text-primary" />
+          <Sparkles className="size-4 text-primary" />
           <span className="ml-2 text-sm font-medium">
             {title ? title : "Data exchange using a customized REST API"}
           </span>
@@ -264,23 +263,47 @@ const DatabaseWithRestApi = ({
         </motion.div>
         {/* box content */}
         <div className="relative z-10 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm shadow-2xl">
-          {/* Badges */}
+          {/* AI + Klaviyo Badge */}
           <motion.div 
-            className="absolute bottom-10 left-16 z-10 h-9 rounded-full bg-[#101112] px-4 text-sm border border-primary/20 flex items-center gap-2 cursor-pointer"
+            className="absolute top-6 left-8 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm border border-primary/20 flex items-center gap-3 cursor-pointer"
             whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.3)", borderColor: "hsl(5, 77%, 66%, 0.5)" }}
             transition={{ duration: 0.2 }}
           >
-            <HeartHandshakeIcon className="size-4 text-primary" />
-            <span className="font-medium">{buttonTexts?.first || "LegionDev"}</span>
+            <Sparkles className="size-4 text-primary" />
+            <span className="font-medium text-primary">AI</span>
+            <span className="text-muted-foreground">+</span>
+            <img src={klaviyoLogo} alt="Klaviyo" className="h-4" />
           </motion.div>
+          
+          {/* Segments Badge */}
           <motion.div 
-            className="absolute right-16 top-10 z-10 hidden h-9 rounded-full bg-[#101112] px-4 text-sm sm:flex border border-accent/20 items-center gap-2 cursor-pointer"
+            className="absolute right-8 top-6 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm flex border border-accent/20 items-center gap-2 cursor-pointer"
             whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.3)", borderColor: "hsl(5, 100%, 64%, 0.5)" }}
             transition={{ duration: 0.2 }}
           >
-            <Folder className="size-4 text-accent" />
-            <span className="font-medium">{buttonTexts?.second || "v2_updates"}</span>
+            <span className="font-bold text-accent">70+</span>
+            <span className="font-medium">Segments</span>
           </motion.div>
+
+          {/* Bottom left badge */}
+          <motion.div 
+            className="absolute bottom-6 left-8 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm border border-green-500/20 flex items-center gap-2 cursor-pointer"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(34, 197, 94, 0.3)", borderColor: "rgba(34, 197, 94, 0.5)" }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="font-medium">Real-time Sync</span>
+          </motion.div>
+
+          {/* Bottom right badge */}
+          <motion.div 
+            className="absolute bottom-6 right-8 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm border border-blue-500/20 flex items-center gap-2 cursor-pointer"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(59, 130, 246, 0.3)", borderColor: "rgba(59, 130, 246, 0.5)" }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className="font-medium">1-Click Deploy</span>
+          </motion.div>
+
           {/* Circles */}
           <motion.div
             className="absolute -bottom-16 h-[120px] w-[120px] rounded-full border-t border-primary/20 bg-primary/5"
@@ -318,7 +341,7 @@ const DatabaseWithRestApi = ({
 
 export default DatabaseWithRestApi;
 
-const DatabaseIcon = ({ x = "0", y = "0" }: { x: string; y: string }) => {
+const SegmentIcon = ({ x = "0", y = "0" }: { x: string; y: string }) => {
   return (
     <svg
       x={x}
@@ -333,9 +356,8 @@ const DatabaseIcon = ({ x = "0", y = "0" }: { x: string; y: string }) => {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <ellipse cx="12" cy="5" rx="9" ry="3" />
-      <path d="M3 5V19A9 3 0 0 0 21 19V5" />
-      <path d="M3 12A9 3 0 0 0 21 12" />
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
     </svg>
   );
 };
