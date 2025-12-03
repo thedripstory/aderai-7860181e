@@ -7,18 +7,18 @@ export const SegmentFlowEffect = () => {
   const ref = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start start", "end start"],
+    offset: ["start end", "end start"],
   });
 
-  const pathLengthFirst = useTransform(scrollYProgress, [0, 0.8], [0.2, 1.2]);
-  const pathLengthSecond = useTransform(scrollYProgress, [0, 0.8], [0.15, 1.2]);
-  const pathLengthThird = useTransform(scrollYProgress, [0, 0.8], [0.1, 1.2]);
-  const pathLengthFourth = useTransform(scrollYProgress, [0, 0.8], [0.05, 1.2]);
-  const pathLengthFifth = useTransform(scrollYProgress, [0, 0.8], [0, 1.2]);
+  const pathLengthFirst = useTransform(scrollYProgress, [0, 1], [0, 1.2]);
+  const pathLengthSecond = useTransform(scrollYProgress, [0, 1], [0, 1.2]);
+  const pathLengthThird = useTransform(scrollYProgress, [0, 1], [0, 1.2]);
+  const pathLengthFourth = useTransform(scrollYProgress, [0, 1], [0, 1.2]);
+  const pathLengthFifth = useTransform(scrollYProgress, [0, 1], [0, 1.2]);
 
   return (
     <div
-      className="h-[200vh] bg-background w-full rounded-md relative pt-40 overflow-clip"
+      className="h-[150vh] bg-background w-full relative overflow-hidden"
       ref={ref}
     >
       <GoogleGeminiEffect

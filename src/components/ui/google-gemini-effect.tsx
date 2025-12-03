@@ -40,11 +40,12 @@ export const GoogleGeminiEffect = ({
         </a>
       </div>
       <svg
-        width="1440"
+        width="100%"
         height="890"
         viewBox="0 0 1440 890"
+        preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="absolute -top-60 md:-top-40 w-full"
+        className="absolute -top-60 md:-top-40 left-0 right-0 w-full"
       >
         {/* Orange gradient paths - Aderai brand colors */}
         <motion.path
