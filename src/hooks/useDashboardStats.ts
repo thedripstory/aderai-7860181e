@@ -80,52 +80,29 @@ export function useDashboardStats() {
         .maybeSingle();
 
       // Get segments created count from segment_operations (successful creates)
-      // Note: operation_type can be 'create' or 'created' depending on when it was logged
-      const { count: segmentCount } = await supabase
+      const { data: segmentOps, count: segmentCount } = await supabase
         .from('segment_operations')
-        .select('id', { count: 'exact', head: true })
+        .select('id', { count: 'exact' })
         .eq('user_id', user.id)
-        .in('operation_type', ['create', 'created'])
+        .eq('operation_type', 'create')
         .eq('operation_status', 'success');
 
       const totalSegmentsCreated = segmentCount || 0;
 
-      // Get recent activity - combine segment operations and analytics events
-      const { data: segmentActivity } = await supabase
-        .from('segment_operations')
-        .select('id, segment_name, operation_type, created_at')
-        .eq('user_id', user.id)
-        .eq('operation_status', 'success')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
+      // Get recent activity from analytics_events
       const { data: recentEvents } = await supabase
         .from('analytics_events')
         .select('id, event_name, created_at, event_metadata')
         .eq('user_id', user.id)
-        .in('event_name', ['create_segments', 'ai_suggestion_used', 'feature_action'])
         .order('created_at', { ascending: false })
         .limit(5);
 
-      // Combine segment operations and analytics events for recent activity
-      const segmentActivities = segmentActivity?.map(op => ({
-        id: op.id,
-        action: `Created segment: ${op.segment_name}`,
-        timestamp: op.created_at || '',
-        metadata: { segment_name: op.segment_name },
-      })) || [];
-
-      const eventActivities = recentEvents?.map(event => ({
+      const recentActivity = recentEvents?.map(event => ({
         id: event.id,
-        action: formatEventName(event.event_name, event.event_metadata),
+        action: formatEventName(event.event_name),
         timestamp: event.created_at || '',
         metadata: event.event_metadata,
       })) || [];
-
-      // Merge and sort by timestamp, take top 5
-      const recentActivity = [...segmentActivities, ...eventActivities]
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        .slice(0, 5);
 
       setStats({
         totalSegmentsCreated,
@@ -142,19 +119,7 @@ export function useDashboardStats() {
     }
   };
 
-  const formatEventName = (eventName: string, metadata?: any): string => {
-    if (eventName === 'create_segments' && metadata?.segment_count) {
-      return `Created ${metadata.segment_count} segment${metadata.segment_count > 1 ? 's' : ''}`;
-    }
-    if (eventName === 'feature_action' && metadata?.action) {
-      const actionMap: Record<string, string> = {
-        'fetch_analytics': 'Refreshed analytics',
-        'create_segments': 'Created segments',
-        'generate_ai_suggestions': 'Generated AI suggestions',
-      };
-      return actionMap[metadata.action] || `${metadata.action.replace(/_/g, ' ')}`;
-    }
-    
+  const formatEventName = (eventName: string): string => {
     const eventMap: Record<string, string> = {
       'feature_viewed': 'Viewed feature',
       'feature_action': 'Performed action',
