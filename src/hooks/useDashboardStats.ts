@@ -42,6 +42,12 @@ const formatEventName = (eventName: string): string => {
     'page_view': 'Visited page',
     'banner_clicked': 'Clicked banner',
     'banner_dismissed': 'Dismissed banner',
+    'onboarding_completed': 'Completed onboarding',
+    'onboarding_step_completed': 'Completed onboarding step',
+    'onboarding_flow_started': 'Started onboarding',
+    'tour_completed': 'Completed product tour',
+    'tour_skipped': 'Skipped product tour',
+    'tour_step_completed': 'Completed tour step',
   };
 
   return eventMap[eventName] || eventName.replace(/_/g, ' ');
@@ -94,16 +100,17 @@ export function useDashboardStats() {
         .maybeSingle();
 
       // Get segments created count from segment_operations (successful creates)
+      // Note: operation_type is 'created' in the database
       const { count: segmentCount } = await supabase
         .from('segment_operations')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
-        .eq('operation_type', 'create')
+        .in('operation_type', ['create', 'created'])
         .eq('operation_status', 'success');
 
       const totalSegmentsCreated = segmentCount || 0;
 
-      // Get recent activity from analytics_events - only major events
+      // Get recent activity from analytics_events - include all meaningful events
       const majorEvents = [
         'create_segments',
         'ai_suggestion_used',
@@ -113,6 +120,11 @@ export function useDashboardStats() {
         'settings_updated',
         'api_key_added',
         'feedback_submitted',
+        'onboarding_completed',
+        'onboarding_step_completed',
+        'onboarding_flow_started',
+        'tour_completed',
+        'feature_action', // Include significant feature actions
       ];
       
       const { data: recentEvents } = await supabase
@@ -123,12 +135,36 @@ export function useDashboardStats() {
         .order('created_at', { ascending: false })
         .limit(5);
 
-      const recentActivity = recentEvents?.map(event => ({
-        id: event.id,
-        action: formatEventName(event.event_name),
-        timestamp: event.created_at || '',
-        metadata: event.event_metadata,
-      })) || [];
+      // If no major events, fall back to recent activity from segment_operations
+      let recentActivity: Array<{ id: string; action: string; timestamp: string; metadata?: any }> = [];
+      
+      if (recentEvents && recentEvents.length > 0) {
+        recentActivity = recentEvents.map(event => ({
+          id: event.id,
+          action: formatEventName(event.event_name),
+          timestamp: event.created_at || '',
+          metadata: event.event_metadata,
+        }));
+      } else {
+        // Fall back to segment_operations for activity
+        const { data: segmentOps } = await supabase
+          .from('segment_operations')
+          .select('id, segment_name, operation_type, operation_status, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (segmentOps) {
+          recentActivity = segmentOps.map(op => ({
+            id: op.id,
+            action: op.operation_status === 'success' 
+              ? `Created segment: ${op.segment_name}`
+              : `Failed to create: ${op.segment_name}`,
+            timestamp: op.created_at,
+            metadata: { segment_name: op.segment_name, status: op.operation_status },
+          }));
+        }
+      }
 
       setStats({
         totalSegmentsCreated,
