@@ -111,11 +111,13 @@ function buildMetricCondition(
       operator: 'after',
       value: timeframe.date
     };
-  } else {
-    // For 'over-all-time', use preset type
+  } else if (timeframe.type === 'over-all-time') {
+    // For "all time", use a 10-year lookback (3650 days) since Klaviyo requires timeframe_filter
     condition.timeframe_filter = {
-      type: 'preset',
-      preset: 'over-all-time'
+      type: 'date',
+      operator: 'in-the-last',
+      quantity: 3650,
+      unit: 'day'
     };
   }
 
