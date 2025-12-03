@@ -236,8 +236,8 @@ export default function UnifiedDashboard() {
     try {
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
-      // Fetch segments with tags (profile_count not available on list endpoint due to Klaviyo API limitations)
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags';
+      // Fetch segments with tags and profile_count using proper fields parameter
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,profile_count,is_active,is_starred';
       
       // Fetch all pages of segments
       while (nextPageUrl) {
@@ -310,8 +310,9 @@ export default function UnifiedDashboard() {
       const stats: Record<string, any> = {};
       
       allFetchedSegments.forEach((segment: any) => {
-        // Use historical profile count if available, otherwise null
-        const profileCount = historicalCounts[segment.id] ?? null;
+        // Use profile_count from API response first, fallback to historical data
+        const apiProfileCount = segment.attributes?.profile_count;
+        const profileCount = apiProfileCount ?? historicalCounts[segment.id] ?? null;
         const segmentName = segment.attributes?.name || 'Unnamed Segment';
         
         // Check if segment has Aderai tag (tag-based detection)
