@@ -67,15 +67,72 @@ const testimonials = [
     img: 'https://randomuser.me/api/portraits/women/79.jpg',
     country: '🇯🇵 Japan',
   },
+  {
+    name: 'Alex Martinez',
+    username: '@alexm',
+    body: 'Best Klaviyo tool I\'ve ever used. Setup took literally 2 minutes.',
+    img: 'https://randomuser.me/api/portraits/men/44.jpg',
+    country: '🇲🇽 Mexico',
+  },
+  {
+    name: 'Nina Petrov',
+    username: '@ninap',
+    body: 'The segment bundles are genius. Saved us weeks of planning and execution.',
+    img: 'https://randomuser.me/api/portraits/women/29.jpg',
+    country: '🇷🇺 Russia',
+  },
+  {
+    name: 'Chris Taylor',
+    username: '@christ',
+    body: 'Our open rates increased 28% after implementing Aderai segments. Incredible results.',
+    img: 'https://randomuser.me/api/portraits/men/76.jpg',
+    country: '🇳🇿 New Zealand',
+  },
+  {
+    name: 'Maria Santos',
+    username: '@marias',
+    body: 'Finally found a tool that understands Klaviyo. The integration is seamless.',
+    img: 'https://randomuser.me/api/portraits/women/63.jpg',
+    country: '🇧🇷 Brazil',
+  },
+  {
+    name: 'Henrik Berg',
+    username: '@henrikb',
+    body: 'We went from 5 segments to 70 in one afternoon. Mind-blowing efficiency.',
+    img: 'https://randomuser.me/api/portraits/men/18.jpg',
+    country: '🇸🇪 Sweden',
+  },
+  {
+    name: 'Aisha Khan',
+    username: '@aishak',
+    body: 'The customer lifecycle segments transformed how we approach email marketing.',
+    img: 'https://randomuser.me/api/portraits/women/37.jpg',
+    country: '🇦🇪 UAE',
+  },
+  {
+    name: 'Liam O\'Brien',
+    username: '@liamob',
+    body: 'Can\'t believe this is free. It\'s better than tools we paid thousands for.',
+    img: 'https://randomuser.me/api/portraits/men/92.jpg',
+    country: '🇮🇪 Ireland',
+  },
 ];
+
+// Split testimonials into groups for different columns
+const col1 = testimonials.slice(0, 4);
+const col2 = testimonials.slice(4, 8);
+const col3 = testimonials.slice(8, 12);
+const col4 = testimonials.slice(12, 16);
+const col5 = testimonials.slice(0, 4);
+const col6 = testimonials.slice(4, 8);
 
 function TestimonialCard({ img, name, username, body, country }: (typeof testimonials)[number]) {
   return (
-    <Card className="w-64 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-colors">
+    <Card className="w-72 bg-card/90 backdrop-blur-sm border-border/50 shadow-lg">
       <CardContent className="p-4">
         <div className="flex items-center gap-2.5">
           <Avatar className="size-9">
-            <AvatarImage src={img} alt={name} />
+            <AvatarImage src={img} alt={name} loading="lazy" />
             <AvatarFallback>{name[0]}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
@@ -93,14 +150,14 @@ function TestimonialCard({ img, name, username, body, country }: (typeof testimo
 
 export function Testimonials3D() {
   return (
-    <section className="py-20 px-6 bg-gradient-to-br from-muted/50 via-background to-muted/50 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-muted/50 via-background to-muted/50 relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
       
-      <div className="max-w-7xl mx-auto relative">
+      <div className="relative">
         <ScrollReveal>
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 px-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
@@ -117,40 +174,49 @@ export function Testimonials3D() {
         </ScrollReveal>
 
         <ScrollReveal delay={0.2}>
-          <div className="relative flex h-[500px] w-full flex-row items-center justify-center overflow-hidden gap-1.5 [perspective:300px]">
+          <div className="relative flex h-[600px] w-full flex-row items-center justify-center overflow-hidden [perspective:300px]">
             <div
-              className="flex flex-row items-center gap-4"
+              className="flex flex-row items-center gap-6"
               style={{
-                transform:
-                  'translateX(-100px) translateY(0px) translateZ(-100px) rotateX(20deg) rotateY(-10deg) rotateZ(20deg)',
+                transform: 'translateX(0) translateY(0) translateZ(-50px) rotateX(15deg) rotateY(-8deg) rotateZ(15deg)',
               }}
             >
-              <Marquee vertical pauseOnHover repeat={3} className="[--duration:40s]">
-                {testimonials.map((review) => (
-                  <TestimonialCard key={review.username} {...review} />
+              <Marquee vertical repeat={4} className="[--duration:30s]">
+                {col1.map((review, i) => (
+                  <TestimonialCard key={`col1-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical pauseOnHover reverse repeat={3} className="[--duration:40s]">
-                {testimonials.map((review) => (
-                  <TestimonialCard key={review.username} {...review} />
+              <Marquee vertical reverse repeat={4} className="[--duration:35s]">
+                {col2.map((review, i) => (
+                  <TestimonialCard key={`col2-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical pauseOnHover repeat={3} className="[--duration:40s]">
-                {testimonials.map((review) => (
-                  <TestimonialCard key={review.username} {...review} />
+              <Marquee vertical repeat={4} className="[--duration:28s]">
+                {col3.map((review, i) => (
+                  <TestimonialCard key={`col3-${i}`} {...review} />
                 ))}
               </Marquee>
-              <Marquee vertical pauseOnHover reverse repeat={3} className="[--duration:40s]">
-                {testimonials.map((review) => (
-                  <TestimonialCard key={review.username} {...review} />
+              <Marquee vertical reverse repeat={4} className="[--duration:32s]">
+                {col4.map((review, i) => (
+                  <TestimonialCard key={`col4-${i}`} {...review} />
                 ))}
               </Marquee>
-              {/* Gradient overlays */}
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-background"></div>
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-background"></div>
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
+              <Marquee vertical repeat={4} className="[--duration:27s]">
+                {col5.map((review, i) => (
+                  <TestimonialCard key={`col5-${i}`} {...review} />
+                ))}
+              </Marquee>
+              <Marquee vertical reverse repeat={4} className="[--duration:33s]">
+                {col6.map((review, i) => (
+                  <TestimonialCard key={`col6-${i}`} {...review} />
+                ))}
+              </Marquee>
             </div>
+            {/* Gradient overlays */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/80 to-transparent z-10"></div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent z-10"></div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10"></div>
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10"></div>
           </div>
         </ScrollReveal>
       </div>
