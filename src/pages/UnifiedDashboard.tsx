@@ -12,7 +12,7 @@ import { DashboardOverview } from '@/components/DashboardOverview';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { OnboardingTour } from '@/components/OnboardingTour';
 import { SegmentDashboard } from '@/components/SegmentDashboard';
-import { BUNDLES, SEGMENTS } from '@/lib/segmentData';
+import { BUNDLES, SEGMENTS, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { AISegmentSuggester } from '@/components/AISegmentSuggester';
@@ -464,6 +464,15 @@ export default function UnifiedDashboard() {
               onClearAll={handleClearAll}
               segmentLimit={999}
               currentTier="free"
+              userSettings={klaviyoKeys[activeKeyIndex] ? {
+                currencySymbol: klaviyoKeys[activeKeyIndex].currency_symbol || '$',
+                highValueThreshold: klaviyoKeys[activeKeyIndex].high_value_threshold || 500,
+                vipThreshold: klaviyoKeys[activeKeyIndex].vip_threshold || 1000,
+                aov: klaviyoKeys[activeKeyIndex].aov || 100,
+                lapsedDays: klaviyoKeys[activeKeyIndex].lapsed_days || 90,
+                churnedDays: klaviyoKeys[activeKeyIndex].churned_days || 180,
+                newCustomerDays: klaviyoKeys[activeKeyIndex].new_customer_days || 60,
+              } : DEFAULT_SEGMENT_SETTINGS}
             />
 
             {selectedSegments.length > 0 && (

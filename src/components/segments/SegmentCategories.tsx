@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CategorySection } from './CategorySection';
-import { CATEGORIES, CATEGORY_ICONS, SEGMENTS } from '@/lib/segmentData';
+import { CATEGORIES, CATEGORY_ICONS } from '@/lib/segmentData';
 import type { Segment } from '@/lib/segmentData';
 
 interface SegmentCategoriesProps {
@@ -12,6 +12,7 @@ interface SegmentCategoriesProps {
   onPreviewSegment: (segment: Segment) => void;
   onToggleFavorite: (id: string) => void;
   onClearSearch: () => void;
+  segments: Segment[];
 }
 
 export function SegmentCategories({
@@ -22,8 +23,9 @@ export function SegmentCategories({
   onPreviewSegment,
   onToggleFavorite,
   onClearSearch,
+  segments,
 }: SegmentCategoriesProps) {
-  const filteredSegments = SEGMENTS.filter(segment => 
+  const filteredSegments = segments.filter(segment => 
     segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     segment.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
