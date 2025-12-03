@@ -502,7 +502,7 @@ export const SEGMENTS = [
   // EXCLUSION SEGMENTS (12 segments)
   {
     id: "unsubscribed",
-    name: "Unsubscribed Contacts",
+    name: "Unsubscribed Contacts (Exclusion)",
     description: "Not subscribed to marketing",
     category: "Exclusion Segments",
     icon: "🚫",
@@ -510,7 +510,7 @@ export const SEGMENTS = [
   },
   {
     id: "bounced-emails",
-    name: "Bounced Email Addresses",
+    name: "Bounced Emails (Exclusion)",
     description: "Suppressed due to bounces",
     category: "Exclusion Segments",
     icon: "⚠️",
@@ -518,7 +518,7 @@ export const SEGMENTS = [
   },
   {
     id: "not-opted-in",
-    name: "Not Opted-In Profiles",
+    name: "Not Opted-In Profiles (Exclusion)",
     description: "Cannot receive marketing",
     category: "Exclusion Segments",
     icon: "❌",
@@ -534,7 +534,7 @@ export const SEGMENTS = [
   },
   {
     id: "refunded-customers",
-    name: "Refunded Customers",
+    name: "Refunded Customers (Exclusion)",
     description: "Refunded order in last 30 days",
     category: "Exclusion Segments",
     icon: "↩️",
@@ -542,7 +542,7 @@ export const SEGMENTS = [
   },
   {
     id: "negative-feedback",
-    name: "Negative Feedback",
+    name: "Negative Feedback (Exclusion)",
     description: "Left review with 2 stars or less",
     category: "Exclusion Segments",
     icon: "😞",
@@ -558,7 +558,7 @@ export const SEGMENTS = [
   },
   {
     id: "sunset-segment",
-    name: "Sunset Segment",
+    name: "Sunset Segment (Exclusion)",
     description: "Opened 1-3 times in last 180 days (low engagement)",
     category: "Exclusion Segments",
     icon: "🌅",
@@ -574,7 +574,7 @@ export const SEGMENTS = [
   },
   {
     id: "received-5-opened-0",
-    name: "Received 5, Opened 0",
+    name: "Received 5, Opened 0 (Exclusion)",
     description: "Received 5+ emails but never opened any",
     category: "Exclusion Segments",
     icon: "📪",
@@ -582,7 +582,7 @@ export const SEGMENTS = [
   },
   {
     id: "received-3-in-3-days",
-    name: "Received 3 in Last 3 Days",
+    name: "Received 3 in 3 Days (Exclusion)",
     description: "Got 3+ emails in 72 hours (prevent fatigue)",
     category: "Exclusion Segments",
     icon: "📬",
@@ -590,7 +590,7 @@ export const SEGMENTS = [
   },
   {
     id: "marked-spam",
-    name: "Marked Spam",
+    name: "Marked Spam (Exclusion)",
     description: "Marked email as spam at least once",
     category: "Exclusion Segments",
     icon: "🗑️",
