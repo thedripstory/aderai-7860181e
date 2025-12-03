@@ -1,6 +1,5 @@
-import { Calculator, BarChart3, Activity, Layers } from "lucide-react";
+import { BarChart3, Activity, Layers } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ValueCalculator } from "@/components/ValueCalculator";
 import { ComparisonChart } from "@/components/ComparisonChart";
 import { RevenueTestimonials } from "@/components/RevenueTestimonials";
 import { SegmentHealthMonitor } from "@/components/SegmentHealthMonitor";
@@ -31,12 +30,8 @@ export default function FeatureShowcase() {
           </div>
         </div>
 
-        <Tabs defaultValue="calculator" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-card border border-border mb-8">
-            <TabsTrigger value="calculator" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
-              <Calculator className="w-4 h-4" />
-              <span className="hidden sm:inline">ROI Calculator</span>
-            </TabsTrigger>
+        <Tabs defaultValue="comparison" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-card border border-border mb-8">
             <TabsTrigger value="comparison" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Comparison</span>
@@ -50,10 +45,6 @@ export default function FeatureShowcase() {
               <span className="hidden sm:inline">Health Monitor</span>
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="calculator">
-            <ValueCalculator />
-          </TabsContent>
 
           <TabsContent value="comparison">
             <ComparisonChart />

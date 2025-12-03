@@ -1,10 +1,9 @@
 import { AutomationFlow } from '@/components/AutomationFlow';
-import { ValueCalculator } from '@/components/ValueCalculator';
 import { ComparisonChart } from '@/components/ComparisonChart';
 
 /**
  * How It Works section explaining the product value
- * Includes automation flow, value calculator, and comparison chart
+ * Includes automation flow and comparison chart
  */
 export function HowItWorks() {
   return (
@@ -22,11 +21,6 @@ export function HowItWorks() {
         {/* Automation Flow */}
         <div className="mb-20">
           <AutomationFlow />
-        </div>
-
-        {/* Value Calculator */}
-        <div className="mb-20">
-          <ValueCalculator />
         </div>
 
         {/* Comparison Chart */}
