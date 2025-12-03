@@ -6,14 +6,10 @@ const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/K
 
 export const AnimatedSegmentVisual = () => {
   return (
-    <div className="relative w-full py-20">
-      {/* Full-width edge-to-edge background */}
-      <div className="absolute inset-0 -mx-[50vw] left-1/2 right-1/2 w-screen bg-gradient-to-b from-primary/5 via-background to-primary/5" />
-      <div className="absolute inset-0 -mx-[50vw] left-1/2 right-1/2 w-screen">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] bg-primary/8 rounded-full blur-[200px]" />
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[150px]" />
-      </div>
+    <div className="relative w-full py-20 overflow-hidden">
+      {/* Large ambient glow */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[150px]" />
       
       <div className="relative max-w-7xl mx-auto px-4">
         {/* Section header */}
@@ -96,6 +92,17 @@ export const AnimatedSegmentVisual = () => {
             viewport={{ once: true }}
           >
             <DatabaseWithRestApi
+              className="scale-110 lg:scale-125"
+              badgeTexts={{
+                first: "Connect",
+                second: "Select",
+                third: "Deploy",
+                fourth: "Target",
+              }}
+              buttonTexts={{
+                first: "aderai",
+                second: "70+ Segments",
+              }}
               title="Instant Klaviyo Segmentation"
               circleText="70+"
               lightColor="hsl(5, 77%, 66%)"

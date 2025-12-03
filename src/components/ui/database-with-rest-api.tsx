@@ -2,146 +2,340 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { Sparkles, Zap, RefreshCw, MousePointerClick } from "lucide-react";
+import { Folder, HeartHandshakeIcon, SparklesIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
 interface DatabaseWithRestApiProps {
   className?: string;
   circleText?: string;
+  badgeTexts?: {
+    first: string;
+    second: string;
+    third: string;
+    fourth: string;
+  };
+  buttonTexts?: {
+    first: string;
+    second: string;
+  };
   title?: string;
   lightColor?: string;
 }
 
 const DatabaseWithRestApi = ({
   className,
-  circleText = "70+",
-  title = "Instant Klaviyo Segmentation",
-  lightColor = "hsl(5, 77%, 66%)",
+  circleText,
+  badgeTexts,
+  buttonTexts,
+  title,
+  lightColor,
 }: DatabaseWithRestApiProps) => {
   return (
-    <div className={cn("relative w-full max-w-3xl mx-auto", className)}>
-      {/* Top Action Badges */}
-      <div className="flex justify-center gap-6 mb-8">
-        {["Connect", "Select", "Deploy", "Target"].map((label, i) => (
-          <motion.div
-            key={label}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.4 }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#18181b] border border-border/50 text-white text-sm font-medium shadow-lg"
-          >
-            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-            {label}
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Connection Lines SVG */}
-      <div className="relative h-16 mb-4">
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 600 60" preserveAspectRatio="xMidYMid meet">
-          <g stroke="hsl(var(--muted))" fill="none" strokeWidth="1.5" strokeDasharray="200 200" pathLength="200">
-            <path d="M 100 0 L 100 30 Q 100 40 110 40 L 290 40 Q 300 40 300 50 L 300 60" />
-            <path d="M 230 0 L 230 20 Q 230 30 240 30 L 290 30 Q 300 30 300 40 L 300 60" />
-            <path d="M 370 0 L 370 20 Q 370 30 360 30 L 310 30 Q 300 30 300 40 L 300 60" />
-            <path d="M 500 0 L 500 30 Q 500 40 490 40 L 310 40 Q 300 40 300 50 L 300 60" />
-            <animate
-              attributeName="stroke-dashoffset"
-              from="200"
-              to="0"
-              dur="1.5s"
-              fill="freeze"
-              calcMode="spline"
-              keySplines="0.25,0.1,0.5,1"
-              keyTimes="0; 1"
-            />
-          </g>
-          {/* Animated light dots */}
-          <g>
-            <circle className="animate-pulse" cx="300" cy="50" r="4" fill={lightColor} />
-          </g>
-        </svg>
-      </div>
-
-      {/* Main Card */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="relative bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden"
+    <div
+      className={cn(
+        "relative flex h-[450px] w-full max-w-[700px] flex-col items-center",
+        className
+      )}
+    >
+      {/* SVG Paths  */}
+      <svg
+        className="h-full sm:w-full text-muted"
+        width="100%"
+        height="100%"
+        viewBox="0 0 200 100"
       >
-        {/* Title Badge */}
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-          <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#18181b] border border-primary/30 shadow-lg shadow-primary/10">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-white">{title}</span>
-          </div>
-        </div>
-
-        {/* Card Content */}
-        <div className="pt-10 pb-16 px-8">
-          {/* Feature Badges Grid */}
-          <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
-            {/* AI + Klaviyo */}
-            <motion.div
-              whileHover={{ scale: 1.03, y: -2 }}
-              className="flex items-center gap-3 px-5 py-4 rounded-xl bg-[#18181b] border border-primary/20 cursor-pointer transition-shadow hover:shadow-lg hover:shadow-primary/10"
+        <g
+          stroke="currentColor"
+          fill="none"
+          strokeWidth="0.4"
+          strokeDasharray="100 100"
+          pathLength="100"
+        >
+          <path d="M 31 10 v 15 q 0 5 5 5 h 59 q 5 0 5 5 v 10" />
+          <path d="M 77 10 v 10 q 0 5 5 5 h 13 q 5 0 5 5 v 10" />
+          <path d="M 124 10 v 10 q 0 5 -5 5 h -14 q -5 0 -5 5 v 10" />
+          <path d="M 170 10 v 15 q 0 5 -5 5 h -60 q -5 0 -5 5 v 10" />
+          {/* Animation For Path Starting */}
+          <animate
+            attributeName="stroke-dashoffset"
+            from="100"
+            to="0"
+            dur="1s"
+            fill="freeze"
+            calcMode="spline"
+            keySplines="0.25,0.1,0.5,1"
+            keyTimes="0; 1"
+          />
+        </g>
+        {/* Blue Lights */}
+        <g mask="url(#db-mask-1)">
+          <circle
+            className="database db-light-1"
+            cx="0"
+            cy="0"
+            r="12"
+            fill="url(#db-blue-grad)"
+          />
+        </g>
+        <g mask="url(#db-mask-2)">
+          <circle
+            className="database db-light-2"
+            cx="0"
+            cy="0"
+            r="12"
+            fill="url(#db-blue-grad)"
+          />
+        </g>
+        <g mask="url(#db-mask-3)">
+          <circle
+            className="database db-light-3"
+            cx="0"
+            cy="0"
+            r="12"
+            fill="url(#db-blue-grad)"
+          />
+        </g>
+        <g mask="url(#db-mask-4)">
+          <circle
+            className="database db-light-4"
+            cx="0"
+            cy="0"
+            r="12"
+            fill="url(#db-blue-grad)"
+          />
+        </g>
+        {/* Buttons */}
+        <g stroke="currentColor" fill="none" strokeWidth="0.4">
+          {/* First Button */}
+          <g className="db-badge-group">
+            <rect
+              className="db-badge-rect"
+              fill="#18181B"
+              x="14"
+              y="5"
+              width="34"
+              height="10"
+              rx="5"
+            ></rect>
+            <DatabaseIcon x="18" y="7.5"></DatabaseIcon>
+            <text
+              x="28"
+              y="12"
+              fill="white"
+              stroke="none"
+              fontSize="5"
+              fontWeight="500"
             >
-              <Sparkles className="w-5 h-5 text-primary shrink-0" />
-              <span className="font-semibold text-white">AI</span>
-              <span className="text-white/40">+</span>
-              <img src={klaviyoLogo} alt="Klaviyo" className="h-5" />
-            </motion.div>
-
-            {/* 70+ Segments */}
-            <motion.div
-              whileHover={{ scale: 1.03, y: -2 }}
-              className="flex items-center gap-3 px-5 py-4 rounded-xl bg-[#18181b] border border-accent/20 cursor-pointer transition-shadow hover:shadow-lg hover:shadow-accent/10"
+              {badgeTexts?.first || "GET"}
+            </text>
+          </g>
+          {/* Second Button */}
+          <g className="db-badge-group">
+            <rect
+              className="db-badge-rect"
+              fill="#18181B"
+              x="60"
+              y="5"
+              width="34"
+              height="10"
+              rx="5"
+            ></rect>
+            <DatabaseIcon x="64" y="7.5"></DatabaseIcon>
+            <text
+              x="74"
+              y="12"
+              fill="white"
+              stroke="none"
+              fontSize="5"
+              fontWeight="500"
             >
-              <Zap className="w-5 h-5 text-accent shrink-0" />
-              <span className="font-bold text-accent">70+</span>
-              <span className="font-medium text-white">Segments</span>
-            </motion.div>
-
-            {/* Real-time Sync */}
-            <motion.div
-              whileHover={{ scale: 1.03, y: -2 }}
-              className="flex items-center gap-3 px-5 py-4 rounded-xl bg-[#18181b] border border-green-500/20 cursor-pointer transition-shadow hover:shadow-lg hover:shadow-green-500/10"
+              {badgeTexts?.second || "POST"}
+            </text>
+          </g>
+          {/* Third Button */}
+          <g className="db-badge-group">
+            <rect
+              className="db-badge-rect"
+              fill="#18181B"
+              x="108"
+              y="5"
+              width="34"
+              height="10"
+              rx="5"
+            ></rect>
+            <DatabaseIcon x="112" y="7.5"></DatabaseIcon>
+            <text
+              x="122"
+              y="12"
+              fill="white"
+              stroke="none"
+              fontSize="5"
+              fontWeight="500"
             >
-              <RefreshCw className="w-5 h-5 text-green-500 shrink-0" />
-              <span className="font-medium text-white">Real-time Sync</span>
-            </motion.div>
-
-            {/* 1-Click Deploy */}
-            <motion.div
-              whileHover={{ scale: 1.03, y: -2 }}
-              className="flex items-center gap-3 px-5 py-4 rounded-xl bg-[#18181b] border border-blue-500/20 cursor-pointer transition-shadow hover:shadow-lg hover:shadow-blue-500/10"
+              {badgeTexts?.third || "PUT"}
+            </text>
+          </g>
+          {/* Fourth Button */}
+          <g className="db-badge-group">
+            <rect
+              className="db-badge-rect"
+              fill="#18181B"
+              x="150"
+              y="5"
+              width="40"
+              height="10"
+              rx="5"
+            ></rect>
+            <DatabaseIcon x="154" y="7.5"></DatabaseIcon>
+            <text
+              x="165"
+              y="12"
+              fill="white"
+              stroke="none"
+              fontSize="5"
+              fontWeight="500"
             >
-              <MousePointerClick className="w-5 h-5 text-blue-500 shrink-0" />
-              <span className="font-medium text-white">1-Click Deploy</span>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Bottom Circle Badge */}
-        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 z-20">
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            className="w-16 h-16 rounded-full bg-gradient-to-b from-[#1a1a1b] to-[#0d0d0e] border border-primary/30 flex items-center justify-center shadow-xl shadow-primary/20"
+              {badgeTexts?.fourth || "DELETE"}
+            </text>
+          </g>
+        </g>
+        <defs>
+          {/* 1 -  user list */}
+          <mask id="db-mask-1">
+            <path
+              d="M 31 10 v 15 q 0 5 5 5 h 59 q 5 0 5 5 v 10"
+              strokeWidth="0.5"
+              stroke="white"
+            />
+          </mask>
+          {/* 2 - task list */}
+          <mask id="db-mask-2">
+            <path
+              d="M 77 10 v 10 q 0 5 5 5 h 13 q 5 0 5 5 v 10"
+              strokeWidth="0.5"
+              stroke="white"
+            />
+          </mask>
+          {/* 3 - backlogs */}
+          <mask id="db-mask-3">
+            <path
+              d="M 124 10 v 10 q 0 5 -5 5 h -14 q -5 0 -5 5 v 10"
+              strokeWidth="0.5"
+              stroke="white"
+            />
+          </mask>
+          {/* 4 - misc */}
+          <mask id="db-mask-4">
+            <path
+              d="M 170 10 v 15 q 0 5 -5 5 h -60 q -5 0 -5 5 v 10"
+              strokeWidth="0.5"
+              stroke="white"
+            />
+          </mask>
+          {/* Blue Grad */}
+          <radialGradient id="db-blue-grad" fx="1">
+            <stop offset="0%" stopColor={lightColor || "#00A6F5"} />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+        </defs>
+      </svg>
+      {/* Main Box */}
+      <div className="absolute bottom-10 flex w-full flex-col items-center">
+        {/* bottom shadow */}
+        <div className="absolute -bottom-6 h-[140px] w-[70%] rounded-xl bg-accent/20" />
+        {/* box title */}
+        <motion.div 
+          className="absolute -top-4 z-20 flex items-center justify-center rounded-xl border border-primary/30 bg-[#101112] px-4 py-2 shadow-lg shadow-primary/10"
+          whileHover={{ scale: 1.05, boxShadow: "0 0 30px hsl(5, 77%, 66%, 0.3)" }}
+          transition={{ duration: 0.2 }}
+        >
+          <SparklesIcon className="size-4 text-primary" />
+          <span className="ml-2 text-sm font-medium">
+            {title ? title : "Data exchange using a customized REST API"}
+          </span>
+        </motion.div>
+        {/* box outter circle */}
+        <motion.div 
+          className="absolute -bottom-10 z-30 grid h-[80px] w-[80px] place-items-center rounded-full border-t border-primary/30 bg-gradient-to-b from-[#1a1a1b] to-[#0d0d0e] font-bold text-xl text-primary shadow-lg shadow-primary/20"
+          whileHover={{ scale: 1.1, boxShadow: "0 0 40px hsl(5, 77%, 66%, 0.4)" }}
+          transition={{ duration: 0.2 }}
+        >
+          {circleText ? circleText : "SVG"}
+        </motion.div>
+        {/* box content */}
+        <div className="relative z-10 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm shadow-2xl">
+          {/* Badges */}
+          <motion.div 
+            className="absolute bottom-10 left-16 z-10 h-9 rounded-full bg-[#101112] px-4 text-sm border border-primary/20 flex items-center gap-2 cursor-pointer"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.3)", borderColor: "hsl(5, 77%, 66%, 0.5)" }}
+            transition={{ duration: 0.2 }}
           >
-            <span className="text-xl font-bold text-primary">{circleText}</span>
+            <HeartHandshakeIcon className="size-4 text-primary" />
+            <span className="font-medium">{buttonTexts?.first || "LegionDev"}</span>
           </motion.div>
+          <motion.div 
+            className="absolute right-16 top-10 z-10 hidden h-9 rounded-full bg-[#101112] px-4 text-sm sm:flex border border-accent/20 items-center gap-2 cursor-pointer"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.3)", borderColor: "hsl(5, 100%, 64%, 0.5)" }}
+            transition={{ duration: 0.2 }}
+          >
+            <Folder className="size-4 text-accent" />
+            <span className="font-medium">{buttonTexts?.second || "v2_updates"}</span>
+          </motion.div>
+          {/* Circles */}
+          <motion.div
+            className="absolute -bottom-16 h-[120px] w-[120px] rounded-full border-t border-primary/20 bg-primary/5"
+            animate={{
+              scale: [0.98, 1.02, 0.98, 1, 1, 1, 1, 1, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute -bottom-24 h-[175px] w-[175px] rounded-full border-t border-primary/15 bg-primary/3"
+            animate={{
+              scale: [1, 1, 1, 0.98, 1.02, 0.98, 1, 1, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute -bottom-[120px] h-[230px] w-[230px] rounded-full border-t border-primary/10 bg-primary/2"
+            animate={{
+              scale: [1, 1, 1, 1, 1, 0.98, 1.02, 0.98, 1, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute -bottom-[150px] h-[290px] w-[290px] rounded-full border-t border-primary/5 bg-primary/1"
+            animate={{
+              scale: [1, 1, 1, 1, 1, 1, 0.98, 1.02, 0.98, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
         </div>
-
-        {/* Decorative bottom glow */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-gradient-to-t from-primary/10 to-transparent rounded-t-full blur-xl" />
-      </motion.div>
-
-      {/* Bottom shadow */}
-      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[85%] h-8 bg-accent/15 rounded-xl blur-sm -z-10" />
+      </div>
     </div>
   );
 };
 
 export default DatabaseWithRestApi;
+
+const DatabaseIcon = ({ x = "0", y = "0" }: { x: string; y: string }) => {
+  return (
+    <svg
+      x={x}
+      y={y}
+      xmlns="http://www.w3.org/2000/svg"
+      width="5"
+      height="5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <ellipse cx="12" cy="5" rx="9" ry="3" />
+      <path d="M3 5V19A9 3 0 0 0 21 19V5" />
+      <path d="M3 12A9 3 0 0 0 21 12" />
+    </svg>
+  );
+};
