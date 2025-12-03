@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Users, TrendingUp, BarChart3, Activity, Search, Download, ArrowUp, ArrowDown, HelpCircle, Target, Zap, Filter, Calendar, Sparkles, Check, X } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { EmptyState } from '@/components/ui/empty-state';
-import { AnalyticsDashboardSkeleton } from '@/components/ui/skeleton-loader';
+import { AnalyticsLoadingState } from '@/components/AnalyticsLoadingState';
 import { SegmentDetailModal } from '@/components/SegmentDetailModal';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -216,7 +216,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   };
 
   if (loadingAnalytics) {
-    return <AnalyticsDashboardSkeleton />;
+    return <AnalyticsLoadingState progress={analyticsProgress} />;
   }
 
   if (allSegments.length === 0) {
