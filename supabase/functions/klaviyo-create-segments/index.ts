@@ -97,11 +97,9 @@ function buildMetricCondition(
     }
   };
 
-  // FIXED: Use correct Klaviyo API timeframe format
-  if (timeframe.type === 'over-all-time') {
-    // For "over all time", set timeframe_filter to null
-    condition.timeframe_filter = null;
-  } else if (timeframe.type === 'in-the-last') {
+  // FIXED: For "over all time", omit timeframe_filter entirely (don't set to null)
+  // Only add timeframe_filter when using specific time ranges
+  if (timeframe.type === 'in-the-last') {
     condition.timeframe_filter = {
       type: 'date',
       operator: 'in-the-last',
@@ -115,6 +113,7 @@ function buildMetricCondition(
       value: timeframe.date
     };
   }
+  // For 'over-all-time', we simply don't add timeframe_filter at all
 
   return condition;
 }
