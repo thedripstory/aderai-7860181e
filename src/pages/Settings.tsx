@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { sanitizeString, sanitizeEmail, sanitizeNumber, validatePassword } from "@/lib/inputSanitization";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
+import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 import {
   Select,
   SelectContent,
@@ -32,6 +33,7 @@ const CURRENCIES = [
 ];
 
 export default function Settings() {
+  useInactivityLogout();
   const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications">("account");
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);

@@ -3,8 +3,11 @@ import { Brain, Shield, Sparkles } from "lucide-react";
 import { ChurnPredictor } from "@/components/ChurnPredictor";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
+import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 
 export default function AIFeaturesDashboard() {
+  useInactivityLogout();
+  
   return (
     <PageErrorBoundary pageName="AI Features">
     <div className="min-h-screen bg-background">

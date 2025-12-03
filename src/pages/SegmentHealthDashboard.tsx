@@ -2,8 +2,11 @@ import { SegmentHealthMonitor } from "@/components/SegmentHealthMonitor";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { Activity } from "lucide-react";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
+import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 
 export default function SegmentHealthDashboard() {
+  useInactivityLogout();
+  
   return (
     <PageErrorBoundary pageName="Segment Health">
     <div className="min-h-screen bg-background">
