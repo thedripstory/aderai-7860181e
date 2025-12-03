@@ -14,7 +14,9 @@ import {
   Lightbulb,
   ArrowRight,
   Activity,
-  RefreshCw
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -29,12 +31,16 @@ export const DashboardOverview = () => {
   const navigate = useNavigate();
   const [activityModalOpen, setActivityModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [segmentPage, setSegmentPage] = useState(0);
+  const SEGMENTS_PER_PAGE = 4;
+  
   const { 
     totalSegmentsCreated, 
     aiSuggestionsUsed, 
     daysSinceSignup, 
     klaviyoConnected,
     recentActivity,
+    createdSegments,
     firstName,
     tipOfTheDay,
     lastRefresh,
@@ -52,6 +58,16 @@ export const DashboardOverview = () => {
   const progressPercentage = useMemo(() => 
     (totalSegmentsCreated / TOTAL_AVAILABLE_SEGMENTS) * 100,
     [totalSegmentsCreated]
+  );
+
+  const paginatedSegments = useMemo(() => {
+    const start = segmentPage * SEGMENTS_PER_PAGE;
+    return createdSegments.slice(start, start + SEGMENTS_PER_PAGE);
+  }, [createdSegments, segmentPage]);
+
+  const totalSegmentPages = useMemo(() => 
+    Math.ceil(createdSegments.length / SEGMENTS_PER_PAGE),
+    [createdSegments.length]
   );
 
   // Define all onboarding steps with completion status
@@ -271,6 +287,54 @@ export const DashboardOverview = () => {
                 )}
               </div>
             </div>
+
+            {/* Created segments list with pagination */}
+            {createdSegments.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Your Segments</p>
+                <div className="space-y-1.5">
+                  {paginatedSegments.map((segment) => (
+                    <div 
+                      key={segment.id}
+                      className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 border border-border/30"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                      <span className="text-sm truncate flex-1">{segment.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(segment.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Pagination controls */}
+                {totalSegmentPages > 1 && (
+                  <div className="flex items-center justify-between pt-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSegmentPage(p => Math.max(0, p - 1))}
+                      disabled={segmentPage === 0}
+                      className="h-7 px-2"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      Page {segmentPage + 1} of {totalSegmentPages}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSegmentPage(p => Math.min(totalSegmentPages - 1, p + 1))}
+                      disabled={segmentPage >= totalSegmentPages - 1}
+                      className="h-7 px-2"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
             
             {progressPercentage < 100 && (
               <Button 
