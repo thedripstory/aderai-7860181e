@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Loader, RefreshCw, Target, Key, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -67,13 +67,14 @@ export default function UnifiedDashboard() {
   } = useOnboardingTour();
 
   // Handle URL tab parameter
+  const [searchParams] = useSearchParams();
+  
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
+    const tabParam = searchParams.get('tab');
     if (tabParam) {
       setActiveTab(tabParam);
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     const checkAuth = async () => {
