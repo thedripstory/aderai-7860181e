@@ -176,9 +176,9 @@ export function Testimonials3D() {
         <ScrollReveal delay={0.2}>
           <div className="relative flex h-[600px] w-full flex-row items-center justify-center overflow-hidden [perspective:300px]">
             <div
-              className="flex flex-row items-center gap-6"
+              className="flex flex-row items-center gap-6 absolute left-1/2"
               style={{
-                transform: 'translateX(0) translateY(0) translateZ(-50px) rotateX(15deg) rotateY(-8deg) rotateZ(15deg)',
+                transform: 'translateX(-50%) translateY(0) translateZ(-50px) rotateX(15deg) rotateY(-8deg) rotateZ(15deg)',
               }}
             >
               <Marquee vertical repeat={4} className="[--duration:30s]">
