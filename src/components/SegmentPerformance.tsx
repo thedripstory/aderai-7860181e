@@ -41,7 +41,7 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
         .select("*")
         .eq("klaviyo_key_id", klaviyoKeyId)
         .order("profile_count", { ascending: false })
-        .limit(10);
+        .limit(50); // Fetch more to filter
 
       if (error) {
         // Table might not exist or other error - just show empty state
@@ -49,17 +49,35 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
       }
       
       // Transform historical data to performance format
+      // Filter out exclude/suppression segments - they don't represent active audiences
       if (data && data.length > 0) {
-        const performanceData: PerformanceData[] = data.map((item: any) => ({
-          segment_id: item.segment_klaviyo_id,
-          segment_name: item.segment_name,
-          revenue: 0, // Not available from historical data
-          conversion_rate: 0,
-          average_order_value: 0,
-          total_orders: 0,
-          active_profiles: item.profile_count || 0,
-          calculated_at: item.recorded_at,
-        }));
+        const excludeKeywords = ['exclude', 'exclusion', 'suppress', 'sunset', 'unsubscribe', 'bounced', 'spam'];
+        
+        const filteredData = data.filter((item: any) => {
+          const nameLower = (item.segment_name || '').toLowerCase();
+          return !excludeKeywords.some(keyword => nameLower.includes(keyword));
+        });
+        
+        // Get unique segments (latest record per segment) and take top 10
+        const uniqueSegments = new Map<string, any>();
+        filteredData.forEach((item: any) => {
+          if (!uniqueSegments.has(item.segment_klaviyo_id)) {
+            uniqueSegments.set(item.segment_klaviyo_id, item);
+          }
+        });
+        
+        const performanceData: PerformanceData[] = Array.from(uniqueSegments.values())
+          .slice(0, 10)
+          .map((item: any) => ({
+            segment_id: item.segment_klaviyo_id,
+            segment_name: item.segment_name,
+            revenue: 0, // Not available from historical data
+            conversion_rate: 0,
+            average_order_value: 0,
+            total_orders: 0,
+            active_profiles: item.profile_count || 0,
+            calculated_at: item.recorded_at,
+          }));
         setPerformance(performanceData);
       }
     } catch (error) {
@@ -124,10 +142,10 @@ export const SegmentPerformance = ({ klaviyoKeyId, apiKey }: SegmentPerformanceP
           <div>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Segment Performance
+              Segments by Audience Size
             </CardTitle>
             <CardDescription>
-              Top revenue-generating segments
+              Your largest segments by profile count
             </CardDescription>
           </div>
           <Button
