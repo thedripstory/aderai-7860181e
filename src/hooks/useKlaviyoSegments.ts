@@ -2,6 +2,24 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorLogger } from '@/lib/errorLogger';
 
+// Helper to track analytics events
+async function trackAnalyticsEvent(eventName: string, metadata?: Record<string, any>) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from('analytics_events').insert({
+      user_id: user.id,
+      event_name: eventName,
+      event_metadata: metadata || {},
+      page_url: window.location.href,
+      user_agent: navigator.userAgent,
+    });
+  } catch (error) {
+    console.error('Failed to track event:', error);
+  }
+}
+
 // Bundle definitions - each bundle expands to multiple segment IDs
 const SEGMENT_BUNDLES: Record<string, string[]> = {
   'core-essentials': [
@@ -221,9 +239,19 @@ export const useKlaviyoSegments = () => {
 
       setResults(newResults);
 
+      // Track successful segment creation event
+      const successCount = newResults.filter(r => r.status === 'success').length;
+      if (successCount > 0) {
+        await trackAnalyticsEvent('create_segments', {
+          segments_created: successCount,
+          segments_skipped: newResults.filter(r => r.status === 'skipped').length,
+          segments_failed: newResults.filter(r => r.status === 'error').length,
+          total_attempted: expandedSegmentIds.length,
+        });
+      }
+
       // Update job completion
       if (jobId) {
-        const successCount = newResults.filter(r => r.status === 'success').length;
         await supabase
           .from('segment_creation_jobs')
           .update({

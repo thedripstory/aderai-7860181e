@@ -238,6 +238,22 @@ const KlaviyoSetup = () => {
         description: "Your Klaviyo integration is ready. Welcome to your dashboard!",
       });
 
+      // Track Klaviyo connected event
+      try {
+        await supabase.from('analytics_events').insert({
+          user_id: user.id,
+          event_name: 'klaviyo_connected',
+          event_metadata: {
+            client_name: clientName || 'My Business',
+            currency,
+          },
+          page_url: window.location.href,
+          user_agent: navigator.userAgent,
+        });
+      } catch (trackError) {
+        console.error('Failed to track klaviyo connection:', trackError);
+      }
+
       // Award "First Steps" achievement
       try {
         const { data: achievements } = await supabase
