@@ -134,8 +134,17 @@ export default function UnifiedDashboard() {
     const bundle = BUNDLES.find(b => b.id === bundleId);
     if (bundle) {
       setSelectedSegments(prev => {
-        const newSegments = [...prev, ...bundle.segments];
-        return Array.from(new Set(newSegments));
+        // Check if all segments in bundle are already selected
+        const allSelected = bundle.segments.every(id => prev.includes(id));
+        
+        if (allSelected) {
+          // Deselect all segments from this bundle
+          return prev.filter(id => !bundle.segments.includes(id));
+        } else {
+          // Add remaining segments from bundle
+          const newSegments = [...prev, ...bundle.segments];
+          return Array.from(new Set(newSegments));
+        }
       });
     }
   }, []);

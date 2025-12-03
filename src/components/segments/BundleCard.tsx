@@ -66,13 +66,14 @@ export const BundleCard = memo(function BundleCard({ bundle, selectedFromBundle,
         
         <button className={`w-full py-2.5 rounded-lg font-semibold transition-all group-hover:shadow-md flex items-center justify-center gap-2 ${
           bundleSelected 
-            ? 'bg-primary/20 text-primary border-2 border-primary' 
+            ? 'bg-primary/20 text-primary border-2 border-primary hover:bg-destructive/10 hover:text-destructive hover:border-destructive' 
             : 'bg-primary text-primary-foreground hover:bg-primary/90'
         }`}>
           {bundleSelected ? (
             <>
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Bundle Complete</span>
+              <CheckCircle2 className="w-4 h-4 group-hover:hidden" />
+              <span className="group-hover:hidden">Bundle Complete</span>
+              <span className="hidden group-hover:inline">Click to Remove</span>
             </>
           ) : partiallySelected ? (
             <>
