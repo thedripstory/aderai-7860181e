@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+interface CreatedSegment {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 interface DashboardStats {
   totalSegmentsCreated: number;
   aiSuggestionsUsed: number;
@@ -12,6 +18,7 @@ interface DashboardStats {
     timestamp: string;
     metadata?: any;
   }>;
+  createdSegments: CreatedSegment[];
   firstName: string;
   loading: boolean;
 }
@@ -102,6 +109,7 @@ export function useDashboardStats() {
     daysSinceSignup: 0,
     klaviyoConnected: false,
     recentActivity: [],
+    createdSegments: [],
     firstName: '',
     loading: true,
   });
@@ -141,16 +149,21 @@ export function useDashboardStats() {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      // Get segments created count from segment_operations (successful creates)
-      // Note: operation_type is 'created' in the database
-      const { count: segmentCount } = await supabase
+      // Get segments created from segment_operations (successful creates)
+      const { data: segmentData, count: segmentCount } = await supabase
         .from('segment_operations')
-        .select('id', { count: 'exact' })
+        .select('id, segment_name, created_at', { count: 'exact' })
         .eq('user_id', user.id)
         .in('operation_type', ['create', 'created'])
-        .eq('operation_status', 'success');
+        .eq('operation_status', 'success')
+        .order('created_at', { ascending: false });
 
       const totalSegmentsCreated = segmentCount || 0;
+      const createdSegments: CreatedSegment[] = (segmentData || []).map(seg => ({
+        id: seg.id,
+        name: seg.segment_name,
+        createdAt: seg.created_at,
+      }));
 
       // Get recent activity from analytics_events - include all meaningful events
       const majorEvents = [
@@ -214,6 +227,7 @@ export function useDashboardStats() {
         daysSinceSignup,
         klaviyoConnected: (klaviyoKeys?.length || 0) > 0,
         recentActivity,
+        createdSegments,
         firstName: userData?.first_name || 'User',
         loading: false,
       });
