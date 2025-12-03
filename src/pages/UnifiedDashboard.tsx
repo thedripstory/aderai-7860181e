@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Loader, RefreshCw, Target, Key, Sparkles } from 'lucide-react';
+import { Loader, RefreshCw, Target, Key, Sparkles, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -220,7 +220,36 @@ export default function UnifiedDashboard() {
     await handleCreateSegments(failedSegmentIds);
   }, [handleCreateSegments]);
 
-  const fetchAllSegments = async () => {
+  // Load cached profile counts from localStorage
+  const loadCachedProfileCounts = useCallback((keyId: string): Record<string, number> => {
+    try {
+      const cached = localStorage.getItem(`profile_counts_${keyId}`);
+      if (cached) {
+        const { counts, timestamp } = JSON.parse(cached);
+        // Cache valid for 24 hours
+        if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
+          return counts;
+        }
+      }
+    } catch {
+      // Invalid cache
+    }
+    return {};
+  }, []);
+
+  // Save profile counts to localStorage
+  const saveCachedProfileCounts = useCallback((keyId: string, counts: Record<string, number>) => {
+    try {
+      localStorage.setItem(`profile_counts_${keyId}`, JSON.stringify({
+        counts,
+        timestamp: Date.now()
+      }));
+    } catch {
+      // Storage full or unavailable
+    }
+  }, []);
+
+  const fetchAllSegments = async (forceRefreshCounts = false) => {
     if (klaviyoKeys.length === 0) {
       return;
     }
@@ -233,21 +262,12 @@ export default function UnifiedDashboard() {
     trackAction('fetch_analytics');
     setLoadingAnalytics(true);
     
+    // Load cached counts first for immediate display
+    const cachedCounts = loadCachedProfileCounts(activeKey.id);
+    
     try {
-      // First, trigger the snapshot recording to fetch profile counts
-      setAnalyticsProgress({ current: 0, total: 100 });
-      toast.info('Fetching profile counts from Klaviyo...', { duration: 3000 });
-      
-      try {
-        await supabase.functions.invoke('record-segment-snapshots');
-      } catch (snapshotError) {
-        console.error('Snapshot recording error:', snapshotError);
-        // Continue anyway - we'll show what historical data we have
-      }
-      
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
-      // Fetch segments with tags (profile_count requires individual segment fetches)
       let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,is_active,is_starred';
       
       // Fetch all pages of segments
@@ -261,20 +281,16 @@ export default function UnifiedDashboard() {
         });
 
         if (error) {
-          console.error('Supabase function error:', error);
           throw error;
         }
         
-        // Check if Klaviyo returned an error
         if (data?.errors) {
-          console.error('Klaviyo API error:', data.errors);
           throw new Error(data.errors[0]?.detail || 'Klaviyo API error');
         }
         
         const pageSegments = data?.data || [];
         allFetchedSegments = [...allFetchedSegments, ...pageSegments];
         
-        // Collect included tags from the response
         if (data?.included) {
           data.included.forEach((item: any) => {
             if (item.type === 'tag') {
@@ -283,7 +299,6 @@ export default function UnifiedDashboard() {
           });
         }
         
-        // Check for next page
         nextPageUrl = data?.links?.next || null;
         
         setAnalyticsProgress({ 
@@ -292,12 +307,13 @@ export default function UnifiedDashboard() {
         });
       }
       
-      // Fetch latest profile counts from historical data table
+      setAllSegments(allFetchedSegments);
+      
+      // Get historical counts from database
       let historicalCounts: Record<string, number> = {};
       if (currentUser?.id) {
         const segmentIds = allFetchedSegments.map((s: any) => s.id);
         
-        // Get the most recent profile count for each segment
         const { data: historicalData } = await supabase
           .from('segment_historical_data')
           .select('segment_klaviyo_id, profile_count, recorded_at')
@@ -306,7 +322,6 @@ export default function UnifiedDashboard() {
           .order('recorded_at', { ascending: false });
         
         if (historicalData) {
-          // Keep only the most recent entry for each segment
           historicalData.forEach((record: any) => {
             if (!historicalCounts[record.segment_klaviyo_id]) {
               historicalCounts[record.segment_klaviyo_id] = record.profile_count;
@@ -314,26 +329,23 @@ export default function UnifiedDashboard() {
           });
         }
       }
+
+      // Merge: cached > historical > null
+      const mergedCounts = { ...cachedCounts, ...historicalCounts };
       
-      setAllSegments(allFetchedSegments);
-      
-      // Build stats from segment attributes + historical profile counts
+      // Build stats
       const stats: Record<string, any> = {};
       
       allFetchedSegments.forEach((segment: any) => {
-        // Use profile_count from API response first, fallback to historical data
-        const apiProfileCount = segment.attributes?.profile_count;
-        const profileCount = apiProfileCount ?? historicalCounts[segment.id] ?? null;
+        const profileCount = mergedCounts[segment.id] ?? null;
         const segmentName = segment.attributes?.name || 'Unnamed Segment';
         
-        // Check if segment has Aderai tag (tag-based detection)
         const segmentTagIds = segment.relationships?.tags?.data?.map((t: any) => t.id) || [];
         const segmentTags = segmentTagIds.map((id: string) => includedTags[id]).filter(Boolean);
         const hasAderaiTag = segmentTags.some((tag: string) => 
           tag.toLowerCase().includes('aderai')
         );
         
-        // Check name-based detection
         const hasAderaiName = segmentName.includes('| Aderai') || segmentName.toLowerCase().includes('aderai');
         
         stats[segment.id] = {
@@ -350,6 +362,11 @@ export default function UnifiedDashboard() {
 
       setSegmentStats(stats);
       
+      // Save to cache for faster subsequent loads
+      if (Object.keys(mergedCounts).length > 0) {
+        saveCachedProfileCounts(activeKey.id, mergedCounts);
+      }
+      
       // Count Aderai segments and segments with profile counts for toast
       const aderaiCount = Object.values(stats).filter((s: any) => s.isAderai).length;
       const profileCountsLoaded = Object.values(stats).filter((s: any) => s.profileCount !== null).length;
@@ -358,8 +375,6 @@ export default function UnifiedDashboard() {
         description: `${allFetchedSegments.length} segments fetched (${profileCountsLoaded} with counts)${aderaiCount > 0 ? ` • ${aderaiCount} Aderai` : ''}`,
       });
     } catch (error) {
-      console.error('Error fetching segments:', error);
-      
       await ErrorLogger.logKlaviyoError(
         'Fetch All Segments',
         error as Error,
@@ -371,6 +386,37 @@ export default function UnifiedDashboard() {
       });
     } finally {
       setLoadingAnalytics(false);
+    }
+  };
+
+  // Fetch fresh profile counts from Klaviyo (triggers edge function)
+  const [fetchingCounts, setFetchingCounts] = useState(false);
+  const [countProgress, setCountProgress] = useState({ current: 0, total: 0 });
+  
+  const fetchFreshProfileCounts = async () => {
+    const activeKey = klaviyoKeys[activeKeyIndex];
+    if (!activeKey?.id) return;
+    
+    setFetchingCounts(true);
+    setCountProgress({ current: 0, total: allSegments.length });
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('record-segment-snapshots', {
+        body: { keyId: activeKey.id }
+      });
+      
+      if (error) throw error;
+      
+      // Refresh the segment data to get new counts
+      await fetchAllSegments();
+      
+      toast.success('Profile counts updated', {
+        description: `${data?.segmentsRecorded || 0} segments updated`
+      });
+    } catch (error) {
+      toast.error('Failed to fetch profile counts');
+    } finally {
+      setFetchingCounts(false);
     }
   };
 
@@ -519,17 +565,45 @@ export default function UnifiedDashboard() {
               />
             ) : (
               <>
-                {/* Refresh button - always visible when Klaviyo is connected */}
-                <div className="flex justify-end mb-4">
-                  <Button 
-                    onClick={fetchAllSegments} 
-                    disabled={loadingAnalytics}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <RefreshCw className={`w-4 h-4 mr-2 ${loadingAnalytics ? 'animate-spin' : ''}`} />
-                    {loadingAnalytics ? 'Loading...' : 'Refresh Analytics'}
-                  </Button>
+                {/* Refresh button and progress indicator */}
+                <div className="flex justify-between items-center mb-4">
+                  {(loadingAnalytics || fetchingCounts) && (
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <div className="relative w-8 h-8">
+                        <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+                        <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+                        </div>
+                      </div>
+                      <span>
+                        {fetchingCounts 
+                          ? `Fetching profile counts from Klaviyo (${allSegments.length} segments)...`
+                          : `Loading segments: ${analyticsProgress.current} fetched...`
+                        }
+                      </span>
+                    </div>
+                  )}
+                  <div className={`flex gap-2 ${(loadingAnalytics || fetchingCounts) ? '' : 'ml-auto'}`}>
+                    <Button 
+                      onClick={fetchFreshProfileCounts} 
+                      disabled={loadingAnalytics || fetchingCounts || allSegments.length === 0}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Users className={`w-4 h-4 mr-2 ${fetchingCounts ? 'animate-pulse' : ''}`} />
+                      {fetchingCounts ? 'Fetching Counts...' : 'Fetch Profile Counts'}
+                    </Button>
+                    <Button 
+                      onClick={() => fetchAllSegments()} 
+                      disabled={loadingAnalytics || fetchingCounts}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <RefreshCw className={`w-4 h-4 mr-2 ${loadingAnalytics ? 'animate-spin' : ''}`} />
+                      {loadingAnalytics ? 'Loading...' : 'Refresh Analytics'}
+                    </Button>
+                  </div>
                 </div>
                 <AnalyticsDashboard
                   allSegments={allSegments}
