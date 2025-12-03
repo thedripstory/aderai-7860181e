@@ -38,11 +38,8 @@ export function useAILimits() {
         return false;
       }
 
-      const { data, error } = await supabase.functions.invoke('check-ai-limit', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      // Let supabase client handle auth headers automatically
+      const { data, error } = await supabase.functions.invoke('check-ai-limit');
       
       if (error) throw error;
 
@@ -78,11 +75,8 @@ export function useAILimits() {
         return;
       }
 
-      const { error } = await supabase.functions.invoke('increment-ai-usage', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      // Let supabase client handle auth headers automatically
+      const { error } = await supabase.functions.invoke('increment-ai-usage');
       if (error) throw error;
       
       // Refresh the limit status after incrementing
