@@ -96,17 +96,6 @@ export const AnimatedSegmentVisual = () => {
             viewport={{ once: true }}
           >
             <DatabaseWithRestApi
-              className="scale-110 lg:scale-125"
-              badgeTexts={{
-                first: "Connect",
-                second: "Select",
-                third: "Deploy",
-                fourth: "Target",
-              }}
-              buttonTexts={{
-                first: "aderai",
-                second: "70+ Segments",
-              }}
               title="Instant Klaviyo Segmentation"
               circleText="70+"
               lightColor="hsl(5, 77%, 66%)"
