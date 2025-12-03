@@ -128,7 +128,14 @@ const col6 = testimonials.slice(4, 8);
 
 function TestimonialCard({ img, name, username, body, country }: (typeof testimonials)[number]) {
   return (
-    <Card className="w-72 bg-card/90 backdrop-blur-sm border-border/50 shadow-lg">
+    <Card 
+      className="w-72 bg-card/90 backdrop-blur-sm border-border/50 shadow-lg"
+      style={{
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+        willChange: 'transform',
+      }}
+    >
       <CardContent className="p-4">
         <div className="flex items-center gap-2.5">
           <Avatar className="size-9">
@@ -174,8 +181,16 @@ export function Testimonials3D() {
         </ScrollReveal>
 
         <ScrollReveal delay={0.2}>
-          <div className="relative flex h-[600px] w-full flex-row items-center justify-center overflow-hidden">
-            <div className="flex flex-row items-center gap-6">
+          <div className="relative flex h-[600px] w-full flex-row items-center justify-center overflow-hidden" style={{ perspective: '1000px' }}>
+            <div 
+              className="flex flex-row items-center gap-6"
+              style={{
+                transform: 'translateX(-50%) translateY(0px) translateZ(-50px) rotateX(15deg) rotateY(-8deg) rotateZ(15deg)',
+                transformStyle: 'preserve-3d',
+                position: 'absolute',
+                left: '50%',
+              }}
+            >
               <Marquee vertical repeat={4} className="[--duration:30s]">
                 {col1.map((review, i) => (
                   <TestimonialCard key={`col1-${i}`} {...review} />
