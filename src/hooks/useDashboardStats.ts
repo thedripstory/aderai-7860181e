@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface DashboardStats {
@@ -27,6 +27,26 @@ const TIPS = [
   "Use the performance tab to identify which segments drive the most revenue.",
 ];
 
+const formatEventName = (eventName: string): string => {
+  const eventMap: Record<string, string> = {
+    'feature_viewed': 'Viewed feature',
+    'feature_action': 'Performed action',
+    'create_segments': 'Created segments',
+    'ai_suggestion_used': 'Used AI suggestion',
+    'segment_created': 'Created segment',
+    'klaviyo_connected': 'Connected Klaviyo',
+    'settings_updated': 'Updated settings',
+    'feedback_submitted': 'Submitted feedback',
+    'api_key_added': 'Added API key',
+    'bundle_created': 'Created bundle',
+    'page_view': 'Visited page',
+    'banner_clicked': 'Clicked banner',
+    'banner_dismissed': 'Dismissed banner',
+  };
+
+  return eventMap[eventName] || eventName.replace(/_/g, ' ');
+};
+
 export function useDashboardStats() {
   const [stats, setStats] = useState<DashboardStats>({
     totalSegmentsCreated: 0,
@@ -39,15 +59,9 @@ export function useDashboardStats() {
   });
 
   const [tipOfTheDay, setTipOfTheDay] = useState('');
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
-  useEffect(() => {
-    loadDashboardStats();
-    // Rotate tip daily
-    const tipIndex = new Date().getDate() % TIPS.length;
-    setTipOfTheDay(TIPS[tipIndex]);
-  }, []);
-
-  const loadDashboardStats = async () => {
+  const loadDashboardStats = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -80,7 +94,7 @@ export function useDashboardStats() {
         .maybeSingle();
 
       // Get segments created count from segment_operations (successful creates)
-      const { data: segmentOps, count: segmentCount } = await supabase
+      const { count: segmentCount } = await supabase
         .from('segment_operations')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
@@ -125,31 +139,88 @@ export function useDashboardStats() {
         firstName: userData?.first_name || 'User',
         loading: false,
       });
+      
+      setLastRefresh(new Date());
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
       setStats(prev => ({ ...prev, loading: false }));
     }
-  };
+  }, []);
 
-  const formatEventName = (eventName: string): string => {
-    const eventMap: Record<string, string> = {
-      'feature_viewed': 'Viewed feature',
-      'feature_action': 'Performed action',
-      'create_segments': 'Created segments',
-      'ai_suggestion_used': 'Used AI suggestion',
-      'segment_created': 'Created segment',
-      'klaviyo_connected': 'Connected Klaviyo',
-      'settings_updated': 'Updated settings',
-      'feedback_submitted': 'Submitted feedback',
-      'api_key_added': 'Added API key',
-      'bundle_created': 'Created bundle',
-      'page_view': 'Visited page',
-      'banner_clicked': 'Clicked banner',
-      'banner_dismissed': 'Dismissed banner',
+  useEffect(() => {
+    loadDashboardStats();
+    
+    // Rotate tip daily
+    const tipIndex = new Date().getDate() % TIPS.length;
+    setTipOfTheDay(TIPS[tipIndex]);
+
+    // Set up real-time subscriptions for live updates
+    const setupRealtimeSubscriptions = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const channel = supabase
+        .channel('dashboard-realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'segment_operations',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => loadDashboardStats()
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'analytics_events',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => loadDashboardStats()
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'usage_limits',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => loadDashboardStats()
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'klaviyo_keys',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => loadDashboardStats()
+        )
+        .subscribe();
+
+      return channel;
     };
 
-    return eventMap[eventName] || eventName.replace(/_/g, ' ');
-  };
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    setupRealtimeSubscriptions().then(c => { channel = c; });
 
-  return { ...stats, tipOfTheDay, refreshStats: loadDashboardStats };
+    // Also poll every 30 seconds as a fallback
+    const pollInterval = setInterval(() => {
+      loadDashboardStats();
+    }, 30000);
+
+    return () => {
+      clearInterval(pollInterval);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [loadDashboardStats]);
+
+  return { ...stats, tipOfTheDay, lastRefresh, refreshStats: loadDashboardStats };
 }

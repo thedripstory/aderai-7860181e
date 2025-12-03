@@ -13,7 +13,8 @@ import {
   TrendingUp,
   Lightbulb,
   ArrowRight,
-  Activity
+  Activity,
+  RefreshCw
 } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -27,6 +28,7 @@ const TOTAL_AVAILABLE_SEGMENTS = 70;
 export const DashboardOverview = () => {
   const navigate = useNavigate();
   const [activityModalOpen, setActivityModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { 
     totalSegmentsCreated, 
     aiSuggestionsUsed, 
@@ -35,8 +37,16 @@ export const DashboardOverview = () => {
     recentActivity,
     firstName,
     tipOfTheDay,
+    lastRefresh,
+    refreshStats,
     loading 
   } = useDashboardStats();
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refreshStats();
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
 
   // Memoize expensive calculations (must be before early return)
   const progressPercentage = useMemo(() => 
@@ -102,6 +112,16 @@ export const DashboardOverview = () => {
                 })}
               </CardDescription>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title={`Last updated ${formatDistanceToNow(lastRefresh, { addSuffix: true })}`}
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="relative">
