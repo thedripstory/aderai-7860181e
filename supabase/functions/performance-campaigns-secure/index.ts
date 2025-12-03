@@ -80,8 +80,8 @@ serve(async (req: Request) => {
       apiKey = await decryptApiKey(apiKey);
     }
 
-    // Call Klaviyo API
-    const response = await fetch("https://a.klaviyo.com/api/campaigns/", {
+    // Call Klaviyo API - must include channel filter as required by API
+    const response = await fetch("https://a.klaviyo.com/api/campaigns/?filter=equals(messages.channel,'email')", {
       method: "GET",
       headers: {
         "Authorization": `Klaviyo-API-Key ${apiKey}`,

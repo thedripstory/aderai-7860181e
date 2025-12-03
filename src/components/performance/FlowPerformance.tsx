@@ -13,10 +13,11 @@ import {
   ArrowUpDown,
   ExternalLink,
   Clock,
-  CheckCircle,
-  AlertCircle,
   FileText,
-  ArrowRight
+  ArrowRight,
+  Activity,
+  Mail,
+  MessageSquare
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -102,10 +103,10 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { color: string; icon: React.ReactNode }> = {
-      live: { color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', icon: <Play className="w-3 h-3" /> },
-      draft: { color: 'bg-muted text-muted-foreground border-border', icon: <FileText className="w-3 h-3" /> },
-      manual: { color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: <Pause className="w-3 h-3" /> },
+    const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
+      live: { color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', icon: <Play className="w-3 h-3" />, label: 'Live' },
+      draft: { color: 'bg-muted text-muted-foreground border-border', icon: <FileText className="w-3 h-3" />, label: 'Draft' },
+      manual: { color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: <Pause className="w-3 h-3" />, label: 'Manual' },
     };
 
     const config = statusConfig[status.toLowerCase()] || statusConfig.draft;
@@ -113,26 +114,22 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
     return (
       <Badge variant="outline" className={`${config.color} flex items-center gap-1`}>
         {config.icon}
-        {status}
+        {config.label}
       </Badge>
     );
   };
 
-  const getTriggerBadge = (triggerType: string) => {
-    const triggers: Record<string, string> = {
-      'list': 'List Trigger',
-      'segment': 'Segment Trigger',
-      'metric': 'Metric Trigger',
-      'price-drop': 'Price Drop',
-      'date-property': 'Date Property',
-      'low-inventory': 'Low Inventory',
+  const getTriggerInfo = (triggerType: string) => {
+    const triggers: Record<string, { label: string; description: string; icon: React.ReactNode }> = {
+      'list': { label: 'List Trigger', description: 'When someone is added to a list', icon: <Mail className="w-4 h-4" /> },
+      'segment': { label: 'Segment Trigger', description: 'When someone enters a segment', icon: <Activity className="w-4 h-4" /> },
+      'metric': { label: 'Metric Trigger', description: 'When someone performs an action', icon: <Zap className="w-4 h-4" /> },
+      'price-drop': { label: 'Price Drop', description: 'When a viewed item drops in price', icon: <ArrowRight className="w-4 h-4" /> },
+      'date-property': { label: 'Date Property', description: 'Based on a date property', icon: <Clock className="w-4 h-4" /> },
+      'low-inventory': { label: 'Low Inventory', description: 'When inventory runs low', icon: <MessageSquare className="w-4 h-4" /> },
     };
 
-    return (
-      <Badge variant="secondary" className="text-xs">
-        {triggers[triggerType] || triggerType}
-      </Badge>
-    );
+    return triggers[triggerType] || { label: triggerType, description: 'Custom trigger', icon: <Zap className="w-4 h-4" /> };
   };
 
   const filteredFlows = flows
@@ -166,7 +163,7 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
             </div>
             <div>
               <p className="text-2xl font-bold">{liveCount}</p>
-              <p className="text-sm text-muted-foreground">Live</p>
+              <p className="text-sm text-muted-foreground">Live & Running</p>
             </div>
           </CardContent>
         </Card>
@@ -177,7 +174,7 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
             </div>
             <div>
               <p className="text-2xl font-bold">{manualCount}</p>
-              <p className="text-sm text-muted-foreground">Manual</p>
+              <p className="text-sm text-muted-foreground">Manual Mode</p>
             </div>
           </CardContent>
         </Card>
@@ -188,7 +185,7 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
             </div>
             <div>
               <p className="text-2xl font-bold">{draftCount}</p>
-              <p className="text-sm text-muted-foreground">Drafts</p>
+              <p className="text-sm text-muted-foreground">In Draft</p>
             </div>
           </CardContent>
         </Card>
@@ -204,7 +201,7 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
                 Automated Flows
               </CardTitle>
               <CardDescription>
-                {flows.filter(f => !f.archived).length} flows in your account
+                {flows.filter(f => !f.archived).length} automation flows in your account
               </CardDescription>
             </div>
             <Button variant="outline" size="sm" onClick={fetchFlows}>
@@ -258,40 +255,51 @@ export const FlowPerformance: React.FC<FlowPerformanceProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredFlows.map((flow) => (
-                <div
-                  key={flow.id}
-                  className="p-4 rounded-lg border border-border/50 bg-card/50 hover:border-primary/30 hover:bg-card/80 transition-all duration-200 group"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <h4 className="font-semibold truncate">{flow.name}</h4>
-                        {getStatusBadge(flow.status)}
-                        {getTriggerBadge(flow.trigger_type)}
+              {filteredFlows.map((flow) => {
+                const triggerInfo = getTriggerInfo(flow.trigger_type);
+                return (
+                  <div
+                    key={flow.id}
+                    className="p-4 rounded-lg border border-border/50 bg-card/50 hover:border-primary/30 hover:bg-card/80 transition-all duration-200 group"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <h4 className="font-semibold truncate">{flow.name}</h4>
+                          {getStatusBadge(flow.status)}
+                        </div>
+                        
+                        {/* Trigger Info */}
+                        <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 mb-2">
+                          <div className="p-1.5 rounded bg-primary/10 text-primary">
+                            {triggerInfo.icon}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">{triggerInfo.label}</p>
+                            <p className="text-xs text-muted-foreground">{triggerInfo.description}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            Updated {format(new Date(flow.updated_at || flow.created_at), 'MMM d, yyyy')}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          Updated {format(new Date(flow.updated_at || flow.created_at), 'MMM d, yyyy')}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <ArrowRight className="w-3 h-3" />
-                          {flow.trigger_type}
-                        </span>
-                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                        onClick={() => window.open(`https://www.klaviyo.com/flow/${flow.id}`, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        Open in Klaviyo
+                      </Button>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => window.open(`https://www.klaviyo.com/flow/${flow.id}`, '_blank')}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
