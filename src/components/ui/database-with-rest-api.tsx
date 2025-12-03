@@ -262,47 +262,56 @@ const DatabaseWithRestApi = ({
           {circleText ? circleText : "SVG"}
         </motion.div>
         {/* box content */}
-        <div className="relative z-10 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm shadow-2xl">
-          {/* AI + Klaviyo Badge */}
-          <motion.div 
-            className="absolute top-6 left-8 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm border border-primary/20 flex items-center gap-3 cursor-pointer"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.3)", borderColor: "hsl(5, 77%, 66%, 0.5)" }}
-            transition={{ duration: 0.2 }}
-          >
-            <Sparkles className="size-4 text-primary" />
-            <span className="font-medium text-primary">AI</span>
-            <span className="text-muted-foreground">+</span>
-            <img src={klaviyoLogo} alt="Klaviyo" className="h-4" />
-          </motion.div>
-          
-          {/* Segments Badge */}
-          <motion.div 
-            className="absolute right-8 top-6 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm flex border border-accent/20 items-center gap-2 cursor-pointer"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.3)", borderColor: "hsl(5, 100%, 64%, 0.5)" }}
-            transition={{ duration: 0.2 }}
-          >
-            <span className="font-bold text-accent">70+</span>
-            <span className="font-medium">Segments</span>
-          </motion.div>
+        <div className="relative z-10 flex h-[180px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-card shadow-2xl">
+          {/* Badge container - flex layout for proper positioning */}
+          <div className="absolute inset-4 flex flex-col justify-between">
+            {/* Top row badges */}
+            <div className="flex justify-between items-start gap-4">
+              {/* AI + Klaviyo Badge */}
+              <motion.div 
+                className="inline-flex h-9 w-fit items-center gap-2 rounded-full bg-[#18181b] px-4 text-sm border border-primary/30 cursor-pointer shrink-0"
+                whileHover={{ scale: 1.05, boxShadow: "0 0 20px hsl(5, 77%, 66%, 0.4)" }}
+                transition={{ duration: 0.2 }}
+              >
+                <Sparkles className="size-4 text-primary" />
+                <span className="font-semibold text-white">AI</span>
+                <span className="text-white/50">+</span>
+                <img src={klaviyoLogo} alt="Klaviyo" className="h-4" />
+              </motion.div>
+              
+              {/* Segments Badge */}
+              <motion.div 
+                className="inline-flex h-9 w-fit items-center gap-2 rounded-full bg-[#18181b] px-4 text-sm border border-accent/30 cursor-pointer shrink-0"
+                whileHover={{ scale: 1.05, boxShadow: "0 0 20px hsl(5, 100%, 64%, 0.4)" }}
+                transition={{ duration: 0.2 }}
+              >
+                <span className="font-bold text-accent">70+</span>
+                <span className="font-medium text-white">Segments</span>
+              </motion.div>
+            </div>
 
-          {/* Bottom left badge */}
-          <motion.div 
-            className="absolute bottom-6 left-8 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm border border-green-500/20 flex items-center gap-2 cursor-pointer"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(34, 197, 94, 0.3)", borderColor: "rgba(34, 197, 94, 0.5)" }}
-            transition={{ duration: 0.2 }}
-          >
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="font-medium">Real-time Sync</span>
-          </motion.div>
+            {/* Bottom row badges */}
+            <div className="flex justify-between items-end gap-4">
+              {/* Real-time Sync badge */}
+              <motion.div 
+                className="inline-flex h-9 w-fit items-center gap-2 rounded-full bg-[#18181b] px-4 text-sm border border-green-500/30 cursor-pointer shrink-0"
+                whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(34, 197, 94, 0.4)" }}
+                transition={{ duration: 0.2 }}
+              >
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="font-medium text-white">Real-time Sync</span>
+              </motion.div>
 
-          {/* Bottom right badge */}
-          <motion.div 
-            className="absolute bottom-6 right-8 z-10 h-10 rounded-full bg-[#101112] px-4 text-sm border border-blue-500/20 flex items-center gap-2 cursor-pointer"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(59, 130, 246, 0.3)", borderColor: "rgba(59, 130, 246, 0.5)" }}
-            transition={{ duration: 0.2 }}
-          >
-            <span className="font-medium">1-Click Deploy</span>
-          </motion.div>
+              {/* 1-Click Deploy badge */}
+              <motion.div 
+                className="inline-flex h-9 w-fit items-center gap-2 rounded-full bg-[#18181b] px-4 text-sm border border-blue-500/30 cursor-pointer shrink-0"
+                whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(59, 130, 246, 0.4)" }}
+                transition={{ duration: 0.2 }}
+              >
+                <span className="font-medium text-white">1-Click Deploy</span>
+              </motion.div>
+            </div>
+          </div>
 
           {/* Circles */}
           <motion.div
