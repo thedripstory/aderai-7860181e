@@ -149,11 +149,15 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   useEffect(() => {
     if (sortedSegments.length > 0 && Object.keys(segmentStats).length > 0) {
-      const topSegments = sortedSegments.slice(0, 10);
+      const topSegments = sortedSegments.slice(0, 8);
       const data = topSegments.map((segment) => {
         const stats = segmentStats[segment.id];
+        const fullName = stats?.name || 'Unknown';
+        // Truncate long names but keep more characters for readability
+        const displayName = fullName.length > 35 ? fullName.substring(0, 32) + '...' : fullName;
         return {
-          name: stats?.name?.substring(0, 20) || 'Unknown',
+          name: displayName,
+          fullName: fullName,
           size: stats?.profileCount || 0,
         };
       });
@@ -326,11 +330,19 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             </a>
           </div>
 
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={chartData} layout="vertical">
+          <ResponsiveContainer width="100%" height={360}>
+            <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => v.toLocaleString()} />
-              <YAxis dataKey="name" type="category" width={120} stroke="hsl(var(--muted-foreground))" fontSize={11} />
+              <YAxis 
+                dataKey="name" 
+                type="category" 
+                width={200} 
+                stroke="hsl(var(--muted-foreground))" 
+                fontSize={11}
+                tick={{ fill: 'hsl(var(--foreground))' }}
+                tickLine={false}
+              />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))', 
@@ -339,6 +351,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   fontSize: '12px'
                 }}
                 formatter={(value: number) => [value.toLocaleString(), 'Profiles']}
+                labelFormatter={(label, payload) => {
+                  const item = payload?.[0]?.payload;
+                  return item?.fullName || label;
+                }}
               />
               <Bar 
                 dataKey="size" 
