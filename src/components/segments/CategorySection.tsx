@@ -14,6 +14,7 @@ interface CategorySectionProps {
   onPreviewSegment: (segment: Segment) => void;
   onToggleFavorite: (id: string) => void;
   onSelectAllInCategory: () => void;
+  onClearAllInCategory: () => void;
   index: number;
   defaultExpanded?: boolean;
 }
@@ -28,6 +29,7 @@ export function CategorySection({
   onPreviewSegment,
   onToggleFavorite,
   onSelectAllInCategory,
+  onClearAllInCategory,
   index,
   defaultExpanded = false,
 }: CategorySectionProps) {
@@ -65,7 +67,7 @@ export function CategorySection({
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -75,6 +77,17 @@ export function CategorySection({
           >
             Select All
           </button>
+          {categorySelectedCount > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClearAllInCategory();
+              }}
+              className="px-4 py-2 text-sm font-medium border-2 border-destructive/50 text-destructive rounded-lg hover:bg-destructive/10 transition-all"
+            >
+              Clear All
+            </button>
+          )}
           <div className={`p-2 rounded-lg bg-muted transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
             <ChevronDown className="w-5 h-5" />
           </div>

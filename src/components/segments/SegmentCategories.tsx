@@ -40,6 +40,18 @@ export function SegmentCategories({
     });
   };
 
+  const clearAllInCategory = (category: string) => {
+    const categorySegmentIds = filteredSegments
+      .filter(s => s.category === category)
+      .map(s => s.id);
+    
+    categorySegmentIds.forEach(id => {
+      if (selectedSegments.includes(id)) {
+        onToggleSegment(id);
+      }
+    });
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
@@ -66,6 +78,7 @@ export function SegmentCategories({
             onPreviewSegment={onPreviewSegment}
             onToggleFavorite={onToggleFavorite}
             onSelectAllInCategory={() => selectAllInCategory(category)}
+            onClearAllInCategory={() => clearAllInCategory(category)}
             index={categoryIndex}
             defaultExpanded={category === "Engagement & Activity"}
           />
