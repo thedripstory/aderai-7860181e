@@ -92,10 +92,39 @@ export const useAchievements = (userId: string | undefined) => {
     }
   };
 
+  // Check Power User achievement (used segments, AI, and analytics)
+  const checkPowerUserAchievement = async () => {
+    if (!userId) return;
+    
+    const powerUserAchievement = achievements.find(a => a.criteria_type === 'power_user');
+    if (!powerUserAchievement || earnedAchievements.has(powerUserAchievement.id)) return;
+
+    try {
+      // Check for all three major feature usages
+      const { data: events } = await supabase
+        .from('analytics_events')
+        .select('event_name')
+        .eq('user_id', userId)
+        .in('event_name', ['create_segments', 'ai_suggestion_used', 'fetch_analytics']);
+
+      const eventTypes = new Set(events?.map(e => e.event_name) || []);
+      const hasSegments = eventTypes.has('create_segments');
+      const hasAI = eventTypes.has('ai_suggestion_used');
+      const hasAnalytics = eventTypes.has('fetch_analytics');
+
+      if (hasSegments && hasAI && hasAnalytics) {
+        await checkAndAwardAchievement('power_user');
+      }
+    } catch (error) {
+      // Silently handle
+    }
+  };
+
   return {
     achievements,
     earnedAchievements,
     loading,
-    checkAndAwardAchievement
+    checkAndAwardAchievement,
+    checkPowerUserAchievement
   };
 };

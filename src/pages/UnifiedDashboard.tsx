@@ -35,6 +35,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useInactivityLogout } from '@/hooks/useInactivityLogout';
 import { EmptyState } from '@/components/ui/empty-state';
 import { MobileMenu } from '@/components/MobileMenu';
+import { DashboardFooter } from '@/components/DashboardFooter';
 import { toast } from 'sonner';
 
 export default function UnifiedDashboard() {
@@ -583,6 +584,9 @@ export default function UnifiedDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Dashboard Footer */}
+      <DashboardFooter />
     </div>
     
     {/* Floating sticky segment selection bar */}
