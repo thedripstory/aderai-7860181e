@@ -602,21 +602,33 @@ export default function LandingPage() {
 
             <div className="relative min-h-[550px] md:min-h-[700px]">
               {/* SVG Connecting Lines */}
-              <svg className="absolute inset-0 w-full h-full z-10 pointer-events-none hidden md:block" preserveAspectRatio="none">
+              <svg className="absolute inset-0 w-full h-full z-30 pointer-events-none hidden md:block" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice">
                 <defs>
                   <linearGradient id="line-gradient-1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="rgba(251, 100, 21, 0.3)" />
-                    <stop offset="100%" stopColor="rgba(251, 100, 21, 0)" />
+                    <stop offset="0%" stopColor="rgba(251, 100, 21, 0.8)" />
+                    <stop offset="100%" stopColor="rgba(251, 100, 21, 0.1)" />
                   </linearGradient>
                   <linearGradient id="line-gradient-2" x1="100%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="rgba(251, 100, 21, 0.3)" />
-                    <stop offset="100%" stopColor="rgba(251, 100, 21, 0)" />
+                    <stop offset="0%" stopColor="rgba(251, 100, 21, 0.8)" />
+                    <stop offset="100%" stopColor="rgba(251, 100, 21, 0.1)" />
+                  </linearGradient>
+                  <linearGradient id="line-gradient-3" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="rgba(34, 197, 94, 0.8)" />
+                    <stop offset="100%" stopColor="rgba(34, 197, 94, 0.1)" />
+                  </linearGradient>
+                  <linearGradient id="line-gradient-4" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stopColor="rgba(251, 100, 21, 0.8)" />
+                    <stop offset="100%" stopColor="rgba(251, 100, 21, 0.1)" />
                   </linearGradient>
                 </defs>
                 {/* Top left card to center */}
-                <path d="M 180 140 Q 350 200 50% 50%" stroke="url(#line-gradient-1)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
+                <path d="M 160 130 Q 300 250 500 350" stroke="url(#line-gradient-1)" strokeWidth="2" fill="none" strokeDasharray="6 4" className="animate-pulse" />
                 {/* Top right card to center */}
-                <path d="M calc(100% - 180px) 160 Q calc(100% - 350px) 220 50% 50%" stroke="url(#line-gradient-2)" strokeWidth="1" fill="none" strokeDasharray="4 4" opacity="0.5" />
+                <path d="M 840 150 Q 700 250 500 350" stroke="url(#line-gradient-2)" strokeWidth="2" fill="none" strokeDasharray="6 4" className="animate-pulse" />
+                {/* Bottom left card to center */}
+                <path d="M 180 550 Q 300 450 500 350" stroke="url(#line-gradient-3)" strokeWidth="2" fill="none" strokeDasharray="6 4" className="animate-pulse" />
+                {/* Bottom right card to center */}
+                <path d="M 820 520 Q 700 430 500 350" stroke="url(#line-gradient-4)" strokeWidth="2" fill="none" strokeDasharray="6 4" className="animate-pulse" />
               </svg>
               
               {/* Floating Stat Cards */}
