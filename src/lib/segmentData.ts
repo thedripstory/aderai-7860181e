@@ -2,7 +2,7 @@ export const SEGMENTS = [
   // ENGAGEMENT & ACTIVITY (14 segments)
   {
     id: "engaged-30-days",
-    name: "📧 Engaged (Last 30 Days)",
+    name: "Engaged (Last 30 Days)",
     description: "Opened or clicked email in last 30 days",
     category: "Engagement & Activity",
     icon: "📧",
@@ -10,7 +10,7 @@ export const SEGMENTS = [
   },
   {
     id: "engaged-60-days",
-    name: "📬 Engaged (Last 60 Days)",
+    name: "Engaged (Last 60 Days)",
     description: "Opened or clicked email in last 60 days",
     category: "Engagement & Activity",
     icon: "📬",
@@ -18,7 +18,7 @@ export const SEGMENTS = [
   },
   {
     id: "engaged-90-days",
-    name: "📮 Engaged (Last 90 Days)",
+    name: "Engaged (Last 90 Days)",
     description: "Opened or clicked email in last 90 days",
     category: "Engagement & Activity",
     icon: "📮",
@@ -26,7 +26,7 @@ export const SEGMENTS = [
   },
   {
     id: "highly-engaged",
-    name: "🔥 Highly Engaged",
+    name: "Highly Engaged",
     description: "Opened email 5+ times in last 30 days",
     category: "Engagement & Activity",
     icon: "🔥",
@@ -34,7 +34,7 @@ export const SEGMENTS = [
   },
   {
     id: "recent-clickers-90",
-    name: "👆 Recent Email Clickers (Last 90 Days)",
+    name: "Recent Email Clickers (Last 90 Days)",
     description: "Clicked email in last 90 days",
     category: "Engagement & Activity",
     icon: "👆",
@@ -42,7 +42,7 @@ export const SEGMENTS = [
   },
   {
     id: "engaged-non-buyers",
-    name: "💡 Engaged Non-Buyers",
+    name: "Engaged Non-Buyers",
     description: "Opens/clicks emails but never purchased",
     category: "Engagement & Activity",
     icon: "💡",
@@ -50,7 +50,7 @@ export const SEGMENTS = [
   },
   {
     id: "active-site-30",
-    name: "🌐 Active on Site (Last 30 Days)",
+    name: "Active on Site (Last 30 Days)",
     description: "Active on site in last 30 days",
     category: "Engagement & Activity",
     icon: "🌐",
@@ -58,7 +58,7 @@ export const SEGMENTS = [
   },
   {
     id: "unengaged-90",
-    name: "😴 Unengaged (90+ Days)",
+    name: "Unengaged (90+ Days)",
     description: "No opens in last 90 days",
     category: "Engagement & Activity",
     icon: "😴",
@@ -66,7 +66,7 @@ export const SEGMENTS = [
   },
   {
     id: "unengaged-180",
-    name: "💤 Unengaged (180+ Days)",
+    name: "Unengaged (180+ Days)",
     description: "No opens in last 180 days",
     category: "Engagement & Activity",
     icon: "💤",
@@ -74,7 +74,7 @@ export const SEGMENTS = [
   },
   {
     id: "email-openers-30",
-    name: "👀 Email Openers (30 Days)",
+    name: "Email Openers (30 Days)",
     description: "Opened in last 30 days",
     category: "Engagement & Activity",
     icon: "👀",
@@ -82,7 +82,7 @@ export const SEGMENTS = [
   },
   {
     id: "email-openers-60",
-    name: "👁️ Email Openers (60 Days)",
+    name: "Email Openers (60 Days)",
     description: "Opened in last 60 days",
     category: "Engagement & Activity",
     icon: "👁️",
@@ -90,7 +90,7 @@ export const SEGMENTS = [
   },
   {
     id: "email-clickers-30",
-    name: "🖱️ Email Clickers (30 Days)",
+    name: "Email Clickers (30 Days)",
     description: "Clicked in last 30 days",
     category: "Engagement & Activity",
     icon: "🖱️",
@@ -98,7 +98,7 @@ export const SEGMENTS = [
   },
   {
     id: "email-clickers-60",
-    name: "🖲️ Email Clickers (60 Days)",
+    name: "Email Clickers (60 Days)",
     description: "Clicked in last 60 days",
     category: "Engagement & Activity",
     icon: "🖲️",
@@ -106,7 +106,7 @@ export const SEGMENTS = [
   },
   {
     id: "site-visitors-30",
-    name: "🏠 Site Visitors (30 Days)",
+    name: "Site Visitors (30 Days)",
     description: "Visited site in last 30 days",
     category: "Engagement & Activity",
     icon: "🏠",
@@ -116,7 +116,7 @@ export const SEGMENTS = [
   // DEMOGRAPHICS (8 segments)
   {
     id: "gender-male",
-    name: "👨 Gender - Male",
+    name: "Gender - Male",
     description: "Predicted gender likely male",
     category: "Demographics",
     icon: "👨",
@@ -124,7 +124,7 @@ export const SEGMENTS = [
   },
   {
     id: "gender-female",
-    name: "👩 Gender - Female",
+    name: "Gender - Female",
     description: "Predicted gender likely female",
     category: "Demographics",
     icon: "👩",
@@ -132,7 +132,7 @@ export const SEGMENTS = [
   },
   {
     id: "gender-uncertain",
-    name: "❓ Gender - Uncertain",
+    name: "Gender - Uncertain",
     description: "Gender unknown",
     category: "Demographics",
     icon: "❓",
@@ -140,7 +140,7 @@ export const SEGMENTS = [
   },
   {
     id: "location-country",
-    name: "🌍 Location - By Country",
+    name: "Location - By Country",
     description: "Filter by specific country",
     category: "Demographics",
     icon: "🌍",
@@ -148,7 +148,7 @@ export const SEGMENTS = [
   },
   {
     id: "location-proximity",
-    name: "📍 Location - Proximity Radius",
+    name: "Location - Proximity Radius",
     description: "Within X miles of location",
     category: "Demographics",
     icon: "📍",
@@ -156,7 +156,7 @@ export const SEGMENTS = [
   },
   {
     id: "birthday-month",
-    name: "🎂 Birthday This Month",
+    name: "Birthday This Month",
     description: "Birthday in current month",
     category: "Demographics",
     icon: "🎂",
@@ -164,7 +164,7 @@ export const SEGMENTS = [
   },
   {
     id: "age-18-24",
-    name: "🧒 Age Group 18-24",
+    name: "Age Group 18-24",
     description: "Born between specific dates for age range",
     category: "Demographics",
     icon: "🧒",
@@ -172,7 +172,7 @@ export const SEGMENTS = [
   },
   {
     id: "age-25-40",
-    name: "🧑 Age Group 25-40",
+    name: "Age Group 25-40",
     description: "Born between specific dates for age range",
     category: "Demographics",
     icon: "🧑",
@@ -182,7 +182,7 @@ export const SEGMENTS = [
   // CUSTOMER LIFECYCLE & VALUE (15 segments)
   {
     id: "new-subscribers",
-    name: "🌱 New Subscribers",
+    name: "New Subscribers",
     description: "Joined list recently, never purchased",
     category: "Customer Lifecycle & Value",
     icon: "🌱",
@@ -190,7 +190,7 @@ export const SEGMENTS = [
   },
   {
     id: "recent-first-time",
-    name: "🎉 Recent First-Time Customers",
+    name: "Recent First-Time Customers",
     description: "Made first purchase in last 30 days",
     category: "Customer Lifecycle & Value",
     icon: "🎉",
@@ -198,7 +198,7 @@ export const SEGMENTS = [
   },
   {
     id: "repeat-customers",
-    name: "🔄 Repeat Customers",
+    name: "Repeat Customers",
     description: "2+ purchases all time",
     category: "Customer Lifecycle & Value",
     icon: "🔄",
@@ -206,7 +206,7 @@ export const SEGMENTS = [
   },
   {
     id: "one-time-buyers",
-    name: "1️⃣ One-Time Customers",
+    name: "One-Time Customers",
     description: "Exactly 1 purchase all time",
     category: "Customer Lifecycle & Value",
     icon: "1️⃣",
@@ -214,7 +214,7 @@ export const SEGMENTS = [
   },
   {
     id: "active-customers",
-    name: "⚡ Active Customers",
+    name: "Active Customers",
     description: "Purchased in last 90 days",
     category: "Customer Lifecycle & Value",
     icon: "⚡",
@@ -222,7 +222,7 @@ export const SEGMENTS = [
   },
   {
     id: "lapsed-customers",
-    name: "😴 Lapsed Customers",
+    name: "Lapsed Customers",
     description: "Purchased before but not in last 180 days",
     category: "Customer Lifecycle & Value",
     icon: "😴",
@@ -230,7 +230,7 @@ export const SEGMENTS = [
   },
   {
     id: "churned-customers",
-    name: "💔 Churned Customers",
+    name: "Churned Customers",
     description: "No purchase in 365+ days",
     category: "Customer Lifecycle & Value",
     icon: "💔",
@@ -238,7 +238,7 @@ export const SEGMENTS = [
   },
   {
     id: "vip-customers",
-    name: "👑 VIP Customers",
+    name: "VIP Customers",
     description: "5+ orders all time",
     category: "Customer Lifecycle & Value",
     icon: "👑",
@@ -246,7 +246,7 @@ export const SEGMENTS = [
   },
   {
     id: "big-spenders",
-    name: "💰 Big Spenders",
+    name: "Big Spenders",
     description: "Historic CLV greater than threshold",
     category: "Customer Lifecycle & Value",
     icon: "💰",
@@ -254,7 +254,7 @@ export const SEGMENTS = [
   },
   {
     id: "bargain-shoppers",
-    name: "🏷️ Bargain Shoppers",
+    name: "Bargain Shoppers",
     description: "Historic CLV less than threshold",
     category: "Customer Lifecycle & Value",
     icon: "🏷️",
@@ -262,7 +262,7 @@ export const SEGMENTS = [
   },
   {
     id: "high-churn-risk",
-    name: "⚠️ High Churn Risk",
+    name: "High Churn Risk",
     description: "Predictive analytics: high churn risk",
     category: "Customer Lifecycle & Value",
     icon: "⚠️",
@@ -270,7 +270,7 @@ export const SEGMENTS = [
   },
   {
     id: "likely-purchase-soon",
-    name: "🎯 Likely to Purchase Soon",
+    name: "Likely to Purchase Soon",
     description: "Expected next order within 14 days",
     category: "Customer Lifecycle & Value",
     icon: "🎯",
@@ -278,7 +278,7 @@ export const SEGMENTS = [
   },
   {
     id: "predicted-vips",
-    name: "⭐ Predicted VIPs",
+    name: "Predicted VIPs",
     description: "High predicted CLV (next 365 days)",
     category: "Customer Lifecycle & Value",
     icon: "⭐",
@@ -286,7 +286,7 @@ export const SEGMENTS = [
   },
   {
     id: "high-aov",
-    name: "📈 High AOV",
+    name: "High AOV",
     description: "Average order value greater than threshold",
     category: "Customer Lifecycle & Value",
     icon: "📈",
@@ -294,7 +294,7 @@ export const SEGMENTS = [
   },
   {
     id: "low-aov",
-    name: "📉 Low AOV",
+    name: "Low AOV",
     description: "Average order value less than threshold",
     category: "Customer Lifecycle & Value",
     icon: "📉",
@@ -304,7 +304,7 @@ export const SEGMENTS = [
   // SHOPPING BEHAVIOR & PURCHASE HISTORY (18 segments)
   {
     id: "all-customers",
-    name: "🛍️ All Customers (PUR ≥ 1)",
+    name: "All Customers (PUR ≥ 1)",
     description: "Made at least 1 purchase",
     category: "Shopping Behavior & Purchase History",
     icon: "🛍️",
@@ -312,7 +312,7 @@ export const SEGMENTS = [
   },
   {
     id: "never-purchased",
-    name: "👤 Never Purchased (Prospects)",
+    name: "Never Purchased (Prospects)",
     description: "Zero purchases all time",
     category: "Shopping Behavior & Purchase History",
     icon: "👤",
@@ -320,7 +320,7 @@ export const SEGMENTS = [
   },
   {
     id: "recent-purchasers-30",
-    name: "🆕 Recent Purchasers (Last 30 Days)",
+    name: "Recent Purchasers (Last 30 Days)",
     description: "Purchased in last 30 days",
     category: "Shopping Behavior & Purchase History",
     icon: "🆕",
@@ -328,7 +328,7 @@ export const SEGMENTS = [
   },
   {
     id: "abandoned-cart",
-    name: "🛒 Abandoned Cart",
+    name: "Abandoned Cart",
     description: "Added to cart but didn't purchase (last 30 days)",
     category: "Shopping Behavior & Purchase History",
     icon: "🛒",
@@ -336,7 +336,7 @@ export const SEGMENTS = [
   },
   {
     id: "abandoned-cart-high-value",
-    name: "💎 Abandoned Cart - High Value",
+    name: "Abandoned Cart - High Value",
     description: "Cart value $400+ but no purchase",
     category: "Shopping Behavior & Purchase History",
     icon: "💎",
@@ -344,7 +344,7 @@ export const SEGMENTS = [
   },
   {
     id: "abandoned-checkout",
-    name: "🏁 Abandoned Checkout",
+    name: "Abandoned Checkout",
     description: "Started checkout but didn't complete",
     category: "Shopping Behavior & Purchase History",
     icon: "🏁",
@@ -352,7 +352,7 @@ export const SEGMENTS = [
   },
   {
     id: "abandoned-checkout-high-value",
-    name: "💵 Abandoned Checkout - High Value",
+    name: "Abandoned Checkout - High Value",
     description: "Checkout value $400+ but no complete",
     category: "Shopping Behavior & Purchase History",
     icon: "💵",
@@ -360,7 +360,7 @@ export const SEGMENTS = [
   },
   {
     id: "browse-abandonment",
-    name: "👁️ Browse Abandonment",
+    name: "Browse Abandonment",
     description: "Viewed product but didn't add to cart or purchase",
     category: "Shopping Behavior & Purchase History",
     icon: "👁️",
@@ -368,7 +368,7 @@ export const SEGMENTS = [
   },
   {
     id: "category-interest",
-    name: "🔍 Category Interest",
+    name: "Category Interest",
     description: "Viewed specific category 2+ times but never purchased from it",
     category: "Shopping Behavior & Purchase History",
     icon: "🔍",
@@ -376,7 +376,7 @@ export const SEGMENTS = [
   },
   {
     id: "product-interest",
-    name: "🎁 Product-Specific Interest",
+    name: "Product-Specific Interest",
     description: "Viewed specific product 2+ times but never purchased it",
     category: "Shopping Behavior & Purchase History",
     icon: "🎁",
@@ -384,7 +384,7 @@ export const SEGMENTS = [
   },
   {
     id: "cross-sell",
-    name: "🔀 Cross-Sell Opportunity",
+    name: "Cross-Sell Opportunity",
     description: "Purchased category X but not category Y",
     category: "Shopping Behavior & Purchase History",
     icon: "🔀",
@@ -392,7 +392,7 @@ export const SEGMENTS = [
   },
   {
     id: "category-buyers",
-    name: "📦 Category Buyers",
+    name: "Category Buyers",
     description: "Purchased from specific category at least once",
     category: "Shopping Behavior & Purchase History",
     icon: "📦",
@@ -400,7 +400,7 @@ export const SEGMENTS = [
   },
   {
     id: "multi-category",
-    name: "🎯 Multi-Category Shoppers",
+    name: "Multi-Category Shoppers",
     description: "Purchased from 2+ different categories",
     category: "Shopping Behavior & Purchase History",
     icon: "🎯",
@@ -408,7 +408,7 @@ export const SEGMENTS = [
   },
   {
     id: "frequent-visitors",
-    name: "🚀 Frequent Site Visitors",
+    name: "Frequent Site Visitors",
     description: "Active on site 10+ times in last 30 days",
     category: "Shopping Behavior & Purchase History",
     icon: "🚀",
@@ -416,7 +416,7 @@ export const SEGMENTS = [
   },
   {
     id: "coupon-users",
-    name: "🎟️ Coupon Users",
+    name: "Coupon Users",
     description: "Used discount code at least once",
     category: "Shopping Behavior & Purchase History",
     icon: "🎟️",
@@ -424,7 +424,7 @@ export const SEGMENTS = [
   },
   {
     id: "full-price-buyers",
-    name: "💳 Full-Price Buyers",
+    name: "Full-Price Buyers",
     description: "Never used discount code",
     category: "Shopping Behavior & Purchase History",
     icon: "💳",
@@ -432,7 +432,7 @@ export const SEGMENTS = [
   },
   {
     id: "product-reviewers",
-    name: "⭐ Product Reviewers",
+    name: "Product Reviewers",
     description: "Left at least one review",
     category: "Shopping Behavior & Purchase History",
     icon: "⭐",
@@ -440,7 +440,7 @@ export const SEGMENTS = [
   },
   {
     id: "non-reviewers",
-    name: "📝 Non-Reviewers",
+    name: "Non-Reviewers",
     description: "Purchased but never left review",
     category: "Shopping Behavior & Purchase History",
     icon: "📝",
@@ -450,7 +450,7 @@ export const SEGMENTS = [
   // EXCLUSION SEGMENTS (12 segments)
   {
     id: "unsubscribed",
-    name: "🚫 Unsubscribed Contacts",
+    name: "Unsubscribed Contacts",
     description: "Not subscribed to marketing",
     category: "Exclusion Segments",
     icon: "🚫",
@@ -458,7 +458,7 @@ export const SEGMENTS = [
   },
   {
     id: "bounced-emails",
-    name: "⚠️ Bounced Email Addresses",
+    name: "Bounced Email Addresses",
     description: "Suppressed due to bounces",
     category: "Exclusion Segments",
     icon: "⚠️",
@@ -466,7 +466,7 @@ export const SEGMENTS = [
   },
   {
     id: "not-opted-in",
-    name: "❌ Not Opted-In Profiles",
+    name: "Not Opted-In Profiles",
     description: "Cannot receive marketing",
     category: "Exclusion Segments",
     icon: "❌",
@@ -474,7 +474,7 @@ export const SEGMENTS = [
   },
   {
     id: "recent-purchasers-exclude",
-    name: "🛑 Recent Purchasers (Exclusion)",
+    name: "Recent Purchasers (Exclusion)",
     description: "Purchased in last 14 days (exclude from promos)",
     category: "Exclusion Segments",
     icon: "🛑",
@@ -482,7 +482,7 @@ export const SEGMENTS = [
   },
   {
     id: "refunded-customers",
-    name: "↩️ Refunded Customers",
+    name: "Refunded Customers",
     description: "Refunded order in last 30 days",
     category: "Exclusion Segments",
     icon: "↩️",
@@ -490,7 +490,7 @@ export const SEGMENTS = [
   },
   {
     id: "negative-feedback",
-    name: "😞 Negative Feedback",
+    name: "Negative Feedback",
     description: "Left review with 2 stars or less",
     category: "Exclusion Segments",
     icon: "😞",
@@ -498,7 +498,7 @@ export const SEGMENTS = [
   },
   {
     id: "unengaged-exclusion",
-    name: "🔇 Unengaged Subscribers (Exclusion)",
+    name: "Unengaged Subscribers (Exclusion)",
     description: "No opens/clicks in 180+ days",
     category: "Exclusion Segments",
     icon: "🔇",
@@ -506,7 +506,7 @@ export const SEGMENTS = [
   },
   {
     id: "sunset-segment",
-    name: "🌅 Sunset Segment",
+    name: "Sunset Segment",
     description: "Opened 1-3 times in last 180 days (low engagement)",
     category: "Exclusion Segments",
     icon: "🌅",
@@ -514,7 +514,7 @@ export const SEGMENTS = [
   },
   {
     id: "high-churn-risk-exclude",
-    name: "🚨 High Churn Risk (Exclusion)",
+    name: "High Churn Risk (Exclusion)",
     description: "Predictive high churn risk",
     category: "Exclusion Segments",
     icon: "🚨",
@@ -522,7 +522,7 @@ export const SEGMENTS = [
   },
   {
     id: "received-5-opened-0",
-    name: "📪 Received 5, Opened 0",
+    name: "Received 5, Opened 0",
     description: "Received 5+ emails but never opened any",
     category: "Exclusion Segments",
     icon: "📪",
@@ -530,7 +530,7 @@ export const SEGMENTS = [
   },
   {
     id: "received-3-in-3-days",
-    name: "📬 Received 3 in Last 3 Days",
+    name: "Received 3 in Last 3 Days",
     description: "Got 3+ emails in 72 hours (prevent fatigue)",
     category: "Exclusion Segments",
     icon: "📬",
@@ -538,7 +538,7 @@ export const SEGMENTS = [
   },
   {
     id: "marked-spam",
-    name: "🗑️ Marked Spam",
+    name: "Marked Spam",
     description: "Marked email as spam at least once",
     category: "Exclusion Segments",
     icon: "🗑️",
