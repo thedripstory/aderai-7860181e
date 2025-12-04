@@ -84,7 +84,7 @@ export const ComparisonChart = () => {
   };
 
   return (
-    <section className="relative py-24 px-4 overflow-hidden bg-gradient-to-b from-background via-background to-primary/5">
+    <section className="relative py-8 px-4 overflow-hidden bg-gradient-to-b from-background via-background to-primary/5">
       {/* Animated background elements - more subtle */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
@@ -114,7 +114,7 @@ export const ComparisonChart = () => {
 
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div 
-          className="text-center mb-16"
+          className="text-center mb-10"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -322,7 +322,7 @@ export const ComparisonChart = () => {
 
         {/* Trust Stats */}
         <motion.div 
-          className="mt-16 grid md:grid-cols-3 gap-6"
+          className="mt-8 grid md:grid-cols-3 gap-6"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
