@@ -106,79 +106,190 @@ const BirthdaySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChan
   </Dialog>
 );
 
-const PredictiveAnalyticsSetupDialog = ({ open, onOpenChange, segmentName }: { open: boolean; onOpenChange: (open: boolean) => void; segmentName: string }) => (
-  <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="max-w-lg">
-      <DialogHeader>
-        <DialogTitle className="flex items-center gap-2">
-          <span className="text-2xl">🔮</span>
-          Predictive Analytics Setup Guide
-        </DialogTitle>
-        <DialogDescription>
-          Unlock {segmentName} with Klaviyo's Predictive Analytics
-        </DialogDescription>
-      </DialogHeader>
-      
-      <div className="space-y-4 mt-2">
-        <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-primary/10 border border-purple-500/20">
-          <div className="flex items-start gap-3">
-            <TrendingUp className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-medium text-sm">Why Predictive Analytics?</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Klaviyo's AI predicts customer behavior including churn risk, expected order date, and lifetime value. Target the right customers at the right time!
-              </p>
-            </div>
-          </div>
-        </div>
+const getPredictiveContent = (segmentId: string) => {
+  switch (segmentId) {
+    case 'high-churn-risk':
+    case 'high-churn-risk-exclude':
+      return {
+        icon: '⚠️',
+        title: 'High Churn Risk Setup Guide',
+        subtitle: 'Identify customers likely to stop buying before it\'s too late',
+        whyTitle: 'Why Churn Risk Segments?',
+        whyText: 'Proactively reaching out to at-risk customers can reduce churn by up to 25%. Target them with win-back campaigns before they leave!',
+        steps: [
+          {
+            title: 'Check Predictive Analytics Access',
+            description: 'Go to Klaviyo → Settings → Billing. Predictive Analytics requires 500+ customers and 180+ days of order data.'
+          },
+          {
+            title: 'Navigate to Segments',
+            description: 'Go to Audience → Lists & Segments → Create Segment'
+          },
+          {
+            title: 'Add Predictive Condition',
+            description: 'Select "Predictive Analytics" → "Churn Risk Prediction" → "equals" → "HIGH"'
+          },
+          {
+            title: 'Name Your Segment',
+            description: 'Name it "High Churn Risk" and save. Use this to trigger win-back flows or special retention offers.'
+          }
+        ],
+        proTip: 'Create an automated flow for this segment offering exclusive discounts, loyalty rewards, or asking for feedback to understand why they\'re disengaging.'
+      };
+    
+    case 'likely-purchase-soon':
+      return {
+        icon: '🎯',
+        title: 'Likely to Purchase Soon Setup Guide',
+        subtitle: 'Target customers predicted to buy within the next 14 days',
+        whyTitle: 'Why Expected Order Date Segments?',
+        whyText: 'Klaviyo\'s AI predicts when customers are ready to buy. Reaching them at the right moment increases conversion rates by up to 40%!',
+        steps: [
+          {
+            title: 'Check Predictive Analytics Access',
+            description: 'Go to Klaviyo → Settings → Billing. Requires 500+ customers with repeat purchase history.'
+          },
+          {
+            title: 'Navigate to Segments',
+            description: 'Go to Audience → Lists & Segments → Create Segment'
+          },
+          {
+            title: 'Add Predictive Condition',
+            description: 'Select "Predictive Analytics" → "Expected Date of Next Order" → "is in the next" → "14 days"'
+          },
+          {
+            title: 'Name Your Segment',
+            description: 'Name it "Likely to Purchase Soon" and save. Perfect for timely product recommendations!'
+          }
+        ],
+        proTip: 'Send personalized product recommendations or time-limited offers to this segment. They\'re already primed to buy—give them a reason to choose you!'
+      };
+    
+    case 'predicted-vips':
+      return {
+        icon: '⭐',
+        title: 'Predicted VIPs Setup Guide',
+        subtitle: 'Find future high-value customers before they become VIPs',
+        whyTitle: 'Why Predicted CLV Segments?',
+        whyText: 'Identifying potential VIPs early lets you nurture them into loyal customers. Treat them like VIPs today, and they\'ll become your best customers tomorrow!',
+        steps: [
+          {
+            title: 'Check Predictive Analytics Access',
+            description: 'Go to Klaviyo → Settings → Billing. Requires substantial order history for accurate CLV predictions.'
+          },
+          {
+            title: 'Navigate to Segments',
+            description: 'Go to Audience → Lists & Segments → Create Segment'
+          },
+          {
+            title: 'Add Predictive Condition',
+            description: 'Select "Predictive Analytics" → "Predicted Customer Lifetime Value" → "is greater than" → [your VIP threshold, e.g., $500]'
+          },
+          {
+            title: 'Name Your Segment',
+            description: 'Name it "Predicted VIPs" and save. Use for exclusive early access, loyalty programs, or VIP treatment!'
+          }
+        ],
+        proTip: 'Give predicted VIPs early access to new products, exclusive discounts, or invite them to a loyalty program. Building relationships early pays off long-term!'
+      };
+    
+    default:
+      return {
+        icon: '🔮',
+        title: 'Predictive Analytics Setup Guide',
+        subtitle: 'Unlock AI-powered customer predictions',
+        whyTitle: 'Why Predictive Analytics?',
+        whyText: 'Klaviyo\'s AI predicts customer behavior including churn risk, expected order date, and lifetime value. Target the right customers at the right time!',
+        steps: [
+          {
+            title: 'Check Your Klaviyo Plan',
+            description: 'Go to Klaviyo → Settings → Billing to verify you have access to Predictive Analytics'
+          },
+          {
+            title: 'Verify Data Requirements',
+            description: 'You need 180+ days of order history and 500+ customers for accurate predictions'
+          },
+          {
+            title: 'Create Segment in Klaviyo',
+            description: 'Once enabled, create a segment using "Predictive Analytics" conditions in Klaviyo\'s segment builder'
+          }
+        ],
+        proTip: 'Start with High Churn Risk to retain customers, then explore Expected Order Date to boost conversions!'
+      };
+  }
+};
 
-        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-          <p className="text-sm text-amber-700 dark:text-amber-400">
-            <strong>Note:</strong> Predictive Analytics requires a Klaviyo paid plan with sufficient customer data (typically 180+ days of order history).
-          </p>
-        </div>
+const PredictiveAnalyticsSetupDialog = ({ open, onOpenChange, segmentId, segmentName }: { open: boolean; onOpenChange: (open: boolean) => void; segmentId: string; segmentName: string }) => {
+  const content = getPredictiveContent(segmentId);
+  
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <span className="text-2xl">{content.icon}</span>
+            {content.title}
+          </DialogTitle>
+          <DialogDescription>
+            {content.subtitle}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 mt-2">
+          <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-primary/10 border border-purple-500/20">
+            <div className="flex items-start gap-3">
+              <TrendingUp className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-sm">{content.whyTitle}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {content.whyText}
+                </p>
+              </div>
+            </div>
+          </div>
 
-        <div className="space-y-3">
-          <h4 className="font-semibold text-sm">How to Check & Enable:</h4>
-          
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">1</div>
-            <div>
-              <p className="font-medium text-sm">Check Your Klaviyo Plan</p>
-              <p className="text-xs text-muted-foreground">Go to Klaviyo → Settings → Billing to verify you have access to Predictive Analytics</p>
-            </div>
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <p className="text-sm text-amber-700 dark:text-amber-400">
+              <strong>Note:</strong> Predictive Analytics requires a Klaviyo paid plan with sufficient customer data (typically 180+ days of order history and 500+ customers).
+            </p>
           </div>
-          
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">2</div>
-            <div>
-              <p className="font-medium text-sm">Verify Data Requirements</p>
-              <p className="text-xs text-muted-foreground">You need 180+ days of order history and 500+ customers for accurate predictions</p>
-            </div>
-          </div>
-          
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">3</div>
-            <div>
-              <p className="font-medium text-sm">Create Segment in Klaviyo</p>
-              <p className="text-xs text-muted-foreground">Once enabled, create a segment using "Predictive Analytics" conditions in Klaviyo's segment builder</p>
-            </div>
-          </div>
-        </div>
 
-        <div className="pt-2">
-          <Button
-            size="sm"
-            className="w-full"
-            onClick={() => onOpenChange(false)}
-          >
-            Got it!
-          </Button>
+          <div className="space-y-3">
+            <h4 className="font-semibold text-sm">Setup Steps:</h4>
+            
+            {content.steps.map((step, index) => (
+              <div key={index} className="flex gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">
+                  {index + 1}
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{step.title}</p>
+                  <p className="text-xs text-muted-foreground">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+            <p className="text-sm text-blue-700 dark:text-blue-400">
+              <strong>💡 Pro Tip:</strong> {content.proTip}
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <Button
+              size="sm"
+              className="w-full"
+              onClick={() => onOpenChange(false)}
+            >
+              Got it!
+            </Button>
+          </div>
         </div>
-      </div>
-    </DialogContent>
-  </Dialog>
-);
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 const LocationInputDialog = ({
   open, 
@@ -738,6 +849,7 @@ export const SegmentCard = memo(function SegmentCard({
         <PredictiveAnalyticsSetupDialog 
           open={showPredictiveGuide} 
           onOpenChange={setShowPredictiveGuide}
+          segmentId={segment.id}
           segmentName={segment.name}
         />
       )}
