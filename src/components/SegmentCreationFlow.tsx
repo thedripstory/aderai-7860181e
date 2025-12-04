@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle, AlertCircle, Target } from 'lucide-react';
-import { SegmentResult } from '@/hooks/useKlaviyoSegments';
+import { CheckCircle, AlertCircle, Target, Info } from 'lucide-react';
+import { SegmentResult, BatchProgress } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS, applySegmentSettings, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
 import { Progress } from '@/components/ui/progress';
 import { SuccessAnimation } from '@/components/SuccessAnimation';
@@ -13,6 +13,7 @@ interface SegmentCreationFlowProps {
   onViewResults: () => void;
   onRetryFailed?: (failedSegmentIds: string[]) => void;
   userSettings?: UserSegmentSettings;
+  batchProgress?: BatchProgress | null;
 }
 
 export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
@@ -21,6 +22,7 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   onViewResults,
   onRetryFailed,
   userSettings = DEFAULT_SEGMENT_SETTINGS,
+  batchProgress,
 }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -43,10 +45,12 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   
   const totalCount = results.length;
   
-  const progressPercent = useMemo(() => 
-    totalCount > 0 ? (results.length / Math.max(totalCount, 1)) * 100 : 0,
-    [totalCount, results.length]
-  );
+  const progressPercent = useMemo(() => {
+    if (batchProgress && loading) {
+      return (batchProgress.segmentsProcessed / batchProgress.totalSegments) * 100;
+    }
+    return totalCount > 0 ? (results.length / Math.max(totalCount, 1)) * 100 : 0;
+  }, [totalCount, results.length, batchProgress, loading]);
 
   // Get current segment being processed with settings applied
   const currentSegment = useMemo(() => {
@@ -155,12 +159,42 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
               </AnimatePresence>
             </div>
 
-            {/* Progress section */}
+            {/* Batch progress indicator */}
             <div className="px-6 pb-6">
+              {loading && batchProgress && batchProgress.totalBatches > 1 && (
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 text-sm text-primary font-medium mb-2">
+                    <div className="relative w-4 h-4">
+                      <div className="absolute inset-0 border-2 border-transparent border-t-primary rounded-full animate-spin" />
+                    </div>
+                    <span>Processing batch {batchProgress.currentBatch} of {batchProgress.totalBatches}</span>
+                  </div>
+                  
+                  {/* API limitation notice */}
+                  <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                      Klaviyo limits segment creation to 5 at a time. We're processing your {batchProgress.totalSegments} segments in {batchProgress.totalBatches} batches with automatic retry to ensure 100% success.
+                    </p>
+                  </div>
+                  
+                  {batchProgress.estimatedTimeRemaining > 0 && (
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      ~{Math.ceil(batchProgress.estimatedTimeRemaining)}s remaining
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Progress section */}
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-muted-foreground">Syncing with Klaviyo</span>
                 <span className="text-primary font-medium">
-                  {loading ? 'Processing...' : `${successfulCount} of ${totalCount} complete`}
+                  {loading && batchProgress 
+                    ? `${batchProgress.segmentsProcessed} of ${batchProgress.totalSegments}` 
+                    : loading 
+                      ? 'Processing...' 
+                      : `${successfulCount} of ${totalCount} complete`}
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
