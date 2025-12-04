@@ -202,36 +202,57 @@ function getSegmentDefinition(
     // ENGAGEMENT & ACTIVITY
     // =====================================
     
-    'engaged-30-days': openedEmailId ? {
+    'engaged-30-days': (openedEmailId || clickedEmailId) ? {
       name: `Engaged (Last 30 Days)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          ...(openedEmailId ? [{
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }] : []),
+          ...(clickedEmailId ? [{
+            conditions: [
+              buildMetricCondition(clickedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }] : [])
+        ]
       }
     } : null,
     
-    'engaged-60-days': openedEmailId ? {
+    'engaged-60-days': (openedEmailId || clickedEmailId) ? {
       name: `Engaged (Last 60 Days)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          ...(openedEmailId ? [{
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
+            ]
+          }] : []),
+          ...(clickedEmailId ? [{
+            conditions: [
+              buildMetricCondition(clickedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
+            ]
+          }] : [])
+        ]
       }
     } : null,
     
-    'engaged-90-days': openedEmailId ? {
+    'engaged-90-days': (openedEmailId || clickedEmailId) ? {
       name: `Engaged (Last 90 Days)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          ...(openedEmailId ? [{
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+            ]
+          }] : []),
+          ...(clickedEmailId ? [{
+            conditions: [
+              buildMetricCondition(clickedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+            ]
+          }] : [])
+        ]
       }
     } : null,
     
@@ -257,15 +278,25 @@ function getSegmentDefinition(
       }
     } : null,
     
-    'engaged-non-buyers': (openedEmailId && placedOrderId) ? {
+    'engaged-non-buyers': ((openedEmailId || clickedEmailId) && placedOrderId) ? {
       name: `Engaged Non-Buyers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
-        }]
+        condition_groups: [
+          // (Opened OR Clicked) AND Never Purchased
+          // Using separate groups for OR, each with AND for never purchased
+          ...(openedEmailId ? [{
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' }),
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 3650, unit: 'day' })
+            ]
+          }] : []),
+          ...(clickedEmailId ? [{
+            conditions: [
+              buildMetricCondition(clickedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' }),
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 3650, unit: 'day' })
+            ]
+          }] : [])
+        ]
       }
     } : null,
     
