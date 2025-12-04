@@ -390,22 +390,35 @@ function getSegmentDefinition(
     } : null,
 
     // =====================================
-    // CUSTOMER LIFECYCLE & VALUE
+    // CUSTOMER LIFECYCLE & VALUE (per Notion guide)
     // =====================================
     
-    'recent-first-time': placedOrderId ? {
-      name: `Recent First-Time Customers${ADERAI_SUFFIX}`,
+    // #18 New Subscribers - 0 purchases all time
+    'new-subscribers': placedOrderId ? {
+      name: `New Subscribers${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            // First-time = exactly 1 purchase all-time AND that purchase was recent
-            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: newCustomerDays, unit: 'day' })
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
           ]
         }]
       }
     } : null,
     
+    // #19 Recent First-Time Customers - Exactly 1 order AND ordered recently
+    'recent-first-time': placedOrderId ? {
+      name: `Recent First-Time Customers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' }),
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+    
+    // #20 Repeat Customers - 2+ orders all time
     'repeat-customers': placedOrderId ? {
       name: `Repeat Customers${ADERAI_SUFFIX}`,
       definition: {
@@ -417,6 +430,7 @@ function getSegmentDefinition(
       }
     } : null,
     
+    // #21 One-Time Customers - Exactly 1 order all time
     'one-time-buyers': placedOrderId ? {
       name: `One-Time Customers${ADERAI_SUFFIX}`,
       definition: {
@@ -428,65 +442,212 @@ function getSegmentDefinition(
       }
     } : null,
     
+    // #22 Active Customers - Purchased in last 90 days
     'active-customers': placedOrderId ? {
       name: `Active Customers${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: lapsedDays, unit: 'day' })
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
           ]
         }]
       }
     } : null,
     
+    // #23 Lapsed Customers - Has ordered, 0 in last 180 days
     'lapsed-customers': placedOrderId ? {
       name: `Lapsed Customers${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            // Lapsed = has purchased, no purchase in lapsedDays, but HAS purchase in churnedDays (excludes churned)
             buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: lapsedDays, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: churnedDays, unit: 'day' })
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
           ]
         }]
       }
     } : null,
     
+    // #24 Churned Customers - Has ordered, 0 in last 365 days
     'churned-customers': placedOrderId ? {
       name: `Churned Customers${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
             buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: churnedDays, unit: 'day' })
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 365, unit: 'day' })
           ]
         }]
       }
     } : null,
     
+    // #25 VIP Customers - 5+ ORDERS (NOT by spend!)
     'vip-customers': placedOrderId ? {
       name: `VIP Customers${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'greater-than', vipThreshold, { type: 'over-all-time' })
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 4, { type: 'over-all-time' })
           ]
         }]
       }
     } : null,
     
-    'big-spenders': placedOrderId ? {
+    // #26 Big Spenders - Historic CLV above threshold (DIFFERENT from VIP!)
+    'big-spenders': {
       name: `Big Spenders (${currencySymbol}${vipThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: 'Historic Customer Lifetime Value',
+            filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: vipThreshold
+            }
+          }]
+        }]
+      }
+    },
+    
+    // #27 Bargain Shoppers - Historic CLV below threshold
+    'bargain-shoppers': {
+      name: `Bargain Shoppers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: 'Historic Customer Lifetime Value',
+            filter: {
+              type: 'numeric',
+              operator: 'less-than',
+              value: aov
+            }
+          }]
+        }]
+      }
+    },
+    
+    // #28 High Churn Risk - Predictive (may not work for all accounts)
+    'high-churn-risk': {
+      name: `High Churn Risk${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-predictive-analytics',
+            dimension: 'churn_risk_prediction',
+            filter: {
+              type: 'string',
+              operator: 'equals',
+              value: 'HIGH'
+            }
+          }]
+        }]
+      }
+    },
+    
+    // #29 Likely to Purchase Soon - Predictive
+    'likely-purchase-soon': {
+      name: `Likely to Purchase Soon${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-predictive-analytics',
+            dimension: 'expected_date_of_next_order',
+            filter: {
+              type: 'date',
+              operator: 'in-the-next',
+              quantity: 14,
+              unit: 'day'
+            }
+          }]
+        }]
+      }
+    },
+    
+    // #30 Predicted VIPs - Predictive CLV
+    'predicted-vips': {
+      name: `Predicted VIPs${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-predictive-analytics',
+            dimension: 'predicted_customer_lifetime_value',
+            filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: vipThreshold
+            }
+          }]
+        }]
+      }
+    },
+    
+    // #31 High AOV - Average Order Value above threshold
+    'high-aov': {
+      name: `High AOV Customers (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: 'Average Order Value',
+            filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: highValueThreshold
+            }
+          }]
+        }]
+      }
+    },
+    
+    // #32 Low AOV - Average Order Value below threshold
+    'low-aov': {
+      name: `Low AOV Customers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-property',
+            property: 'Average Order Value',
+            filter: {
+              type: 'numeric',
+              operator: 'less-than',
+              value: aov
+            }
+          }]
+        }]
+      }
+    },
+    
+    // =====================================
+    // SHOPPING BEHAVIOR & PURCHASE HISTORY
+    // =====================================
+    
+    // #33 All Customers
+    'all-customers': placedOrderId ? {
+      name: `All Customers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'greater-than', vipThreshold, { type: 'over-all-time' })
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
           ]
         }]
       }
     } : null,
     
+    // #34 Never Purchased
+    'never-purchased': placedOrderId ? {
+      name: `Never Purchased (Prospects)${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+    
+    // #35 Recent Purchasers 30 days
     'recent-purchasers-30': placedOrderId ? {
       name: `Recent Purchasers (30 Days)${ADERAI_SUFFIX}`,
       definition: {
@@ -498,12 +659,142 @@ function getSegmentDefinition(
       }
     } : null,
     
-    'all-customers': placedOrderId ? {
-      name: `All Customers${ADERAI_SUFFIX}`,
+    // #36 Abandoned Cart
+    'abandoned-cart': (addedToCartId && placedOrderId) ? {
+      name: `Abandoned Cart${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            buildMetricCondition(addedToCartId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+    
+    // #38 Abandoned Checkout
+    'abandoned-checkout': (startedCheckoutId && placedOrderId) ? {
+      name: `Abandoned Checkout${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(startedCheckoutId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+    
+    // #40 Browse Abandonment
+    'browse-abandonment': (viewedProductId && addedToCartId && placedOrderId) ? {
+      name: `Browse Abandonment${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(viewedProductId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
+            buildMetricCondition(addedToCartId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+    
+    // #46 Frequent Site Visitors - 10+ activities in 30 days
+    'frequent-visitors': activeOnSiteId ? {
+      name: `Frequent Site Visitors${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(activeOnSiteId, 'count', 'greater-than', 9, { type: 'in-the-last', quantity: 30, unit: 'day' })
+          ]
+        }]
+      }
+    } : null,
+    
+    // #47 Coupon Users - Used discount code
+    'coupon-users': placedOrderId ? {
+      name: `Coupon Users${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-metric',
+            metric_id: placedOrderId,
+            measurement: 'count',
+            measurement_filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: 0
+            },
+            timeframe_filter: {
+              type: 'date',
+              operator: 'in-the-last',
+              quantity: 3650,
+              unit: 'day'
+            },
+            metric_filters: [{
+              property: 'Discount Codes',
+              filter: {
+                type: 'string',
+                operator: 'is-not-empty'
+              }
+            }]
+          }]
+        }]
+      }
+    } : null,
+    
+    // #48 Full-Price Buyers
+    'full-price-buyers': placedOrderId ? {
+      name: `Full-Price Buyers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [{
+            type: 'profile-metric',
+            metric_id: placedOrderId,
+            measurement: 'count',
+            measurement_filter: {
+              type: 'numeric',
+              operator: 'greater-than',
+              value: 0
+            },
+            timeframe_filter: {
+              type: 'date',
+              operator: 'in-the-last',
+              quantity: 3650,
+              unit: 'day'
+            },
+            metric_filters: [{
+              property: 'Discount Codes',
+              filter: {
+                type: 'string',
+                operator: 'is-empty'
+              }
+            }]
+          }]
+        }]
+      }
+    } : null,
+    
+    // #49 Product Reviewers
+    'product-reviewers': reviewedProductId ? {
+      name: `Product Reviewers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(reviewedProductId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+          ]
+        }]
+      }
+    } : null,
+    
+    // #50 Non-Reviewers
+    'non-reviewers': (reviewedProductId && placedOrderId) ? {
+      name: `Non-Reviewers${ADERAI_SUFFIX}`,
+      definition: {
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
+            buildMetricCondition(reviewedProductId, 'count', 'equals', 0, { type: 'over-all-time' })
           ]
         }]
       }
@@ -604,68 +895,8 @@ function getSegmentDefinition(
       }
     } : null,
 
-    'abandoned-cart': (addedToCartId && placedOrderId) ? {
-      name: `Abandoned Cart${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(addedToCartId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
-      }
-    } : null,
-
-    'abandoned-checkout': (startedCheckoutId && placedOrderId) ? {
-      name: `Abandoned Checkout${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(startedCheckoutId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
-      }
-    } : null,
-
-    'browse-abandonment': (viewedProductId && addedToCartId) ? {
-      name: `Browse Abandonment${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(viewedProductId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 14, unit: 'day' }),
-            buildMetricCondition(addedToCartId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
-          ]
-        }]
-      }
-    } : null,
-
-    // =====================================
-    // CUSTOMER LIFECYCLE ADDITIONS
-    // =====================================
-
-    'new-subscribers': (openedEmailId && placedOrderId) ? {
-      name: `New Subscribers${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: newCustomerDays, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null,
-
-    'never-purchased': placedOrderId ? {
-      name: `Never Purchased (Prospects)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null,
+    // Note: abandoned-cart, abandoned-checkout, browse-abandonment, new-subscribers, never-purchased
+    // are now defined in the main SHOPPING BEHAVIOR section above
 
     'first-time-buyers': placedOrderId ? {
       name: `First-Time Buyers${ADERAI_SUFFIX}`,
@@ -867,47 +1098,25 @@ function getSegmentDefinition(
     // Marked as unavailable in UI since most accounts don't have this feature
     // =====================================
 
-    'predicted-vips': null,
-    'high-churn-risk': null,
-    'likely-purchase-soon': null,
-    'high-churn-risk-exclude': null,
-
-    // =====================================
-    // VALUE-BASED SEGMENTS
-    // =====================================
-
-    'high-aov': placedOrderId ? {
-      name: `High AOV Customers (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
+    // Note: predicted-vips, high-churn-risk, likely-purchase-soon, high-aov, low-aov, bargain-shoppers
+    // are now defined in the main CUSTOMER LIFECYCLE section above
+    
+    'high-churn-risk-exclude': {
+      name: `🚫 High Churn Risk${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'greater-than', highValueThreshold, { type: 'over-all-time' })
-          ]
+          conditions: [{
+            type: 'profile-predictive-analytics',
+            dimension: 'churn_risk_prediction',
+            filter: {
+              type: 'string',
+              operator: 'equals',
+              value: 'HIGH'
+            }
+          }]
         }]
       }
-    } : null,
-
-    'low-aov': placedOrderId ? {
-      name: `Low AOV Customers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null,
-
-    'bargain-shoppers': placedOrderId ? {
-      name: `Bargain Shoppers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null,
+    },
 
     // =====================================
     // PROFILE PROPERTY SEGMENTS
@@ -1045,118 +1254,8 @@ function getSegmentDefinition(
     'location-chicago': null,
     'location-houston': null,
 
-    // =====================================
-    // PURCHASE BEHAVIOR - DISCOUNT SENSITIVITY
-    // =====================================
-
-    'coupon-users': placedOrderId ? {
-      name: `Discount Shoppers${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [{
-            type: 'profile-metric',
-            metric_id: placedOrderId,
-            measurement: 'count',
-            measurement_filter: {
-              type: 'numeric',
-              operator: 'greater-than',
-              value: 0
-            },
-            timeframe_filter: {
-              type: 'date',
-              operator: 'in-the-last',
-              quantity: 90,
-              unit: 'day'
-            },
-            metric_filters: [{
-              property: '$discount_value',
-              filter: {
-                type: 'numeric',
-                operator: 'greater-than',
-                value: 0
-              }
-            }]
-          }]
-        }]
-      }
-    } : null,
-
-    'full-price-buyers': placedOrderId ? {
-      name: `Full Price Buyers${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [{
-            type: 'profile-metric',
-            metric_id: placedOrderId,
-            measurement: 'count',
-            measurement_filter: {
-              type: 'numeric',
-              operator: 'greater-than',
-              value: 0
-            },
-            timeframe_filter: {
-              type: 'date',
-              operator: 'in-the-last',
-              quantity: 90,
-              unit: 'day'
-            },
-            metric_filters: [{
-              property: '$discount_value',
-              filter: {
-                type: 'numeric',
-                operator: 'equals',
-                value: 0
-              }
-            }]
-          }]
-        }]
-      }
-    } : null,
-
-    // =====================================
-    // REVIEW SEGMENTS
-    // =====================================
-
-    'product-reviewers': reviewedProductId ? {
-      name: `Product Reviewers${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(reviewedProductId, 'count', 'greater-than', 0, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : (placedOrderId ? {
-      name: `Repeat Buyers (Likely Reviewers)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 1, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null),
-
-    'non-reviewers': (reviewedProductId && placedOrderId) ? {
-      name: `Purchased But Never Reviewed${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(reviewedProductId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : (placedOrderId ? {
-      name: `One-Time Buyers (Review Candidates)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null),
+    // Note: coupon-users, full-price-buyers, product-reviewers, non-reviewers
+    // are now defined in the main SHOPPING BEHAVIOR section above
 
     // =====================================
     // REFUND & FEEDBACK SEGMENTS
@@ -1364,16 +1463,7 @@ function getSegmentDefinition(
       }
     } : null,
 
-    'frequent-visitors': activeOnSiteId ? {
-      name: `Frequent Site Visitors (10+ in 30 Days)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(activeOnSiteId, 'count', 'greater-than', 9, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
-      }
-    } : null,
+    // Note: frequent-visitors is now defined in the main SHOPPING BEHAVIOR section above
 
     // These are marked as unavailable in UI - require manual category setup
     'multi-category': null,
