@@ -289,7 +289,7 @@ export const DashboardOverview = () => {
                 Exclusive Segmentation Cheat Sheet
               </h3>
               <Badge variant="outline" className="border-primary/50 text-primary font-semibold">
-                Worth $29
+                Premium Resource
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
