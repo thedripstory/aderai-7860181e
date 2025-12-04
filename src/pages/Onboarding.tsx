@@ -6,6 +6,7 @@ import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { toast } from "sonner";
 import { ErrorLogger } from "@/lib/errorLogger";
 import { AderaiLogo } from "@/components/AderaiLogo";
+import { trackEvent, setUserProperties } from '@/lib/analytics';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -22,6 +23,19 @@ export default function Onboarding() {
       if (paymentStatus === 'success' && sessionId) {
         // Clear URL params
         window.history.replaceState({}, '', '/onboarding');
+        
+        // Track subscription with PostHog
+        trackEvent('Subscription Started', {
+          plan: 'monthly',
+          amount: 9,
+          currency: 'USD',
+        });
+
+        setUserProperties({
+          subscriptionStatus: 'active',
+          subscribedAt: new Date().toISOString(),
+          plan: 'monthly',
+        });
         
         toast.success('Payment successful! Welcome to Aderai.', {
           duration: 5000,

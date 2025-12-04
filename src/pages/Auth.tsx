@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { SignInCard } from "@/components/ui/sign-in-card";
 import { ErrorLogger } from "@/lib/errorLogger";
 import { sanitizeEmail, sanitizeString, validatePassword } from "@/lib/inputSanitization";
+import { identifyUser, trackEvent, setGroup } from '@/lib/analytics';
 
 interface AuthProps {
   onComplete?: (user: any) => void;
@@ -155,6 +156,28 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             description: "Redirecting to payment...",
           });
 
+          // Track signup with PostHog
+          identifyUser(authData.user.id, {
+            email: sanitizedEmail,
+            firstName: sanitizedFirstName,
+            accountName: sanitizedBrandName || sanitizedEmail.split('@')[0],
+            createdAt: new Date().toISOString(),
+            subscriptionStatus: 'pending',
+          });
+
+          // Group by account for B2B analytics
+          if (sanitizedBrandName) {
+            setGroup('company', sanitizedBrandName, {
+              name: sanitizedBrandName,
+              createdAt: new Date().toISOString(),
+            });
+          }
+
+          trackEvent('User Signed Up', {
+            method: 'email',
+            accountName: sanitizedBrandName,
+          });
+
           // Create Stripe checkout session and redirect
           try {
             const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
@@ -200,6 +223,16 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
           title: "Welcome back!",
           description: "Successfully signed in",
         });
+
+        // Identify returning user with PostHog
+        identifyUser(data.user.id, {
+          email: sanitizedEmail,
+        });
+
+        trackEvent('User Signed In', {
+          method: 'email',
+        });
+
         navigate('/dashboard');
       }
     } catch (error: any) {

@@ -24,6 +24,7 @@ import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 import { cn } from "@/lib/utils";
 import { AderaiLogo } from "@/components/AderaiLogo";
+import { trackEvent, setUserProperties } from '@/lib/analytics';
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
@@ -155,11 +156,18 @@ const KlaviyoSetup = () => {
       }
 
       if (!validationData?.valid) {
+        const errorMessage = validationData?.error || "The API key you entered is not valid. Please check and try again.";
         toast({
           title: "Invalid API Key",
-          description: validationData?.error || "The API key you entered is not valid. Please check and try again.",
+          description: errorMessage,
           variant: "destructive",
         });
+        
+        // Track failed connection with PostHog
+        trackEvent('Klaviyo Connection Failed', {
+          error: errorMessage,
+        });
+        
         setIsSaving(false);
         return;
       }
@@ -244,7 +252,19 @@ const KlaviyoSetup = () => {
         description: "Your Klaviyo integration is ready. Welcome to your dashboard!",
       });
 
-      // Track Klaviyo connected event
+      // Track with PostHog
+      trackEvent('Klaviyo Connected', {
+        success: true,
+        clientName: clientName || 'My Business',
+        currency,
+      });
+
+      setUserProperties({
+        klaviyoConnected: true,
+        klaviyoConnectedAt: new Date().toISOString(),
+      });
+
+      // Track Klaviyo connected event in Supabase
       try {
         await supabase.from('analytics_events').insert({
           user_id: user.id,
