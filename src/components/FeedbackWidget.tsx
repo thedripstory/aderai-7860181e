@@ -330,8 +330,8 @@ export const FeedbackWidget: React.FC = () => {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-primary" />
-              We'd love to hear from you!
+              <MessageCircle className="w-5 h-5 text-primary shrink-0" />
+              <span>We'd love to hear from you!</span>
             </DialogTitle>
           </DialogHeader>
 
