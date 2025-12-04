@@ -392,7 +392,7 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="performance">
-            <PremiumInviteGate featureName="Performance Insights" />
+            <PremiumInviteGate featureName="Performance Insights" variant="performance" />
           </TabsContent>
 
           <TabsContent value="more">
