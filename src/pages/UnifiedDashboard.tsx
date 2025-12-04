@@ -312,51 +312,13 @@ export default function UnifiedDashboard() {
           .in('segment_klaviyo_id', segmentIds)
           .order('recorded_at', { ascending: false });
         
-        if (historicalData && historicalData.length > 0) {
+        if (historicalData) {
           // Keep only the most recent entry for each segment
           historicalData.forEach((record: any) => {
             if (!historicalCounts[record.segment_klaviyo_id]) {
               historicalCounts[record.segment_klaviyo_id] = record.profile_count;
             }
           });
-        } else if (allFetchedSegments.length > 0) {
-          // No historical data exists - trigger on-demand snapshot recording
-          toast.info('Recording segment data for the first time...', {
-            description: 'This may take a moment. Profile counts will appear shortly.',
-            duration: 10000,
-          });
-          
-          try {
-            const { data: snapshotResult, error: snapshotError } = await supabase.functions.invoke(
-              'record-user-segment-snapshots',
-              { body: { keyId: activeKey.id } }
-            );
-            
-            if (!snapshotError && snapshotResult?.success) {
-              // Re-fetch historical data after recording
-              const { data: freshHistoricalData } = await supabase
-                .from('segment_historical_data')
-                .select('segment_klaviyo_id, profile_count, recorded_at')
-                .eq('klaviyo_key_id', activeKey.id)
-                .in('segment_klaviyo_id', segmentIds)
-                .order('recorded_at', { ascending: false });
-              
-              if (freshHistoricalData) {
-                freshHistoricalData.forEach((record: any) => {
-                  if (!historicalCounts[record.segment_klaviyo_id]) {
-                    historicalCounts[record.segment_klaviyo_id] = record.profile_count;
-                  }
-                });
-              }
-              
-              toast.success('Segment data recorded!', {
-                description: `${snapshotResult.segmentsRecorded} segments with profile counts loaded.`,
-              });
-            }
-          } catch (snapshotErr) {
-            // Silently fail - user will just see N/A for counts until daily cron runs
-            console.error('Failed to record snapshots on-demand:', snapshotErr);
-          }
         }
       }
       
