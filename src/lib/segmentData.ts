@@ -50,7 +50,7 @@ export function applySettingsToSegments(segments: Segment[], settings: UserSegme
   return segments.map(segment => applySegmentSettings(segment, settings));
 }
 
-export const SEGMENTS = [
+export const SEGMENTS: Segment[] = [
   // ENGAGEMENT & ACTIVITY (14 segments)
   {
     id: "engaged-30-days",
@@ -208,11 +208,12 @@ export const SEGMENTS = [
   },
   {
     id: "birthday-month",
-    name: "Birthday This Month",
-    description: "Birthday in current month",
+    name: "Birthday This Month (Manual Only)",
+    description: "Birthday in current month - Must be created manually in Klaviyo",
     category: "Demographics",
     icon: "🎂",
-    definition: "Birthday month = current month",
+    definition: "Not supported via API - create in Klaviyo UI",
+    unavailable: true,
   },
   {
     id: "age-18-24",
@@ -652,5 +653,14 @@ export const CATEGORIES = [
   "Exclusion Segments"
 ];
 
-export type Segment = typeof SEGMENTS[0];
+export interface Segment {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon: string;
+  definition: string;
+  unavailable?: boolean;
+}
+
 export type Bundle = typeof BUNDLES[0];
