@@ -336,13 +336,42 @@ export const PremiumInviteGate: React.FC<PremiumInviteGateProps> = ({ featureNam
 
         {submitted ? (
           /* Success state */
-          <div className="flex flex-col items-center animate-fade-in">
+          <div className="flex flex-col items-center animate-fade-in max-w-md">
             <div className="w-14 h-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-4">
               <CheckCircle2 className="w-7 h-7 text-green-500" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">You're on the list!</h3>
-            <p className="text-muted-foreground text-center max-w-sm text-sm">
-              We'll review your request and send an invite to <span className="font-medium text-foreground">{formData.email}</span> if you're selected.
+            <h3 className="text-lg font-semibold mb-3">You're on the waitlist!</h3>
+            
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-4">
+              <p className="text-sm text-center text-amber-700 dark:text-amber-300 font-medium mb-2">
+                ⚡ High Demand Notice
+              </p>
+              <p className="text-xs text-center text-muted-foreground leading-relaxed">
+                Due to overwhelming demand, we're prioritizing invites for <span className="font-semibold text-foreground">regular and active Aderai users</span>.
+              </p>
+            </div>
+            
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                To get access faster:
+              </p>
+              <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">1</span>
+                  <span>Use Aderai regularly to create segments</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">2</span>
+                  <span>Active users trigger <span className="font-medium text-foreground">auto-invites</span></span>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-xs text-muted-foreground text-center mt-4">
+              Or simply wait until Premium opens for everyone!
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-2">
+              Invite will be sent to <span className="font-medium text-foreground">{formData.email}</span>
             </p>
           </div>
         ) : (
