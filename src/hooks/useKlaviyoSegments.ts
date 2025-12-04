@@ -90,7 +90,8 @@ export const useKlaviyoSegments = () => {
     selectedSegments: string[],
     activeKey: KlaviyoKey,
     segmentsList: any[],
-    jobId?: string
+    jobId?: string,
+    customInputs?: Record<string, string>
   ) => {
     if (selectedSegments.length === 0) {
       throw new Error('Please select at least one segment to create');
@@ -155,6 +156,7 @@ export const useKlaviyoSegments = () => {
         segmentIds: availableSegmentIds,
         currencySymbol,
         settings,
+        customInputs: customInputs || {},
       };
 
       const { data: response, error } = await supabase.functions.invoke('klaviyo-create-segments', {

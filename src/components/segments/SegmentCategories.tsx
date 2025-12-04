@@ -3,6 +3,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { CategorySection } from './CategorySection';
 import { CATEGORIES, CATEGORY_ICONS } from '@/lib/segmentData';
 import type { Segment } from '@/lib/segmentData';
+import type { SegmentCustomInputs } from '@/components/SegmentDashboard';
 
 interface SegmentCategoriesProps {
   searchQuery: string;
@@ -13,6 +14,8 @@ interface SegmentCategoriesProps {
   onToggleFavorite: (id: string) => void;
   onClearSearch: () => void;
   segments: Segment[];
+  customInputs?: SegmentCustomInputs;
+  onCustomInputChange?: (segmentId: string, value: string) => void;
 }
 
 export function SegmentCategories({
@@ -24,6 +27,8 @@ export function SegmentCategories({
   onToggleFavorite,
   onClearSearch,
   segments,
+  customInputs = {},
+  onCustomInputChange,
 }: SegmentCategoriesProps) {
   const filteredSegments = segments.filter(segment => 
     segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,7 +37,7 @@ export function SegmentCategories({
 
   const selectAllInCategory = (category: string) => {
     const categorySegmentIds = filteredSegments
-      .filter(s => s.category === category)
+      .filter(s => s.category === category && !s.unavailable && !s.requiresInput)
       .map(s => s.id);
     
     categorySegmentIds.forEach(id => {
@@ -83,6 +88,8 @@ export function SegmentCategories({
             onClearAllInCategory={() => clearAllInCategory(category)}
             index={categoryIndex}
             defaultExpanded={category === "Engagement & Activity"}
+            customInputs={customInputs}
+            onCustomInputChange={onCustomInputChange}
           />
         );
       })}
