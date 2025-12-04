@@ -130,48 +130,35 @@ Recover lost sales:
 - Get started faster`
   },
   {
-    slug: 'free-beta',
-    title: 'How the free beta works',
+    slug: 'pricing',
+    title: 'Pricing & Subscription',
     category: 'Getting Started',
-    excerpt: 'Everything you need to know about using the free beta',
+    excerpt: 'Everything you need to know about Aderai pricing',
     order_index: 4,
-    content: `# How the free beta works
+    content: `# Pricing & Subscription
 
-## What's Included
+Aderai offers professional Klaviyo segmentation for just $9/month.
 
-During the free beta period, you get:
-- ✅ Unlimited segment creation
-- ✅ All 70+ pre-built segments
-- ✅ AI-powered segment suggestions (10/day)
-- ✅ Full analytics dashboard
-- ✅ Multiple client/brand management
-- ✅ Priority support
+## What's included:
+- Full access to all 70+ segments
+- Unlimited segment creation in Klaviyo
+- AI-powered segment suggestions (10 per day)
+- Real-time analytics dashboard
+- All future updates and new segments
 
-## Beta Period
+## Billing
 
-The free beta is currently **active** and will continue until we announce transition plans. We'll give at least 30 days notice before any changes.
+- Monthly subscription: $9/month
+- Billed through Stripe (secure payment)
+- Cancel anytime from your account settings
 
-## Your Feedback Matters
+## Value Comparison
 
-As a beta user, your input shapes the product:
-- Use the feedback widget (bottom right)
-- Report bugs or issues
-- Suggest new segments or features
-- Share what's working well
+Agencies typically charge $1,500-$5,000 for similar segmentation work. With Aderai, you get the same professional results for just $9/month.
 
-## After Beta
+## Current Status
 
-Aderai is currently free for all users. Enjoy full access to all features with no limitations.
-- You'll be notified well in advance
-
-## Fair Use Policy
-
-While we offer unlimited segments, we ask that you:
-- Use segments for legitimate marketing purposes
-- Avoid automated/bulk segment creation
-- Report any issues you encounter
-
-Thank you for being an early user! 🚀`
+All features are fully available to subscribers with no limitations.`
   },
 
   // Segments Category
@@ -441,7 +428,7 @@ Instead of single segments, request campaign flows:
 
 ## Current Limits
 
-During the free beta:
+With your subscription:
 - **10 AI suggestions per day**
 - Resets at midnight UTC
 - No rollover of unused suggestions
@@ -449,7 +436,7 @@ During the free beta:
 ## Why Limits?
 
 AI suggestions use computational resources and API calls. Limits ensure:
-- Fair access for all beta users
+- Fair access for all users
 - System reliability and performance
 - Sustainable service delivery
 

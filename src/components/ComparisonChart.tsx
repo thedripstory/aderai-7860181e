@@ -29,7 +29,7 @@ export const ComparisonChart = () => {
     {
       feature: "Cost",
       manual: "$1,500+/month in labor",
-      aderai: "Free",
+      aderai: "Just $9/month",
       icon: DollarSign
     },
     {

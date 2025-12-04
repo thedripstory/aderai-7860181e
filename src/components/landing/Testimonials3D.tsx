@@ -28,7 +28,7 @@ const testimonials = [
   {
     name: 'David Kim',
     username: '@davidkim',
-    body: 'Finally, enterprise-level segmentation without the enterprise price tag. 100% free!',
+    body: 'Finally, enterprise-level segmentation without the enterprise price tag. Best $9 I spend each month!',
     img: 'https://randomuser.me/api/portraits/men/33.jpg',
     country: '🇰🇷 Korea',
   },
@@ -63,7 +63,7 @@ const testimonials = [
   {
     name: 'Lisa Park',
     username: '@lisap',
-    body: 'VIP reactivation segment alone paid for itself... oh wait, it\'s free! Amazing tool.',
+    body: 'VIP reactivation segment alone paid for the subscription 10x over. Amazing ROI!',
     img: 'https://randomuser.me/api/portraits/women/79.jpg',
     country: '🇯🇵 Japan',
   },
@@ -112,7 +112,7 @@ const testimonials = [
   {
     name: 'Liam O\'Brien',
     username: '@liamob',
-    body: 'Can\'t believe this is free. It\'s better than tools we paid thousands for.',
+    body: 'For $9/month, you get what agencies charge thousands for. Absolute no-brainer.',
     img: 'https://randomuser.me/api/portraits/men/92.jpg',
     country: '🇮🇪 Ireland',
   },
