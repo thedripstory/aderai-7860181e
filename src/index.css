@@ -126,6 +126,25 @@ body {
 }
 
 @layer utilities {
+  /* Performance: CSS Containment for heavy sections */
+  .contain-layout {
+    contain: layout style;
+  }
+  
+  .contain-paint {
+    contain: paint;
+  }
+  
+  .contain-strict {
+    contain: strict;
+  }
+  
+  /* GPU acceleration hints for animated elements */
+  .gpu-accelerated {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
   /* 3D Flip Card Utilities */
   .perspective-1000 {
     perspective: 1000px;

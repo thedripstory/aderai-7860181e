@@ -91,12 +91,16 @@ export function Globe({
 }) {
   // Generate random markers on mount
   const markers = useMemo(() => getRandomMarkers(18), [])
+  const [isVisible, setIsVisible] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null)
+  const animationRef = useRef<number | null>(null)
   
   const GLOBE_CONFIG: COBEOptions = {
     width: 800,
     height: 800,
     onRender: () => {},
-    devicePixelRatio: 2,
+    devicePixelRatio: Math.min(window.devicePixelRatio, 2), // Cap at 2 for performance
     phi: 0,
     theta: 0.3,
     dark: 0,
@@ -117,6 +121,22 @@ export function Globe({
   const pointerInteractionMovement = useRef(0)
   const [r, setR] = useState(0)
 
+  // Visibility detection to pause globe when off-screen
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0, rootMargin: '100px' }
+    )
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   const updatePointerInteraction = (value: any) => {
     pointerInteracting.current = value
     if (canvasRef.current) {
@@ -134,12 +154,15 @@ export function Globe({
 
   const onRender = useCallback(
     (state: Record<string, any>) => {
+      // Skip rendering when not visible
+      if (!isVisible) return
+      
       if (!pointerInteracting.current) phi += 0.005
       state.phi = phi + r
       state.width = width * 2
       state.height = width * 2
     },
-    [r],
+    [r, isVisible],
   )
 
   const onResize = () => {
@@ -158,13 +181,20 @@ export function Globe({
       height: width * 2,
       onRender,
     })
+    globeRef.current = globe
 
     setTimeout(() => (canvasRef.current!.style.opacity = "1"))
-    return () => globe.destroy()
-  }, [markers])
+    return () => {
+      globe.destroy()
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [markers, isVisible])
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "absolute inset-0 mx-auto aspect-[1/1] w-full max-w-[600px]",
         className,
