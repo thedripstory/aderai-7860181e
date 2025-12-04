@@ -47,7 +47,7 @@ export const CREATABLE_SEGMENTS = new Set([
   'high-aov',
   'low-aov',
   
-  // Shopping Behavior & Purchase History (14 creatable, 3 unavailable)
+  // Shopping Behavior & Purchase History (15 creatable, 3 unavailable)
   'all-customers',
   'never-purchased',
   'recent-purchasers-30',
@@ -98,11 +98,9 @@ export const UNAVAILABLE_SEGMENTS = new Set([
   'negative-feedback',     // Requires manual feedback tracking in Klaviyo
 ]);
 
-// Segments with fallback definitions (creates alternative if primary metric unavailable)
-export const FALLBACK_SEGMENTS = new Set([
-  'product-reviewers',    // Falls back to Repeat Buyers (2+ purchases)
-  'non-reviewers',        // Falls back to One-Time Buyers (1 purchase)
-  'refunded-customers',   // Falls back to Single Purchase
+// Note: Fallback segments removed - per spec, segments return null if metric unavailable
+export const FALLBACK_SEGMENTS = new Set<string>([
+  // No fallbacks - segments simply won't be created if metrics don't exist
 ]);
 
 /**
