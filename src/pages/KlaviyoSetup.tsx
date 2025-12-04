@@ -353,7 +353,7 @@ const KlaviyoSetup = () => {
 
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Connect Your{" "}
-              <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-baseline" />{" "}
+              <img src={klaviyoLogo} alt="Klaviyo" className="h-[0.85em] inline-block align-middle relative -top-[0.05em]" />{" "}
               Account
             </h1>
             <p className="text-xl text-muted-foreground max-w-xl mx-auto">
