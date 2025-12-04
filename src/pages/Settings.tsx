@@ -518,6 +518,37 @@ export default function Settings() {
     }
   };
 
+  const handleResubscribe = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        body: { origin: window.location.origin },
+      });
+      
+      if (error) throw error;
+      
+      if (data?.url) {
+        // Track resubscribe attempt
+        await supabase.from('analytics_events').insert({
+          user_id: currentUser.id,
+          event_name: 'resubscribe_initiated',
+          page_url: window.location.href,
+        });
+        
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error initiating resubscription:', error);
+      toast({
+        title: "Error",
+        description: "Could not start resubscription. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <PageErrorBoundary pageName="Settings">
     <div className="min-h-screen bg-background">
@@ -958,35 +989,91 @@ export default function Settings() {
                         </div>
                       )}
 
+                      {/* Canceled Subscription Notice */}
+                      {(subscriptionDetails.status === 'canceled' || !subscriptionDetails.hasSubscription) && (
+                        <div className="bg-muted/50 border border-border rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <XCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="font-medium">
+                                {subscriptionDetails.status === 'canceled' ? 'Your subscription has been canceled' : 'No active subscription'}
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Resubscribe to regain access to all Aderai features including 70+ expert segments and AI-powered suggestions.
+                              </p>
+                              <Button
+                                size="sm"
+                                className="mt-3"
+                                onClick={handleResubscribe}
+                                disabled={loading}
+                              >
+                                {loading ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Loading...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CreditCard className="w-4 h-4 mr-2" />
+                                    Resubscribe - $9/month
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
-                        <Button
-                          onClick={handleOpenPortal}
-                          disabled={portalLoading || !subscriptionDetails.hasSubscription}
-                          className="flex-1"
-                        >
-                          {portalLoading ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Opening...
-                            </>
-                          ) : (
-                            <>
-                              <ExternalLink className="w-4 h-4 mr-2" />
-                              Manage in Stripe
-                            </>
-                          )}
-                        </Button>
+                        {subscriptionDetails.hasSubscription && subscriptionDetails.status !== 'canceled' ? (
+                          <>
+                            <Button
+                              onClick={handleOpenPortal}
+                              disabled={portalLoading}
+                              className="flex-1"
+                            >
+                              {portalLoading ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Opening...
+                                </>
+                              ) : (
+                                <>
+                                  <ExternalLink className="w-4 h-4 mr-2" />
+                                  Manage in Stripe
+                                </>
+                              )}
+                            </Button>
 
-                        {subscriptionDetails.hasSubscription && 
-                         subscriptionDetails.status === 'active' && 
-                         !subscriptionDetails.cancelAtPeriodEnd && (
+                            {subscriptionDetails.status === 'active' && 
+                             !subscriptionDetails.cancelAtPeriodEnd && (
+                              <Button
+                                variant="outline"
+                                onClick={() => setShowCancelConfirm(true)}
+                                className="text-muted-foreground hover:text-destructive hover:border-destructive"
+                              >
+                                Cancel Subscription
+                              </Button>
+                            )}
+                          </>
+                        ) : (
                           <Button
-                            variant="outline"
-                            onClick={() => setShowCancelConfirm(true)}
-                            className="text-muted-foreground hover:text-destructive hover:border-destructive"
+                            onClick={handleResubscribe}
+                            disabled={loading}
+                            className="flex-1"
                           >
-                            Cancel Subscription
+                            {loading ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Loading...
+                              </>
+                            ) : (
+                              <>
+                                <CreditCard className="w-4 h-4 mr-2" />
+                                Subscribe Now - $9/month
+                              </>
+                            )}
                           </Button>
                         )}
                       </div>
