@@ -253,6 +253,66 @@ export const DashboardOverview = () => {
         </div>
       </div>
 
+      {/* Notion Cheat Sheet Promo */}
+      <div 
+        onClick={() => window.open('https://thedripstory.notion.site/Segmentation-Cheat-Sheet-The-Drip-Story-284a3d203356803a8298e9637fec1ed7?source=copy_link', '_blank')}
+        className="group relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-accent/5 to-card cursor-pointer hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300"
+      >
+        {/* Animated background effects */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-primary/20 rounded-full blur-[100px] group-hover:bg-primary/30 transition-all duration-500" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/20 rounded-full blur-[80px] group-hover:bg-accent/30 transition-all duration-500" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,107,53,0.1),transparent_50%)]" />
+        
+        <div className="relative p-6 flex flex-col md:flex-row items-start md:items-center gap-4">
+          {/* Icon/Badge section */}
+          <div className="flex-shrink-0">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary-foreground">
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <line x1="10" y1="9" x2="8" y2="9"/>
+                </svg>
+              </div>
+              <Badge className="absolute -top-2 -right-2 bg-accent text-accent-foreground font-bold px-2 py-0.5 text-[10px] shadow-lg animate-pulse">
+                FREE
+              </Badge>
+            </div>
+          </div>
+          
+          {/* Content section */}
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-lg font-bold text-foreground">
+                Exclusive Segmentation Cheat Sheet
+              </h3>
+              <Badge variant="outline" className="border-primary/50 text-primary font-semibold">
+                Worth $29
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Get the complete Notion guide with <span className="text-foreground font-medium">screenshots of every segment</span>, detailed explanations, real-world examples, usage criteria, and <span className="text-foreground font-medium">content ideas</span> for each segment type.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Badge variant="secondary" className="text-xs">📸 Visual Screenshots</Badge>
+              <Badge variant="secondary" className="text-xs">📝 Usage Examples</Badge>
+              <Badge variant="secondary" className="text-xs">💡 Content Ideas</Badge>
+              <Badge variant="secondary" className="text-xs">✅ Best Practices</Badge>
+            </div>
+          </div>
+          
+          {/* CTA section */}
+          <div className="flex-shrink-0">
+            <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:shadow-primary/40 group-hover:scale-105 transition-all duration-300">
+              <span>Access Free Guide</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* Progress Section */}
         <div className="relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-card/80 via-card/95 to-card backdrop-blur-xl shadow-lg">
