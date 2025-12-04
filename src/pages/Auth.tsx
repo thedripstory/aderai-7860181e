@@ -152,9 +152,40 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
 
           toast({
             title: "Account created!",
-            description: "Welcome to Aderai",
+            description: "Redirecting to payment...",
           });
-          navigate('/onboarding');
+
+          // Create Stripe checkout session and redirect
+          try {
+            const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
+              'stripe-create-checkout',
+              {
+                body: { origin: window.location.origin },
+              }
+            );
+
+            if (checkoutError) throw checkoutError;
+
+            if (checkoutData?.url) {
+              window.location.href = checkoutData.url;
+            } else {
+              throw new Error('No checkout URL returned');
+            }
+          } catch (stripeError: any) {
+            await ErrorLogger.logError(stripeError, {
+              context: 'Error creating Stripe checkout',
+              userId: authData.user.id,
+            });
+            
+            toast({
+              title: "Payment Setup Error",
+              description: "Please try again or contact support at akshat@aderai.io",
+              variant: "destructive",
+            });
+            
+            // Still allow them to proceed to try again
+            navigate('/signup?payment=error');
+          }
         }
       } else {
         // Sign in

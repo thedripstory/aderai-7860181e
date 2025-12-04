@@ -847,6 +847,41 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_events: {
+        Row: {
+          created_at: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          stripe_event_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          stripe_event_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          stripe_event_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       two_factor_auth: {
         Row: {
           backup_codes: string[] | null
@@ -1042,6 +1077,12 @@ export type Database = {
           password_hash: string
           password_reset_expires: string | null
           password_reset_token: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_canceled_at: string | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
+          subscription_status: string | null
           two_factor_backup_codes: Json | null
           two_factor_enabled: boolean | null
           two_factor_prompt_shown_at: string | null
@@ -1063,6 +1104,12 @@ export type Database = {
           password_hash: string
           password_reset_expires?: string | null
           password_reset_token?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_canceled_at?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string | null
           two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
           two_factor_prompt_shown_at?: string | null
@@ -1084,6 +1131,12 @@ export type Database = {
           password_hash?: string
           password_reset_expires?: string | null
           password_reset_token?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_canceled_at?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string | null
           two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
           two_factor_prompt_shown_at?: string | null
