@@ -1010,22 +1010,9 @@ function getSegmentDefinition(
     // PROFILE PROPERTY SEGMENTS
     // =====================================
 
-    'birthday-month': {
-      name: `Birthday This Month${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [{
-            type: 'profile-property',
-            property: 'properties["birthday"]',
-            filter: {
-              type: 'date',
-              operator: 'is-in-month',
-              value: new Date().getMonth() + 1
-            }
-          }]
-        }]
-      }
-    },
+    // Birthday This Month - NOT SUPPORTED via Klaviyo API (no 'is-in-month' operator available)
+    // This segment must be created manually in Klaviyo or via Klaviyo's UI
+    'birthday-month': null,
 
     'location-country': {
       name: `United States Customers${ADERAI_SUFFIX}`,

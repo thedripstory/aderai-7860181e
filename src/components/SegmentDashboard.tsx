@@ -5,7 +5,7 @@ import { SegmentFilters } from './segments/SegmentFilters';
 import { FavoritesSection } from './segments/FavoritesSection';
 import { BundlesSection } from './segments/BundlesSection';
 import { SegmentCategories } from './segments/SegmentCategories';
-import { SEGMENTS, applySettingsToSegments, DEFAULT_SEGMENT_SETTINGS, UserSegmentSettings } from '@/lib/segmentData';
+import { SEGMENTS, applySettingsToSegments, DEFAULT_SEGMENT_SETTINGS, UserSegmentSettings, Segment } from '@/lib/segmentData';
 import { toast } from 'sonner';
 
 interface SegmentDashboardProps {
@@ -34,7 +34,7 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
     const stored = localStorage.getItem('segment-favorites');
     return stored ? JSON.parse(stored) : [];
   });
-  const [previewSegment, setPreviewSegment] = useState<typeof SEGMENTS[0] | null>(null);
+  const [previewSegment, setPreviewSegment] = useState<Segment | null>(null);
   const [showShortcutsHint, setShowShortcutsHint] = useState(true);
 
   // Apply user settings to all segments
