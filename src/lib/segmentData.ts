@@ -557,10 +557,12 @@ export const SEGMENTS: Segment[] = [
   {
     id: "negative-feedback",
     name: "Negative Feedback (Exclusion)",
-    description: "Submitted negative feedback (or Unengaged 60d if not tracked)",
+    description: "Submitted negative feedback - requires manual tracking setup",
     category: "Exclusion Segments",
     icon: "😞",
-    definition: "Feedback rating < 3 (fallback: no engagement 60d)",
+    definition: "Requires custom feedback tracking property in Klaviyo",
+    unavailable: true,
+    unavailableReason: "Requires manual feedback tracking setup in Klaviyo",
   },
   {
     id: "unengaged-exclusion",
@@ -683,6 +685,7 @@ export interface Segment {
   icon: string;
   definition: string;
   unavailable?: boolean;
+  unavailableReason?: string;
   requiresInput?: SegmentInputConfig;
 }
 

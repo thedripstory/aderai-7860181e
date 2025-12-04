@@ -64,13 +64,12 @@ export const CREATABLE_SEGMENTS = new Set([
   'product-reviewers',
   'non-reviewers',
   
-  // Exclusion Segments (11 creatable, 1 unavailable)
+  // Exclusion Segments (10 creatable, 2 unavailable)
   'unsubscribed',
   'bounced-emails',
   'not-opted-in',
   'recent-purchasers-exclude',
   'refunded-customers',
-  'negative-feedback',
   'unengaged-exclusion',
   'sunset-segment',
   'received-5-opened-0',
@@ -94,8 +93,9 @@ export const UNAVAILABLE_SEGMENTS = new Set([
   'category-buyers',       // Requires manual category setup
   'multi-category',        // Requires manual category tracking
   
-  // Exclusion - requires predictive analytics
+  // Exclusion - require manual setup or predictive analytics
   'high-churn-risk-exclude', // Requires predictive analytics
+  'negative-feedback',     // Requires manual feedback tracking in Klaviyo
 ]);
 
 // Segments with fallback definitions (creates alternative if primary metric unavailable)
@@ -103,7 +103,6 @@ export const FALLBACK_SEGMENTS = new Set([
   'product-reviewers',    // Falls back to Repeat Buyers (2+ purchases)
   'non-reviewers',        // Falls back to One-Time Buyers (1 purchase)
   'refunded-customers',   // Falls back to Single Purchase
-  'negative-feedback',    // Falls back to Unengaged 60d
 ]);
 
 /**
