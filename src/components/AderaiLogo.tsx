@@ -2,12 +2,14 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 const ADERAI_LOGO_URL = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png";
+const KLAVIYO_LOGO_URL = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
 interface AderaiLogoProps {
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
   className?: string;
   href?: string;
   showHoverEffect?: boolean;
+  showKlaviyoBadge?: boolean;
 }
 
 const sizeClasses = {
@@ -24,6 +26,7 @@ export const AderaiLogo: React.FC<AderaiLogoProps> = ({
   className,
   href,
   showHoverEffect = true,
+  showKlaviyoBadge = false,
 }) => {
   const logoElement = (
     <img
@@ -39,15 +42,29 @@ export const AderaiLogo: React.FC<AderaiLogoProps> = ({
     />
   );
 
+  const content = showKlaviyoBadge ? (
+    <div className="flex flex-col">
+      {logoElement}
+      <div className="flex items-center gap-1.5 mt-0.5 opacity-60">
+        <span className="text-[10px] text-muted-foreground">Powered by</span>
+        <img 
+          src={KLAVIYO_LOGO_URL} 
+          alt="Klaviyo" 
+          className="h-3 w-auto"
+        />
+      </div>
+    </div>
+  ) : logoElement;
+
   if (href) {
     return (
       <a href={href} className="inline-block group">
-        {logoElement}
+        {content}
       </a>
     );
   }
 
-  return logoElement;
+  return content;
 };
 
 export { ADERAI_LOGO_URL };
