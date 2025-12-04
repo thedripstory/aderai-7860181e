@@ -95,10 +95,10 @@ export const SEGMENTS: Segment[] = [
   {
     id: "engaged-non-buyers",
     name: "Engaged Non-Buyers",
-    description: "Opens/clicks emails but never purchased",
+    description: "Opened/clicked emails in last 90 days but never purchased",
     category: "Engagement & Activity",
     icon: "💡",
-    definition: "Engaged but 0 purchases all time",
+    definition: "Engaged in 90d, 0 purchases all time",
   },
   {
     id: "active-site-30",
@@ -225,18 +225,18 @@ export const SEGMENTS: Segment[] = [
   {
     id: "age-18-24",
     name: "Age Group 18-24",
-    description: "Born between specific dates for age range",
+    description: "Born between specific dates for age range (requires age property)",
     category: "Demographics",
     icon: "🧒",
-    definition: "Age between 18-24",
+    definition: "Age between 18-24 (needs profile age)",
   },
   {
     id: "age-25-40",
     name: "Age Group 25-40",
-    description: "Born between specific dates for age range",
+    description: "Born between specific dates for age range (requires age property)",
     category: "Demographics",
     icon: "🧑",
-    definition: "Age between 25-40",
+    definition: "Age between 25-40 (needs profile age)",
   },
 
   // CUSTOMER LIFECYCLE & VALUE (15 segments)
@@ -483,18 +483,18 @@ export const SEGMENTS: Segment[] = [
   {
     id: "coupon-users",
     name: "Coupon Users",
-    description: "Used discount code at least once",
+    description: "Used discount code in last 90 days",
     category: "Shopping Behavior & Purchase History",
     icon: "🎟️",
-    definition: "Discount code used ≥ 1",
+    definition: "Discount code used in 90d",
   },
   {
     id: "full-price-buyers",
     name: "Full-Price Buyers",
-    description: "Never used discount code",
+    description: "No discount code used in last 90 days",
     category: "Shopping Behavior & Purchase History",
     icon: "💳",
-    definition: "Discount code used = 0",
+    definition: "No discount code in 90d",
   },
   {
     id: "product-reviewers",
@@ -606,7 +606,7 @@ export const SEGMENTS: Segment[] = [
   {
     id: "marked-spam",
     name: "Unengaged 90+ Days (Exclusion)",
-    description: "No email engagement in 90+ days (spam risk)",
+    description: "No email opens in 90+ days (spam risk)",
     category: "Exclusion Segments",
     icon: "🗑️",
     definition: "0 opens in 90+ days",
