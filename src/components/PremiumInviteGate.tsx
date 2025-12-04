@@ -102,9 +102,10 @@ const CURRENCIES = [
 
 interface PremiumInviteGateProps {
   featureName: string;
+  variant?: 'analytics' | 'performance';
 }
 
-export const PremiumInviteGate: React.FC<PremiumInviteGateProps> = ({ featureName }) => {
+export const PremiumInviteGate: React.FC<PremiumInviteGateProps> = ({ featureName, variant = 'analytics' }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     brandName: '',
@@ -153,155 +154,304 @@ export const PremiumInviteGate: React.FC<PremiumInviteGateProps> = ({ featureNam
     }
   };
 
+  // Different color palettes for variants
+  const PERF_COLORS = ['#8B5CF6', '#06B6D4', '#F59E0B', '#10B981', '#EC4899', '#6366F1', '#14B8A6', '#F97316'];
+  
   return (
     <div className="relative w-full min-h-[700px] rounded-2xl overflow-hidden">
-      {/* Background fake charts - reduced blur for visibility */}
+      {/* Background fake charts - different for each variant */}
       <div className="absolute inset-0 p-4 grid grid-cols-3 gap-4 opacity-80">
-        {/* Row 1 */}
-        {/* Area Chart with multiple lines */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <AreaChart data={fakeLineData}>
-              <defs>
-                <linearGradient id="colorValue1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="colorValue2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4ECDC4" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#4ECDC4" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <Area type="monotone" dataKey="value" stroke="#FF6B6B" fill="url(#colorValue1)" strokeWidth={2} />
-              <Area type="monotone" dataKey="value2" stroke="#4ECDC4" fill="url(#colorValue2)" strokeWidth={2} />
-              <Line type="monotone" dataKey="value3" stroke="#FFEAA7" strokeWidth={2} dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        {variant === 'analytics' ? (
+          <>
+            {/* Analytics variant charts */}
+            {/* Row 1 */}
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <AreaChart data={fakeLineData}>
+                  <defs>
+                    <linearGradient id="colorValue1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorValue2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4ECDC4" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#4ECDC4" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="#FF6B6B" fill="url(#colorValue1)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="value2" stroke="#4ECDC4" fill="url(#colorValue2)" strokeWidth={2} />
+                  <Line type="monotone" dataKey="value3" stroke="#FFEAA7" strokeWidth={2} dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
 
-        {/* Stacked Bar Chart */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-32 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={fakeBarData}>
-              <Bar dataKey="value" stackId="a" fill="#45B7D1" radius={[0, 0, 0, 0]} />
-              <Bar dataKey="value2" stackId="a" fill="#FF8C42" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-32 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={fakeBarData}>
+                  <Bar dataKey="value" stackId="a" fill="#45B7D1" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="value2" stackId="a" fill="#FF8C42" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-        {/* Pie Chart */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-24 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <PieChart>
-              <Pie
-                data={fakePieData}
-                cx="50%"
-                cy="50%"
-                innerRadius={35}
-                outerRadius={55}
-                paddingAngle={3}
-                dataKey="value"
-              >
-                {fakePieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-24 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <PieChart>
+                  <Pie data={fakePieData} cx="50%" cy="50%" innerRadius={35} outerRadius={55} paddingAngle={3} dataKey="value">
+                    {fakePieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Row 2 */}
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-36 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <RadarChart data={fakeRadarData}>
+                  <PolarGrid stroke="hsl(var(--border))" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 8 }} />
+                  <Radar name="Campaign A" dataKey="A" stroke="#DDA0DD" fill="#DDA0DD" fillOpacity={0.4} />
+                  <Radar name="Campaign B" dataKey="B" stroke="#96CEB4" fill="#96CEB4" fillOpacity={0.4} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <LineChart data={fakeLineData}>
+                  <Line type="monotone" dataKey="value" stroke="#FF6B6B" strokeWidth={2} dot={{ fill: '#FF6B6B', r: 3 }} />
+                  <Line type="monotone" dataKey="value2" stroke="#45B7D1" strokeWidth={2} dot={{ fill: '#45B7D1', r: 3 }} />
+                  <Line type="monotone" dataKey="value3" stroke="#96CEB4" strokeWidth={2} dot={{ fill: '#96CEB4', r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-20 bg-muted/40 rounded mb-3" />
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { color: '#FF6B6B', value: '$42.5K' },
+                  { color: '#4ECDC4', value: '12.8%' },
+                  { color: '#45B7D1', value: '3,420' },
+                  { color: '#FF8C42', value: '+24%' },
+                ].map((stat, i) => (
+                  <div key={i} className="bg-muted/20 rounded-lg p-2">
+                    <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
+                    <div className="h-3 w-14 bg-muted/30 rounded mt-1" />
+                  </div>
                 ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Row 2 */}
-        {/* Radar Chart */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-36 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <RadarChart data={fakeRadarData}>
-              <PolarGrid stroke="hsl(var(--border))" />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 8 }} />
-              <Radar name="Campaign A" dataKey="A" stroke="#DDA0DD" fill="#DDA0DD" fillOpacity={0.4} />
-              <Radar name="Campaign B" dataKey="B" stroke="#96CEB4" fill="#96CEB4" fillOpacity={0.4} />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Line Chart */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <LineChart data={fakeLineData}>
-              <Line type="monotone" dataKey="value" stroke="#FF6B6B" strokeWidth={2} dot={{ fill: '#FF6B6B', r: 3 }} />
-              <Line type="monotone" dataKey="value2" stroke="#45B7D1" strokeWidth={2} dot={{ fill: '#45B7D1', r: 3 }} />
-              <Line type="monotone" dataKey="value3" stroke="#96CEB4" strokeWidth={2} dot={{ fill: '#96CEB4', r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-20 bg-muted/40 rounded mb-3" />
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { color: '#FF6B6B', value: '$42.5K' },
-              { color: '#4ECDC4', value: '12.8%' },
-              { color: '#45B7D1', value: '3,420' },
-              { color: '#FF8C42', value: '+24%' },
-            ].map((stat, i) => (
-              <div key={i} className="bg-muted/20 rounded-lg p-2">
-                <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
-                <div className="h-3 w-14 bg-muted/30 rounded mt-1" />
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Row 3 */}
-        {/* Composed Chart */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-32 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <ComposedChart data={fakeRevenueData}>
-              <Bar dataKey="orders" fill="#98D8C8" radius={[4, 4, 0, 0]} />
-              <Line type="monotone" dataKey="revenue" stroke="#FF6B6B" strokeWidth={2} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
+            {/* Row 3 */}
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-32 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <ComposedChart data={fakeRevenueData}>
+                  <Bar dataKey="orders" fill="#98D8C8" radius={[4, 4, 0, 0]} />
+                  <Line type="monotone" dataKey="revenue" stroke="#FF6B6B" strokeWidth={2} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
 
-        {/* Another Pie - donut style */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <PieChart>
-              <Pie
-                data={fakeBarData}
-                cx="50%"
-                cy="50%"
-                innerRadius={30}
-                outerRadius={50}
-                paddingAngle={2}
-                dataKey="value"
-              >
-                {fakeBarData.map((entry, index) => (
-                  <Cell key={`cell2-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <PieChart>
+                  <Pie data={fakeBarData} cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={2} dataKey="value">
+                    {fakeBarData.map((entry, index) => (
+                      <Cell key={`cell2-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-24 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={fakeBarData.slice(0, 4)} layout="vertical">
+                  <XAxis type="number" hide />
+                  <YAxis type="category" dataKey="name" hide />
+                  <Bar dataKey="value" fill="#DDA0DD" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Performance variant - completely different charts */}
+            {/* Row 1 - Flow/Campaign metrics */}
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-32 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <AreaChart data={[
+                  { name: 'Mon', sent: 12400, delivered: 11800, opened: 4200 },
+                  { name: 'Tue', sent: 14800, delivered: 14100, opened: 5800 },
+                  { name: 'Wed', sent: 11200, delivered: 10600, opened: 3900 },
+                  { name: 'Thu', sent: 15600, delivered: 14900, opened: 6200 },
+                  { name: 'Fri', sent: 18200, delivered: 17400, opened: 7100 },
+                  { name: 'Sat', sent: 9800, delivered: 9300, opened: 2800 },
+                  { name: 'Sun', sent: 8400, delivered: 7900, opened: 2200 },
+                ]}>
+                  <defs>
+                    <linearGradient id="perfGrad1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.5}/>
+                      <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="sent" stroke="#8B5CF6" fill="url(#perfGrad1)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="opened" stroke="#10B981" fill="#10B981" fillOpacity={0.2} strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={[
+                  { name: 'Welcome', rate: 68 },
+                  { name: 'Abandon', rate: 42 },
+                  { name: 'Win-back', rate: 28 },
+                  { name: 'VIP', rate: 72 },
+                  { name: 'Birthday', rate: 85 },
+                ]}>
+                  <Bar dataKey="rate" fill="#06B6D4" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-20 bg-muted/40 rounded mb-3" />
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { color: '#8B5CF6', value: '24.8%', label: 'Open Rate' },
+                  { color: '#10B981', value: '$18.4K', label: 'Revenue' },
+                  { color: '#F59E0B', value: '3.2%', label: 'Click Rate' },
+                  { color: '#EC4899', value: '156', label: 'Conversions' },
+                ].map((stat, i) => (
+                  <div key={i} className="bg-muted/20 rounded-lg p-2">
+                    <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
+                    <div className="h-3 w-14 bg-muted/30 rounded mt-1" />
+                  </div>
                 ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+              </div>
+            </div>
 
-        {/* Bar Chart horizontal style */}
-        <div className="bg-card/40 rounded-xl p-3 border border-border/20">
-          <div className="h-5 w-24 bg-muted/40 rounded mb-3" />
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={fakeBarData.slice(0, 4)} layout="vertical">
-              <XAxis type="number" hide />
-              <YAxis type="category" dataKey="name" hide />
-              <Bar dataKey="value" fill="#DDA0DD" radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+            {/* Row 2 - Revenue & conversion metrics */}
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-36 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <ComposedChart data={[
+                  { name: 'Jan', revenue: 42000, conv: 120 },
+                  { name: 'Feb', revenue: 38000, conv: 98 },
+                  { name: 'Mar', revenue: 56000, conv: 156 },
+                  { name: 'Apr', revenue: 48000, conv: 134 },
+                ]}>
+                  <Bar dataKey="revenue" fill="#6366F1" radius={[4, 4, 0, 0]} />
+                  <Line type="monotone" dataKey="conv" stroke="#F59E0B" strokeWidth={3} dot={{ fill: '#F59E0B', r: 4 }} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <PieChart>
+                  <Pie data={[
+                    { name: 'Email', value: 45 },
+                    { name: 'SMS', value: 25 },
+                    { name: 'Push', value: 20 },
+                    { name: 'Flow', value: 10 },
+                  ]} cx="50%" cy="50%" innerRadius={40} outerRadius={55} paddingAngle={4} dataKey="value">
+                    {[0, 1, 2, 3].map((index) => (
+                      <Cell key={`perf-cell-${index}`} fill={PERF_COLORS[index]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-24 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <LineChart data={[
+                  { day: '1', clicks: 420, conv: 28 },
+                  { day: '7', clicks: 680, conv: 45 },
+                  { day: '14', clicks: 520, conv: 32 },
+                  { day: '21', clicks: 890, conv: 58 },
+                  { day: '28', clicks: 1100, conv: 72 },
+                ]}>
+                  <Line type="monotone" dataKey="clicks" stroke="#14B8A6" strokeWidth={2} dot={{ fill: '#14B8A6', r: 3 }} />
+                  <Line type="monotone" dataKey="conv" stroke="#F97316" strokeWidth={2} dot={{ fill: '#F97316', r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Row 3 - More performance metrics */}
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-32 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={[
+                  { name: 'Campaign A', value: 8420, value2: 2100 },
+                  { name: 'Campaign B', value: 6890, value2: 1800 },
+                  { name: 'Campaign C', value: 9200, value2: 2400 },
+                  { name: 'Campaign D', value: 5400, value2: 1200 },
+                ]}>
+                  <Bar dataKey="value" fill="#EC4899" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="value2" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-28 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <RadarChart data={[
+                  { metric: 'Delivery', A: 95, B: 88 },
+                  { metric: 'Opens', A: 45, B: 52 },
+                  { metric: 'Clicks', A: 12, B: 18 },
+                  { metric: 'Conv', A: 8, B: 6 },
+                  { metric: 'Rev', A: 78, B: 65 },
+                ]}>
+                  <PolarGrid stroke="hsl(var(--border))" />
+                  <PolarAngleAxis dataKey="metric" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 8 }} />
+                  <Radar dataKey="A" stroke="#06B6D4" fill="#06B6D4" fillOpacity={0.3} />
+                  <Radar dataKey="B" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.3} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-card/40 rounded-xl p-3 border border-border/20">
+              <div className="h-5 w-24 bg-muted/40 rounded mb-3" />
+              <ResponsiveContainer width="100%" height={140}>
+                <AreaChart data={[
+                  { hour: '0', value: 120 },
+                  { hour: '4', value: 80 },
+                  { hour: '8', value: 450 },
+                  { hour: '12', value: 680 },
+                  { hour: '16', value: 520 },
+                  { hour: '20', value: 340 },
+                ]}>
+                  <defs>
+                    <linearGradient id="perfGrad2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.5}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="#10B981" fill="url(#perfGrad2)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Glass blur overlay - reduced blur */}
