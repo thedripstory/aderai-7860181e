@@ -228,7 +228,7 @@ export function useDashboardStats() {
         klaviyoConnected: (klaviyoKeys?.length || 0) > 0,
         recentActivity,
         createdSegments,
-        firstName: userData?.first_name || 'User',
+        firstName: userData?.first_name || '',
         loading: false,
       });
       
