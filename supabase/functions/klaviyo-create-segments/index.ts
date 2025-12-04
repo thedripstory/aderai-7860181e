@@ -1673,8 +1673,128 @@ async function createKlaviyoSegment(
 }
 
 // ==========================================
+// HELPER: Sleep function
+// ==========================================
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ==========================================
+// HELPER: Parse Klaviyo's wait time from error message
+// ==========================================
+
+function parseWaitTime(errorMessage: string): number | null {
+  // "Expected available in 1 second" → 1500ms (with buffer)
+  // "Expected available in 5 seconds" → 5500ms
+  const match = errorMessage.match(/Expected available in (\d+) second/);
+  if (match) {
+    return parseInt(match[1], 10) * 1000 + 500; // Add 500ms buffer
+  }
+  return null;
+}
+
+// ==========================================
+// HELPER: Check if error is retryable
+// ==========================================
+
+function isRetryableError(errorMessage: string): boolean {
+  const retryablePatterns = [
+    'throttled',
+    'segment processing limit',
+    'rate limit',
+    'too many requests',
+    '429',
+    'Expected available in'
+  ];
+  const lowerError = errorMessage.toLowerCase();
+  return retryablePatterns.some(pattern => lowerError.includes(pattern.toLowerCase()));
+}
+
+// ==========================================
+// HELPER: Create segment with auto-retry
+// ==========================================
+
+async function createSegmentWithRetry(
+  apiKey: string,
+  segmentId: string,
+  metricMap: Record<string, string>,
+  currencySymbol: string,
+  settings: any,
+  tagId: string | null,
+  customInputs: Record<string, string>,
+  maxRetries: number = 3,
+  baseDelay: number = 2000
+): Promise<any> {
+  let lastError: string = '';
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const result = await createKlaviyoSegment(
+      apiKey,
+      segmentId,
+      metricMap,
+      currencySymbol,
+      settings,
+      tagId,
+      customInputs
+    );
+    
+    // Success or non-retryable result
+    if (result.status !== 'error') {
+      return result;
+    }
+    
+    const errorMsg = result.error || '';
+    lastError = errorMsg;
+    
+    // Check if this error is retryable
+    if (!isRetryableError(errorMsg)) {
+      console.log(`[klaviyo-create-segments] Non-retryable error for ${segmentId}: ${errorMsg}`);
+      return result;
+    }
+    
+    // Don't retry on last attempt
+    if (attempt === maxRetries) {
+      console.log(`[klaviyo-create-segments] Max retries (${maxRetries}) reached for ${segmentId}`);
+      return result;
+    }
+    
+    // Calculate wait time - use Klaviyo's suggestion or exponential backoff
+    const klaviyoWaitTime = parseWaitTime(errorMsg);
+    const exponentialDelay = baseDelay * Math.pow(2, attempt - 1);
+    const waitTime = klaviyoWaitTime || exponentialDelay;
+    
+    console.log(`[klaviyo-create-segments] Retry ${attempt}/${maxRetries} for ${segmentId} - waiting ${waitTime}ms (${klaviyoWaitTime ? 'Klaviyo suggested' : 'exponential backoff'})`);
+    await sleep(waitTime);
+  }
+  
+  // Shouldn't reach here, but just in case
+  return {
+    segmentId,
+    status: 'error',
+    error: lastError || 'Max retries exceeded'
+  };
+}
+
+// ==========================================
+// HELPER: Split array into chunks
+// ==========================================
+
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+// ==========================================
 // MAIN HANDLER
 // ==========================================
+
+const BATCH_SIZE = 4; // Stay under Klaviyo's 5 segment processing limit
+const BATCH_DELAY = 3000; // 3 seconds between batches
+const INTRA_BATCH_DELAY = 500; // 500ms between requests within a batch
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -1726,13 +1846,7 @@ serve(async (req) => {
       );
     }
 
-    console.log(`[klaviyo-create-segments] Creating ${segmentIds.length} segments...`);
-
-    // Rate limiting for bulk operations to prevent API abuse
-    if (segmentIds.length > 10) {
-      console.log(`[klaviyo-create-segments] Bulk operation detected: ${segmentIds.length} segments - adding rate limit delay`);
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
+    console.log(`[klaviyo-create-segments] Creating ${segmentIds.length} segments with batching (batch size: ${BATCH_SIZE})...`);
 
     // Step 1: Detect available metrics
     const metricMap = await detectAvailableMetrics(apiKey);
@@ -1745,33 +1859,55 @@ serve(async (req) => {
       console.log('[klaviyo-create-segments] Could not get Aderai tag, segments will not be tagged');
     }
 
-    // Step 3: Create segments with rate limiting
-    const results = [];
+    // Step 3: Split segments into batches
+    const batches = chunkArray(segmentIds, BATCH_SIZE);
+    console.log(`[klaviyo-create-segments] Split into ${batches.length} batches`);
+
+    // Step 4: Process batches with delays
+    const results: any[] = [];
     let successCount = 0;
     let existsCount = 0;
     let errorCount = 0;
     let skippedCount = 0;
 
-    for (const segmentId of segmentIds) {
-      const result = await createKlaviyoSegment(
-        apiKey,
-        segmentId,
-        metricMap,
-        currencySymbol || '$',
-        settings || {},
-        aderaiTagId,
-        customInputs || {}
-      );
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      console.log(`[klaviyo-create-segments] Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} segments)...`);
+
+      // Process each segment in the batch with small delays between them
+      for (let i = 0; i < batch.length; i++) {
+        const segmentId = batch[i];
+        
+        const result = await createSegmentWithRetry(
+          apiKey,
+          segmentId,
+          metricMap,
+          currencySymbol || '$',
+          settings || {},
+          aderaiTagId,
+          customInputs || {}
+        );
+        
+        results.push(result);
+        
+        if (result.status === 'created') successCount++;
+        else if (result.status === 'exists') existsCount++;
+        else if (result.status === 'skipped') skippedCount++;
+        else errorCount++;
+        
+        // Small delay between segments within a batch (except for last one in batch)
+        if (i < batch.length - 1) {
+          await sleep(INTRA_BATCH_DELAY);
+        }
+      }
       
-      results.push(result);
+      console.log(`[klaviyo-create-segments] Batch ${batchIndex + 1} complete: ${successCount} created, ${existsCount} exist, ${skippedCount} skipped, ${errorCount} errors so far`);
       
-      if (result.status === 'created') successCount++;
-      else if (result.status === 'exists') existsCount++;
-      else if (result.status === 'skipped') skippedCount++;
-      else errorCount++;
-      
-      // Rate limiting: 250ms between requests
-      await new Promise(resolve => setTimeout(resolve, 250));
+      // Longer delay between batches (except after last batch)
+      if (batchIndex < batches.length - 1) {
+        console.log(`[klaviyo-create-segments] Waiting ${BATCH_DELAY / 1000}s before next batch...`);
+        await sleep(BATCH_DELAY);
+      }
     }
 
     console.log(`[klaviyo-create-segments] Complete: ${successCount} created, ${existsCount} exist, ${skippedCount} skipped, ${errorCount} errors`);
