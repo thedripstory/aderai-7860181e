@@ -83,3 +83,15 @@ verify_jwt = false
 
 [functions.stripe-check-subscription]
 verify_jwt = true
+
+[functions.stripe-create-portal-session]
+verify_jwt = true
+
+[functions.stripe-get-subscription-details]
+verify_jwt = true
+
+[functions.stripe-cancel-subscription]
+verify_jwt = true
+
+[functions.stripe-resume-subscription]
+verify_jwt = true

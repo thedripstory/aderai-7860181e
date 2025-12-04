@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, User, Lock, AlertCircle, Bell } from "lucide-react";
+import { Settings as SettingsIcon, User, Lock, AlertCircle, Bell, CreditCard, ExternalLink, Calendar, CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +33,7 @@ const CURRENCIES = [
 
 export default function Settings() {
   useInactivityLogout();
-  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications">("account");
+  const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications" | "billing">("account");
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeKey, setActiveKey] = useState<any>(null);
@@ -70,6 +70,13 @@ export default function Settings() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Subscription/Billing state
+  const [subscriptionDetails, setSubscriptionDetails] = useState<any>(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -137,6 +144,42 @@ export default function Settings() {
 
     loadSettings();
   }, [navigate]);
+
+  // Load subscription when billing tab is selected
+  useEffect(() => {
+    if (activeTab === 'billing' && currentUser) {
+      loadSubscriptionDetails();
+    }
+  }, [activeTab, currentUser]);
+
+  // Check URL params for tab on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam === 'billing') {
+      setActiveTab('billing');
+    }
+  }, []);
+
+  const loadSubscriptionDetails = async () => {
+    setSubscriptionLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-get-subscription-details');
+      
+      if (error) throw error;
+      
+      setSubscriptionDetails(data);
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+      toast({
+        title: "Error loading subscription",
+        description: "Could not load your subscription details. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubscriptionLoading(false);
+    }
+  };
 
   const handleSaveAccount = async () => {
     if (!accountName.trim()) {
@@ -383,6 +426,98 @@ export default function Settings() {
     }
   };
 
+  const handleOpenPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-create-portal-session', {
+        body: { origin: window.location.origin },
+      });
+      
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Error opening portal:', error);
+      toast({
+        title: "Error",
+        description: "Could not open billing portal. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    setCancelLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-cancel-subscription', {
+        body: { cancelImmediately: false }, // Cancel at end of period
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Subscription canceled",
+        description: `Your subscription will remain active until ${new Date(data.currentPeriodEnd).toLocaleDateString()}.`,
+      });
+      
+      setShowCancelConfirm(false);
+      loadSubscriptionDetails(); // Refresh data
+      
+      // Track cancellation
+      await supabase.from('analytics_events').insert({
+        user_id: currentUser.id,
+        event_name: 'subscription_canceled',
+        event_metadata: { cancel_at_period_end: true },
+        page_url: window.location.href,
+      });
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      toast({
+        title: "Error",
+        description: "Could not cancel subscription. Please try again or contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
+  const handleResumeSubscription = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-resume-subscription');
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Subscription resumed!",
+        description: "Your subscription is now active again.",
+      });
+      
+      loadSubscriptionDetails(); // Refresh data
+      
+      // Track resumption
+      await supabase.from('analytics_events').insert({
+        user_id: currentUser.id,
+        event_name: 'subscription_resumed',
+        page_url: window.location.href,
+      });
+    } catch (error) {
+      console.error('Error resuming subscription:', error);
+      toast({
+        title: "Error",
+        description: "Could not resume subscription. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <PageErrorBoundary pageName="Settings">
     <div className="min-h-screen bg-background">
@@ -409,7 +544,7 @@ export default function Settings() {
         </div>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
-          <TabsList className="grid grid-cols-4 bg-card border border-border">
+          <TabsList className="grid grid-cols-5 bg-card border border-border">
             <TabsTrigger value="account" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               <User className="w-4 h-4" />
               <span className="hidden sm:inline">Account</span>
@@ -425,6 +560,10 @@ export default function Settings() {
             <TabsTrigger value="notifications" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               <Bell className="w-4 h-4" />
               <span className="hidden sm:inline">Notifications</span>
+            </TabsTrigger>
+            <TabsTrigger value="billing" className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+              <CreditCard className="w-4 h-4" />
+              <span className="hidden sm:inline">Billing</span>
             </TabsTrigger>
           </TabsList>
 
@@ -666,6 +805,291 @@ export default function Settings() {
                 </Button>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Billing Tab */}
+          <TabsContent value="billing">
+            <div className="space-y-6">
+              {/* Subscription Status Card */}
+              <Card className="border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5" />
+                    Subscription
+                  </CardTitle>
+                  <CardDescription>Manage your Aderai subscription</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {subscriptionLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : subscriptionDetails ? (
+                    <div className="space-y-6">
+                      {/* Status Badge */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Status</span>
+                        <div className="flex items-center gap-2">
+                          {subscriptionDetails.status === 'active' && !subscriptionDetails.cancelAtPeriodEnd && (
+                            <>
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                              <span className="font-medium text-emerald-600 dark:text-emerald-400">Active</span>
+                            </>
+                          )}
+                          {subscriptionDetails.status === 'active' && subscriptionDetails.cancelAtPeriodEnd && (
+                            <>
+                              <AlertTriangle className="w-4 h-4 text-amber-500" />
+                              <span className="font-medium text-amber-600 dark:text-amber-400">Canceling</span>
+                            </>
+                          )}
+                          {subscriptionDetails.status === 'past_due' && (
+                            <>
+                              <AlertCircle className="w-4 h-4 text-red-500" />
+                              <span className="font-medium text-red-600 dark:text-red-400">Past Due</span>
+                            </>
+                          )}
+                          {subscriptionDetails.status === 'canceled' && (
+                            <>
+                              <XCircle className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-medium text-muted-foreground">Canceled</span>
+                            </>
+                          )}
+                          {!subscriptionDetails.hasSubscription && (
+                            <>
+                              <XCircle className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-medium text-muted-foreground">No Subscription</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Plan Details */}
+                      {subscriptionDetails.hasSubscription && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Plan</span>
+                            <span className="font-medium">
+                              Aderai Monthly - ${subscriptionDetails.amount || 9}/{subscriptionDetails.interval || 'month'}
+                            </span>
+                          </div>
+
+                          {/* Next Billing Date */}
+                          {subscriptionDetails.status === 'active' && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">
+                                {subscriptionDetails.cancelAtPeriodEnd ? 'Access Until' : 'Next Billing Date'}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-muted-foreground" />
+                                <span className="font-medium">
+                                  {new Date(subscriptionDetails.nextBillingDate).toLocaleDateString('en-US', {
+                                    month: 'long',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Payment Method */}
+                          {subscriptionDetails.paymentMethod && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">Payment Method</span>
+                              <div className="flex items-center gap-2">
+                                <CreditCard className="w-4 h-4 text-muted-foreground" />
+                                <span className="font-medium capitalize">
+                                  {subscriptionDetails.paymentMethod.brand} •••• {subscriptionDetails.paymentMethod.last4}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {/* Cancellation Notice */}
+                      {subscriptionDetails.cancelAtPeriodEnd && (
+                        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="font-medium text-amber-800 dark:text-amber-200">
+                                Your subscription is set to cancel
+                              </p>
+                              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                                You'll have access until {new Date(subscriptionDetails.nextBillingDate).toLocaleDateString()}. 
+                                After that, you won't be able to access Aderai features.
+                              </p>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="mt-3 border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/50"
+                                onClick={handleResumeSubscription}
+                                disabled={loading}
+                              >
+                                {loading ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Resuming...
+                                  </>
+                                ) : (
+                                  'Resume Subscription'
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Past Due Notice */}
+                      {subscriptionDetails.status === 'past_due' && (
+                        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="font-medium text-red-800 dark:text-red-200">
+                                Payment failed
+                              </p>
+                              <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                                Please update your payment method to continue using Aderai.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+                        <Button
+                          onClick={handleOpenPortal}
+                          disabled={portalLoading || !subscriptionDetails.hasSubscription}
+                          className="flex-1"
+                        >
+                          {portalLoading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Opening...
+                            </>
+                          ) : (
+                            <>
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              Manage in Stripe
+                            </>
+                          )}
+                        </Button>
+
+                        {subscriptionDetails.hasSubscription && 
+                         subscriptionDetails.status === 'active' && 
+                         !subscriptionDetails.cancelAtPeriodEnd && (
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowCancelConfirm(true)}
+                            className="text-muted-foreground hover:text-destructive hover:border-destructive"
+                          >
+                            Cancel Subscription
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground mb-4">No subscription information available</p>
+                      <Button onClick={loadSubscriptionDetails}>
+                        Retry
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Billing History Card */}
+              <Card className="border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg">Billing History & Invoices</CardTitle>
+                  <CardDescription>View and download your past invoices</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Access your complete billing history, download invoices, and manage your payment methods through the Stripe portal.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenPortal}
+                    disabled={portalLoading || !subscriptionDetails?.hasSubscription}
+                  >
+                    {portalLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Opening...
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        View Billing History
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Support Card */}
+              <Card className="border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg">Need Help?</CardTitle>
+                  <CardDescription>Contact us for billing support</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    For billing questions or issues, please contact us at{' '}
+                    <a href="mailto:akshat@aderai.io" className="text-primary hover:underline font-medium">
+                      akshat@aderai.io
+                    </a>
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Cancel Confirmation Dialog */}
+            {showCancelConfirm && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div 
+                  className="absolute inset-0 bg-background/80 backdrop-blur-sm" 
+                  onClick={() => setShowCancelConfirm(false)} 
+                />
+                <div className="relative bg-card border border-border rounded-xl p-6 max-w-md mx-4 shadow-2xl">
+                  <h3 className="text-xl font-bold mb-2">Cancel Subscription?</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Your subscription will remain active until the end of your current billing period. 
+                    After that, you'll lose access to Aderai features.
+                  </p>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setShowCancelConfirm(false)}
+                    >
+                      Keep Subscription
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="flex-1"
+                      onClick={handleCancelSubscription}
+                      disabled={cancelLoading}
+                    >
+                      {cancelLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Canceling...
+                        </>
+                      ) : (
+                        'Yes, Cancel'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </main>
