@@ -816,7 +816,7 @@ export default function LandingPage() {
 
           {/* Main Footer Content */}
           <div className="py-12">
-            <div className="grid md:grid-cols-5 gap-8 mb-12">
+            <div className="grid md:grid-cols-4 gap-8 mb-12">
               {/* Brand Column - Larger */}
               <div className="md:col-span-2">
                 <div className="mb-4">
@@ -835,14 +835,14 @@ export default function LandingPage() {
                 <h4 className="font-bold mb-4 text-sm">Product</h4>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li>
-                    <a href="#how-it-works" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>How it Works</span>
+                    <a href="#how-it-works" className="hover:text-foreground transition-colors flex items-center gap-1 group w-fit">
+                      How it Works
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>
                   <li>
-                    <a href="/help" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Help Center</span>
+                    <a href="/help" className="hover:text-foreground transition-colors flex items-center gap-1 group w-fit">
+                      Help Center
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>
@@ -853,28 +853,16 @@ export default function LandingPage() {
                 <h4 className="font-bold mb-4 text-sm">Resources</h4>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li>
-                    <a href="/help?category=getting-started" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>Getting Started</span>
+                    <a href="/help?category=getting-started" className="hover:text-foreground transition-colors flex items-center gap-1 group w-fit">
+                      Getting Started
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
                   </li>
                   <li>
-                    <a href="/help?category=ai-features" className="hover:text-foreground transition-colors inline-flex items-center gap-1 group">
-                      <span>AI Features</span>
+                    <a href="/help?category=ai-features" className="hover:text-foreground transition-colors flex items-center gap-1 group w-fit">
+                      AI Features
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-bold mb-4 text-sm">Legal</h4>
-                <ul className="space-y-3 text-sm text-muted-foreground">
-                  <li>
-                    <span className="text-muted-foreground/60">Privacy (Coming Soon)</span>
-                  </li>
-                  <li>
-                    <span className="text-muted-foreground/60">Terms (Coming Soon)</span>
                   </li>
                 </ul>
               </div>
