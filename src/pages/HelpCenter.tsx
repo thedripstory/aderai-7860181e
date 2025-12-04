@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, BookOpen, ChevronRight, X } from 'lucide-react';
+import { Search, BookOpen, ChevronRight, X, Mail, Clock, Calendar } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -187,6 +187,57 @@ export default function HelpCenter() {
             </div>
           </div>
         )}
+
+        {/* Contact Support Section */}
+        <div className="mt-16 mb-8">
+          <Card className="bg-gradient-to-br from-card via-card to-primary/5 border-border/50 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="relative p-8 md:p-12">
+              <div className="max-w-2xl mx-auto text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 mb-6">
+                  <Mail className="w-8 h-8 text-primary" />
+                </div>
+                
+                <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                  Still have questions?
+                </h2>
+                <p className="text-muted-foreground mb-8 text-lg">
+                  Can't find what you're looking for? Our support team is here to help.
+                </p>
+
+                <a 
+                  href="mailto:help@aderai.io"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/25 mb-8"
+                >
+                  <Mail className="w-5 h-5" />
+                  help@aderai.io
+                </a>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-muted/50">
+                      <Clock className="w-4 h-4 text-primary" />
+                    </div>
+                    <span>11:00 AM – 6:00 PM UTC</span>
+                  </div>
+                  <div className="hidden sm:block w-1 h-1 rounded-full bg-border" />
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-muted/50">
+                      <Calendar className="w-4 h-4 text-primary" />
+                    </div>
+                    <span>Monday – Friday</span>
+                  </div>
+                </div>
+
+                <p className="mt-6 text-sm text-muted-foreground/80">
+                  We typically respond within <span className="text-foreground font-medium">24 hours</span>
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
 
         {/* Article Modal */}
         {selectedArticle && (
