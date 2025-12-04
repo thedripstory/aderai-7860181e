@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { 
   Users, Shield, Key, Building2, Mail, AlertCircle, 
-  TrendingUp, LogOut, Search, RefreshCw, UserCog, FileText, Download
+  TrendingUp, LogOut, Search, RefreshCw, UserCog, FileText, Download, CreditCard
 } from "lucide-react";
 import { AdminBulkActions } from "@/components/AdminBulkActions";
 import { AdminAnalyticsCharts } from "@/components/AdminAnalyticsCharts";
@@ -38,6 +38,7 @@ import { exportUsersToCSV, exportFeedbackToCSV } from "@/lib/csvExport";
 import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
+import { AdminSubscriptionMonitoring } from "@/components/AdminSubscriptionMonitoring";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 const AdminDashboard = () => {
@@ -378,8 +379,9 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-7 xl:grid-cols-15 w-full mb-8 gap-2">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-8 xl:grid-cols-17 w-full mb-8 gap-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
             <TabsTrigger value="cohorts">Cohorts</TabsTrigger>
             <TabsTrigger value="segments">Segments</TabsTrigger>
             <TabsTrigger value="userhealth">User Health</TabsTrigger>
@@ -469,6 +471,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Subscriptions Tab */}
+          <TabsContent value="subscriptions">
+            <AdminSubscriptionMonitoring />
           </TabsContent>
 
           {/* Cohort Analysis Tab */}
