@@ -427,10 +427,10 @@ export const SEGMENTS: Segment[] = [
   {
     id: "browse-abandonment",
     name: "Browse Abandonment",
-    description: "Viewed product in last 14 days but didn't add to cart",
+    description: "Viewed product in last 30 days but didn't add to cart or purchase",
     category: "Shopping Behavior & Purchase History",
     icon: "👁️",
-    definition: "Viewed product, no cart add in 14d",
+    definition: "Viewed product, no cart/purchase 30d",
   },
   {
     id: "category-interest",
@@ -486,34 +486,34 @@ export const SEGMENTS: Segment[] = [
   {
     id: "coupon-users",
     name: "Coupon Users",
-    description: "Used discount code in last 90 days",
+    description: "Used discount code on any order (all time)",
     category: "Shopping Behavior & Purchase History",
     icon: "🎟️",
-    definition: "Discount code used in 90d",
+    definition: "Discount code used (all time)",
   },
   {
     id: "full-price-buyers",
     name: "Full-Price Buyers",
-    description: "No discount code used in last 90 days",
+    description: "Never used discount code on any order (all time)",
     category: "Shopping Behavior & Purchase History",
     icon: "💳",
-    definition: "No discount code in 90d",
+    definition: "No discount code (all time)",
   },
   {
     id: "product-reviewers",
     name: "Product Reviewers",
-    description: "Left at least one review (or Repeat Buyers if no review metric)",
+    description: "Left at least one product review (all time)",
     category: "Shopping Behavior & Purchase History",
     icon: "⭐",
-    definition: "Reviews ≥ 1 (fallback: 2+ purchases)",
+    definition: "Reviews ≥ 1 all time",
   },
   {
     id: "non-reviewers",
     name: "Non-Reviewers",
-    description: "Purchased but never left review (or One-Time Buyers if no review metric)",
+    description: "Purchased but never left a review (all time)",
     category: "Shopping Behavior & Purchase History",
     icon: "📝",
-    definition: "Purchases ≥ 1, reviews = 0 (fallback: 1 purchase)",
+    definition: "1+ purchases, 0 reviews all time",
   },
 
   // EXCLUSION SEGMENTS (12 segments)
@@ -591,6 +591,7 @@ export const SEGMENTS: Segment[] = [
     icon: "🚨",
     definition: "Predicted churn > threshold",
     unavailable: true,
+    unavailableReason: "Requires Klaviyo Predictive Analytics",
   },
   {
     id: "received-5-opened-0",
