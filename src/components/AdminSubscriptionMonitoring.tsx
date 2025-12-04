@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CreditCard, Users, TrendingUp, AlertCircle, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { RefreshCw, CreditCard, Users, TrendingUp, AlertCircle, CheckCircle2, XCircle, Clock, DollarSign, TrendingDown, BarChart3 } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, CartesianGrid, Legend } from "recharts";
 
 interface SubscriptionEvent {
   id: string;
@@ -27,6 +29,14 @@ interface UserSubscription {
   subscription_canceled_at: string | null;
   created_at: string;
 }
+
+const CHART_COLORS = {
+  primary: "hsl(var(--primary))",
+  emerald: "#10b981",
+  amber: "#f59e0b",
+  destructive: "hsl(var(--destructive))",
+  muted: "hsl(var(--muted-foreground))",
+};
 
 export function AdminSubscriptionMonitoring() {
   const [events, setEvents] = useState<SubscriptionEvent[]>([]);
@@ -79,6 +89,82 @@ export function AdminSubscriptionMonitoring() {
   const pendingCancellations = users.filter(u => u.subscription_canceled_at && u.subscription_status === 'active').length;
   const totalRevenue = activeSubscriptions * 9; // $9/month per active subscription
 
+  // Calculate churn metrics
+  const churnAnalytics = useMemo(() => {
+    const totalEverSubscribed = users.filter(u => u.stripe_subscription_id).length;
+    const churnRate = totalEverSubscribed > 0 
+      ? ((canceledSubscriptions / totalEverSubscribed) * 100).toFixed(1) 
+      : 0;
+    
+    // Calculate monthly churn data (last 6 months)
+    const now = new Date();
+    const monthlyData = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+      const monthName = monthStart.toLocaleDateString('en-US', { month: 'short' });
+      
+      const newSubs = users.filter(u => {
+        if (!u.subscription_start_date) return false;
+        const startDate = new Date(u.subscription_start_date);
+        return startDate >= monthStart && startDate <= monthEnd;
+      }).length;
+      
+      const churned = users.filter(u => {
+        if (!u.subscription_canceled_at) return false;
+        const cancelDate = new Date(u.subscription_canceled_at);
+        return cancelDate >= monthStart && cancelDate <= monthEnd;
+      }).length;
+      
+      // Estimate MRR for that month (simplified)
+      const activeAtMonthEnd = users.filter(u => {
+        if (!u.subscription_start_date) return false;
+        const startDate = new Date(u.subscription_start_date);
+        if (startDate > monthEnd) return false;
+        if (u.subscription_canceled_at) {
+          const cancelDate = new Date(u.subscription_canceled_at);
+          if (cancelDate < monthEnd) return false;
+        }
+        return true;
+      }).length;
+      
+      monthlyData.push({
+        month: monthName,
+        newSubscriptions: newSubs,
+        churned: churned,
+        mrr: activeAtMonthEnd * 9,
+        active: activeAtMonthEnd,
+      });
+    }
+    
+    return {
+      churnRate,
+      totalEverSubscribed,
+      monthlyData,
+    };
+  }, [users, canceledSubscriptions]);
+
+  // Subscription status distribution for pie chart
+  const statusDistribution = useMemo(() => {
+    return [
+      { name: 'Active', value: activeSubscriptions, color: CHART_COLORS.emerald },
+      { name: 'Canceled', value: canceledSubscriptions, color: CHART_COLORS.muted },
+      { name: 'Pending Cancel', value: pendingCancellations, color: CHART_COLORS.amber },
+      { name: 'Inactive', value: users.filter(u => !u.subscription_status || u.subscription_status === 'inactive').length, color: '#6b7280' },
+    ].filter(item => item.value > 0);
+  }, [users, activeSubscriptions, canceledSubscriptions, pendingCancellations]);
+
+  // Event type distribution
+  const eventTypeDistribution = useMemo(() => {
+    const counts: Record<string, number> = {};
+    events.forEach(event => {
+      const type = event.event_type.replace('customer.subscription.', '').replace('checkout.session.', '');
+      counts[type] = (counts[type] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [events]);
+
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'active':
@@ -121,7 +207,7 @@ export function AdminSubscriptionMonitoring() {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
@@ -130,33 +216,46 @@ export function AdminSubscriptionMonitoring() {
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">{activeSubscriptions}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              ${totalRevenue}/month MRR
+              Paying customers
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending Cancellations</CardTitle>
+            <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald-600">${totalRevenue}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              MRR @ $9/user
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Churn Rate</CardTitle>
+            <TrendingDown className="h-4 w-4 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">{churnAnalytics.churnRate}%</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {canceledSubscriptions} of {churnAnalytics.totalEverSubscribed} churned
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Pending Cancels</CardTitle>
             <Clock className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-600">{pendingCancellations}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Scheduled to cancel
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Canceled</CardTitle>
-            <XCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{canceledSubscriptions}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Total churned
+              End of period
             </p>
           </CardContent>
         </Card>
@@ -164,13 +263,216 @@ export function AdminSubscriptionMonitoring() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-            <TrendingUp className="h-4 w-4 text-primary" />
+            <BarChart3 className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{events.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Subscription events
+              Stripe webhooks
             </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* MRR Trend Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" />
+              MRR Trend
+            </CardTitle>
+            <CardDescription>Monthly recurring revenue over time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={churnAnalytics.monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    tickFormatter={(value) => `$${value}`}
+                  />
+                  <ChartTooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+                            <p className="font-medium">{payload[0].payload.month}</p>
+                            <p className="text-emerald-500">MRR: ${payload[0].value}</p>
+                            <p className="text-muted-foreground text-sm">{payload[0].payload.active} active users</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="mrr" 
+                    stroke={CHART_COLORS.emerald}
+                    fill={CHART_COLORS.emerald}
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* New vs Churned Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              Subscriptions vs Churn
+            </CardTitle>
+            <CardDescription>New subscriptions vs cancellations by month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={churnAnalytics.monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <ChartTooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+                            <p className="font-medium">{payload[0].payload.month}</p>
+                            <p className="text-emerald-500">New: {payload[0].payload.newSubscriptions}</p>
+                            <p className="text-red-500">Churned: {payload[0].payload.churned}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar dataKey="newSubscriptions" name="New" fill={CHART_COLORS.emerald} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="churned" name="Churned" fill={CHART_COLORS.destructive} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Status Distribution Pie Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Subscription Status Distribution
+            </CardTitle>
+            <CardDescription>Breakdown of all user subscription statuses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={2}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                    labelLine={false}
+                  >
+                    {statusDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+                            <p className="font-medium">{payload[0].name}</p>
+                            <p>{payload[0].value} users</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4 mt-4">
+              {statusDistribution.map((item) => (
+                <div key={item.name} className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-sm text-muted-foreground">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Event Type Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Event Types
+            </CardTitle>
+            <CardDescription>Distribution of Stripe webhook events</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              {eventTypeDistribution.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={eventTypeDistribution} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <YAxis 
+                      type="category" 
+                      dataKey="name" 
+                      stroke="hsl(var(--muted-foreground))" 
+                      fontSize={11}
+                      width={100}
+                    />
+                    <ChartTooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+                              <p className="font-medium">{payload[0].payload.name}</p>
+                              <p>{payload[0].value} events</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar dataKey="value" fill={CHART_COLORS.primary} radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  <p>No events recorded yet</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
