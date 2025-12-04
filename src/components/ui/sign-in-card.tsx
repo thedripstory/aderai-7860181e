@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Mail, Lock, Eye, EyeClosed, ArrowRight, User, Clock } from 'lucide-react';
+import { Mail, Lock, Eye, EyeClosed, ArrowRight, User, Clock, XCircle } from 'lucide-react';
 import { cn } from "@/lib/utils"
 import { AuroraBackground } from "@/components/ui/aurora-background"
 import { AderaiLogo } from "@/components/AderaiLogo"
@@ -40,11 +40,15 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const [showInactivityMessage, setShowInactivityMessage] = useState(false);
+  const [showPaymentCanceledMessage, setShowPaymentCanceledMessage] = useState(false);
 
-  // Check if redirected due to inactivity
+  // Check if redirected due to inactivity or canceled payment
   useEffect(() => {
     if (searchParams.get('reason') === 'inactivity') {
       setShowInactivityMessage(true);
+    }
+    if (searchParams.get('payment') === 'canceled') {
+      setShowPaymentCanceledMessage(true);
     }
   }, [searchParams]);
 
@@ -255,6 +259,25 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                       <Clock className="w-5 h-5 text-amber-500 flex-shrink-0" />
                       <p className="text-sm text-amber-200">
                         You were logged out due to inactivity. Please sign in again.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Payment Canceled Message */}
+              <AnimatePresence>
+                {showPaymentCanceledMessage && isSignUp && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: 'auto' }}
+                    exit={{ opacity: 0, y: -10, height: 0 }}
+                    className="mb-4"
+                  >
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                      <XCircle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                      <p className="text-sm text-muted-foreground">
+                        Payment was canceled. You can try again below.
                       </p>
                     </div>
                   </motion.div>
