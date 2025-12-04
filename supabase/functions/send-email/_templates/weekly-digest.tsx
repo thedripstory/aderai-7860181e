@@ -13,6 +13,9 @@ import {
 } from 'https://esm.sh/@react-email/components@0.0.22';
 import * as React from 'https://esm.sh/react@18.3.1';
 
+const ADERAI_LOGO_URL = 'https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png';
+const BRAND_COLOR = '#FF6B35';
+
 interface WeeklyDigestProps {
   accountName: string;
   segmentsCreated: number;
@@ -37,10 +40,13 @@ export const WeeklyDigest = ({
       <Container style={container}>
         {/* Header */}
         <Section style={header}>
-          <div style={logoContainer}>
-            <span style={logoText}>aderai</span>
-            <span style={logoDot}>.</span>
-          </div>
+          <Img 
+            src={ADERAI_LOGO_URL} 
+            width="140" 
+            height="auto" 
+            alt="Aderai" 
+            style={logo}
+          />
           <Text style={headerSubtitle}>Your Weekly Activity</Text>
         </Section>
 
@@ -111,6 +117,13 @@ export const WeeklyDigest = ({
 
         {/* Footer */}
         <Section style={footer}>
+          <Img 
+            src={ADERAI_LOGO_URL} 
+            width="80" 
+            height="auto" 
+            alt="Aderai" 
+            style={{ margin: '0 auto 15px' }}
+          />
           <Text style={footerText}>
             <Link href={dashboardUrl + '/settings'} style={link}>Manage email preferences</Link>
           </Text>
@@ -133,8 +146,7 @@ export default WeeklyDigest;
 // Styles
 const main = {
   backgroundColor: '#f6f6f6',
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
 };
 
 const container = {
@@ -148,32 +160,17 @@ const header = {
   padding: '30px 20px',
   textAlign: 'center' as const,
   borderRadius: '10px 10px 0 0',
-  borderBottom: '3px solid #FF6B35',
+  borderBottom: `3px solid ${BRAND_COLOR}`,
 };
 
-const logoContainer = {
-  display: 'inline-block',
-};
-
-const logoText = {
-  fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
-  fontWeight: 'bold',
-  color: '#1a1a1a',
-  letterSpacing: '-0.5px',
-};
-
-const logoDot = {
-  fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
-  fontWeight: 'bold',
-  color: '#FF6B35',
+const logo = {
+  margin: '0 auto',
 };
 
 const headerSubtitle = {
   fontSize: '14px',
   color: '#666666',
-  margin: '8px 0 0',
+  margin: '12px 0 0',
   fontWeight: 'normal' as const,
 };
 
@@ -217,7 +214,7 @@ const statCard = {
 const statNumber = {
   fontSize: '32px',
   fontWeight: 'bold',
-  color: '#FF6B35',
+  color: BRAND_COLOR,
   margin: '0 0 8px',
   display: 'block',
 };
@@ -282,7 +279,7 @@ const buttonContainer = {
 };
 
 const button = {
-  backgroundColor: '#FF6B35',
+  backgroundColor: BRAND_COLOR,
   borderRadius: '8px',
   color: '#ffffff',
   fontSize: '16px',
@@ -296,14 +293,14 @@ const button = {
 const secondaryButton = {
   backgroundColor: '#ffffff',
   borderRadius: '8px',
-  color: '#FF6B35',
+  color: BRAND_COLOR,
   fontSize: '14px',
   fontWeight: 'bold',
   textDecoration: 'none',
   textAlign: 'center' as const,
   display: 'inline-block',
   padding: '12px 30px',
-  border: '2px solid #FF6B35',
+  border: `2px solid ${BRAND_COLOR}`,
 };
 
 const tipBox = {
@@ -334,7 +331,7 @@ const hr = {
 };
 
 const link = {
-  color: '#FF6B35',
+  color: BRAND_COLOR,
   textDecoration: 'underline',
 };
 

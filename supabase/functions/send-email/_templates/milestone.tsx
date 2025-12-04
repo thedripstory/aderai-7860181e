@@ -13,6 +13,9 @@ import {
 } from 'https://esm.sh/@react-email/components@0.0.22';
 import * as React from 'https://esm.sh/react@18.3.1';
 
+const ADERAI_LOGO_URL = 'https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png';
+const BRAND_COLOR = '#FF6B35';
+
 interface MilestoneEmailProps {
   accountName: string;
   milestone: number;
@@ -44,10 +47,13 @@ export const MilestoneEmail = ({
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <div style={logoContainer}>
-              <span style={logoText}>aderai</span>
-              <span style={logoDot}>.</span>
-            </div>
+            <Img 
+              src={ADERAI_LOGO_URL} 
+              width="140" 
+              height="auto" 
+              alt="Aderai" 
+              style={logo}
+            />
           </Section>
 
           {/* Main Content */}
@@ -60,7 +66,7 @@ export const MilestoneEmail = ({
             <Text style={text}>Hi {accountName},</Text>
             
             <Text style={bigText}>
-              Congratulations! You've created <strong style={{ color: '#FF6B35' }}>{segmentCount} segments</strong> with Aderai.
+              Congratulations! You've created <strong style={{ color: BRAND_COLOR }}>{segmentCount} segments</strong> with Aderai.
             </Text>
 
             <Text style={text}>
@@ -114,13 +120,20 @@ export const MilestoneEmail = ({
 
             <Hr style={hr} />
 
-            <Text style={footerText}>
+            <Text style={footerContentText}>
               Keep up the great work! Your segments are helping you target the right customers at the right time.
             </Text>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
+            <Img 
+              src={ADERAI_LOGO_URL} 
+              width="80" 
+              height="auto" 
+              alt="Aderai" 
+              style={{ margin: '0 auto 15px' }}
+            />
             <Text style={footerSmallText}>
               © {new Date().getFullYear()} Aderai. All rights reserved.
             </Text>
@@ -141,8 +154,7 @@ export default MilestoneEmail;
 // Styles
 const main = {
   backgroundColor: '#f6f6f6',
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
 };
 
 const container = {
@@ -156,26 +168,11 @@ const header = {
   padding: '30px 20px',
   textAlign: 'center' as const,
   borderRadius: '10px 10px 0 0',
-  borderBottom: '3px solid #FF6B35',
+  borderBottom: `3px solid ${BRAND_COLOR}`,
 };
 
-const logoContainer = {
-  display: 'inline-block',
-};
-
-const logoText = {
-  fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
-  fontWeight: 'bold',
-  color: '#1a1a1a',
-  letterSpacing: '-0.5px',
-};
-
-const logoDot = {
-  fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
-  fontWeight: 'bold',
-  color: '#FF6B35',
+const logo = {
+  margin: '0 auto',
 };
 
 const content = {
@@ -241,7 +238,7 @@ const statLabel = {
 const statValue = {
   fontSize: '24px',
   fontWeight: 'bold',
-  color: '#FF6B35',
+  color: BRAND_COLOR,
   margin: '0',
 };
 
@@ -283,7 +280,7 @@ const buttonContainer = {
 };
 
 const button = {
-  backgroundColor: '#FF6B35',
+  backgroundColor: BRAND_COLOR,
   borderRadius: '8px',
   color: '#ffffff',
   fontSize: '16px',
@@ -304,7 +301,7 @@ const footer = {
   padding: '20px',
 };
 
-const footerText = {
+const footerContentText = {
   color: '#666666',
   fontSize: '14px',
   lineHeight: '22px',
