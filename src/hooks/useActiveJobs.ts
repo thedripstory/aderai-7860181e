@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export interface ActiveJob {
   id: string;
@@ -44,6 +45,27 @@ export const useActiveJobs = () => {
     }
   }, []);
 
+  const cancelJob = useCallback(async (jobId: string) => {
+    try {
+      const { error } = await supabase
+        .from('segment_creation_jobs')
+        .update({ 
+          status: 'cancelled',
+          completed_at: new Date().toISOString(),
+          error_message: 'Cancelled by user'
+        })
+        .eq('id', jobId);
+
+      if (error) throw error;
+      
+      toast.success('Job cancelled');
+      fetchJobs();
+    } catch (error) {
+      console.error('Failed to cancel job:', error);
+      toast.error('Failed to cancel job');
+    }
+  }, [fetchJobs]);
+
   // Poll for job updates every 5 seconds
   useEffect(() => {
     fetchJobs();
@@ -87,5 +109,6 @@ export const useActiveJobs = () => {
     hasActiveJobs,
     totalProgress,
     refreshJobs: fetchJobs,
+    cancelJob,
   };
 };

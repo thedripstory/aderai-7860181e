@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, CheckCircle, XCircle, Clock, ChevronDown, RefreshCw, Inbox } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Clock, ChevronDown, RefreshCw, Inbox, X } from 'lucide-react';
 import { useActiveJobs, ActiveJob } from '@/hooks/useActiveJobs';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export const ActiveJobsIndicator: React.FC = () => {
-  const { jobs, hasActiveJobs, loading, refreshJobs } = useActiveJobs();
+  const { jobs, hasActiveJobs, loading, refreshJobs, cancelJob } = useActiveJobs();
   const [open, setOpen] = useState(false);
   const previousJobsRef = useRef<Map<string, ActiveJob>>(new Map());
 
@@ -176,14 +176,26 @@ export const ActiveJobsIndicator: React.FC = () => {
                           <span className="text-green-500">✓ {job.success_count}</span>
                         )}
                         {job.error_count > 0 && (
-                          <span className="text-amber-500">⟳ {job.error_count} retrying</span>
-                        )}
+                              <span className="text-amber-500">⟳ {job.error_count} retrying</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                      {/* Cancel button */}
+                      {['pending', 'in_progress', 'retrying', 'waiting_retry'].includes(job.status) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="mt-2 w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => cancelJob(job.id)}
+                        >
+                          <X className="w-3 h-3 mr-1" />
+                          Cancel Job
+                        </Button>
+                      )}
                     </div>
-                  </div>
-                </div>
-              );
-            })
+                  );
+                })
           ) : (
             <div className="p-6 text-center text-muted-foreground text-sm">
               <Inbox className="w-8 h-8 mx-auto mb-2 opacity-50" />

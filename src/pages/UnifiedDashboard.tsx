@@ -23,7 +23,8 @@ import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
 import { PremiumInviteGate } from '@/components/PremiumInviteGate';
 
 import { AchievementsPanel } from '@/components/AchievementsPanel';
-import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
+import { useKlaviyoSegments, KlaviyoKey, SegmentResult, BatchProgress } from '@/hooks/useKlaviyoSegments';
+import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { PageErrorBoundary } from '@/components/PageErrorBoundary';
@@ -45,12 +46,14 @@ export default function UnifiedDashboard() {
   const [activeKeyIndex, setActiveKeyIndex] = useState(0);
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [segmentCustomInputs, setSegmentCustomInputs] = useState<Record<string, string>>({});
-  // Segment creation now uses queue system - no view state needed
+  const [showCreationModal, setShowCreationModal] = useState(false);
+  const [creationResults, setCreationResults] = useState<SegmentResult[]>([]);
+  const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null);
   const [emailVerified, setEmailVerified] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
 
-  const { loading: creatingSegments, createSegmentsWithAutoRetry } = useKlaviyoSegments();
+  const { loading: creatingSegments, createSegments, createSegmentsWithAutoRetry, results: segmentResults, batchProgress: currentBatchProgress } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
   const { 
     run: runTour, 
@@ -171,21 +174,21 @@ export default function UnifiedDashboard() {
 
     trackAction('create_segments', { segment_count: availableSegments.length });
     
+    // Show the creation modal
+    setCreationResults([]);
+    setBatchProgress(null);
+    setShowCreationModal(true);
+    
     try {
       // Create a background job that auto-retries
-      const jobId = await createSegmentsWithAutoRetry(
+      await createSegmentsWithAutoRetry(
         availableSegments,
         klaviyoKeys[activeKeyIndex],
         SEGMENTS,
         segmentCustomInputs
       );
       
-      toast.success('Segment creation started!', {
-        description: `Creating ${availableSegments.length} segments. Track progress via "Active Jobs" in the header.`,
-        duration: 5000,
-      });
-      
-      // Clear selection and stay on dashboard
+      // Clear selection
       setSelectedSegments([]);
       setSegmentCustomInputs({});
       
@@ -196,7 +199,22 @@ export default function UnifiedDashboard() {
     }
   }, [selectedSegments, klaviyoKeys, activeKeyIndex, trackAction, createSegmentsWithAutoRetry, segmentCustomInputs]);
 
-  // Retry is now handled automatically by the queue system via process-segment-queue
+  // Update modal with results from hook
+  useEffect(() => {
+    if (segmentResults.length > 0) {
+      setCreationResults(segmentResults);
+    }
+  }, [segmentResults]);
+
+  useEffect(() => {
+    if (currentBatchProgress) {
+      setBatchProgress(currentBatchProgress);
+    }
+  }, [currentBatchProgress]);
+
+  const handleCloseCreationModal = useCallback(() => {
+    setShowCreationModal(false);
+  }, []);
 
 
   const handleLogout = async () => {
@@ -212,7 +230,27 @@ export default function UnifiedDashboard() {
     );
   }
 
-  // Queue-based segment creation - no longer uses view state
+  // Show segment creation modal
+  if (showCreationModal) {
+    return (
+      <SegmentCreationFlow
+        loading={creatingSegments}
+        results={creationResults}
+        onViewResults={handleCloseCreationModal}
+        onContinueInBackground={handleCloseCreationModal}
+        userSettings={klaviyoKeys[activeKeyIndex] ? {
+          currencySymbol: klaviyoKeys[activeKeyIndex].currency_symbol || '$',
+          highValueThreshold: klaviyoKeys[activeKeyIndex].high_value_threshold || 500,
+          vipThreshold: klaviyoKeys[activeKeyIndex].vip_threshold || 1000,
+          aov: klaviyoKeys[activeKeyIndex].aov || 100,
+          lapsedDays: klaviyoKeys[activeKeyIndex].lapsed_days || 90,
+          churnedDays: klaviyoKeys[activeKeyIndex].churned_days || 180,
+          newCustomerDays: klaviyoKeys[activeKeyIndex].new_customer_days || 60,
+        } : DEFAULT_SEGMENT_SETTINGS}
+        batchProgress={batchProgress}
+      />
+    );
+  }
 
   return (
     <PageErrorBoundary pageName="Dashboard">
