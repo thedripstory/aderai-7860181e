@@ -240,7 +240,7 @@ function getSegmentDefinition(
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 4, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            buildMetricCondition(openedEmailId, 'count', 'greater-than', 5, { type: 'in-the-last', quantity: 30, unit: 'day' })
           ]
         }]
       }
