@@ -260,6 +260,10 @@ export default function UnifiedDashboard() {
         results={results}
         onViewResults={() => setView(null)}
         onRetryFailed={handleRetryFailed}
+        onContinueInBackground={() => {
+          // Reset the view to allow background processing via Active Jobs indicator
+          setView(null);
+        }}
         userSettings={userSettings}
         batchProgress={batchProgress}
       />

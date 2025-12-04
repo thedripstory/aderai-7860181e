@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle, AlertCircle, Target, Info } from 'lucide-react';
+import { CheckCircle, AlertCircle, Target, Info, X, Mail } from 'lucide-react';
 import { SegmentResult, BatchProgress } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS, applySegmentSettings, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
 import { Progress } from '@/components/ui/progress';
 import { SuccessAnimation } from '@/components/SuccessAnimation';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 interface SegmentCreationFlowProps {
   loading: boolean;
   results: SegmentResult[];
   onViewResults: () => void;
   onRetryFailed?: (failedSegmentIds: string[]) => void;
+  onContinueInBackground?: () => void;
   userSettings?: UserSegmentSettings;
   batchProgress?: BatchProgress | null;
 }
@@ -21,6 +23,7 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   results,
   onViewResults,
   onRetryFailed,
+  onContinueInBackground,
   userSettings = DEFAULT_SEGMENT_SETTINGS,
   batchProgress,
 }) => {
@@ -71,6 +74,13 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
     }
   }, [loading, results, hasFailures]);
 
+  const handleContinueInBackground = () => {
+    if (onContinueInBackground) {
+      onContinueInBackground();
+    }
+    navigate('/dashboard');
+  };
+
   return (
     <>
       <SuccessAnimation
@@ -89,7 +99,18 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md"
         >
-          <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden relative">
+            {/* Close button */}
+            {loading && (
+              <button
+                onClick={handleContinueInBackground}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors z-10"
+                title="Continue in background"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+
             {/* Header with icon */}
             <div className="pt-8 pb-4 flex flex-col items-center">
               <div className="w-16 h-16 flex items-center justify-center mb-4">
@@ -206,6 +227,27 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                 />
               </div>
             </div>
+
+            {/* Continue in background option - only show while loading */}
+            {loading && (
+              <div className="px-6 pb-6 space-y-3">
+                <Button
+                  variant="outline"
+                  onClick={handleContinueInBackground}
+                  className="w-full border-primary/30 hover:bg-primary/5"
+                >
+                  Continue in Background
+                </Button>
+                
+                {/* Email notification note */}
+                <div className="flex items-center gap-2 p-3 bg-muted/50 border border-border/50 rounded-lg">
+                  <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs text-muted-foreground">
+                    We'll send you an email once all segments are created. You can also track progress via the <span className="font-medium text-foreground">Active Jobs</span> indicator in the header.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Results list (collapsed view) */}
             {!loading && results.length > 0 && (
