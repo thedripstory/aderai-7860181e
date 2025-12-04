@@ -402,12 +402,24 @@ export default function UnifiedDashboard() {
   }
 
   if (view === 'creating' || view === 'results') {
+    const activeKey = klaviyoKeys[activeKeyIndex];
+    const userSettings = activeKey ? {
+      currencySymbol: activeKey.currency_symbol || '$',
+      highValueThreshold: activeKey.high_value_threshold || 500,
+      vipThreshold: activeKey.vip_threshold || 1000,
+      aov: activeKey.aov || 100,
+      lapsedDays: activeKey.lapsed_days || 90,
+      churnedDays: activeKey.churned_days || 180,
+      newCustomerDays: activeKey.new_customer_days || 60,
+    } : undefined;
+    
     return (
       <SegmentCreationFlow
         loading={creatingSegments}
         results={results}
         onViewResults={() => setView(null)}
         onRetryFailed={handleRetryFailed}
+        userSettings={userSettings}
       />
     );
   }
