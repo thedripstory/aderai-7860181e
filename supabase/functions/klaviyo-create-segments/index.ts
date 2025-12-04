@@ -863,51 +863,14 @@ function getSegmentDefinition(
 
     // =====================================
     // PREDICTIVE ANALYTICS SEGMENTS
+    // These require Klaviyo Predictive Analytics to be enabled on the account
+    // Marked as unavailable in UI since most accounts don't have this feature
     // =====================================
 
-    'predicted-vips': {
-      name: `Predicted VIPs (High CLV)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildPredictiveCondition('predicted_clv', 'numeric', 'greater-than', vipThreshold)
-          ]
-        }]
-      }
-    },
-
-    'high-churn-risk': {
-      name: `High Churn Risk${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildPredictiveCondition('churn_risk', 'string', 'equals', 'high')
-          ]
-        }]
-      }
-    },
-
-    'likely-purchase-soon': {
-      name: `Likely to Purchase Soon${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildPredictiveCondition('predicted_number_of_orders', 'numeric', 'greater-than', 0)
-          ]
-        }]
-      }
-    },
-
-    'high-churn-risk-exclude': {
-      name: `🚫 High Churn Risk Exclusion${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildPredictiveCondition('churn_risk', 'string', 'equals', 'high')
-          ]
-        }]
-      }
-    },
+    'predicted-vips': null,
+    'high-churn-risk': null,
+    'likely-purchase-soon': null,
+    'high-churn-risk-exclude': null,
 
     // =====================================
     // VALUE-BASED SEGMENTS
@@ -1073,83 +1036,14 @@ function getSegmentDefinition(
 
     // =====================================
     // LOCATION PROXIMITY SEGMENTS
+    // These require manual setup with specific coordinates
+    // Marked as unavailable in UI
     // =====================================
 
-    'location-proximity': {
-      name: `Near Major Metro (25 Miles)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [{
-            type: 'profile-postal-code-distance',
-            country_code: 'USA',
-            postal_code: '10001',
-            unit: 'miles',
-            filter: {
-              type: 'numeric',
-              operator: 'less-than',
-              value: 25
-            }
-          }]
-        }]
-      }
-    },
-
-    'location-los-angeles': {
-      name: `Near Los Angeles (25 Miles)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [{
-            type: 'profile-postal-code-distance',
-            country_code: 'USA',
-            postal_code: '90001',
-            unit: 'miles',
-            filter: {
-              type: 'numeric',
-              operator: 'less-than',
-              value: 25
-            }
-          }]
-        }]
-      }
-    },
-
-    'location-chicago': {
-      name: `Near Chicago (25 Miles)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [{
-            type: 'profile-postal-code-distance',
-            country_code: 'USA',
-            postal_code: '60601',
-            unit: 'miles',
-            filter: {
-              type: 'numeric',
-              operator: 'less-than',
-              value: 25
-            }
-          }]
-        }]
-      }
-    },
-
-    'location-houston': {
-      name: `Near Houston (25 Miles)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [{
-            type: 'profile-postal-code-distance',
-            country_code: 'USA',
-            postal_code: '77001',
-            unit: 'miles',
-            filter: {
-              type: 'numeric',
-              operator: 'less-than',
-              value: 25
-            }
-          }]
-        }]
-      }
-    },
+    'location-proximity': null,
+    'location-los-angeles': null,
+    'location-chicago': null,
+    'location-houston': null,
 
     // =====================================
     // PURCHASE BEHAVIOR - DISCOUNT SENSITIVITY
