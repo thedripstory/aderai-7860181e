@@ -234,21 +234,12 @@ export default function UnifiedDashboard() {
     setLoadingAnalytics(true);
     
     try {
-      // First, trigger the snapshot recording to fetch profile counts
       setAnalyticsProgress({ current: 0, total: 100 });
-      toast.info('Fetching profile counts from Klaviyo...', { duration: 3000 });
-      
-      try {
-        await supabase.functions.invoke('record-segment-snapshots');
-      } catch (snapshotError) {
-        console.error('Snapshot recording error:', snapshotError);
-        // Continue anyway - we'll show what historical data we have
-      }
       
       let allFetchedSegments: any[] = [];
       let includedTags: Record<string, any> = {};
-      // Fetch segments with tags (profile_count requires individual segment fetches)
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,is_active,is_starred';
+      // Fetch segments with tags and profile counts
+      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,is_active,is_starred&additional-fields[segment]=profile_count';
       
       // Fetch all pages of segments
       while (nextPageUrl) {
