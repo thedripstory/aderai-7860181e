@@ -95,6 +95,74 @@ export const useKlaviyoSegments = () => {
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null);
 
+  // Create a background job that will auto-retry until all segments succeed
+  const createSegmentsWithAutoRetry = async (
+    selectedSegments: string[],
+    activeKey: KlaviyoKey,
+    segmentsList: any[],
+    customInputs?: Record<string, string>
+  ): Promise<string> => {
+    if (selectedSegments.length === 0) {
+      throw new Error('Please select at least one segment to create');
+    }
+
+    // Expand any bundle IDs into their component segments
+    let expandedSegmentIds = [...selectedSegments];
+    selectedSegments.forEach(id => {
+      if (SEGMENT_BUNDLES[id]) {
+        expandedSegmentIds = expandedSegmentIds.filter(s => s !== id);
+        expandedSegmentIds.push(...SEGMENT_BUNDLES[id]);
+      }
+    });
+    expandedSegmentIds = [...new Set(expandedSegmentIds)];
+    
+    // Filter out unavailable segments
+    const availableSegmentIds = expandedSegmentIds.filter(id => {
+      const segment = segmentsList.find((s: any) => s.id === id);
+      return segment && !segment.unavailable;
+    });
+
+    if (availableSegmentIds.length === 0) {
+      throw new Error('No available segments to create.');
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    // Create the job in the database
+    const { data: job, error: jobError } = await supabase
+      .from('segment_creation_jobs')
+      .insert({
+        user_id: user.id,
+        klaviyo_key_id: activeKey.id,
+        segments_to_create: availableSegmentIds,
+        total_segments: availableSegmentIds.length,
+        status: 'pending',
+        custom_inputs: customInputs || {},
+      })
+      .select()
+      .single();
+
+    if (jobError || !job) {
+      throw new Error('Failed to create segment job');
+    }
+
+    // Trigger the background processor
+    supabase.functions.invoke('process-segment-queue', {
+      body: { jobId: job.id },
+    }).catch(err => {
+      console.error('Failed to start background processor:', err);
+    });
+
+    // Track the event
+    await trackAnalyticsEvent('segments_queued', {
+      job_id: job.id,
+      segment_count: availableSegmentIds.length,
+    });
+
+    return job.id;
+  };
+
   const createSegments = async (
     selectedSegments: string[],
     activeKey: KlaviyoKey,
@@ -368,6 +436,7 @@ export const useKlaviyoSegments = () => {
     progress,
     batchProgress,
     createSegments,
+    createSegmentsWithAutoRetry,
     setResults,
   };
 };
