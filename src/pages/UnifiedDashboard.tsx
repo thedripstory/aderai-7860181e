@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Loader, RefreshCw, Target, Key, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Loader, Target, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
 import { ShimmerButton } from '@/components/ui/shimmer-button';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { KlaviyoSetupBanner } from '@/components/KlaviyoSetupBanner';
@@ -16,17 +15,15 @@ import { OnboardingTour } from '@/components/OnboardingTour';
 import { SegmentDashboard } from '@/components/SegmentDashboard';
 import { BUNDLES, SEGMENTS, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
 import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
-import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { AISegmentSuggester } from '@/components/AISegmentSuggester';
 import { KlaviyoSyncIndicator } from '@/components/KlaviyoSyncIndicator';
 import { KlaviyoHealthDashboard } from '@/components/KlaviyoHealthDashboard';
 import { SegmentHistoricalTrends } from '@/components/SegmentHistoricalTrends';
 import { SegmentOperationHistory } from '@/components/SegmentOperationHistory';
 import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
-import { PerformanceDashboard } from '@/components/performance';
+import { PremiumInviteGate } from '@/components/PremiumInviteGate';
 
 import { AchievementsPanel } from '@/components/AchievementsPanel';
-import { ErrorLogger } from '@/lib/errorLogger';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
@@ -53,11 +50,6 @@ export default function UnifiedDashboard() {
   const [emailVerified, setEmailVerified] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Analytics state
-  const [allSegments, setAllSegments] = useState<any[]>([]);
-  const [segmentStats, setSegmentStats] = useState<Record<string, any>>({});
-  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
-  const [analyticsProgress, setAnalyticsProgress] = useState({ current: 0, total: 0 });
 
   const { loading: creatingSegments, results, createSegments, setResults, batchProgress } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
@@ -236,157 +228,6 @@ export default function UnifiedDashboard() {
     await handleCreateSegments(failedSegmentIds);
   }, [handleCreateSegments]);
 
-  const fetchAllSegments = async () => {
-    if (klaviyoKeys.length === 0) {
-      return;
-    }
-
-    const activeKey = klaviyoKeys[activeKeyIndex];
-    if (!activeKey?.id) {
-      return;
-    }
-
-    trackAction('fetch_analytics');
-    setLoadingAnalytics(true);
-    
-    try {
-      setAnalyticsProgress({ current: 0, total: 100 });
-      
-      let allFetchedSegments: any[] = [];
-      let includedTags: Record<string, any> = {};
-      // Fetch segments with tags - profile_count requires individual segment fetches or historical data
-      let nextPageUrl: string | null = 'https://a.klaviyo.com/api/segments/?include=tags&fields[segment]=name,created,updated,is_active,is_starred';
-      
-      // Fetch all pages of segments
-      while (nextPageUrl) {
-        const { data, error } = await supabase.functions.invoke('klaviyo-proxy', {
-          body: {
-            keyId: activeKey.id,
-            endpoint: nextPageUrl,
-            method: 'GET',
-          },
-        });
-
-        if (error) {
-          console.error('Supabase function error:', error);
-          throw error;
-        }
-        
-        // Check if Klaviyo returned an error
-        if (data?.errors) {
-          console.error('Klaviyo API error:', data.errors);
-          throw new Error(data.errors[0]?.detail || 'Klaviyo API error');
-        }
-        
-        const pageSegments = data?.data || [];
-        allFetchedSegments = [...allFetchedSegments, ...pageSegments];
-        
-        // Collect included tags from the response
-        if (data?.included) {
-          data.included.forEach((item: any) => {
-            if (item.type === 'tag') {
-              includedTags[item.id] = item.attributes?.name || '';
-            }
-          });
-        }
-        
-        // Check for next page
-        nextPageUrl = data?.links?.next || null;
-        
-        setAnalyticsProgress({ 
-          current: allFetchedSegments.length, 
-          total: allFetchedSegments.length + (nextPageUrl ? 100 : 0) 
-        });
-      }
-      
-      // Fetch latest profile counts from historical data table
-      let historicalCounts: Record<string, number> = {};
-      if (currentUser?.id) {
-        const segmentIds = allFetchedSegments.map((s: any) => s.id);
-        
-        // Get the most recent profile count for each segment
-        const { data: historicalData } = await supabase
-          .from('segment_historical_data')
-          .select('segment_klaviyo_id, profile_count, recorded_at')
-          .eq('klaviyo_key_id', activeKey.id)
-          .in('segment_klaviyo_id', segmentIds)
-          .order('recorded_at', { ascending: false });
-        
-        if (historicalData) {
-          // Keep only the most recent entry for each segment
-          historicalData.forEach((record: any) => {
-            if (!historicalCounts[record.segment_klaviyo_id]) {
-              historicalCounts[record.segment_klaviyo_id] = record.profile_count;
-            }
-          });
-        }
-      }
-      
-      setAllSegments(allFetchedSegments);
-      
-      // Build stats from segment attributes + historical profile counts
-      const stats: Record<string, any> = {};
-      
-      allFetchedSegments.forEach((segment: any) => {
-        // Use profile_count from API response first, fallback to historical data
-        const apiProfileCount = segment.attributes?.profile_count;
-        const profileCount = apiProfileCount ?? historicalCounts[segment.id] ?? null;
-        const segmentName = segment.attributes?.name || 'Unnamed Segment';
-        
-        // Check if segment has Aderai tag (tag-based detection)
-        const segmentTagIds = segment.relationships?.tags?.data?.map((t: any) => t.id) || [];
-        const segmentTags = segmentTagIds.map((id: string) => includedTags[id]).filter(Boolean);
-        const hasAderaiTag = segmentTags.some((tag: string) => 
-          tag.toLowerCase().includes('aderai')
-        );
-        
-        // Check name-based detection
-        const hasAderaiName = segmentName.includes('| Aderai') || segmentName.toLowerCase().includes('aderai');
-        
-        stats[segment.id] = {
-          profileCount: profileCount,
-          name: segmentName,
-          created: segment.attributes?.created || null,
-          updated: segment.attributes?.updated || null,
-          isStarred: segment.attributes?.is_starred || false,
-          isActive: segment.attributes?.is_active !== false,
-          tags: segmentTags,
-          isAderai: hasAderaiTag || hasAderaiName,
-        };
-      });
-
-      setSegmentStats(stats);
-      
-      // Count Aderai segments and segments with profile counts for toast
-      const aderaiCount = Object.values(stats).filter((s: any) => s.isAderai).length;
-      const profileCountsLoaded = Object.values(stats).filter((s: any) => s.profileCount !== null).length;
-      
-      toast.success('Analytics loaded successfully', {
-        description: `${allFetchedSegments.length} segments fetched (${profileCountsLoaded} with counts)${aderaiCount > 0 ? ` • ${aderaiCount} Aderai` : ''}`,
-      });
-    } catch (error) {
-      console.error('Error fetching segments:', error);
-      
-      await ErrorLogger.logKlaviyoError(
-        'Fetch All Segments',
-        error as Error,
-        activeKey?.id
-      );
-      
-      toast.error('Failed to load analytics', {
-        description: 'Check your Klaviyo connection and try again',
-      });
-    } finally {
-      setLoadingAnalytics(false);
-    }
-  };
-
-  // Auto-fetch analytics when switching to the analytics tab
-  useEffect(() => {
-    if (activeTab === 'analytics' && klaviyoKeys.length > 0 && allSegments.length === 0 && !loadingAnalytics) {
-      fetchAllSegments();
-    }
-  }, [activeTab, klaviyoKeys]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -529,41 +370,7 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="analytics">
-            {klaviyoKeys.length === 0 ? (
-              <EmptyState
-                icon={Target}
-                title="Connect Klaviyo to view analytics"
-                description="Analytics show segment performance, profile counts, and growth trends. Connect your Klaviyo account to start tracking your audience data."
-                actionLabel="Connect Klaviyo"
-                onAction={() => navigate('/klaviyo-setup')}
-                secondaryActionLabel="Learn More"
-                onSecondaryAction={() => window.open('/help?article=klaviyo-setup', '_blank')}
-              />
-            ) : (
-              <>
-                {/* Refresh button - always visible when Klaviyo is connected */}
-                <div className="flex justify-end mb-4">
-                  <Button 
-                    onClick={fetchAllSegments} 
-                    disabled={loadingAnalytics}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <RefreshCw className={`w-4 h-4 mr-2 ${loadingAnalytics ? 'animate-spin' : ''}`} />
-                    {loadingAnalytics ? 'Loading...' : 'Refresh Analytics'}
-                  </Button>
-                </div>
-                <AnalyticsDashboard
-                  allSegments={allSegments}
-                  segmentStats={segmentStats}
-                  loadingAnalytics={loadingAnalytics}
-                  analyticsProgress={analyticsProgress}
-                  onShowHealthScore={() => {}}
-                  calculateHealthScore={() => 0}
-                  klaviyoKeyId={klaviyoKeys[activeKeyIndex]?.id}
-                />
-              </>
-            )}
+            <PremiumInviteGate featureName="Advanced Analytics" />
           </TabsContent>
 
           <TabsContent value="ai">
@@ -585,20 +392,7 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="performance">
-            {klaviyoKeys.length === 0 ? (
-              <EmptyState
-                icon={Target}
-                title="Connect Klaviyo to view performance"
-                description="Track segments, campaigns, flows, and get AI-powered insights. Connect your Klaviyo account to unlock comprehensive marketing analytics."
-                actionLabel="Connect Klaviyo"
-                onAction={() => navigate('/klaviyo-setup')}
-              />
-            ) : (
-              <PerformanceDashboard 
-                klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
-                apiKey={klaviyoKeys[activeKeyIndex].klaviyo_api_key_hash}
-              />
-            )}
+            <PremiumInviteGate featureName="Performance Insights" />
           </TabsContent>
 
           <TabsContent value="more">
