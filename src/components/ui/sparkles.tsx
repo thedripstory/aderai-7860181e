@@ -1,5 +1,5 @@
 "use client";
-import React, { useId, useRef } from "react";
+import React, { useId } from "react";
 import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container, SingleOrMultiple } from "@tsparticles/engine";
@@ -31,34 +31,6 @@ export const SparklesCore = (props: ParticlesProps) => {
     particleDensity,
   } = props;
   const [init, setInit] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const particleContainerRef = useRef<Container | null>(null);
-
-  // Visibility detection to pause particles when off-screen
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-        // Pause/resume particle animation
-        if (particleContainerRef.current) {
-          if (entry.isIntersecting) {
-            particleContainerRef.current.play();
-          } else {
-            particleContainerRef.current.pause();
-          }
-        }
-      },
-      { threshold: 0 }
-    );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   useEffect(() => {
     initParticlesEngine(async (engine) => {
       await loadSlim(engine);
@@ -70,11 +42,6 @@ export const SparklesCore = (props: ParticlesProps) => {
 
   const particlesLoaded = async (container?: Container) => {
     if (container) {
-      particleContainerRef.current = container;
-      // Pause immediately if not visible
-      if (!isVisible) {
-        container.pause();
-      }
       controls.start({
         opacity: 1,
         transition: {
@@ -86,7 +53,7 @@ export const SparklesCore = (props: ParticlesProps) => {
 
   const generatedId = useId();
   return (
-    <motion.div ref={containerRef} animate={controls} className={cn("opacity-0", className)}>
+    <motion.div animate={controls} className={cn("opacity-0", className)}>
       {init && (
         <Particles
           id={id || generatedId}
@@ -102,7 +69,7 @@ export const SparklesCore = (props: ParticlesProps) => {
               enable: false,
               zIndex: 1,
             },
-            fpsLimit: 60, // Reduced from 120 for better performance
+            fpsLimit: 120,
             interactivity: {
               events: {
                 onClick: {

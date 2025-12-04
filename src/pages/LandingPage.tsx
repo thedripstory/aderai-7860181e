@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle } from "lucide-react";
 import { TubelightNavbar } from "@/components/TubelightNavbar";
 import { useABTest, trackABTestConversion } from "@/hooks/useABTest";
@@ -12,51 +12,26 @@ import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
+import { AutomationFlow } from "@/components/AutomationFlow";
+import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
+import { TimeBasedPopup } from "@/components/TimeBasedPopup";
+import { SegmentFlowEffect } from "@/components/SegmentFlowEffect";
+import { ComparisonChart } from "@/components/ComparisonChart";
 import { AderaiLogo } from "@/components/AderaiLogo";
+
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { LazySection } from "@/components/LazySection";
+import { Testimonials3D } from "@/components/landing/Testimonials3D";
+import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
-
-// Lazy load heavy components below the fold
-const AutomationFlow = lazy(() => import('@/components/AutomationFlow').then(m => ({ default: m.AutomationFlow })));
-const RevolvingTestimonials = lazy(() => import('@/components/RevolvingTestimonials').then(m => ({ default: m.RevolvingTestimonials })));
-const TimeBasedPopup = lazy(() => import('@/components/TimeBasedPopup').then(m => ({ default: m.TimeBasedPopup })));
-const SegmentFlowEffect = lazy(() => import('@/components/SegmentFlowEffect').then(m => ({ default: m.SegmentFlowEffect })));
-const ComparisonChart = lazy(() => import('@/components/ComparisonChart').then(m => ({ default: m.ComparisonChart })));
-const Testimonials3D = lazy(() => import('@/components/landing/Testimonials3D').then(m => ({ default: m.Testimonials3D })));
-const Globe = lazy(() => import('@/components/ui/globe').then(m => ({ default: m.Globe })));
-
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [showPopupComponent, setShowPopupComponent] = useState(false);
   const navigate = useNavigate();
   const heroVariant = useABTest('hero-headline');
   
-  // Throttled scroll handler for better performance
   useEffect(() => {
-    let ticking = false;
-    
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 20);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Defer popup loading until page is idle
-  useEffect(() => {
-    if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(() => setShowPopupComponent(true));
-    } else {
-      setTimeout(() => setShowPopupComponent(true), 2000);
-    }
   }, []);
   
   const handleGetStarted = () => {
@@ -108,12 +83,12 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative z-10 pt-40 pb-12 px-6 overflow-visible">
         {/* Animated Background Elements */}
-        <div className="absolute inset-0 -z-10 contain-paint">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl transform-gpu animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl transform-gpu animate-pulse" style={{
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{
           animationDelay: "1s"
         }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl transform-gpu" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto">
@@ -270,9 +245,7 @@ export default function LandingPage() {
             </div>
 
             {/* Revolving Testimonials */}
-            <LazySection fallbackHeight="200px">
-              <RevolvingTestimonials />
-            </LazySection>
+            <RevolvingTestimonials />
           </div>
 
           {/* Visual Demo */}
@@ -295,10 +268,10 @@ export default function LandingPage() {
       </section>
 
       {/* Automation Section */}
-      <section className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden contain-paint">
+      <section className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl transform-gpu" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl transform-gpu" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -371,9 +344,7 @@ export default function LandingPage() {
             {/* Right Workflow Visual */}
             <ScrollReveal direction="right" delay={0.2}>
               <div className="relative">
-                <Suspense fallback={<div className="min-h-[400px]" />}>
-                  <AutomationFlow />
-                </Suspense>
+                <AutomationFlow />
               </div>
             </ScrollReveal>
           </div>
@@ -532,10 +503,10 @@ export default function LandingPage() {
       </div>
 
       {/* Success Stories */}
-      <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden contain-paint">
+      <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl transform-gpu" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl transform-gpu" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto relative">
           {/* Header Section */}
@@ -590,17 +561,13 @@ export default function LandingPage() {
       </section>
 
         {/* Comparison Chart Section */}
-        <LazySection fallbackHeight="600px">
-          <ScrollReveal>
-            <ComparisonChart />
-          </ScrollReveal>
-        </LazySection>
+        <ScrollReveal>
+          <ComparisonChart />
+        </ScrollReveal>
 
 
         {/* 3D Testimonials Wall */}
-        <LazySection fallbackHeight="600px">
-          <Testimonials3D />
-        </LazySection>
+        <Testimonials3D />
 
         {/* Live Aderai Users Globe Section */}
         <section className="py-20 px-4 bg-background relative overflow-hidden">
@@ -676,13 +643,11 @@ export default function LandingPage() {
               
               {/* Floating Globe with parallax */}
               <div className="relative w-full max-w-[650px] md:max-w-[750px] aspect-square mx-auto transform-gpu hover:scale-[1.02] transition-transform duration-700">
-                <Suspense fallback={<div className="w-full aspect-square" />}>
-                  <Globe className="inset-0 scale-100 md:scale-110" />
-                </Suspense>
+                <Globe className="inset-0 scale-100 md:scale-110" />
               </div>
               
               {/* Subtle glow underneath */}
-              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-3xl transform-gpu" />
+              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-3xl" />
             </div>
           </div>
         </section>
@@ -761,14 +726,12 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl transform-gpu" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl transform-gpu" />
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
         
         <div className="max-w-7xl mx-auto px-6 relative">
           {/* Segment Flow Effect Section */}
-          <LazySection fallbackHeight="150vh">
-            <SegmentFlowEffect />
-          </LazySection>
+          <SegmentFlowEffect />
 
           {/* Newsletter Section - Unique Element */}
           <div className="py-16 border-b border-border/50">
@@ -884,10 +847,6 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {showPopupComponent && (
-        <Suspense fallback={null}>
-          <TimeBasedPopup onGetStarted={handleGetStarted} />
-        </Suspense>
-      )}
+      <TimeBasedPopup onGetStarted={handleGetStarted} />
     </div>;
 }
