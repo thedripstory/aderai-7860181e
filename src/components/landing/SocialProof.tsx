@@ -41,7 +41,7 @@ export function SocialProof() {
             name="Mike Rodriguez"
             role="E-commerce Manager"
             company="Beauty & Wellness"
-            story="The free tier gives us everything we need. We're seeing 30% better email engagement already."
+            story="At just $9/month, Aderai gives us everything we need. We're seeing 30% better email engagement already."
             metrics={[
               { label: "Email Revenue", value: "$523K" },
               { label: "Growth", value: "+89%" }

@@ -74,7 +74,7 @@ export default function LandingPage() {
               onClick={handleGetStarted} 
               className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-base font-semibold hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary/30"
             >
-              Sign up free
+              Get Started
             </button>
           </div>
         </div>
@@ -164,11 +164,11 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>100% Free</span>
+                <span>Just $9/month</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>No credit card required</span>
+                <span>70+ expert segments</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />

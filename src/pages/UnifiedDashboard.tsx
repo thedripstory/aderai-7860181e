@@ -353,7 +353,7 @@ export default function UnifiedDashboard() {
               onSelectAll={handleSelectAll}
               onClearAll={handleClearAll}
               segmentLimit={999}
-              currentTier="free"
+              currentTier="starter"
               userSettings={klaviyoKeys[activeKeyIndex] ? {
                 currencySymbol: klaviyoKeys[activeKeyIndex].currency_symbol || '$',
                 highValueThreshold: klaviyoKeys[activeKeyIndex].high_value_threshold || 500,

@@ -45,7 +45,7 @@ export const AnimatedSignUpCTA = () => {
         <div className="relative z-10 flex items-center gap-4">
           <Sparkles className="w-6 h-6 text-white animate-pulse" />
           <span className="text-xl font-bold text-white tracking-wide">
-            Start Free Today
+            Start Building Segments
           </span>
           <motion.div
             animate={{ x: [0, 5, 0] }}
@@ -64,7 +64,7 @@ export const AnimatedSignUpCTA = () => {
         viewport={{ once: true }}
         className="mt-4 text-sm text-muted-foreground"
       >
-        No credit card required • 70 segments in 30 seconds
+        70+ segments deployed in 30 seconds
       </motion.p>
     </motion.div>
   );

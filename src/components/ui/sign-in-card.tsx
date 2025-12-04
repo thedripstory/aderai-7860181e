@@ -229,7 +229,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                   transition={{ delay: 0.3 }}
                   className="text-muted-foreground text-sm"
                 >
-                  {isSignUp ? "Get started with Aderai for free" : "Sign in to continue to Aderai"}
+                  {isSignUp ? "Get started with Aderai" : "Sign in to continue to Aderai"}
                 </motion.p>
               </div>
 
@@ -502,7 +502,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
 
                 {isSignUp && (
                   <p className="text-sm text-muted-foreground text-center">
-                    Free forever • No credit card required
+                    $9/month • Cancel anytime
                   </p>
                 )}
 
