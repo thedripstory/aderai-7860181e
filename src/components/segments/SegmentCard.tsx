@@ -15,6 +15,9 @@ import { Label } from '@/components/ui/label';
 // Predictive analytics segment IDs
 const PREDICTIVE_ANALYTICS_SEGMENTS = ['high-churn-risk', 'likely-purchase-soon', 'predicted-vips', 'high-churn-risk-exclude'];
 
+// Category-based segment IDs
+const CATEGORY_SEGMENTS = ['cross-sell', 'category-buyers', 'multi-category'];
+
 interface SegmentCardProps {
   segment: Segment;
   isSelected: boolean;
@@ -356,6 +359,170 @@ const ProximitySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenCha
   </Dialog>
 );
 
+const CategorySetupDialog = ({ open, onOpenChange, segmentId, segmentName }: { open: boolean; onOpenChange: (open: boolean) => void; segmentId: string; segmentName: string }) => {
+  const getGuideContent = () => {
+    switch (segmentId) {
+      case 'cross-sell':
+        return {
+          icon: '🔀',
+          title: 'Cross-Sell Segment Setup Guide',
+          subtitle: 'Target customers who bought X but not Y for perfect upselling',
+          whyTitle: 'Why Cross-Sell Segments?',
+          whyText: 'Cross-sell segments can increase revenue by 10-30%. Target customers who bought complementary products to drive additional purchases!',
+          steps: [
+            {
+              title: 'Identify Product Relationships',
+              description: 'List products that pair well together (e.g., camera → lens, phone → case, skincare → moisturizer)'
+            },
+            {
+              title: 'Create Segment in Klaviyo',
+              description: 'Go to Audience → Segments → Create Segment'
+            },
+            {
+              title: 'Add "Purchased Product" Condition',
+              description: 'Select: "What someone has done → Placed Order → where Item Name contains [Product A]"'
+            },
+            {
+              title: 'Add Exclusion Condition',
+              description: 'Add AND condition: "Placed Order → where Item Name contains [Product B] → zero times"'
+            }
+          ],
+          proTip: 'Create multiple cross-sell segments for your top product pairings and set up automated flows for each!'
+        };
+      case 'category-buyers':
+        return {
+          icon: '📦',
+          title: 'Category Buyers Segment Setup Guide',
+          subtitle: 'Target customers who purchased from specific product categories',
+          whyTitle: 'Why Category Segments?',
+          whyText: 'Category-based targeting lets you send highly relevant content. Customers who bought skincare want skincare updates, not electronics!',
+          steps: [
+            {
+              title: 'Identify Your Categories',
+              description: 'List your main product categories (e.g., Skincare, Electronics, Apparel, Home Goods)'
+            },
+            {
+              title: 'Create Segment in Klaviyo',
+              description: 'Go to Audience → Segments → Create Segment'
+            },
+            {
+              title: 'Add Category Condition',
+              description: 'Select: "What someone has done → Placed Order → where Product Category equals [Your Category]"'
+            },
+            {
+              title: 'Set Time Frame (Optional)',
+              description: 'Add "in the last X days" to target recent buyers, or leave open for all-time buyers'
+            }
+          ],
+          proTip: 'Create a segment for each major category and personalize your campaigns accordingly!'
+        };
+      case 'multi-category':
+        return {
+          icon: '🎯',
+          title: 'Multi-Category Shoppers Setup Guide',
+          subtitle: 'Identify your most engaged customers who shop across categories',
+          whyTitle: 'Why Multi-Category Segments?',
+          whyText: 'Multi-category shoppers have 3x higher lifetime value. These are your most engaged customers - treat them like VIPs!',
+          steps: [
+            {
+              title: 'Create First Category Condition',
+              description: 'In Segment Builder: "Placed Order → where Product Category equals [Category A] → at least once"'
+            },
+            {
+              title: 'Add Second Category Condition',
+              description: 'Add AND: "Placed Order → where Product Category equals [Category B] → at least once"'
+            },
+            {
+              title: 'Add More Categories (Optional)',
+              description: 'Continue adding AND conditions for each category you want to include'
+            },
+            {
+              title: 'Refine Time Frame',
+              description: 'Optionally add "in the last 365 days" to focus on recent multi-category shoppers'
+            }
+          ],
+          proTip: 'Segment by 2+ categories for "engaged" and 3+ categories for "highly engaged" customers!'
+        };
+      default:
+        return null;
+    }
+  };
+
+  const content = getGuideContent();
+  if (!content) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <span className="text-2xl">{content.icon}</span>
+            {content.title}
+          </DialogTitle>
+          <DialogDescription>
+            {content.subtitle}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 mt-2">
+          <div className="p-4 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
+            <div className="flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-sm">{content.whyTitle}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {content.whyText}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="font-semibold text-sm">Setup Steps in Klaviyo:</h4>
+            
+            {content.steps.map((step, index) => (
+              <div key={index} className="flex gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">
+                  {index + 1}
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{step.title}</p>
+                  <p className="text-xs text-muted-foreground">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+            <p className="text-sm text-blue-700 dark:text-blue-400">
+              <strong>💡 Pro Tip:</strong> {content.proTip}
+            </p>
+          </div>
+
+          <div className="pt-2 flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => window.open('https://help.klaviyo.com/hc/en-us/articles/115005080407-Create-a-Segment-in-Klaviyo', '_blank')}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Klaviyo Guide
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1"
+              onClick={() => onOpenChange(false)}
+            >
+              Got it!
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export const SegmentCard = memo(function SegmentCard({
   segment,
   isSelected,
@@ -370,6 +537,7 @@ export const SegmentCard = memo(function SegmentCard({
   const [showBirthdayGuide, setShowBirthdayGuide] = useState(false);
   const [showProximityGuide, setShowProximityGuide] = useState(false);
   const [showPredictiveGuide, setShowPredictiveGuide] = useState(false);
+  const [showCategoryGuide, setShowCategoryGuide] = useState(false);
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [tempLocationValue, setTempLocationValue] = useState(
     customInputValue || segment.requiresInput?.defaultValue || ''
@@ -378,6 +546,7 @@ export const SegmentCard = memo(function SegmentCard({
   const isUnavailable = segment.unavailable;
   const requiresInput = segment.requiresInput && !isUnavailable;
   const isPredictiveSegment = PREDICTIVE_ANALYTICS_SEGMENTS.includes(segment.id);
+  const isCategorySegment = CATEGORY_SEGMENTS.includes(segment.id);
 
   const handleClick = () => {
     if (segment.id === 'birthday-month') {
@@ -386,6 +555,8 @@ export const SegmentCard = memo(function SegmentCard({
       setShowProximityGuide(true);
     } else if (isPredictiveSegment) {
       setShowPredictiveGuide(true);
+    } else if (isCategorySegment) {
+      setShowCategoryGuide(true);
     } else if (requiresInput && !isSelected) {
       // Show input dialog for segments that require custom input
       setTempLocationValue(customInputValue || segment.requiresInput?.defaultValue || '');
@@ -512,6 +683,15 @@ export const SegmentCard = memo(function SegmentCard({
         <PredictiveAnalyticsSetupDialog 
           open={showPredictiveGuide} 
           onOpenChange={setShowPredictiveGuide}
+          segmentName={segment.name}
+        />
+      )}
+
+      {isCategorySegment && (
+        <CategorySetupDialog 
+          open={showCategoryGuide} 
+          onOpenChange={setShowCategoryGuide}
+          segmentId={segment.id}
           segmentName={segment.name}
         />
       )}
