@@ -85,35 +85,30 @@ export const ComparisonChart = () => {
 
   return (
     <section className="relative py-24 px-4 overflow-hidden bg-gradient-to-b from-background via-background to-primary/5">
-      {/* Animated background elements */}
+      {/* Animated background elements - more subtle */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
-          className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-72 h-72 bg-muted/30 rounded-full blur-3xl"
           animate={{ 
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
+            opacity: [0.2, 0.3, 0.2],
             x: [0, 30, 0]
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
+          className="absolute bottom-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
           animate={{ 
             scale: [1.2, 1, 1.2],
-            opacity: [0.4, 0.2, 0.4],
+            opacity: [0.2, 0.1, 0.2],
             y: [0, -40, 0]
           }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-primary/5 rounded-full"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-border/20 rounded-full"
           animate={{ rotate: 360 }}
           transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-accent/5 rounded-full"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
         />
       </div>
 
@@ -150,39 +145,37 @@ export const ComparisonChart = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          {/* Glass card effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-card/80 via-card/60 to-card/80 backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-          <div className="absolute inset-[1px] rounded-3xl border border-white/10" />
+          {/* Glass card effect - neutral base */}
+          <div className="absolute inset-0 bg-gradient-to-br from-card/90 via-card/80 to-card/90 backdrop-blur-xl" />
+          <div className="absolute inset-[1px] rounded-3xl border border-border/50" />
           
-          {/* Glow effect */}
-          <div className="absolute -inset-px bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-sm opacity-50" />
+          {/* Subtle glow on right side only for Aderai column */}
+          <div className="absolute top-0 right-0 bottom-0 w-1/3 bg-gradient-to-l from-primary/10 to-transparent rounded-r-3xl" />
 
           <div className="relative">
             {/* Header */}
-            <div className="grid grid-cols-3 border-b border-white/10">
-              <div className="p-6 md:p-8"></div>
+            <div className="grid grid-cols-3 border-b border-border/30">
+              <div className="p-6 md:p-8 bg-transparent"></div>
               <motion.div 
-                className="p-6 md:p-8 text-center border-x border-white/10 relative overflow-hidden"
+                className="p-6 md:p-8 text-center border-x border-border/30 relative overflow-hidden bg-muted/40"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.5 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-b from-destructive/10 to-transparent" />
                 <div className="relative">
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Old Way</div>
-                  <div className="text-xl md:text-2xl font-bold text-muted-foreground">Manual Klaviyo</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-2">Old Way</div>
+                  <div className="text-xl md:text-2xl font-bold text-muted-foreground/80">Manual Klaviyo</div>
                 </div>
               </motion.div>
               <motion.div 
-                className="p-6 md:p-8 text-center relative overflow-hidden"
+                className="p-6 md:p-8 text-center relative overflow-hidden bg-primary/5"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.6 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/15 to-primary/5" />
                 <motion.div 
                   className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"
                   animate={{ opacity: [0.5, 1, 0.5] }}
@@ -217,45 +210,45 @@ export const ComparisonChart = () => {
                   <motion.div
                     key={idx}
                     variants={rowVariants}
-                    className={`grid grid-cols-3 group ${idx !== comparisons.length - 1 ? 'border-b border-white/5' : ''}`}
+                    className={`grid grid-cols-3 group ${idx !== comparisons.length - 1 ? 'border-b border-border/20' : ''}`}
                   >
                     {/* Feature Name */}
-                    <div className="p-5 md:p-6 flex items-center gap-3 group-hover:bg-white/[0.02] transition-colors duration-300">
+                    <div className="p-5 md:p-6 flex items-center gap-3 group-hover:bg-muted/20 transition-colors duration-300">
                       <motion.div 
-                        className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20"
+                        className="w-10 h-10 rounded-xl bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center border border-border/50"
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         transition={{ type: "spring", stiffness: 400 }}
                       >
-                        <Icon className="w-5 h-5 text-primary" />
+                        <Icon className="w-5 h-5 text-foreground/70" />
                       </motion.div>
                       <span className="font-semibold text-sm md:text-base">{item.feature}</span>
                     </div>
 
-                    {/* Manual Column */}
-                    <div className="p-5 md:p-6 border-x border-white/5 flex items-center justify-center text-center group-hover:bg-white/[0.02] transition-colors duration-300">
+                    {/* Manual Column - Grey/Muted */}
+                    <div className="p-5 md:p-6 border-x border-border/20 flex items-center justify-center text-center bg-muted/30 group-hover:bg-muted/40 transition-colors duration-300">
                       {typeof item.manual === 'boolean' ? (
                         item.manual ? (
                           <motion.div 
-                            className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center"
+                            className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center"
                             whileHover={{ scale: 1.2 }}
                           >
-                            <Check className="w-5 h-5 text-emerald-500" />
+                            <Check className="w-5 h-5 text-muted-foreground" />
                           </motion.div>
                         ) : (
                           <motion.div 
-                            className="w-8 h-8 rounded-full bg-destructive/20 flex items-center justify-center"
+                            className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center"
                             whileHover={{ scale: 1.2 }}
                           >
-                            <X className="w-5 h-5 text-destructive" />
+                            <X className="w-5 h-5 text-destructive/70" />
                           </motion.div>
                         )
                       ) : (
-                        <span className="text-muted-foreground text-sm md:text-base">{item.manual}</span>
+                        <span className="text-muted-foreground/80 text-sm md:text-base">{item.manual}</span>
                       )}
                     </div>
 
-                    {/* Aderai Column */}
-                    <div className="p-5 md:p-6 flex items-center justify-center text-center relative group-hover:bg-primary/[0.03] transition-colors duration-300">
+                    {/* Aderai Column - Vibrant */}
+                    <div className="p-5 md:p-6 flex items-center justify-center text-center relative bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
                       {typeof item.aderai === 'boolean' ? (
                         item.aderai ? (
                           <motion.div 
@@ -293,18 +286,13 @@ export const ComparisonChart = () => {
 
             {/* Bottom CTA */}
             <motion.div 
-              className="p-8 md:p-12 text-center relative overflow-hidden"
+              className="p-8 md:p-12 text-center relative overflow-hidden border-t border-border/30"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.8 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-primary/5 to-transparent" />
-              <motion.div 
-                className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"
-                animate={{ opacity: [0.3, 0.8, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              />
+              <div className="absolute inset-0 bg-gradient-to-t from-muted/30 to-transparent" />
               
               <div className="relative max-w-xl mx-auto">
                 <h3 className="text-2xl md:text-3xl font-bold mb-4">
@@ -315,15 +303,12 @@ export const ComparisonChart = () => {
                 </p>
                 <motion.button 
                   onClick={() => window.location.href = '/signup'}
-                  className="relative group inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-lg overflow-hidden"
+                  className="relative group inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-lg overflow-hidden bg-primary hover:bg-primary/90 transition-colors"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite]" />
-                  <div className="absolute inset-[1px] rounded-full bg-gradient-to-r from-primary to-accent" />
-                  <span className="relative text-primary-foreground">Switch to Aderai Today</span>
+                  <span className="text-primary-foreground">Switch to Aderai Today</span>
                   <motion.div
-                    className="relative"
                     animate={{ x: [0, 4, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   >
