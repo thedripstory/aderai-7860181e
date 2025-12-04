@@ -406,15 +406,22 @@ function getSegmentDefinition(
     } : null,
     
     // #19 Recent First-Time Customers - Exactly 1 order AND ordered recently
+    // MUST use separate condition_groups for AND logic!
     'recent-first-time': placedOrderId ? {
       name: `Recent First-Time Customers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
@@ -455,28 +462,42 @@ function getSegmentDefinition(
     } : null,
     
     // #23 Lapsed Customers - Has ordered, 0 in last 180 days
+    // MUST use separate condition_groups for AND logic!
     'lapsed-customers': placedOrderId ? {
       name: `Lapsed Customers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
     // #24 Churned Customers - Has ordered, 0 in last 365 days
+    // MUST use separate condition_groups for AND logic!
     'churned-customers': placedOrderId ? {
       name: `Churned Customers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 365, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 365, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
@@ -659,43 +680,65 @@ function getSegmentDefinition(
       }
     } : null,
     
-    // #36 Abandoned Cart
+    // #36 Abandoned Cart - MUST use separate condition_groups for AND logic!
     'abandoned-cart': (addedToCartId && placedOrderId) ? {
       name: `Abandoned Cart${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(addedToCartId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(addedToCartId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
-    // #38 Abandoned Checkout
+    // #38 Abandoned Checkout - MUST use separate condition_groups for AND logic!
     'abandoned-checkout': (startedCheckoutId && placedOrderId) ? {
       name: `Abandoned Checkout${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(startedCheckoutId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(startedCheckoutId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
-    // #40 Browse Abandonment
+    // #40 Browse Abandonment - THREE separate condition_groups for AND logic!
     'browse-abandonment': (viewedProductId && addedToCartId && placedOrderId) ? {
       name: `Browse Abandonment${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(viewedProductId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
-            buildMetricCondition(addedToCartId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(viewedProductId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(addedToCartId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
@@ -787,16 +830,23 @@ function getSegmentDefinition(
       }
     } : null,
     
-    // #50 Non-Reviewers
+    // #50 Non-Reviewers - purchased AND never reviewed
+    // MUST use separate condition_groups for AND logic!
     'non-reviewers': (reviewedProductId && placedOrderId) ? {
       name: `Non-Reviewers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(reviewedProductId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(reviewedProductId, 'count', 'equals', 0, { type: 'over-all-time' })
+            ]
+          }
+        ]
       }
     } : null,
     
@@ -807,24 +857,36 @@ function getSegmentDefinition(
     'cart-abandoners': (startedCheckoutId && placedOrderId) ? {
       name: `Cart Abandoners${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(startedCheckoutId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(startedCheckoutId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
     'browse-abandoners': (viewedProductId && startedCheckoutId) ? {
       name: `Browse Abandoners${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(viewedProductId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 14, unit: 'day' }),
-            buildMetricCondition(startedCheckoutId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(viewedProductId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(startedCheckoutId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 14, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
     
@@ -886,12 +948,18 @@ function getSegmentDefinition(
     'win-back-target': placedOrderId ? {
       name: `Win-Back Target (60-180 Days)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
 
@@ -967,24 +1035,36 @@ function getSegmentDefinition(
     'at-risk-customers': placedOrderId ? {
       name: `At-Risk Customers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 60, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
 
     'dormant-customers': placedOrderId ? {
       name: `Dormant Customers (120+ Days)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
 
@@ -1006,12 +1086,18 @@ function getSegmentDefinition(
     'never-engaged-exclusion': (openedEmailId && clickedEmailId) ? {
       name: `🚫 Never Engaged${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'over-all-time' }),
-            buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'over-all-time' })
+            ]
+          }
+        ]
       }
     } : null,
 
@@ -1341,16 +1427,22 @@ function getSegmentDefinition(
       }
     },
 
+    // No opens AND no clicks - MUST use separate condition_groups for AND logic!
     'unengaged-exclusion': (openedEmailId && clickedEmailId) ? {
       name: `🚫 Unengaged Exclusion (180+ Days)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            // No opens AND no clicks in 180 days
-            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' }),
-            buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
 
@@ -1384,15 +1476,22 @@ function getSegmentDefinition(
     // SUNSET/WINBACK SEGMENT
     // =====================================
 
+    // Sunset: some opens AND low opens - MUST use separate condition_groups for AND logic!
     'sunset-segment': openedEmailId ? {
       name: `🚫 Sunset Segment${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 180, unit: 'day' }),
-            buildMetricCondition(openedEmailId, 'count', 'less-than', 3, { type: 'in-the-last', quantity: 180, unit: 'day' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(openedEmailId, 'count', 'less-than', 3, { type: 'in-the-last', quantity: 180, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
 
@@ -1400,57 +1499,71 @@ function getSegmentDefinition(
     // ADVANCED SHOPPING SEGMENTS
     // =====================================
 
+    // High value cart AND no purchase - MUST use separate condition_groups for AND logic!
     'abandoned-cart-high-value': (addedToCartId && placedOrderId) ? {
       name: `Abandoned Cart - High Value (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            {
-              type: 'profile-metric',
-              metric_id: addedToCartId,
-              measurement: 'sum',
-              measurement_filter: {
-                type: 'numeric',
-                operator: 'greater-than-or-equal',
-                value: highValueThreshold
-              },
-              timeframe_filter: {
-                type: 'date',
-                operator: 'in-the-last',
-                quantity: 30,
-                unit: 'day'
+        condition_groups: [
+          {
+            conditions: [
+              {
+                type: 'profile-metric',
+                metric_id: addedToCartId,
+                measurement: 'sum',
+                measurement_filter: {
+                  type: 'numeric',
+                  operator: 'greater-than-or-equal',
+                  value: highValueThreshold
+                },
+                timeframe_filter: {
+                  type: 'date',
+                  operator: 'in-the-last',
+                  quantity: 30,
+                  unit: 'day'
+                }
               }
-            },
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
 
+    // High value checkout AND no purchase - MUST use separate condition_groups for AND logic!
     'abandoned-checkout-high-value': (startedCheckoutId && placedOrderId) ? {
       name: `Abandoned Checkout - High Value (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            {
-              type: 'profile-metric',
-              metric_id: startedCheckoutId,
-              measurement: 'sum',
-              measurement_filter: {
-                type: 'numeric',
-                operator: 'greater-than-or-equal',
-                value: highValueThreshold
-              },
-              timeframe_filter: {
-                type: 'date',
-                operator: 'in-the-last',
-                quantity: 30,
-                unit: 'day'
+        condition_groups: [
+          {
+            conditions: [
+              {
+                type: 'profile-metric',
+                metric_id: startedCheckoutId,
+                measurement: 'sum',
+                measurement_filter: {
+                  type: 'numeric',
+                  operator: 'greater-than-or-equal',
+                  value: highValueThreshold
+                },
+                timeframe_filter: {
+                  type: 'date',
+                  operator: 'in-the-last',
+                  quantity: 30,
+                  unit: 'day'
+                }
               }
-            },
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-          ]
-        }]
+            ]
+          },
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            ]
+          }
+        ]
       }
     } : null,
 
