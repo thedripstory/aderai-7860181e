@@ -59,7 +59,7 @@ export default function UnifiedDashboard() {
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [analyticsProgress, setAnalyticsProgress] = useState({ current: 0, total: 0 });
 
-  const { loading: creatingSegments, results, createSegments, setResults } = useKlaviyoSegments();
+  const { loading: creatingSegments, results, createSegments, setResults, batchProgress } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
   const { 
     run: runTour, 
@@ -420,6 +420,7 @@ export default function UnifiedDashboard() {
         onViewResults={() => setView(null)}
         onRetryFailed={handleRetryFailed}
         userSettings={userSettings}
+        batchProgress={batchProgress}
       />
     );
   }

@@ -81,10 +81,19 @@ export interface KlaviyoKey {
   is_active: boolean;
 }
 
+export interface BatchProgress {
+  currentBatch: number;
+  totalBatches: number;
+  segmentsProcessed: number;
+  totalSegments: number;
+  estimatedTimeRemaining: number; // in seconds
+}
+
 export const useKlaviyoSegments = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<SegmentResult[]>([]);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null);
 
   const createSegments = async (
     selectedSegments: string[],
@@ -122,6 +131,39 @@ export const useKlaviyoSegments = () => {
     setLoading(true);
     setResults([]);
     setProgress({ current: 0, total: availableSegmentIds.length });
+    
+    // Calculate batch progress info for UI feedback
+    const BATCH_SIZE = 4;
+    const BATCH_DELAY_SECONDS = 3;
+    const INTRA_BATCH_DELAY_SECONDS = 0.5;
+    const totalBatches = Math.ceil(availableSegmentIds.length / BATCH_SIZE);
+    const estimatedTimePerBatch = (BATCH_SIZE * INTRA_BATCH_DELAY_SECONDS) + BATCH_DELAY_SECONDS + 2; // +2s for API calls
+    
+    setBatchProgress({
+      currentBatch: 1,
+      totalBatches,
+      segmentsProcessed: 0,
+      totalSegments: availableSegmentIds.length,
+      estimatedTimeRemaining: totalBatches * estimatedTimePerBatch
+    });
+    
+    // Simulate batch progress updates for better UX
+    let batchInterval: NodeJS.Timeout | null = null;
+    if (totalBatches > 1) {
+      let currentBatch = 1;
+      batchInterval = setInterval(() => {
+        currentBatch = Math.min(currentBatch + 1, totalBatches);
+        const segmentsProcessed = Math.min(currentBatch * BATCH_SIZE, availableSegmentIds.length);
+        const remainingBatches = totalBatches - currentBatch;
+        setBatchProgress({
+          currentBatch,
+          totalBatches,
+          segmentsProcessed,
+          totalSegments: availableSegmentIds.length,
+          estimatedTimeRemaining: remainingBatches * estimatedTimePerBatch
+        });
+      }, estimatedTimePerBatch * 1000);
+    }
 
     try {
       const currencySymbol = activeKey.currency_symbol || '$';
@@ -312,6 +354,10 @@ export const useKlaviyoSegments = () => {
       setResults(errorResults);
       throw error;
     } finally {
+      if (batchInterval) {
+        clearInterval(batchInterval);
+      }
+      setBatchProgress(null);
       setLoading(false);
     }
   };
@@ -320,6 +366,7 @@ export const useKlaviyoSegments = () => {
     loading,
     results,
     progress,
+    batchProgress,
     createSegments,
     setResults,
   };
