@@ -39,11 +39,11 @@ serve(async (req) => {
     }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2023-10-16",
+      apiVersion: "2025-08-27.basil",
     });
 
     const reqData = await req.json();
-    const origin = reqData?.origin || Deno.env.get("APP_URL") || "https://aderai.io";
+    const origin = reqData?.origin || Deno.env.get("SITE_URL") || "https://aderai.io";
 
     // Create Stripe Customer Portal session
     const session = await stripe.billingPortal.sessions.create({

@@ -7,6 +7,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Fixed price ID for Aderai Monthly subscription ($9/month)
+const ADERAI_MONTHLY_PRICE_ID = "price_1SacRA0lE1soQQfxnQig4ytO";
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[STRIPE-CHECKOUT] ${step}${detailsStr}`);
@@ -37,7 +40,7 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2023-10-16",
+      apiVersion: "2025-08-27.basil",
     });
 
     // Check if customer already exists
@@ -76,57 +79,7 @@ serve(async (req) => {
 
     logStep("Updated user with Stripe customer ID");
 
-    // Create or get the product
-    let product;
-    const products = await stripe.products.list({ 
-      active: true,
-      limit: 100 
-    });
-    
-    const existingProduct = products.data.find((p: Stripe.Product) => p.name === "Aderai Monthly Subscription");
-    
-    if (existingProduct) {
-      product = existingProduct;
-      logStep("Found existing product", { productId: product.id });
-    } else {
-      product = await stripe.products.create({
-        name: "Aderai Monthly Subscription",
-        description: "Full access to Aderai - 70+ Klaviyo segments, AI suggestions, and analytics",
-        metadata: {
-          app: "aderai",
-        },
-      });
-      logStep("Created new product", { productId: product.id });
-    }
-
-    // Create or get the price
-    let price;
-    const prices = await stripe.prices.list({
-      product: product.id,
-      active: true,
-      limit: 100,
-    });
-
-    const existingPrice = prices.data.find(
-      (p: Stripe.Price) => p.unit_amount === 900 && p.recurring?.interval === "month"
-    );
-
-    if (existingPrice) {
-      price = existingPrice;
-      logStep("Found existing price", { priceId: price.id });
-    } else {
-      price = await stripe.prices.create({
-        product: product.id,
-        unit_amount: 900, // $9.00 in cents
-        currency: "usd",
-        recurring: {
-          interval: "month",
-        },
-      });
-      logStep("Created new price", { priceId: price.id });
-    }
-
-    // Create checkout session
+    // Create checkout session with fixed price
     const reqData = await req.json().catch(() => ({}));
     const origin = reqData?.origin || Deno.env.get("SITE_URL") || "https://aderai.io";
 
@@ -134,13 +87,13 @@ serve(async (req) => {
       customer: customerId,
       line_items: [
         {
-          price: price.id,
+          price: ADERAI_MONTHLY_PRICE_ID,
           quantity: 1,
         },
       ],
       mode: "subscription",
       success_url: `${origin}/onboarding?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/signup?payment=canceled`,
+      cancel_url: `${origin}/auth?payment=canceled`,
       metadata: {
         supabase_user_id: user.id,
       },

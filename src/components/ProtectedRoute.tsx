@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/errorLogger';
+import { CreditCard, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
-  const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
   const location = useLocation();
 
@@ -52,13 +53,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             });
           } else {
             setHasProfile(!!profile);
-            
-            // Check subscription status
-            if (profile) {
-              const isActive = profile.subscription_status === 'active' || 
-                               profile.subscription_status === 'trialing';
-              setHasActiveSubscription(isActive);
-            }
+            setSubscriptionStatus(profile?.subscription_status || 'inactive');
           }
         } catch (err) {
           await ErrorLogger.logError(err as Error, {
@@ -101,13 +96,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               }
               
               setHasProfile(!!profile);
-              
-              // Check subscription status
-              if (profile) {
-                const isActive = profile.subscription_status === 'active' || 
-                                 profile.subscription_status === 'trialing';
-                setHasActiveSubscription(isActive);
-              }
+              setSubscriptionStatus(profile?.subscription_status || 'inactive');
             } catch (err) {
               await ErrorLogger.logError(err as Error, {
                 context: 'Auth state change profile check failed',
@@ -117,7 +106,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           });
         } else {
           setHasProfile(null);
-          setHasActiveSubscription(null);
+          setSubscriptionStatus(null);
         }
       }
     );
@@ -140,8 +129,23 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     }
   };
 
+  const handleUpdatePayment = async () => {
+    setIsCheckingSubscription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-create-portal-session', {
+        body: { origin: window.location.origin },
+      });
+      if (error) throw error;
+      if (data?.url) window.open(data.url, '_blank');
+    } catch (err) {
+      toast.error('Error opening billing portal. Please try again.');
+    } finally {
+      setIsCheckingSubscription(false);
+    }
+  };
+
   // Still checking auth, profile, or subscription
-  if (isAuthenticated === null || (isAuthenticated && hasProfile === null) || (isAuthenticated && hasProfile && hasActiveSubscription === null)) {
+  if (isAuthenticated === null || (isAuthenticated && hasProfile === null) || (isAuthenticated && hasProfile && subscriptionStatus === null)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         <div className="relative w-8 h-8">
@@ -189,7 +193,51 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Authenticated but no active subscription
+  // Check for active subscription (active or trialing)
+  const hasActiveSubscription = subscriptionStatus === 'active' || subscriptionStatus === 'trialing';
+
+  // Past due subscription - payment failed
+  if (subscriptionStatus === 'past_due') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <div className="max-w-md mx-auto p-8 bg-card rounded-2xl border border-border shadow-xl text-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-amber-500/10 flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-amber-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-3">Payment Failed</h2>
+          <p className="text-muted-foreground mb-6">
+            Your last payment didn't go through. Please update your payment method to continue using Aderai.
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={handleUpdatePayment}
+              disabled={isCheckingSubscription}
+              className="w-full bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 transition-colors font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <CreditCard className="w-4 h-4" />
+              {isCheckingSubscription ? 'Opening...' : 'Update Payment Method'}
+            </button>
+            <button
+              onClick={handleSubscribe}
+              disabled={isCheckingSubscription}
+              className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <RefreshCw className="w-4 h-4" />
+              {isCheckingSubscription ? 'Setting up...' : 'Retry Payment'}
+            </button>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="w-full text-muted-foreground hover:text-foreground px-4 py-2 transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated but no active subscription (inactive, canceled, etc.)
   if (!hasActiveSubscription) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -199,16 +247,20 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold mb-3">Subscription Required</h2>
+          <h2 className="text-2xl font-bold mb-3">
+            {subscriptionStatus === 'canceled' ? 'Subscription Ended' : 'Subscription Required'}
+          </h2>
           <p className="text-muted-foreground mb-6">
-            To access Aderai, please complete your subscription setup.
+            {subscriptionStatus === 'canceled' 
+              ? 'Your subscription has been canceled. Resubscribe to regain access to Aderai.'
+              : 'To access Aderai, please complete your subscription setup.'}
           </p>
           <button
             onClick={handleSubscribe}
             disabled={isCheckingSubscription}
             className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold mb-3 disabled:opacity-50"
           >
-            {isCheckingSubscription ? 'Setting up...' : 'Complete Subscription - $9/month'}
+            {isCheckingSubscription ? 'Setting up...' : subscriptionStatus === 'canceled' ? 'Resubscribe - $9/month' : 'Complete Subscription - $9/month'}
           </button>
           <button
             onClick={() => supabase.auth.signOut()}
