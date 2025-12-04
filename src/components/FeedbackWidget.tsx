@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { MessageSquare, X, Send, Bug, Lightbulb, MessageCircle, Star } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { MessageSquare, X, Send, Bug, Lightbulb, MessageCircle, Star, Image, Video, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,6 +16,7 @@ import { ErrorLogger } from '@/lib/errorLogger';
 const bugReportSchema = z.object({
   description: z.string().trim().min(10, 'Description must be at least 10 characters').max(1000, 'Description must be less than 1000 characters'),
   steps: z.string().trim().max(2000, 'Steps must be less than 2000 characters').optional(),
+  videoLink: z.string().trim().url('Please enter a valid URL').optional().or(z.literal('')),
 });
 
 const featureRequestSchema = z.object({
@@ -38,6 +39,9 @@ export const FeedbackWidget: React.FC = () => {
   // Bug Report State
   const [bugDescription, setBugDescription] = useState('');
   const [bugSteps, setBugSteps] = useState('');
+  const [bugScreenshot, setBugScreenshot] = useState<string | null>(null);
+  const [bugVideoLink, setBugVideoLink] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Feature Request State
   const [featureTitle, setFeatureTitle] = useState('');
@@ -61,11 +65,43 @@ export const FeedbackWidget: React.FC = () => {
   const resetForms = () => {
     setBugDescription('');
     setBugSteps('');
+    setBugScreenshot(null);
+    setBugVideoLink('');
     setFeatureTitle('');
     setFeatureDescription('');
     setFeatureImportance(3);
     setGeneralFeedback('');
     setSatisfaction(5);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            setBugScreenshot(event.target?.result as string);
+          };
+          reader.readAsDataURL(file);
+        }
+        break;
+      }
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setBugScreenshot(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const submitFeedback = async (type: 'bug_report' | 'feature_request' | 'general', data: any, metadata: any) => {
@@ -180,12 +216,15 @@ export const FeedbackWidget: React.FC = () => {
       const validated = bugReportSchema.parse({
         description: bugDescription,
         steps: bugSteps,
+        videoLink: bugVideoLink || undefined,
       });
 
       setSubmitting(true);
 
       const metadata = {
         steps_to_reproduce: validated.steps || '',
+        screenshot: bugScreenshot || null,
+        video_link: validated.videoLink || null,
         browser: navigator.userAgent,
         page_url: window.location.href,
         timestamp: new Date().toISOString(),
@@ -335,9 +374,71 @@ export const FeedbackWidget: React.FC = () => {
                   value={bugSteps}
                   onChange={(e) => setBugSteps(e.target.value)}
                   placeholder="1. Go to...&#10;2. Click on...&#10;3. See error..."
-                  className="min-h-[100px]"
+                  className="min-h-[80px]"
                   maxLength={2000}
                 />
+              </div>
+
+              {/* Screenshot field */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Image className="w-4 h-4" />
+                  Screenshot (optional)
+                </Label>
+                <div 
+                  className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  onPaste={handlePaste}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  {bugScreenshot ? (
+                    <div className="space-y-2">
+                      <img 
+                        src={bugScreenshot} 
+                        alt="Screenshot preview" 
+                        className="max-h-32 mx-auto rounded-md"
+                      />
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBugScreenshot(null);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">
+                      <Upload className="w-6 h-6 mx-auto mb-2 opacity-50" />
+                      <p>Click to upload or paste (Ctrl+V) a screenshot</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Video link field */}
+              <div className="space-y-2">
+                <Label htmlFor="bug-video" className="flex items-center gap-2">
+                  <Video className="w-4 h-4" />
+                  Screen recording link (optional)
+                </Label>
+                <Input
+                  id="bug-video"
+                  type="url"
+                  value={bugVideoLink}
+                  onChange={(e) => setBugVideoLink(e.target.value)}
+                  placeholder="https://www.loom.com/share/... or any video link"
+                />
+                <p className="text-xs text-muted-foreground">Loom, YouTube, Google Drive, or any video link</p>
               </div>
 
               <div className="bg-muted p-3 rounded-lg text-sm">
