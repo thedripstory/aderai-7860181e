@@ -599,6 +599,48 @@ export type Database = {
         }
         Relationships: []
       }
+      premium_invite_requests: {
+        Row: {
+          brand_name: string
+          created_at: string
+          currency: string
+          email: string
+          feature_requested: string
+          first_name: string
+          id: string
+          notes: string | null
+          projected_yearly_revenue: number
+          reviewed_at: string | null
+          status: string
+        }
+        Insert: {
+          brand_name: string
+          created_at?: string
+          currency?: string
+          email: string
+          feature_requested: string
+          first_name: string
+          id?: string
+          notes?: string | null
+          projected_yearly_revenue: number
+          reviewed_at?: string | null
+          status?: string
+        }
+        Update: {
+          brand_name?: string
+          created_at?: string
+          currency?: string
+          email?: string
+          feature_requested?: string
+          first_name?: string
+          id?: string
+          notes?: string | null
+          projected_yearly_revenue?: number
+          reviewed_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           count: number | null
