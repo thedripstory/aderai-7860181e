@@ -277,7 +277,7 @@ export const DashboardOverview = () => {
                 </svg>
               </div>
               <Badge className="absolute -top-2 -right-2 bg-accent text-accent-foreground font-bold px-2 py-0.5 text-[10px] shadow-lg animate-pulse">
-                FREE
+                INCLUDED
               </Badge>
             </div>
           </div>
