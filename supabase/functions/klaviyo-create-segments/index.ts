@@ -520,7 +520,7 @@ function getSegmentDefinition(
         condition_groups: [{
           conditions: [{
             type: 'profile-property',
-            property: 'Historic Customer Lifetime Value',
+            property: "properties['Historic Customer Lifetime Value']",
             filter: {
               type: 'numeric',
               operator: 'greater-than',
@@ -538,7 +538,7 @@ function getSegmentDefinition(
         condition_groups: [{
           conditions: [{
             type: 'profile-property',
-            property: 'Historic Customer Lifetime Value',
+            property: "properties['Historic Customer Lifetime Value']",
             filter: {
               type: 'numeric',
               operator: 'less-than',
@@ -611,7 +611,7 @@ function getSegmentDefinition(
         condition_groups: [{
           conditions: [{
             type: 'profile-property',
-            property: 'Average Order Value',
+            property: "properties['Average Order Value']",
             filter: {
               type: 'numeric',
               operator: 'greater-than',
@@ -629,7 +629,7 @@ function getSegmentDefinition(
         condition_groups: [{
           conditions: [{
             type: 'profile-property',
-            property: 'Average Order Value',
+            property: "properties['Average Order Value']",
             filter: {
               type: 'numeric',
               operator: 'less-than',
