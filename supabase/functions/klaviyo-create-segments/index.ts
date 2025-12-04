@@ -398,7 +398,7 @@ function getSegmentDefinition(
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'in-the-last', quantity: newCustomerDays, unit: 'day' })
           ]
         }]
       }
@@ -431,7 +431,7 @@ function getSegmentDefinition(
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: lapsedDays, unit: 'day' })
           ]
         }]
       }
@@ -691,18 +691,12 @@ function getSegmentDefinition(
     'new-subscribers': (openedEmailId && placedOrderId) ? {
       name: `New Subscribers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [
-          {
-            conditions: [
-              buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
-            ]
-          },
-          {
-            conditions: [
-              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
-            ]
-          }
-        ]
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: newCustomerDays, unit: 'day' }),
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
+          ]
+        }]
       }
     } : null,
 
@@ -863,19 +857,26 @@ function getSegmentDefinition(
       }
     } : null,
 
-    'unsubscribed': openedEmailId ? {
-      name: `🚫 Unsubscribed Contacts${ADERAI_SUFFIX}`,
+    'unsubscribed': {
+      name: `🚫 Not Receiving Marketing${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
-          conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
+          conditions: [{
+            type: 'profile-marketing-consent',
+            consent: {
+              channel: 'email',
+              can_receive_marketing: false,
+              consent_status: {
+                subscription: 'any'
+              }
+            }
+          }]
         }]
       }
-    } : null,
+    },
 
     'bounced-emails': openedEmailId ? {
-      name: `🚫 Bounced Email Addresses${ADERAI_SUFFIX}`,
+      name: `🚫 Never Opened Any Email${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -975,33 +976,33 @@ function getSegmentDefinition(
     // =====================================
 
     'high-aov': placedOrderId ? {
-      name: `High AOV Customers (${currencySymbol}${aov * 2}+)${ADERAI_SUFFIX}`,
+      name: `High AOV Customers (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'greater-than', aov * 2, { type: 'over-all-time' })
+            buildMetricCondition(placedOrderId, 'sum', 'greater-than', highValueThreshold, { type: 'over-all-time' })
           ]
         }]
       }
     } : null,
 
     'low-aov': placedOrderId ? {
-      name: `Low AOV Customers (Under ${currencySymbol}${aov / 2})${ADERAI_SUFFIX}`,
+      name: `Low AOV Customers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov / 2, { type: 'over-all-time' })
+            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov, { type: 'over-all-time' })
           ]
         }]
       }
     } : null,
 
     'bargain-shoppers': placedOrderId ? {
-      name: `Bargain Shoppers (Low AOV)${ADERAI_SUFFIX}`,
+      name: `Bargain Shoppers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov * 0.75, { type: 'over-all-time' })
+            buildMetricCondition(placedOrderId, 'sum', 'less-than', aov, { type: 'over-all-time' })
           ]
         }]
       }
@@ -1440,7 +1441,7 @@ function getSegmentDefinition(
     // =====================================
 
     'received-3-in-3-days': openedEmailId ? {
-      name: `🚫 Received 3+ Emails in 3 Days${ADERAI_SUFFIX}`,
+      name: `🚫 3+ Opens in 3 Days (Highly Active)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1451,7 +1452,7 @@ function getSegmentDefinition(
     } : null,
 
     'received-5-opened-0': openedEmailId ? {
-      name: `🚫 Received 5+ Emails, Opened 0${ADERAI_SUFFIX}`,
+      name: `🚫 Never Opened (30 Days)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1468,18 +1469,12 @@ function getSegmentDefinition(
     'sunset-segment': (openedEmailId && clickedEmailId) ? {
       name: `Sunset Candidates (No Engagement 120+ Days)${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [
-          {
-            conditions: [
-              buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
-            ]
-          },
-          {
-            conditions: [
-              buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
-            ]
-          }
-        ]
+        condition_groups: [{
+          conditions: [
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' }),
+            buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
+          ]
+        }]
       }
     } : null,
 
@@ -1554,11 +1549,11 @@ function getSegmentDefinition(
     } : null,
 
     'frequent-visitors': activeOnSiteId ? {
-      name: `Frequent Site Visitors (5+ in 7 Days)${ADERAI_SUFFIX}`,
+      name: `Frequent Site Visitors (10+ in 30 Days)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(activeOnSiteId, 'count', 'greater-than', 4, { type: 'in-the-last', quantity: 7, unit: 'day' })
+            buildMetricCondition(activeOnSiteId, 'count', 'greater-than', 9, { type: 'in-the-last', quantity: 30, unit: 'day' })
           ]
         }]
       }
@@ -1599,22 +1594,22 @@ function getSegmentDefinition(
     } : null,
 
     'product-interest': viewedProductId ? {
-      name: `Product Interest (3+ Views)${ADERAI_SUFFIX}`,
+      name: `Repeat Product Viewers (3+ Views)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(viewedProductId, 'count', 'greater-than', 2, { type: 'in-the-last', quantity: 14, unit: 'day' })
+            buildMetricCondition(viewedProductId, 'count', 'greater-than', 2, { type: 'in-the-last', quantity: 30, unit: 'day' })
           ]
         }]
       }
     } : null,
 
     'category-interest': viewedProductId ? {
-      name: `Category Interest (5+ Views)${ADERAI_SUFFIX}`,
+      name: `Product Browsers (2+ Views)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(viewedProductId, 'count', 'greater-than', 4, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            buildMetricCondition(viewedProductId, 'count', 'greater-than', 1, { type: 'in-the-last', quantity: 30, unit: 'day' })
           ]
         }]
       }

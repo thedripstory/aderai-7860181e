@@ -126,17 +126,14 @@ export const useKlaviyoSegments = () => {
     try {
       const currencySymbol = activeKey.currency_symbol || '$';
       
+      // CRITICAL: Settings keys must match edge function expectations exactly
       const settings = {
-        highValue: activeKey.vip_threshold || 1000,
-        mediumValue: activeKey.high_value_threshold || 500,
-        lowValue: activeKey.aov || 100,
-        atRiskDays: activeKey.lapsed_days || 180,
-        lostDays: activeKey.churned_days || 365,
-        recentDays: activeKey.new_customer_days || 30,
-        activeDays: 90,
+        aov: activeKey.aov || 100,
         vipThreshold: activeKey.vip_threshold || 1000,
         highValueThreshold: activeKey.high_value_threshold || 500,
-        aov: activeKey.aov || 100,
+        newCustomerDays: activeKey.new_customer_days || 60,
+        lapsedDays: activeKey.lapsed_days || 90,
+        churnedDays: activeKey.churned_days || 180,
       };
 
       // Save progress if jobId provided
