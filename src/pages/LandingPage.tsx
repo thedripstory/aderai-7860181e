@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle } from "lucide-react";
+import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { TubelightNavbar } from "@/components/TubelightNavbar";
 import { useABTest, trackABTestConversion } from "@/hooks/useABTest";
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
@@ -25,8 +27,40 @@ import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
   const navigate = useNavigate();
   const heroVariant = useABTest('hero-headline');
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail || !newsletterEmail.includes('@')) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
+    setNewsletterLoading(true);
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert({ email: newsletterEmail.toLowerCase().trim() });
+      
+      if (error) {
+        if (error.code === '23505') {
+          toast.info('You\'re already subscribed!');
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success('Thanks for subscribing! We\'ll be in touch soon.');
+        setNewsletterEmail("");
+      }
+    } catch (err) {
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -734,7 +768,7 @@ export default function LandingPage() {
           <SegmentFlowEffect />
 
           {/* Newsletter Section - Unique Element */}
-          <div className="py-16 border-b border-border/50">
+          <div className="py-16 mt-16 border-b border-border/50">
             <div className="max-w-2xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <Sparkles className="w-4 h-4 text-primary" />
@@ -750,22 +784,32 @@ export default function LandingPage() {
                 <img src={klaviyoLogo} alt="Klaviyo logo" className="h-[0.9em] inline-block align-text-bottom mx-1" loading="lazy" /> 
                 segmentation strategies
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
                   type="email"
                   placeholder="Enter your email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
                   className="flex-1 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  disabled
+                  required
                 />
                 <button 
-                  disabled
-                  className="px-8 py-3 rounded-full bg-muted text-muted-foreground font-semibold cursor-not-allowed whitespace-nowrap"
+                  type="submit"
+                  disabled={newsletterLoading}
+                  className="px-8 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                 >
-                  Coming Soon
+                  {newsletterLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Subscribing...
+                    </>
+                  ) : (
+                    'Subscribe'
+                  )}
                 </button>
-              </div>
+              </form>
               <p className="text-xs text-muted-foreground mt-3">
-                Newsletter launching soon
+                No spam, unsubscribe anytime
               </p>
             </div>
           </div>
