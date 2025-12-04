@@ -91,7 +91,7 @@ export function Globe({
 }) {
   // Generate random markers on mount
   const markers = useMemo(() => getRandomMarkers(18), [])
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
   const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null)
   const animationRef = useRef<number | null>(null)
