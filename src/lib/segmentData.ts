@@ -243,10 +243,10 @@ export const SEGMENTS: Segment[] = [
   {
     id: "new-subscribers",
     name: "New Subscribers",
-    description: "Joined list in last {newCustomerDays} days, never purchased",
+    description: "Opened email in last {newCustomerDays} days, never purchased",
     category: "Customer Lifecycle & Value",
     icon: "🌱",
-    definition: "Subscribed within {newCustomerDays}d, 0 purchases",
+    definition: "Email engagement within {newCustomerDays}d, 0 purchases",
   },
   {
     id: "recent-first-time",
@@ -349,19 +349,19 @@ export const SEGMENTS: Segment[] = [
   },
   {
     id: "high-aov",
-    name: "High AOV",
-    description: "Average order value greater than {currencySymbol}{highValueThreshold}",
+    name: "High Spenders",
+    description: "Total spending greater than {currencySymbol}{highValueThreshold}",
     category: "Customer Lifecycle & Value",
     icon: "📈",
-    definition: "AOV > {currencySymbol}{highValueThreshold}",
+    definition: "Total spend > {currencySymbol}{highValueThreshold}",
   },
   {
     id: "low-aov",
-    name: "Low AOV",
-    description: "Average order value less than {currencySymbol}{aov}",
+    name: "Low Spenders",
+    description: "Total spending less than {currencySymbol}{aov}",
     category: "Customer Lifecycle & Value",
     icon: "📉",
-    definition: "AOV < {currencySymbol}{aov}",
+    definition: "Total spend < {currencySymbol}{aov}",
   },
 
   // SHOPPING BEHAVIOR & PURCHASE HISTORY (18 segments)
@@ -499,18 +499,18 @@ export const SEGMENTS: Segment[] = [
   {
     id: "product-reviewers",
     name: "Product Reviewers",
-    description: "Left at least one review",
+    description: "Left at least one review (or Repeat Buyers if no review metric)",
     category: "Shopping Behavior & Purchase History",
     icon: "⭐",
-    definition: "Reviews ≥ 1",
+    definition: "Reviews ≥ 1 (fallback: 2+ purchases)",
   },
   {
     id: "non-reviewers",
     name: "Non-Reviewers",
-    description: "Purchased but never left review",
+    description: "Purchased but never left review (or One-Time Buyers if no review metric)",
     category: "Shopping Behavior & Purchase History",
     icon: "📝",
-    definition: "Purchases ≥ 1, reviews = 0",
+    definition: "Purchases ≥ 1, reviews = 0 (fallback: 1 purchase)",
   },
 
   // EXCLUSION SEGMENTS (12 segments)
@@ -549,18 +549,18 @@ export const SEGMENTS: Segment[] = [
   {
     id: "refunded-customers",
     name: "Refunded Customers (Exclusion)",
-    description: "Refunded/cancelled order in last 90 days",
+    description: "Refunded/cancelled order in last 90 days (or Single Purchase if no refund metric)",
     category: "Exclusion Segments",
     icon: "↩️",
-    definition: "Refund within 90 days",
+    definition: "Refund within 90d (fallback: 1 purchase only)",
   },
   {
     id: "negative-feedback",
     name: "Negative Feedback (Exclusion)",
-    description: "Submitted negative feedback (if tracked)",
+    description: "Submitted negative feedback (or Unengaged 60d if not tracked)",
     category: "Exclusion Segments",
     icon: "😞",
-    definition: "Feedback rating < 3 stars",
+    definition: "Feedback rating < 3 (fallback: no engagement 60d)",
   },
   {
     id: "unengaged-exclusion",

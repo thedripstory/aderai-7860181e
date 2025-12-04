@@ -262,7 +262,7 @@ function getSegmentDefinition(
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'greater-than', 5, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            buildMetricCondition(openedEmailId, 'count', 'greater-than', 4, { type: 'in-the-last', quantity: 30, unit: 'day' })
           ]
         }]
       }
@@ -398,7 +398,9 @@ function getSegmentDefinition(
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'in-the-last', quantity: newCustomerDays, unit: 'day' })
+            // First-time = exactly 1 purchase all-time AND that purchase was recent
+            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' }),
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: newCustomerDays, unit: 'day' })
           ]
         }]
       }
@@ -442,8 +444,10 @@ function getSegmentDefinition(
       definition: {
         condition_groups: [{
           conditions: [
+            // Lapsed = has purchased, no purchase in lapsedDays, but HAS purchase in churnedDays (excludes churned)
             buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: lapsedDays, unit: 'day' })
+            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'in-the-last', quantity: lapsedDays, unit: 'day' }),
+            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: churnedDays, unit: 'day' })
           ]
         }]
       }
@@ -1353,12 +1357,14 @@ function getSegmentDefinition(
       }
     },
 
-    'unengaged-exclusion': openedEmailId ? {
+    'unengaged-exclusion': (openedEmailId && clickedEmailId) ? {
       name: `🚫 Unengaged Exclusion (180+ Days)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
+            // No opens AND no clicks in 180 days
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' }),
+            buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 180, unit: 'day' })
           ]
         }]
       }
@@ -1475,39 +1481,10 @@ function getSegmentDefinition(
       }
     } : null,
 
-    'multi-category': placedOrderId ? {
-      name: `Multi-Category Buyers (3+ Orders)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 2, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null,
-
-    'cross-sell': placedOrderId ? {
-      name: `Cross-Sell Candidates (1-2 Orders)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'over-all-time' }),
-            buildMetricCondition(placedOrderId, 'count', 'less-than', 3, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null,
-
-    'category-buyers': placedOrderId ? {
-      name: `Active Category Buyers${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
-          ]
-        }]
-      }
-    } : null,
+    // These are marked as unavailable in UI - require manual category setup
+    'multi-category': null,
+    'cross-sell': null,
+    'category-buyers': null,
 
     'product-interest': viewedProductId ? {
       name: `Repeat Product Viewers (3+ Views)${ADERAI_SUFFIX}`,
