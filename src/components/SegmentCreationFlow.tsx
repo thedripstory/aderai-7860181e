@@ -1,20 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle, AlertCircle, Target, Info, X, Mail, Clock, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Target, Info } from 'lucide-react';
 import { SegmentResult, BatchProgress } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS, applySegmentSettings, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
 import { Progress } from '@/components/ui/progress';
 import { SuccessAnimation } from '@/components/SuccessAnimation';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SegmentCreationFlowProps {
   loading: boolean;
   results: SegmentResult[];
   onViewResults: () => void;
   onRetryFailed?: (failedSegmentIds: string[]) => void;
-  onContinueInBackground?: () => void;
   userSettings?: UserSegmentSettings;
   batchProgress?: BatchProgress | null;
 }
@@ -24,39 +21,36 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   results,
   onViewResults,
   onRetryFailed,
-  onContinueInBackground,
   userSettings = DEFAULT_SEGMENT_SETTINGS,
   batchProgress,
 }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
   const failedResults = useMemo(() => 
     results.filter(r => r.status === 'error'),
     [results]
   );
   
-  const successfulResults = useMemo(() => 
-    results.filter(r => r.status === 'success'),
+  const hasFailures = useMemo(() => 
+    failedResults.length > 0,
+    [failedResults]
+  );
+  
+  const successfulCount = useMemo(() => 
+    results.filter(r => r.status === 'success').length,
     [results]
   );
   
-  const skippedResults = useMemo(() => 
-    results.filter(r => r.status === 'skipped'),
-    [results]
-  );
-  
-  const hasFailures = failedResults.length > 0;
-  const successfulCount = successfulResults.length;
-  const totalProcessed = results.length;
-  const totalSegments = batchProgress?.totalSegments || totalProcessed;
+  const totalCount = results.length;
   
   const progressPercent = useMemo(() => {
     if (batchProgress && loading) {
       return (batchProgress.segmentsProcessed / batchProgress.totalSegments) * 100;
     }
-    return totalSegments > 0 ? (totalProcessed / totalSegments) * 100 : 0;
-  }, [totalSegments, totalProcessed, batchProgress, loading]);
+    return totalCount > 0 ? (results.length / Math.max(totalCount, 1)) * 100 : 0;
+  }, [totalCount, results.length, batchProgress, loading]);
 
   // Get current segment being processed with settings applied
   const currentSegment = useMemo(() => {
@@ -77,39 +71,6 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
     }
   }, [loading, results, hasFailures]);
 
-  const handleContinueInBackground = () => {
-    if (onContinueInBackground) {
-      onContinueInBackground();
-    }
-    navigate('/dashboard');
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'success':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="w-4 h-4 text-destructive" />;
-      case 'skipped':
-        return <Clock className="w-4 h-4 text-amber-500" />;
-      default:
-        return <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />;
-    }
-  };
-
-  const getStatusBg = (status: string) => {
-    switch (status) {
-      case 'success':
-        return 'bg-green-500/10 border-green-500/20';
-      case 'error':
-        return 'bg-destructive/10 border-destructive/20';
-      case 'skipped':
-        return 'bg-amber-500/10 border-amber-500/20';
-      default:
-        return 'bg-muted/50 border-border/50';
-    }
-  };
-
   return (
     <>
       <SuccessAnimation
@@ -126,29 +87,27 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-lg"
+          className="w-full max-w-md"
         >
-          <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden relative">
-            {/* Close button - always visible */}
-            <button
-              onClick={handleContinueInBackground}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors z-10"
-              title="Close and continue in background"
-            >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
-
+          <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden">
             {/* Header with icon */}
             <div className="pt-8 pb-4 flex flex-col items-center">
               <div className="w-16 h-16 flex items-center justify-center mb-4">
                 {loading ? (
                   /* Aggressive rotating loader */
                   <div className="relative w-12 h-12">
+                    {/* Outer rotating ring */}
                     <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+                    
+                    {/* Middle counter-rotating ring */}
                     <div className="absolute inset-1.5 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+                    
+                    {/* Inner pulsing core */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-3 h-3 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
                     </div>
+                    
+                    {/* Orbiting particles */}
                     <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent" />
                     </div>
@@ -169,38 +128,39 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
               <h2 className="text-xl font-semibold text-foreground">
                 {loading ? 'Creating Segments...' : hasFailures ? 'Some Segments Failed' : 'Segments Created!'}
               </h2>
-              
-              {/* Summary stats */}
-              <div className="flex items-center gap-4 mt-3 text-sm">
-                {successfulCount > 0 && (
-                  <span className="flex items-center gap-1 text-green-600">
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    {successfulCount} created
-                  </span>
+            </div>
+
+            {/* Current segment card */}
+            <div className="px-6 pb-4">
+              <AnimatePresence mode="wait">
+                {currentSegment && (
+                  <motion.div
+                    key={currentSegment.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="bg-muted/50 rounded-xl p-4 border border-border/50"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Target className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-foreground truncate">
+                          {currentSegment.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                          {currentSegment.description}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
                 )}
-                {failedResults.length > 0 && (
-                  <span className="flex items-center gap-1 text-destructive">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {failedResults.length} failed
-                  </span>
-                )}
-                {skippedResults.length > 0 && (
-                  <span className="flex items-center gap-1 text-amber-600">
-                    <Clock className="w-3.5 h-3.5" />
-                    {skippedResults.length} skipped
-                  </span>
-                )}
-                {loading && totalSegments - totalProcessed > 0 && (
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    {totalSegments - totalProcessed} remaining
-                  </span>
-                )}
-              </div>
+              </AnimatePresence>
             </div>
 
             {/* Batch progress indicator */}
-            <div className="px-6 pb-4">
+            <div className="px-6 pb-6">
               {loading && batchProgress && batchProgress.totalBatches > 1 && (
                 <div className="mb-4">
                   <div className="flex items-center gap-2 text-sm text-primary font-medium mb-2">
@@ -210,10 +170,11 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                     <span>Processing batch {batchProgress.currentBatch} of {batchProgress.totalBatches}</span>
                   </div>
                   
+                  {/* API limitation notice */}
                   <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                     <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
                     <p className="text-xs text-blue-600 dark:text-blue-400">
-                      Klaviyo limits segment creation to 5 at a time. We're processing your {batchProgress.totalSegments} segments in {batchProgress.totalBatches} batches with automatic retry.
+                      Klaviyo limits segment creation to 5 at a time. We're processing your {batchProgress.totalSegments} segments in {batchProgress.totalBatches} batches with automatic retry to ensure 100% success.
                     </p>
                   </div>
                   
@@ -229,9 +190,11 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-muted-foreground">Syncing with Klaviyo</span>
                 <span className="text-primary font-medium">
-                  {batchProgress 
+                  {loading && batchProgress 
                     ? `${batchProgress.segmentsProcessed} of ${batchProgress.totalSegments}` 
-                    : `${totalProcessed} of ${totalSegments}`}
+                    : loading 
+                      ? 'Processing...' 
+                      : `${successfulCount} of ${totalCount} complete`}
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -244,58 +207,35 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
               </div>
             </div>
 
-            {/* Results list */}
-            {results.length > 0 && (
-              <div className="px-6 pb-4">
-                <ScrollArea className="h-[200px]">
-                  <div className="space-y-2 pr-4">
-                    {results.map((result, idx) => {
-                      const segment = SEGMENTS.find((s) => s.id === result.segmentId);
-                      return (
-                        <div
-                          key={idx}
-                          className={`flex items-center gap-3 p-3 rounded-lg border text-sm ${getStatusBg(result.status)}`}
-                        >
-                          {getStatusIcon(result.status)}
-                          <div className="flex-1 min-w-0">
-                            <span className="truncate block font-medium">
-                              {segment?.name || result.segmentId}
-                            </span>
-                            {result.message && result.status === 'error' && (
-                              <span className="text-xs text-muted-foreground truncate block">
-                                {result.message}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
-              </div>
-            )}
-
-            {/* Continue in background option - show while loading */}
-            {loading && (
-              <div className="px-6 pb-6 space-y-3">
-                <Button
-                  variant="outline"
-                  onClick={handleContinueInBackground}
-                  className="w-full border-primary/30 hover:bg-primary/5"
-                >
-                  Continue in Background
-                </Button>
-                
-                <div className="flex items-center gap-2 p-3 bg-muted/50 border border-border/50 rounded-lg">
-                  <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <p className="text-xs text-muted-foreground">
-                    We'll send you an email once all segments are created. Track progress via the <span className="font-medium text-foreground">Active Jobs</span> indicator in the header.
-                  </p>
+            {/* Results list (collapsed view) */}
+            {!loading && results.length > 0 && (
+              <div className="px-6 pb-4 max-h-48 overflow-y-auto">
+                <div className="space-y-2">
+                  {results.map((result, idx) => {
+                    const segment = SEGMENTS.find((s) => s.id === result.segmentId);
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex items-center gap-2 p-2 rounded-lg text-sm ${
+                          result.status === "success"
+                            ? "bg-green-500/10 text-green-600"
+                            : "bg-red-500/10 text-red-600"
+                        }`}
+                      >
+                        {result.status === "success" ? (
+                          <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                        )}
+                        <span className="truncate">{segment?.name || result.segmentId}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Action buttons - show when not loading */}
+            {/* Action buttons */}
             {!loading && (
               <div className="px-6 pb-6 space-y-2">
                 {hasFailures && onRetryFailed && (

@@ -761,58 +761,43 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string | null
-          custom_inputs: Json | null
           error_count: number | null
           error_message: string | null
-          failed_segments: Json | null
           id: string
           klaviyo_key_id: string
-          next_retry_at: string | null
-          retry_count: number | null
           segments_processed: number | null
           segments_to_create: Json
           status: string
           success_count: number | null
           total_segments: number
-          updated_at: string | null
           user_id: string
         }
         Insert: {
           completed_at?: string | null
           created_at?: string | null
-          custom_inputs?: Json | null
           error_count?: number | null
           error_message?: string | null
-          failed_segments?: Json | null
           id?: string
           klaviyo_key_id: string
-          next_retry_at?: string | null
-          retry_count?: number | null
           segments_processed?: number | null
           segments_to_create: Json
           status?: string
           success_count?: number | null
           total_segments: number
-          updated_at?: string | null
           user_id: string
         }
         Update: {
           completed_at?: string | null
           created_at?: string | null
-          custom_inputs?: Json | null
           error_count?: number | null
           error_message?: string | null
-          failed_segments?: Json | null
           id?: string
           klaviyo_key_id?: string
-          next_retry_at?: string | null
-          retry_count?: number | null
           segments_processed?: number | null
           segments_to_create?: Json
           status?: string
           success_count?: number | null
           total_segments?: number
-          updated_at?: string | null
           user_id?: string
         }
         Relationships: []

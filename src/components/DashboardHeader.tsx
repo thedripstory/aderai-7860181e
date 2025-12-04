@@ -12,7 +12,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { trackEvent, resetAnalytics } from '@/lib/analytics';
-import { ActiveJobsIndicator } from '@/components/ActiveJobsIndicator';
 
 interface DashboardHeaderProps {
   onStartTour?: () => void;
@@ -48,9 +47,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            
-            {/* Active Jobs Indicator - Always visible when jobs are running */}
-            <ActiveJobsIndicator />
             
             {/* Back to Dashboard button */}
             {showBackButton && (
