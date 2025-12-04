@@ -128,10 +128,6 @@ export const OnboardingFlow = ({ userId }: OnboardingFlowProps) => {
     }
   };
 
-  const handleSkip = async () => {
-    trackEvent("onboarding_flow_skipped", { step: currentStep });
-    navigate("/dashboard");
-  };
 
   const currentStepData = steps[currentStep - 1];
   const Icon = currentStepData.icon;
@@ -165,11 +161,8 @@ export const OnboardingFlow = ({ userId }: OnboardingFlowProps) => {
         <CardContent className="space-y-6">
           {currentStepData.content}
 
-          <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={handleSkip} className="flex-1">
-              Skip for now
-            </Button>
-            <Button onClick={handleNext} disabled={loading} className="flex-1">
+          <div className="flex justify-center pt-4">
+            <Button onClick={handleNext} disabled={loading} className="w-full max-w-xs">
               {currentStep === 2 ? "Connect Klaviyo" : currentStep === steps.length ? "Go to Dashboard" : "Next"}
             </Button>
           </div>
