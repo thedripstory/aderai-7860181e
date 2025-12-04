@@ -1878,14 +1878,36 @@ function sleep(ms: number): Promise<void> {
 // HELPER: Parse Klaviyo's wait time from error message
 // ==========================================
 
+const MAX_WAIT_TIME_MS = 30000; // Max 30 seconds wait - don't wait longer to avoid timeouts
+
 function parseWaitTime(errorMessage: string): number | null {
   // "Expected available in 1 second" → 1500ms (with buffer)
   // "Expected available in 5 seconds" → 5500ms
   const match = errorMessage.match(/Expected available in (\d+) second/);
   if (match) {
-    return parseInt(match[1], 10) * 1000 + 500; // Add 500ms buffer
+    const waitSeconds = parseInt(match[1], 10);
+    const waitMs = waitSeconds * 1000 + 500; // Add 500ms buffer
+    
+    // If Klaviyo wants us to wait too long, return null to use exponential backoff instead
+    // or let the caller handle it as a non-retryable situation
+    if (waitMs > MAX_WAIT_TIME_MS) {
+      console.log(`[klaviyo-create-segments] Klaviyo requested ${waitSeconds}s wait - too long, will not wait`);
+      return null; // Signal that we shouldn't wait this long
+    }
+    
+    return waitMs;
   }
   return null;
+}
+
+// Check if the rate limit is too severe to retry (long wait times)
+function isRateLimitTooSevere(errorMessage: string): boolean {
+  const match = errorMessage.match(/Expected available in (\d+) second/);
+  if (match) {
+    const waitSeconds = parseInt(match[1], 10);
+    return waitSeconds > 60; // If wait > 60 seconds, don't retry
+  }
+  return false;
 }
 
 // ==========================================
@@ -1947,6 +1969,16 @@ async function createSegmentWithRetry(
       return result;
     }
     
+    // Check if rate limit is too severe (long wait times) - don't retry, just fail fast
+    if (isRateLimitTooSevere(errorMsg)) {
+      console.log(`[klaviyo-create-segments] Rate limit too severe for ${segmentId}, skipping to avoid timeout`);
+      return {
+        segmentId,
+        status: 'error',
+        error: `Rate limited by Klaviyo - please try again later. ${errorMsg}`
+      };
+    }
+    
     // Don't retry on last attempt
     if (attempt === maxRetries) {
       console.log(`[klaviyo-create-segments] Max retries (${maxRetries}) reached for ${segmentId}`);
@@ -1958,8 +1990,11 @@ async function createSegmentWithRetry(
     const exponentialDelay = baseDelay * Math.pow(2, attempt - 1);
     const waitTime = klaviyoWaitTime || exponentialDelay;
     
-    console.log(`[klaviyo-create-segments] Retry ${attempt}/${maxRetries} for ${segmentId} - waiting ${waitTime}ms (${klaviyoWaitTime ? 'Klaviyo suggested' : 'exponential backoff'})`);
-    await sleep(waitTime);
+    // Final safety check - never wait more than 30 seconds
+    const safeWaitTime = Math.min(waitTime, MAX_WAIT_TIME_MS);
+    
+    console.log(`[klaviyo-create-segments] Retry ${attempt}/${maxRetries} for ${segmentId} - waiting ${safeWaitTime}ms (${klaviyoWaitTime ? 'Klaviyo suggested' : 'exponential backoff'})`);
+    await sleep(safeWaitTime);
   }
   
   // Shouldn't reach here, but just in case
