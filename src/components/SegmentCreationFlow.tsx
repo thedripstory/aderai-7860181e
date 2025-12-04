@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { CheckCircle, AlertCircle, Target } from 'lucide-react';
 import { SegmentResult } from '@/hooks/useKlaviyoSegments';
-import { SEGMENTS } from '@/lib/segmentData';
+import { SEGMENTS, applySegmentSettings, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
 import { Progress } from '@/components/ui/progress';
 import { SuccessAnimation } from '@/components/SuccessAnimation';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,7 @@ interface SegmentCreationFlowProps {
   results: SegmentResult[];
   onViewResults: () => void;
   onRetryFailed?: (failedSegmentIds: string[]) => void;
+  userSettings?: UserSegmentSettings;
 }
 
 export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
@@ -19,6 +20,7 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   results,
   onViewResults,
   onRetryFailed,
+  userSettings = DEFAULT_SEGMENT_SETTINGS,
 }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -46,14 +48,17 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
     [totalCount, results.length]
   );
 
-  // Get current segment being processed
+  // Get current segment being processed with settings applied
   const currentSegment = useMemo(() => {
     if (results.length > 0) {
       const lastResult = results[results.length - 1];
-      return SEGMENTS.find(s => s.id === lastResult.segmentId);
+      const segment = SEGMENTS.find(s => s.id === lastResult.segmentId);
+      if (segment) {
+        return applySegmentSettings(segment, userSettings);
+      }
     }
     return null;
-  }, [results]);
+  }, [results, userSettings]);
 
   // Show success animation when all segments complete successfully
   useEffect(() => {
