@@ -85,7 +85,7 @@ export default function LandingPage() {
       <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border/50" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           {/* Logo */}
-          <AderaiLogo href="/" size="lg" />
+          <AderaiLogo href="/" size="lg" showKlaviyoBadge />
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-4">
