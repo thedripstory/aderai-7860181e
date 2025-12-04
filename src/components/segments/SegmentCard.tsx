@@ -1,5 +1,5 @@
 import { memo, useState } from 'react';
-import { CheckCircle2, Eye, Star, Info, ExternalLink, Sparkles, MapPin, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Eye, Star, Info, Sparkles, MapPin, TrendingUp } from 'lucide-react';
 import type { Segment } from '@/lib/segmentData';
 import {
   Dialog,
@@ -92,19 +92,10 @@ const BirthdaySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChan
           </div>
         </div>
 
-        <div className="pt-2 flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={() => window.open('https://help.klaviyo.com/hc/en-us/articles/115005078747-Guide-to-Collecting-Birthday-Information', '_blank')}
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Klaviyo Guide
-          </Button>
+        <div className="pt-2">
           <Button
             size="sm"
-            className="flex-1"
+            className="w-full"
             onClick={() => onOpenChange(false)}
           >
             Got it!
@@ -175,19 +166,10 @@ const PredictiveAnalyticsSetupDialog = ({ open, onOpenChange, segmentName }: { o
           </div>
         </div>
 
-        <div className="pt-2 flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={() => window.open('https://help.klaviyo.com/hc/en-us/articles/360057055772-Guide-to-Predictive-Analytics-in-Klaviyo', '_blank')}
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Klaviyo Guide
-          </Button>
+        <div className="pt-2">
           <Button
             size="sm"
-            className="flex-1"
+            className="w-full"
             onClick={() => onOpenChange(false)}
           >
             Got it!
@@ -336,19 +318,10 @@ const ProximitySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenCha
           </div>
         </div>
 
-        <div className="pt-2 flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={() => window.open('https://help.klaviyo.com/hc/en-us/articles/115005080407-Create-a-Segment-in-Klaviyo', '_blank')}
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Klaviyo Guide
-          </Button>
+        <div className="pt-2">
           <Button
             size="sm"
-            className="flex-1"
+            className="w-full"
             onClick={() => onOpenChange(false)}
           >
             Got it!
@@ -499,19 +472,10 @@ const CategorySetupDialog = ({ open, onOpenChange, segmentId, segmentName }: { o
             </p>
           </div>
 
-          <div className="pt-2 flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={() => window.open('https://help.klaviyo.com/hc/en-us/articles/115005080407-Create-a-Segment-in-Klaviyo', '_blank')}
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Klaviyo Guide
-            </Button>
+          <div className="pt-2">
             <Button
               size="sm"
-              className="flex-1"
+              className="w-full"
               onClick={() => onOpenChange(false)}
             >
               Got it!
