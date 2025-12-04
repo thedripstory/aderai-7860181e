@@ -14,8 +14,7 @@ export function useInactivityLogout() {
 
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
-    toast.info('You have been logged out due to inactivity');
-    navigate('/auth');
+    navigate('/login?reason=inactivity');
   }, [navigate]);
 
   const showReminder = useCallback(() => {

@@ -1,8 +1,8 @@
 'use client'
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Mail, Lock, Eye, EyeClosed, ArrowRight, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeClosed, ArrowRight, User, Clock } from 'lucide-react';
 import { cn } from "@/lib/utils"
 import { AuroraBackground } from "@/components/ui/aurora-background"
 import { AderaiLogo } from "@/components/AderaiLogo"
@@ -31,6 +31,7 @@ interface SignInCardProps {
 }
 
 export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading = false }: SignInCardProps) {
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +39,14 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
   const [brandName, setBrandName] = useState("");
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showInactivityMessage, setShowInactivityMessage] = useState(false);
+
+  // Check if redirected due to inactivity
+  useEffect(() => {
+    if (searchParams.get('reason') === 'inactivity') {
+      setShowInactivityMessage(true);
+    }
+  }, [searchParams]);
 
   // For 3D card effect
   const mouseX = useMotionValue(0);
@@ -232,6 +241,25 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                   {isSignUp ? "Get started with Aderai" : "Sign in to continue to Aderai"}
                 </motion.p>
               </div>
+
+              {/* Inactivity Message */}
+              <AnimatePresence>
+                {showInactivityMessage && !isSignUp && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: 'auto' }}
+                    exit={{ opacity: 0, y: -10, height: 0 }}
+                    className="mb-4"
+                  >
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <Clock className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                      <p className="text-sm text-amber-200">
+                        You were logged out due to inactivity. Please sign in again.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Login form */}
               <form onSubmit={handleSubmit} className="space-y-5">
