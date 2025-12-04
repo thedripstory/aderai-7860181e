@@ -151,7 +151,8 @@ export default function UnifiedDashboard() {
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    setSelectedSegments(SEGMENTS.map(s => s.id));
+    // Only select available segments (filter out unavailable like birthday-month)
+    setSelectedSegments(SEGMENTS.filter(s => !s.unavailable).map(s => s.id));
   }, []);
 
   const handleClearAll = useCallback(() => {
@@ -160,14 +161,22 @@ export default function UnifiedDashboard() {
 
   const handleCreateSegments = useCallback(async (segmentIds?: string[]) => {
     const segmentsToCreate = segmentIds || selectedSegments;
-    if (segmentsToCreate.length === 0 || klaviyoKeys.length === 0) {
+    
+    // Filter out any unavailable segments before creating
+    const availableSegments = segmentsToCreate.filter(id => {
+      const segment = SEGMENTS.find(s => s.id === id);
+      return segment && !segment.unavailable;
+    });
+    
+    if (availableSegments.length === 0 || klaviyoKeys.length === 0) {
+      toast.error('No segments available to create');
       return;
     }
 
-    trackAction('create_segments', { segment_count: segmentsToCreate.length });
+    trackAction('create_segments', { segment_count: availableSegments.length });
     setView('creating');
     await createSegments(
-      segmentsToCreate,
+      availableSegments,
       klaviyoKeys[activeKeyIndex],
       SEGMENTS
     );
