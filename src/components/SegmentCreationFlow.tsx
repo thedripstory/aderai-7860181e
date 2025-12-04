@@ -83,13 +83,41 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
           <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden">
             {/* Header with icon */}
             <div className="pt-8 pb-4 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-primary" />
-                </div>
+              <div className="w-16 h-16 flex items-center justify-center mb-4">
+                {loading ? (
+                  /* Aggressive rotating loader */
+                  <div className="relative w-12 h-12">
+                    {/* Outer rotating ring */}
+                    <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+                    
+                    {/* Middle counter-rotating ring */}
+                    <div className="absolute inset-1.5 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+                    
+                    {/* Inner pulsing core */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-3 h-3 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+                    </div>
+                    
+                    {/* Orbiting particles */}
+                    <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent" />
+                    </div>
+                    <div className="absolute inset-0 animate-[spin_2s_linear_infinite_reverse]">
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    </div>
+                  </div>
+                ) : hasFailures ? (
+                  <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                    <Target className="w-6 h-6 text-destructive" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-green-500" />
+                  </div>
+                )}
               </div>
               <h2 className="text-xl font-semibold text-foreground">
-                {loading ? 'Creating Segment...' : hasFailures ? 'Some Segments Failed' : 'Segments Created!'}
+                {loading ? 'Creating Segments...' : hasFailures ? 'Some Segments Failed' : 'Segments Created!'}
               </h2>
             </div>
 
