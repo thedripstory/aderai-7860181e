@@ -14,12 +14,17 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const location = useLocation();
+
+  // Check if email has free access (bypass subscription)
+  const hasFreeAccess = userEmail?.toLowerCase().endsWith('@thedripstory.com') ?? false;
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+      setUserEmail(session?.user?.email || null);
 
       // Check if user has profile
       if (session?.user) {
@@ -69,6 +74,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setIsAuthenticated(!!session);
+        setUserEmail(session?.user?.email || null);
         
         if (session?.user) {
           // Use queueMicrotask to defer profile check and avoid Supabase auth deadlock
@@ -193,11 +199,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Check for active subscription (active or trialing)
-  const hasActiveSubscription = subscriptionStatus === 'active' || subscriptionStatus === 'trialing';
+  // Check for active subscription (active or trialing) or free access for whitelisted domains
+  const hasActiveSubscription = hasFreeAccess || subscriptionStatus === 'active' || subscriptionStatus === 'trialing';
 
-  // Past due subscription - payment failed
-  if (subscriptionStatus === 'past_due') {
+  // Past due subscription - payment failed (skip for free access users)
+  if (!hasFreeAccess && subscriptionStatus === 'past_due') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         <div className="max-w-md mx-auto p-8 bg-card rounded-2xl border border-border shadow-xl text-center">
