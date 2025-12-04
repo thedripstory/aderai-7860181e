@@ -14,7 +14,17 @@ export const ActiveJobsIndicator: React.FC = () => {
   const { jobs, hasActiveJobs, loading, refreshJobs } = useActiveJobs();
   const [open, setOpen] = useState(false);
 
-  if (loading || !hasActiveJobs) {
+  // Show loading state briefly, then hide if no jobs
+  if (loading) {
+    return (
+      <Button variant="ghost" size="sm" className="gap-2 opacity-50" disabled>
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span className="hidden sm:inline">Checking...</span>
+      </Button>
+    );
+  }
+  
+  if (!hasActiveJobs) {
     return null;
   }
 

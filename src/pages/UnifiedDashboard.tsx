@@ -14,7 +14,6 @@ import { DashboardHeader } from '@/components/DashboardHeader';
 import { OnboardingTour } from '@/components/OnboardingTour';
 import { SegmentDashboard } from '@/components/SegmentDashboard';
 import { BUNDLES, SEGMENTS, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
-import { SegmentCreationFlow } from '@/components/SegmentCreationFlow';
 import { AISegmentSuggester } from '@/components/AISegmentSuggester';
 import { KlaviyoSyncIndicator } from '@/components/KlaviyoSyncIndicator';
 import { KlaviyoHealthDashboard } from '@/components/KlaviyoHealthDashboard';
@@ -46,12 +45,12 @@ export default function UnifiedDashboard() {
   const [activeKeyIndex, setActiveKeyIndex] = useState(0);
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [segmentCustomInputs, setSegmentCustomInputs] = useState<Record<string, string>>({});
-  const [view, setView] = useState<'creating' | 'results' | null>(null);
+  // Segment creation now uses queue system - no view state needed
   const [emailVerified, setEmailVerified] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
 
-  const { loading: creatingSegments, results, createSegments, setResults, batchProgress } = useKlaviyoSegments();
+  const { loading: creatingSegments, createSegmentsWithAutoRetry } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
   const { 
     run: runTour, 
@@ -171,62 +170,33 @@ export default function UnifiedDashboard() {
     }
 
     trackAction('create_segments', { segment_count: availableSegments.length });
-    setView('creating');
-    await createSegments(
-      availableSegments,
-      klaviyoKeys[activeKeyIndex],
-      SEGMENTS,
-      undefined,
-      segmentCustomInputs
-    );
     
-    // Check segment creation achievements
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Get total segment count
-        const { count } = await supabase
-          .from('ai_suggestions')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        // Award achievements based on segment count
-        const checkAchievements = async (criteriaValue: number) => {
-          const { data: achievement } = await supabase
-            .from('achievements')
-            .select('id')
-            .eq('criteria_type', 'segments_created')
-            .eq('criteria_value', criteriaValue)
-            .single();
-
-          if (achievement) {
-            await supabase
-              .from('user_achievements')
-              .insert({
-                user_id: user.id,
-                achievement_id: achievement.id
-              })
-              .select()
-              .single();
-          }
-        };
-
-        const totalCount = (count || 0) + segmentsToCreate.length;
-        if (totalCount >= 1) await checkAchievements(1);
-        if (totalCount >= 25) await checkAchievements(25);
-        if (totalCount >= 50) await checkAchievements(50);
-      }
-    } catch (error) {
-      // Silently handle achievement check errors
+      // Create a background job that auto-retries
+      const jobId = await createSegmentsWithAutoRetry(
+        availableSegments,
+        klaviyoKeys[activeKeyIndex],
+        SEGMENTS,
+        segmentCustomInputs
+      );
+      
+      toast.success('Segment creation started!', {
+        description: `Creating ${availableSegments.length} segments. Track progress via "Active Jobs" in the header.`,
+        duration: 5000,
+      });
+      
+      // Clear selection and stay on dashboard
+      setSelectedSegments([]);
+      setSegmentCustomInputs({});
+      
+    } catch (error: any) {
+      toast.error('Failed to start segment creation', {
+        description: error.message || 'Please try again',
+      });
     }
+  }, [selectedSegments, klaviyoKeys, activeKeyIndex, trackAction, createSegmentsWithAutoRetry, segmentCustomInputs]);
 
-    setView('results');
-  }, [selectedSegments, klaviyoKeys, activeKeyIndex, trackAction, createSegments]);
-
-  const handleRetryFailed = useCallback(async (failedSegmentIds: string[]) => {
-    setResults([]);
-    await handleCreateSegments(failedSegmentIds);
-  }, [handleCreateSegments]);
+  // Retry is now handled automatically by the queue system via process-segment-queue
 
 
   const handleLogout = async () => {
@@ -242,33 +212,7 @@ export default function UnifiedDashboard() {
     );
   }
 
-  if (view === 'creating' || view === 'results') {
-    const activeKey = klaviyoKeys[activeKeyIndex];
-    const userSettings = activeKey ? {
-      currencySymbol: activeKey.currency_symbol || '$',
-      highValueThreshold: activeKey.high_value_threshold || 500,
-      vipThreshold: activeKey.vip_threshold || 1000,
-      aov: activeKey.aov || 100,
-      lapsedDays: activeKey.lapsed_days || 90,
-      churnedDays: activeKey.churned_days || 180,
-      newCustomerDays: activeKey.new_customer_days || 60,
-    } : undefined;
-    
-    return (
-      <SegmentCreationFlow
-        loading={creatingSegments}
-        results={results}
-        onViewResults={() => setView(null)}
-        onRetryFailed={handleRetryFailed}
-        onContinueInBackground={() => {
-          // Reset the view to allow background processing via Active Jobs indicator
-          setView(null);
-        }}
-        userSettings={userSettings}
-        batchProgress={batchProgress}
-      />
-    );
-  }
+  // Queue-based segment creation - no longer uses view state
 
   return (
     <PageErrorBoundary pageName="Dashboard">
