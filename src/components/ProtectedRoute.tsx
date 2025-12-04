@@ -11,6 +11,8 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         try {
           const { data: profile, error } = await supabase
             .from('users')
-            .select('id')
+            .select('id, subscription_status')
             .eq('id', session.user.id)
             .maybeSingle();
 
@@ -50,6 +52,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             });
           } else {
             setHasProfile(!!profile);
+            
+            // Check subscription status
+            if (profile) {
+              const isActive = profile.subscription_status === 'active' || 
+                               profile.subscription_status === 'trialing';
+              setHasActiveSubscription(isActive);
+            }
           }
         } catch (err) {
           await ErrorLogger.logError(err as Error, {
@@ -72,7 +81,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             try {
               const { data: profile, error } = await supabase
                 .from('users')
-                .select('id')
+                .select('id, subscription_status')
                 .eq('id', session.user.id)
                 .maybeSingle();
 
@@ -92,6 +101,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               }
               
               setHasProfile(!!profile);
+              
+              // Check subscription status
+              if (profile) {
+                const isActive = profile.subscription_status === 'active' || 
+                                 profile.subscription_status === 'trialing';
+                setHasActiveSubscription(isActive);
+              }
             } catch (err) {
               await ErrorLogger.logError(err as Error, {
                 context: 'Auth state change profile check failed',
@@ -101,6 +117,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           });
         } else {
           setHasProfile(null);
+          setHasActiveSubscription(null);
         }
       }
     );
@@ -108,8 +125,23 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Still checking auth or profile
-  if (isAuthenticated === null || (isAuthenticated && hasProfile === null)) {
+  const handleSubscribe = async () => {
+    setIsCheckingSubscription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        body: { origin: window.location.origin },
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (err) {
+      toast.error('Error setting up payment. Please try again.');
+    } finally {
+      setIsCheckingSubscription(false);
+    }
+  };
+
+  // Still checking auth, profile, or subscription
+  if (isAuthenticated === null || (isAuthenticated && hasProfile === null) || (isAuthenticated && hasProfile && hasActiveSubscription === null)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         <div className="relative w-8 h-8">
@@ -157,6 +189,38 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Authenticated with profile, render children
+  // Authenticated but no active subscription
+  if (!hasActiveSubscription) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <div className="max-w-md mx-auto p-8 bg-card rounded-2xl border border-border shadow-xl text-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+            <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold mb-3">Subscription Required</h2>
+          <p className="text-muted-foreground mb-6">
+            To access Aderai, please complete your subscription setup.
+          </p>
+          <button
+            onClick={handleSubscribe}
+            disabled={isCheckingSubscription}
+            className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold mb-3 disabled:opacity-50"
+          >
+            {isCheckingSubscription ? 'Setting up...' : 'Complete Subscription - $9/month'}
+          </button>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="w-full text-muted-foreground hover:text-foreground px-4 py-2 transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated with profile and active subscription, render children
   return <>{children}</>;
 }

@@ -74,3 +74,12 @@ verify_jwt = false
 
 [functions.record-segment-snapshots]
 verify_jwt = false
+
+[functions.stripe-create-checkout]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.stripe-check-subscription]
+verify_jwt = true

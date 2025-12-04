@@ -14,6 +14,20 @@ export default function Onboarding() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      // Check for payment success
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentStatus = urlParams.get('payment');
+      const sessionId = urlParams.get('session_id');
+
+      if (paymentStatus === 'success' && sessionId) {
+        // Clear URL params
+        window.history.replaceState({}, '', '/onboarding');
+        
+        toast.success('Payment successful! Welcome to Aderai.', {
+          duration: 5000,
+        });
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
