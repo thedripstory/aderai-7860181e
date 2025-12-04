@@ -458,7 +458,7 @@ const KlaviyoSetup = () => {
                     )}
                     {!validationState.message && (
                       <p className="text-sm text-muted-foreground">
-                        Find your API key in Klaviyo → Settings → API Keys
+                        Find your API key in Klaviyo → Settings → API Keys → Create Private API Key → Select <span className="font-semibold text-foreground">Full Access</span>
                       </p>
                     )}
                   </div>
