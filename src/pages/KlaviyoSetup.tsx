@@ -12,7 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
+import { Key, DollarSign, Users, TrendingUp, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { supabase } from "@/lib/supabase";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { useInactivityLogout } from "@/hooks/useInactivityLogout";
@@ -558,11 +564,42 @@ const KlaviyoSetup = () => {
                       <Users className="w-5 h-5 text-primary" />
                     </div>
                     <h3 className="text-lg font-semibold">Customer Lifecycle (Days)</h3>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button type="button" className="ml-auto p-1.5 rounded-full hover:bg-muted transition-colors">
+                            <Info className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs p-3">
+                          <p className="text-sm">
+                            These settings define how customers are categorized based on their last purchase date.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="newCustomerDays">New Customer</Label>
+                      <div className="flex items-center gap-1.5">
+                        <Label htmlFor="newCustomerDays">New Customer</Label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="p-0.5 rounded-full hover:bg-muted transition-colors">
+                                <Info className="w-3.5 h-3.5 text-muted-foreground" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs p-3">
+                              <p className="text-sm font-medium mb-1">New Customer</p>
+                              <p className="text-sm text-muted-foreground">
+                                Customers who made their first purchase within this many days are considered "new customers."
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <Input
                         id="newCustomerDays"
                         type="number"
@@ -574,7 +611,24 @@ const KlaviyoSetup = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="lapsedDays">Lapsed</Label>
+                      <div className="flex items-center gap-1.5">
+                        <Label htmlFor="lapsedDays">Lapsed</Label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="p-0.5 rounded-full hover:bg-muted transition-colors">
+                                <Info className="w-3.5 h-3.5 text-muted-foreground" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs p-3">
+                              <p className="text-sm font-medium mb-1">Lapsed Customer</p>
+                              <p className="text-sm text-muted-foreground">
+                                Customers who haven't purchased in this many days are considered "lapsed" and may need re-engagement.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <Input
                         id="lapsedDays"
                         type="number"
@@ -586,7 +640,24 @@ const KlaviyoSetup = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="churnedDays">Churned</Label>
+                      <div className="flex items-center gap-1.5">
+                        <Label htmlFor="churnedDays">Churned</Label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="p-0.5 rounded-full hover:bg-muted transition-colors">
+                                <Info className="w-3.5 h-3.5 text-muted-foreground" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs p-3">
+                              <p className="text-sm font-medium mb-1">Churned Customer</p>
+                              <p className="text-sm text-muted-foreground">
+                                Customers who haven't purchased in this many days are considered "churned" and unlikely to return without intervention.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <Input
                         id="churnedDays"
                         type="number"
@@ -599,8 +670,8 @@ const KlaviyoSetup = () => {
                   </div>
                 </div>
 
-                {/* Submit Buttons */}
-                <div className="pt-4 space-y-3">
+                {/* Submit Button */}
+                <div className="pt-4">
                   <Button
                     type="submit"
                     disabled={isSaving}
@@ -615,25 +686,6 @@ const KlaviyoSetup = () => {
                     ) : (
                       "Connect Klaviyo & Continue"
                     )}
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="w-full text-muted-foreground"
-                    onClick={async () => {
-                      try {
-                        await supabase.from("users").update({ 
-                          onboarding_completed: true 
-                        }).eq("id", user.id);
-                        navigate("/dashboard");
-                      } catch (error) {
-                        console.error("Error skipping setup:", error);
-                        navigate("/dashboard");
-                      }
-                    }}
-                  >
-                    Skip for now
                   </Button>
                 </div>
               </form>
