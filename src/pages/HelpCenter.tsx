@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Search, BookOpen, ChevronRight, X, ArrowLeft, Sparkles } from 'lucide-react';
+import { Search, BookOpen, ChevronRight, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
 import { helpArticlesData } from '@/lib/helpArticlesData';
 import { HelpArticleRenderer } from '@/components/HelpArticleRenderer';
 import { DashboardHeader } from '@/components/DashboardHeader';
@@ -13,40 +12,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function HelpCenter() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [articles, setArticles] = useState<any[]>([]);
-  const [selectedArticle, setSelectedArticle] = useState<any>(null);
+  const [selectedArticle, setSelectedArticle] = useState<typeof helpArticlesData[0] | null>(null);
   const [activeCategory, setActiveCategory] = useState('Getting Started');
 
-  useEffect(() => {
-    loadArticles();
-  }, []);
-
-  const loadArticles = async () => {
-    const { data } = await supabase
-      .from('help_articles')
-      .select('*')
-      .order('order_index');
-    
-    if (data && data.length > 0) {
-      setArticles(data);
-    } else {
-      await seedArticles();
-    }
-  };
-
-  const seedArticles = async () => {
-    await supabase.from('help_articles').insert(helpArticlesData);
-    loadArticles();
-  };
-
-  const trackView = async (articleId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from('help_article_views').insert({
-      article_id: articleId,
-      user_id: user?.id,
-      session_id: sessionStorage.getItem('session_id') || crypto.randomUUID()
-    });
-  };
+  // Use local data directly - more reliable for public help page
+  const articles = helpArticlesData.map((a, i) => ({ ...a, id: `article-${i}` }));
 
   const filteredArticles = articles.filter(a => 
     (a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -148,11 +118,11 @@ export default function HelpCenter() {
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                  {articles.filter(a => a.category === category).map((article, idx) => (
+                  {articles.filter(a => a.category === category).map((article) => (
                     <Card 
                       key={article.id} 
-                      className="group cursor-pointer border-border/50 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 bg-card/80 backdrop-blur-sm overflow-hidden"
-                      onClick={() => { setSelectedArticle(article); trackView(article.id); }}
+                      className="group cursor-pointer border-border/50 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 bg-card/80 backdrop-blur-sm overflow-hidden relative"
+                      onClick={() => setSelectedArticle(article)}
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       <CardHeader className="pb-3 relative">
@@ -191,7 +161,7 @@ export default function HelpCenter() {
                 <Card 
                   key={article.id} 
                   className="group cursor-pointer border-border/50 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 bg-card/80 backdrop-blur-sm"
-                  onClick={() => { setSelectedArticle(article); trackView(article.id); }}
+                  onClick={() => setSelectedArticle(article)}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
