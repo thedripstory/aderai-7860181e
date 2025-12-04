@@ -7,113 +7,111 @@
  * 2. supabase/functions/klaviyo-create-segments/index.ts (Klaviyo definitions)
  */
 
-// Segments that CAN be created via Klaviyo API
+// Segments that CAN be created via Klaviyo API (57 total - matches segmentData.ts)
 export const CREATABLE_SEGMENTS = new Set([
-  // Engagement & Activity
+  // Engagement & Activity (14 segments)
+  'engaged-30-days',
+  'engaged-60-days',
+  'engaged-90-days',
   'highly-engaged',
-  'moderately-engaged',
-  'low-engagement',
-  'email-openers',
-  'email-clickers',
-  'sms-subscribers',
-  'push-subscribers',
-  'multi-channel',
-  'email-only',
-  'recent-website-visitors',
-  'browse-abandoners',
-  'cart-abandoners',
-  'checkout-abandoners',
-  'winback-candidates',
+  'recent-clickers-90',
+  'engaged-non-buyers',
+  'active-site-30',
+  'unengaged-90',
+  'unengaged-180',
+  'email-openers-30',
+  'email-openers-60',
+  'email-clickers-30',
+  'email-clickers-60',
+  'site-visitors-30',
   
-  // Demographics
-  'mobile-users',
-  'desktop-users',
-  'gmail-users',
-  'yahoo-users',
-  'outlook-users',
-  'corporate-email',
-  'us-customers',
-  'international-customers',
+  // Demographics (6 creatable, 2 unavailable)
+  'gender-male',
+  'gender-female',
+  'gender-uncertain',
+  'location-country',
+  'age-18-24',
+  'age-25-40',
   
-  // Customer Lifecycle & Value
+  // Customer Lifecycle & Value (12 creatable, 3 unavailable)
   'new-subscribers',
-  'first-time-buyers',
   'recent-first-time',
   'repeat-customers',
-  'vip-customers',
-  'high-value',
-  'at-risk',
+  'one-time-buyers',
+  'active-customers',
   'lapsed-customers',
   'churned-customers',
-  'one-time-buyers',
-  'loyal-customers',
-  'engaged-non-buyers',
-  'high-spenders',
-  'low-spenders',
-  'bargain-shoppers',
-  
-  // Shopping Behavior & Purchase History
-  'frequent-buyers',
-  'seasonal-shoppers',
-  'holiday-shoppers',
-  'sale-shoppers',
-  'full-price-buyers',
-  'discount-sensitive',
-  'bulk-buyers',
-  'small-order',
-  'large-order',
-  'recent-purchasers',
+  'vip-customers',
   'big-spenders',
+  'bargain-shoppers',
+  'high-aov',
+  'low-aov',
   
-  // Exclusion Segments
-  'recent-purchasers-exclude',
-  'unsubscribed-exclude',
-  'bounced-exclude',
-  'complained-exclude',
-  'unengaged-exclusion',
-  'new-subscriber-exclude',
-  'vip-exclude',
-  'sunset-segment',
-]);
-
-// Segments that CANNOT be created (missing metrics, predictive analytics, etc.)
-export const UNAVAILABLE_SEGMENTS = new Set([
-  // Require specific metrics not commonly available
+  // Shopping Behavior & Purchase History (14 creatable, 3 unavailable)
+  'all-customers',
+  'never-purchased',
+  'recent-purchasers-30',
+  'abandoned-cart',
+  'abandoned-cart-high-value',
+  'abandoned-checkout',
+  'abandoned-checkout-high-value',
+  'browse-abandonment',
+  'category-interest',
+  'product-interest',
+  'frequent-visitors',
+  'coupon-users',
+  'full-price-buyers',
   'product-reviewers',
   'non-reviewers',
+  
+  // Exclusion Segments (11 creatable, 1 unavailable)
+  'unsubscribed',
+  'bounced-emails',
+  'not-opted-in',
+  'recent-purchasers-exclude',
   'refunded-customers',
   'negative-feedback',
-  'cross-sell',
-  'multi-category',
-  'category-buyers',
-  
-  // Require Klaviyo Predictive Analytics (premium feature)
-  'predicted-vips',
-  'high-churn-risk',
-  'likely-purchase-soon',
-  'high-churn-risk-exclude',
-  
-  // Require manual location setup
-  'location-proximity',
-  'location-los-angeles',
-  'location-chicago',
-  'location-houston',
+  'unengaged-exclusion',
+  'sunset-segment',
+  'received-5-opened-0',
+  'received-3-in-3-days',
+  'marked-spam',
 ]);
 
-// Segments with fallback definitions (will create alternative if primary metric unavailable)
+// Segments that CANNOT be created (require manual Klaviyo setup or predictive analytics)
+export const UNAVAILABLE_SEGMENTS = new Set([
+  // Demographics - require manual Klaviyo setup
+  'location-proximity',    // Requires coordinate setup in Klaviyo UI
+  'birthday-month',        // Must be created manually in Klaviyo
+  
+  // Customer Lifecycle - require Klaviyo Predictive Analytics (premium)
+  'high-churn-risk',       // Requires predictive analytics
+  'likely-purchase-soon',  // Requires predictive analytics
+  'predicted-vips',        // Requires predictive analytics
+  
+  // Shopping Behavior - require manual category setup
+  'cross-sell',            // Requires manual category mapping
+  'category-buyers',       // Requires manual category setup
+  'multi-category',        // Requires manual category tracking
+  
+  // Exclusion - requires predictive analytics
+  'high-churn-risk-exclude', // Requires predictive analytics
+]);
+
+// Segments with fallback definitions (creates alternative if primary metric unavailable)
 export const FALLBACK_SEGMENTS = new Set([
-  'product-reviewers',    // Falls back to Repeat Buyers
-  'non-reviewers',        // Falls back to One-Time Buyers
+  'product-reviewers',    // Falls back to Repeat Buyers (2+ purchases)
+  'non-reviewers',        // Falls back to One-Time Buyers (1 purchase)
   'refunded-customers',   // Falls back to Single Purchase
   'negative-feedback',    // Falls back to Unengaged 60d
 ]);
 
 /**
- * Validates segment data consistency
+ * Validates segment data consistency between UI and edge function
  * Run this during development to catch mismatches
  */
 export function validateSegmentData(
-  uiSegments: { id: string; available?: boolean }[],
+  uiSegments: { id: string; unavailable?: boolean }[],
   edgeFunctionSegmentIds: string[]
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -122,15 +120,15 @@ export function validateSegmentData(
     const isCreatable = CREATABLE_SEGMENTS.has(segment.id);
     const isUnavailable = UNAVAILABLE_SEGMENTS.has(segment.id);
     const hasEdgeDefinition = edgeFunctionSegmentIds.includes(segment.id);
-    const uiMarkedAvailable = segment.available !== false;
+    const uiMarkedUnavailable = segment.unavailable === true;
     
-    // Check: UI availability matches our registry
-    if (uiMarkedAvailable && isUnavailable) {
-      errors.push(`${segment.id}: UI marks as available but registered as UNAVAILABLE`);
+    // Check: UI unavailable flag matches our registry
+    if (uiMarkedUnavailable && isCreatable) {
+      errors.push(`${segment.id}: UI marks as unavailable but registered as CREATABLE`);
     }
     
-    if (!uiMarkedAvailable && isCreatable) {
-      errors.push(`${segment.id}: UI marks as unavailable but registered as CREATABLE`);
+    if (!uiMarkedUnavailable && isUnavailable) {
+      errors.push(`${segment.id}: UI marks as available but registered as UNAVAILABLE`);
     }
     
     // Check: Edge function has definition for creatable segments
@@ -138,9 +136,14 @@ export function validateSegmentData(
       errors.push(`${segment.id}: Registered as CREATABLE but missing edge function definition`);
     }
     
-    // Check: Edge function should NOT have definition for unavailable segments
+    // Check: Edge function should NOT have non-null definition for unavailable segments
     if (isUnavailable && hasEdgeDefinition && !FALLBACK_SEGMENTS.has(segment.id)) {
       errors.push(`${segment.id}: Registered as UNAVAILABLE but has edge function definition`);
+    }
+    
+    // Check: Segment ID exists in one of the sets
+    if (!isCreatable && !isUnavailable) {
+      errors.push(`${segment.id}: Not registered in CREATABLE or UNAVAILABLE sets`);
     }
   }
   
@@ -151,14 +154,14 @@ export function validateSegmentData(
 }
 
 /**
- * Check if a segment can be created
+ * Check if a segment can be created via Klaviyo API
  */
 export function canCreateSegment(segmentId: string): boolean {
   return CREATABLE_SEGMENTS.has(segmentId);
 }
 
 /**
- * Check if a segment has fallback logic
+ * Check if a segment has fallback logic when primary metric unavailable
  */
 export function hasFallback(segmentId: string): boolean {
   return FALLBACK_SEGMENTS.has(segmentId);
@@ -172,4 +175,18 @@ export function getSegmentStatus(segmentId: string): 'creatable' | 'unavailable'
   if (CREATABLE_SEGMENTS.has(segmentId)) return 'creatable';
   if (UNAVAILABLE_SEGMENTS.has(segmentId)) return 'unavailable';
   return 'unknown';
+}
+
+/**
+ * Get all segment IDs that should exist in the system
+ */
+export function getAllSegmentIds(): string[] {
+  return [...CREATABLE_SEGMENTS, ...UNAVAILABLE_SEGMENTS];
+}
+
+/**
+ * Validate that a segment ID exists in the registry
+ */
+export function isKnownSegment(segmentId: string): boolean {
+  return CREATABLE_SEGMENTS.has(segmentId) || UNAVAILABLE_SEGMENTS.has(segmentId);
 }
