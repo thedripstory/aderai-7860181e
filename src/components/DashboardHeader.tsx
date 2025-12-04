@@ -42,20 +42,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <a 
-              href="/dashboard" 
-              className="group flex flex-col transition-opacity hover:opacity-80"
-            >
-              <AderaiLogo size="lg" />
-              <div className="flex items-center gap-1.5 mt-0.5 opacity-60">
-                <span className="text-[10px] text-muted-foreground">Powered by</span>
-                <img 
-                  src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png" 
-                  alt="Klaviyo" 
-                  className="h-3 w-auto"
-                />
-              </div>
-            </a>
+            <AderaiLogo size="lg" href="/dashboard" showKlaviyoBadge />
           </div>
 
           {/* Actions */}
