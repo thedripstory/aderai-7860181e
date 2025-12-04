@@ -1,5 +1,5 @@
 import { memo, useState } from 'react';
-import { CheckCircle2, Eye, Star, Info, Sparkles, MapPin, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Eye, Star, Info, Sparkles, MapPin, TrendingUp, MessageSquareWarning } from 'lucide-react';
 import type { Segment } from '@/lib/segmentData';
 import {
   Dialog,
@@ -332,6 +332,94 @@ const ProximitySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenCha
   </Dialog>
 );
 
+const NegativeFeedbackSetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="max-w-lg">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <span className="text-2xl">😞</span>
+          Negative Feedback Segment Setup Guide
+        </DialogTitle>
+        <DialogDescription>
+          Protect your sender reputation by excluding unhappy customers
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="space-y-4 mt-2">
+        <div className="p-4 rounded-lg bg-gradient-to-r from-red-500/10 to-amber-500/10 border border-red-500/20">
+          <div className="flex items-start gap-3">
+            <MessageSquareWarning className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-sm">Why This Segment Matters</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Sending promotional emails to customers who left negative feedback can damage your brand reputation and increase unsubscribes. This exclusion segment keeps them out of campaigns while you work to resolve their issues.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+          <p className="text-sm text-blue-700 dark:text-blue-400">
+            <strong>What counts as negative feedback?</strong> Low review ratings (1-2 stars), support ticket complaints, refund requests with negative reasons, or survey responses indicating dissatisfaction.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-semibold text-sm">Setup Steps in Klaviyo:</h4>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">1</div>
+            <div>
+              <p className="font-medium text-sm">Set Up Feedback Tracking</p>
+              <p className="text-xs text-muted-foreground">Connect your review platform (Yotpo, Judge.me, Stamped, etc.) to Klaviyo, or create a custom property like "feedback_rating" or "customer_sentiment"</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">2</div>
+            <div>
+              <p className="font-medium text-sm">Create Segment in Klaviyo</p>
+              <p className="text-xs text-muted-foreground">Go to Audience → Segments → Create Segment</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">3</div>
+            <div>
+              <p className="font-medium text-sm">Add Condition</p>
+              <p className="text-xs text-muted-foreground">Select: "Properties about someone → [feedback_rating] is less than 3" OR "Has left a review → where Rating is less than 3"</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">4</div>
+            <div>
+              <p className="font-medium text-sm">Use as Exclusion</p>
+              <p className="text-xs text-muted-foreground">Add this segment to campaign exclusions to automatically skip unhappy customers from promotional emails</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+          <p className="text-sm text-green-700 dark:text-green-400">
+            <strong>💡 Pro Tip:</strong> Create a separate re-engagement flow for this segment offering special care, apologies, or exclusive discounts to win them back!
+          </p>
+        </div>
+
+        <div className="pt-2">
+          <Button
+            size="sm"
+            className="w-full"
+            onClick={() => onOpenChange(false)}
+          >
+            Got it!
+          </Button>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
+
 const CategorySetupDialog = ({ open, onOpenChange, segmentId, segmentName }: { open: boolean; onOpenChange: (open: boolean) => void; segmentId: string; segmentName: string }) => {
   const getGuideContent = () => {
     switch (segmentId) {
@@ -502,6 +590,7 @@ export const SegmentCard = memo(function SegmentCard({
   const [showProximityGuide, setShowProximityGuide] = useState(false);
   const [showPredictiveGuide, setShowPredictiveGuide] = useState(false);
   const [showCategoryGuide, setShowCategoryGuide] = useState(false);
+  const [showNegativeFeedbackGuide, setShowNegativeFeedbackGuide] = useState(false);
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [tempLocationValue, setTempLocationValue] = useState(
     customInputValue || segment.requiresInput?.defaultValue || ''
@@ -517,6 +606,8 @@ export const SegmentCard = memo(function SegmentCard({
       setShowBirthdayGuide(true);
     } else if (segment.id === 'location-proximity') {
       setShowProximityGuide(true);
+    } else if (segment.id === 'negative-feedback') {
+      setShowNegativeFeedbackGuide(true);
     } else if (isPredictiveSegment) {
       setShowPredictiveGuide(true);
     } else if (isCategorySegment) {
@@ -658,6 +749,10 @@ export const SegmentCard = memo(function SegmentCard({
           segmentId={segment.id}
           segmentName={segment.name}
         />
+      )}
+
+      {segment.id === 'negative-feedback' && (
+        <NegativeFeedbackSetupDialog open={showNegativeFeedbackGuide} onOpenChange={setShowNegativeFeedbackGuide} />
       )}
 
       {requiresInput && (
