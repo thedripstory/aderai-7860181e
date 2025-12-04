@@ -1262,24 +1262,15 @@ function getSegmentDefinition(
     // =====================================
 
     'refunded-customers': refundedOrderId ? {
-      name: `🚫 Refunded Customers${ADERAI_SUFFIX}`,
+      name: `🚫 Refunded Customers (30 Days)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(refundedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 90, unit: 'day' })
+            buildMetricCondition(refundedOrderId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
           ]
         }]
       }
-    } : (placedOrderId ? {
-      name: `🚫 Single Purchase Only (Potential Refund)${ADERAI_SUFFIX}`,
-      definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'equals', 1, { type: 'over-all-time' })
-          ]
-        }]
-      }
-    } : null),
+    } : null,
 
     'negative-feedback': submittedFeedbackId ? {
       name: `🚫 Negative Feedback${ADERAI_SUFFIX}`,
@@ -1379,11 +1370,11 @@ function getSegmentDefinition(
     } : null,
 
     'received-5-opened-0': openedEmailId ? {
-      name: `🚫 Never Opened (30 Days)${ADERAI_SUFFIX}`,
+      name: `🚫 Never Opened (All Time)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 30, unit: 'day' })
+            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'over-all-time' })
           ]
         }]
       }
@@ -1393,13 +1384,13 @@ function getSegmentDefinition(
     // SUNSET/WINBACK SEGMENT
     // =====================================
 
-    'sunset-segment': (openedEmailId && clickedEmailId) ? {
-      name: `Sunset Candidates (No Engagement 120+ Days)${ADERAI_SUFFIX}`,
+    'sunset-segment': openedEmailId ? {
+      name: `🚫 Sunset Segment${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
-            buildMetricCondition(openedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' }),
-            buildMetricCondition(clickedEmailId, 'count', 'equals', 0, { type: 'in-the-last', quantity: 120, unit: 'day' })
+            buildMetricCondition(openedEmailId, 'count', 'greater-than', 0, { type: 'in-the-last', quantity: 180, unit: 'day' }),
+            buildMetricCondition(openedEmailId, 'count', 'less-than', 3, { type: 'in-the-last', quantity: 180, unit: 'day' })
           ]
         }]
       }

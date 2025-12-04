@@ -552,10 +552,10 @@ export const SEGMENTS: Segment[] = [
   {
     id: "refunded-customers",
     name: "Refunded Customers (Exclusion)",
-    description: "Refunded/cancelled order in last 90 days (or Single Purchase if no refund metric)",
+    description: "Refunded/cancelled order in last 30 days",
     category: "Exclusion Segments",
     icon: "↩️",
-    definition: "Refund within 90d (fallback: 1 purchase only)",
+    definition: "Refund within 30d",
   },
   {
     id: "negative-feedback",
@@ -578,10 +578,10 @@ export const SEGMENTS: Segment[] = [
   {
     id: "sunset-segment",
     name: "Sunset Segment (Exclusion)",
-    description: "No opens or clicks in last 120+ days",
+    description: "Opened email in last 180 days but fewer than 3 times",
     category: "Exclusion Segments",
     icon: "🌅",
-    definition: "0 engagement in 120+ days",
+    definition: "1-2 opens in 180 days (low engagement)",
   },
   {
     id: "high-churn-risk-exclude",
@@ -594,11 +594,11 @@ export const SEGMENTS: Segment[] = [
   },
   {
     id: "received-5-opened-0",
-    name: "Never Opened (30 Days) (Exclusion)",
-    description: "No email opens in last 30 days",
+    name: "Never Opened (All Time) (Exclusion)",
+    description: "Zero email opens all time",
     category: "Exclusion Segments",
     icon: "📪",
-    definition: "0 opens in 30 days",
+    definition: "0 opens all time",
   },
   {
     id: "received-3-in-3-days",
