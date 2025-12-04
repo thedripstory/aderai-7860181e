@@ -336,12 +336,9 @@ Segments update automatically as customer behavior changes
 - **Population:** 5-15 minutes for initial profiles
 - **Updates:** Real-time as customers meet criteria
 
-## Segment Limits
+## Note on Klaviyo Segment Limits
 
-Klaviyo has account-based segment limits:
-- Starter: 100 segments
-- Professional: Unlimited segments
-- Free accounts: 150 segments`
+Your Klaviyo account has its own segment limits based on your Klaviyo plan (separate from Aderai). Check your Klaviyo account settings for your specific limit. Aderai itself has no limit on how many segments you can create.`
   },
 
   // AI Features
