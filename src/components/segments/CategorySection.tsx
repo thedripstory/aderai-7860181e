@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SegmentCard } from './SegmentCard';
 import type { Segment } from '@/lib/segmentData';
+import type { SegmentCustomInputs } from '@/components/SegmentDashboard';
 
 interface CategorySectionProps {
   category: string;
@@ -17,6 +18,8 @@ interface CategorySectionProps {
   onClearAllInCategory: () => void;
   index: number;
   defaultExpanded?: boolean;
+  customInputs?: SegmentCustomInputs;
+  onCustomInputChange?: (segmentId: string, value: string) => void;
 }
 
 export function CategorySection({
@@ -32,6 +35,8 @@ export function CategorySection({
   onClearAllInCategory,
   index,
   defaultExpanded = false,
+  customInputs = {},
+  onCustomInputChange,
 }: CategorySectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const categorySelectedCount = segments.filter(s => selectedSegments.includes(s.id)).length;
@@ -108,6 +113,8 @@ export function CategorySection({
                 onPreview={() => onPreviewSegment(segment)}
                 onToggleFavorite={() => onToggleFavorite(segment.id)}
                 index={segmentIndex}
+                customInputValue={customInputs[segment.id]}
+                onCustomInputChange={onCustomInputChange ? (value) => onCustomInputChange(segment.id, value) : undefined}
               />
             ))}
           </div>

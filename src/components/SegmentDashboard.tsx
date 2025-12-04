@@ -8,6 +8,10 @@ import { SegmentCategories } from './segments/SegmentCategories';
 import { SEGMENTS, applySettingsToSegments, DEFAULT_SEGMENT_SETTINGS, UserSegmentSettings, Segment } from '@/lib/segmentData';
 import { toast } from 'sonner';
 
+export interface SegmentCustomInputs {
+  [segmentId: string]: string;
+}
+
 interface SegmentDashboardProps {
   selectedSegments: string[];
   onToggleSegment: (segmentId: string) => void;
@@ -17,6 +21,8 @@ interface SegmentDashboardProps {
   segmentLimit?: number;
   currentTier?: string;
   userSettings?: UserSegmentSettings;
+  customInputs?: SegmentCustomInputs;
+  onCustomInputChange?: (segmentId: string, value: string) => void;
 }
 
 export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
@@ -28,6 +34,8 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
   segmentLimit = 999,
   currentTier = 'professional',
   userSettings = DEFAULT_SEGMENT_SETTINGS,
+  customInputs = {},
+  onCustomInputChange,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -212,6 +220,8 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
         onToggleFavorite={toggleFavorite}
         onClearSearch={() => setSearchQuery('')}
         segments={segmentsWithSettings}
+        customInputs={customInputs}
+        onCustomInputChange={onCustomInputChange}
       />
     </div>
   );

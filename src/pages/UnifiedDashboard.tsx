@@ -48,6 +48,7 @@ export default function UnifiedDashboard() {
   const [klaviyoKeys, setKlaviyoKeys] = useState<KlaviyoKey[]>([]);
   const [activeKeyIndex, setActiveKeyIndex] = useState(0);
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
+  const [segmentCustomInputs, setSegmentCustomInputs] = useState<Record<string, string>>({});
   const [view, setView] = useState<'creating' | 'results' | null>(null);
   const [emailVerified, setEmailVerified] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
@@ -159,6 +160,10 @@ export default function UnifiedDashboard() {
     setSelectedSegments([]);
   }, []);
 
+  const handleCustomInputChange = useCallback((segmentId: string, value: string) => {
+    setSegmentCustomInputs(prev => ({ ...prev, [segmentId]: value }));
+  }, []);
+
   const handleCreateSegments = useCallback(async (segmentIds?: string[]) => {
     const segmentsToCreate = segmentIds || selectedSegments;
     
@@ -178,7 +183,9 @@ export default function UnifiedDashboard() {
     await createSegments(
       availableSegments,
       klaviyoKeys[activeKeyIndex],
-      SEGMENTS
+      SEGMENTS,
+      undefined,
+      segmentCustomInputs
     );
     
     // Check segment creation achievements
@@ -502,6 +509,8 @@ export default function UnifiedDashboard() {
                 churnedDays: klaviyoKeys[activeKeyIndex].churned_days || 180,
                 newCustomerDays: klaviyoKeys[activeKeyIndex].new_customer_days || 60,
               } : DEFAULT_SEGMENT_SETTINGS}
+              customInputs={segmentCustomInputs}
+              onCustomInputChange={handleCustomInputChange}
             />
 
           </TabsContent>

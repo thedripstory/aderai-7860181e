@@ -174,7 +174,8 @@ function getSegmentDefinition(
   segmentId: string, 
   metricMap: Record<string, string>, 
   currencySymbol: string = '$', 
-  settings: any = {}
+  settings: any = {},
+  customInputs: Record<string, string> = {}
 ) {
   const {
     aov = 100,
@@ -1015,7 +1016,7 @@ function getSegmentDefinition(
     'birthday-month': null,
 
     'location-country': {
-      name: `United States Customers${ADERAI_SUFFIX}`,
+      name: `${customInputs['location-country'] || 'United States'} Customers${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
@@ -1024,7 +1025,7 @@ function getSegmentDefinition(
             filter: {
               type: 'string',
               operator: 'equals',
-              value: 'United States'
+              value: customInputs['location-country'] || 'United States'
             }
           }]
         }]
@@ -1761,10 +1762,11 @@ async function createKlaviyoSegment(
   metricMap: Record<string, string>, 
   currencySymbol: string, 
   settings: any = {},
-  tagId: string | null = null
+  tagId: string | null = null,
+  customInputs: Record<string, string> = {}
 ) {
   try {
-    const segmentDef = getSegmentDefinition(segmentId, metricMap, currencySymbol, settings);
+    const segmentDef = getSegmentDefinition(segmentId, metricMap, currencySymbol, settings, customInputs);
     
     if (!segmentDef) {
       // Determine the actual reason for skipping
@@ -1912,7 +1914,7 @@ serve(async (req) => {
       );
     }
     
-    let { apiKey, segmentIds, currencySymbol, settings } = body;
+    let { apiKey, segmentIds, currencySymbol, settings, customInputs } = body;
     
     console.log('[klaviyo-create-segments] Request params:', {
       hasApiKey: !!apiKey,
@@ -1975,7 +1977,8 @@ serve(async (req) => {
         metricMap,
         currencySymbol || '$',
         settings || {},
-        aderaiTagId
+        aderaiTagId,
+        customInputs || {}
       );
       
       results.push(result);

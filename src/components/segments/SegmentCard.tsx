@@ -1,5 +1,5 @@
 import { memo, useState } from 'react';
-import { CheckCircle2, Eye, Star, Info, ExternalLink, Sparkles } from 'lucide-react';
+import { CheckCircle2, Eye, Star, Info, ExternalLink, Sparkles, MapPin } from 'lucide-react';
 import type { Segment } from '@/lib/segmentData';
 import {
   Dialog,
@@ -9,6 +9,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface SegmentCardProps {
   segment: Segment;
@@ -18,6 +20,8 @@ interface SegmentCardProps {
   onPreview: () => void;
   onToggleFavorite: () => void;
   index: number;
+  customInputValue?: string;
+  onCustomInputChange?: (value: string) => void;
 }
 
 const BirthdaySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => (
@@ -105,6 +109,167 @@ const BirthdaySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChan
   </Dialog>
 );
 
+const LocationInputDialog = ({ 
+  open, 
+  onOpenChange, 
+  segment,
+  value,
+  onValueChange,
+  onConfirm
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  segment: Segment;
+  value: string;
+  onValueChange: (value: string) => void;
+  onConfirm: () => void;
+}) => {
+  const inputConfig = segment.requiresInput;
+  
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <span className="text-2xl">{segment.icon}</span>
+            {segment.name}
+          </DialogTitle>
+          <DialogDescription>
+            Customize this segment for your target location
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 mt-2">
+          <div className="p-4 rounded-lg bg-gradient-to-r from-blue-500/10 to-primary/10 border border-blue-500/20">
+            <div className="flex items-start gap-3">
+              <MapPin className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-sm">Location-Based Targeting</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Enter the country name exactly as it appears in your Klaviyo profile data for accurate segmentation.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location-input">{inputConfig?.label || 'Location'}</Label>
+            <Input
+              id="location-input"
+              placeholder={inputConfig?.placeholder || 'Enter location...'}
+              value={value}
+              onChange={(e) => onValueChange(e.target.value)}
+              className="text-base"
+            />
+            <p className="text-xs text-muted-foreground">
+              Common values: United States, United Kingdom, Canada, Australia, Germany, France
+            </p>
+          </div>
+
+          <div className="pt-2 flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1"
+              onClick={() => {
+                onConfirm();
+                onOpenChange(false);
+              }}
+              disabled={!value.trim()}
+            >
+              Add Segment
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ProximitySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="max-w-lg">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <span className="text-2xl">📍</span>
+          Proximity Segment Setup Guide
+        </DialogTitle>
+        <DialogDescription>
+          Target customers within a specific radius of a location
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="space-y-4 mt-2">
+        <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+          <div className="flex items-start gap-3">
+            <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-sm">Why Proximity Segments?</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Perfect for local promotions, store events, and geo-targeted campaigns. Reach customers near your physical locations!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-semibold text-sm">Setup Steps in Klaviyo:</h4>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">1</div>
+            <div>
+              <p className="font-medium text-sm">Go to Lists & Segments</p>
+              <p className="text-xs text-muted-foreground">Navigate to Audience → Lists & Segments in Klaviyo</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">2</div>
+            <div>
+              <p className="font-medium text-sm">Create New Segment</p>
+              <p className="text-xs text-muted-foreground">Click "Create Segment" and select location-based condition</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">3</div>
+            <div>
+              <p className="font-medium text-sm">Set Location & Radius</p>
+              <p className="text-xs text-muted-foreground">Enter your target address/coordinates and set the radius in miles or kilometers</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-2 flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => window.open('https://help.klaviyo.com/hc/en-us/articles/115005080407-Create-a-Segment-in-Klaviyo', '_blank')}
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Klaviyo Guide
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1"
+            onClick={() => onOpenChange(false)}
+          >
+            Got it!
+          </Button>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
+
 export const SegmentCard = memo(function SegmentCard({
   segment,
   isSelected,
@@ -113,16 +278,38 @@ export const SegmentCard = memo(function SegmentCard({
   onPreview,
   onToggleFavorite,
   index,
+  customInputValue,
+  onCustomInputChange,
 }: SegmentCardProps) {
   const [showBirthdayGuide, setShowBirthdayGuide] = useState(false);
+  const [showProximityGuide, setShowProximityGuide] = useState(false);
+  const [showLocationInput, setShowLocationInput] = useState(false);
+  const [tempLocationValue, setTempLocationValue] = useState(
+    customInputValue || segment.requiresInput?.defaultValue || ''
+  );
+  
   const isUnavailable = segment.unavailable;
+  const requiresInput = segment.requiresInput && !isUnavailable;
 
   const handleClick = () => {
-    if (isUnavailable && segment.id === 'birthday-month') {
+    if (segment.id === 'birthday-month') {
       setShowBirthdayGuide(true);
+    } else if (segment.id === 'location-proximity') {
+      setShowProximityGuide(true);
+    } else if (requiresInput && !isSelected) {
+      // Show input dialog for segments that require custom input
+      setTempLocationValue(customInputValue || segment.requiresInput?.defaultValue || '');
+      setShowLocationInput(true);
     } else if (!isUnavailable) {
       onToggle();
     }
+  };
+
+  const handleLocationConfirm = () => {
+    if (onCustomInputChange && tempLocationValue.trim()) {
+      onCustomInputChange(tempLocationValue.trim());
+    }
+    onToggle();
   };
 
   return (
@@ -143,6 +330,14 @@ export const SegmentCard = memo(function SegmentCard({
           <div className="absolute -top-2 left-4 px-2 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center gap-1">
             <Info className="w-3 h-3" />
             SETUP GUIDE
+          </div>
+        )}
+
+        {/* Custom input badge for segments requiring input */}
+        {requiresInput && !isUnavailable && (
+          <div className="absolute -top-2 left-4 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center gap-1">
+            <MapPin className="w-3 h-3" />
+            CUSTOMIZABLE
           </div>
         )}
 
@@ -193,16 +388,22 @@ export const SegmentCard = memo(function SegmentCard({
             </h4>
             <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
               {isUnavailable 
-                ? "Click to learn how to set up birthday marketing in Klaviyo" 
+                ? `Click to learn how to set up this segment in Klaviyo`
                 : segment.description}
             </p>
             <div className={`inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border ${
               isUnavailable 
                 ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400' 
+                : isSelected && requiresInput && customInputValue
+                ? 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400'
                 : 'bg-muted/50 border-border'
             }`}>
               <span className="font-mono text-muted-foreground">
-                {isUnavailable ? 'Click for setup guide →' : segment.definition}
+                {isUnavailable 
+                  ? 'Click for setup guide →' 
+                  : isSelected && requiresInput && customInputValue
+                  ? `Country = ${customInputValue}`
+                  : segment.definition}
               </span>
             </div>
           </div>
@@ -211,6 +412,21 @@ export const SegmentCard = memo(function SegmentCard({
 
       {segment.id === 'birthday-month' && (
         <BirthdaySetupDialog open={showBirthdayGuide} onOpenChange={setShowBirthdayGuide} />
+      )}
+      
+      {segment.id === 'location-proximity' && (
+        <ProximitySetupDialog open={showProximityGuide} onOpenChange={setShowProximityGuide} />
+      )}
+
+      {requiresInput && (
+        <LocationInputDialog 
+          open={showLocationInput} 
+          onOpenChange={setShowLocationInput}
+          segment={segment}
+          value={tempLocationValue}
+          onValueChange={setTempLocationValue}
+          onConfirm={handleLocationConfirm}
+        />
       )}
     </>
   );

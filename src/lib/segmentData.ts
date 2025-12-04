@@ -196,15 +196,22 @@ export const SEGMENTS: Segment[] = [
     description: "Filter by specific country",
     category: "Demographics",
     icon: "🌍",
-    definition: "Country = [specified]",
+    definition: "Country = [your selection]",
+    requiresInput: {
+      type: 'text',
+      label: 'Country Name',
+      placeholder: 'e.g., United States, United Kingdom, Canada',
+      defaultValue: 'United States'
+    }
   },
   {
     id: "location-proximity",
-    name: "Location - Proximity Radius",
-    description: "Within X miles of location",
+    name: "Location - Proximity Radius (Manual Only)",
+    description: "Within X miles of location - Requires coordinates setup in Klaviyo",
     category: "Demographics",
     icon: "📍",
-    definition: "Within radius of coordinates",
+    definition: "Not supported via API - create in Klaviyo UI",
+    unavailable: true,
   },
   {
     id: "birthday-month",
@@ -653,6 +660,14 @@ export const CATEGORIES = [
   "Exclusion Segments"
 ];
 
+export interface SegmentInputConfig {
+  type: 'text' | 'select';
+  label: string;
+  placeholder?: string;
+  options?: string[];
+  defaultValue?: string;
+}
+
 export interface Segment {
   id: string;
   name: string;
@@ -661,6 +676,7 @@ export interface Segment {
   icon: string;
   definition: string;
   unavailable?: boolean;
+  requiresInput?: SegmentInputConfig;
 }
 
 export type Bundle = typeof BUNDLES[0];
