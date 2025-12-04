@@ -1,5 +1,5 @@
 import { memo, useState } from 'react';
-import { CheckCircle2, Eye, Star, Info, ExternalLink, Sparkles, MapPin } from 'lucide-react';
+import { CheckCircle2, Eye, Star, Info, ExternalLink, Sparkles, MapPin, TrendingUp } from 'lucide-react';
 import type { Segment } from '@/lib/segmentData';
 import {
   Dialog,
@@ -11,6 +11,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
+// Predictive analytics segment IDs
+const PREDICTIVE_ANALYTICS_SEGMENTS = ['high-churn-risk', 'likely-purchase-soon', 'predicted-vips', 'high-churn-risk-exclude'];
 
 interface SegmentCardProps {
   segment: Segment;
@@ -109,7 +112,90 @@ const BirthdaySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChan
   </Dialog>
 );
 
-const LocationInputDialog = ({ 
+const PredictiveAnalyticsSetupDialog = ({ open, onOpenChange, segmentName }: { open: boolean; onOpenChange: (open: boolean) => void; segmentName: string }) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="max-w-lg">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <span className="text-2xl">🔮</span>
+          Predictive Analytics Setup Guide
+        </DialogTitle>
+        <DialogDescription>
+          Unlock {segmentName} with Klaviyo's Predictive Analytics
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="space-y-4 mt-2">
+        <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-primary/10 border border-purple-500/20">
+          <div className="flex items-start gap-3">
+            <TrendingUp className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-sm">Why Predictive Analytics?</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Klaviyo's AI predicts customer behavior including churn risk, expected order date, and lifetime value. Target the right customers at the right time!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+          <p className="text-sm text-amber-700 dark:text-amber-400">
+            <strong>Note:</strong> Predictive Analytics requires a Klaviyo paid plan with sufficient customer data (typically 180+ days of order history).
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-semibold text-sm">How to Check & Enable:</h4>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">1</div>
+            <div>
+              <p className="font-medium text-sm">Check Your Klaviyo Plan</p>
+              <p className="text-xs text-muted-foreground">Go to Klaviyo → Settings → Billing to verify you have access to Predictive Analytics</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">2</div>
+            <div>
+              <p className="font-medium text-sm">Verify Data Requirements</p>
+              <p className="text-xs text-muted-foreground">You need 180+ days of order history and 500+ customers for accurate predictions</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center">3</div>
+            <div>
+              <p className="font-medium text-sm">Create Segment in Klaviyo</p>
+              <p className="text-xs text-muted-foreground">Once enabled, create a segment using "Predictive Analytics" conditions in Klaviyo's segment builder</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-2 flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => window.open('https://help.klaviyo.com/hc/en-us/articles/360057055772-Guide-to-Predictive-Analytics-in-Klaviyo', '_blank')}
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Klaviyo Guide
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1"
+            onClick={() => onOpenChange(false)}
+          >
+            Got it!
+          </Button>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
+
+const LocationInputDialog = ({
   open, 
   onOpenChange, 
   segment,
@@ -283,6 +369,7 @@ export const SegmentCard = memo(function SegmentCard({
 }: SegmentCardProps) {
   const [showBirthdayGuide, setShowBirthdayGuide] = useState(false);
   const [showProximityGuide, setShowProximityGuide] = useState(false);
+  const [showPredictiveGuide, setShowPredictiveGuide] = useState(false);
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [tempLocationValue, setTempLocationValue] = useState(
     customInputValue || segment.requiresInput?.defaultValue || ''
@@ -290,12 +377,15 @@ export const SegmentCard = memo(function SegmentCard({
   
   const isUnavailable = segment.unavailable;
   const requiresInput = segment.requiresInput && !isUnavailable;
+  const isPredictiveSegment = PREDICTIVE_ANALYTICS_SEGMENTS.includes(segment.id);
 
   const handleClick = () => {
     if (segment.id === 'birthday-month') {
       setShowBirthdayGuide(true);
     } else if (segment.id === 'location-proximity') {
       setShowProximityGuide(true);
+    } else if (isPredictiveSegment) {
+      setShowPredictiveGuide(true);
     } else if (requiresInput && !isSelected) {
       // Show input dialog for segments that require custom input
       setTempLocationValue(customInputValue || segment.requiresInput?.defaultValue || '');
@@ -416,6 +506,14 @@ export const SegmentCard = memo(function SegmentCard({
       
       {segment.id === 'location-proximity' && (
         <ProximitySetupDialog open={showProximityGuide} onOpenChange={setShowProximityGuide} />
+      )}
+
+      {isPredictiveSegment && (
+        <PredictiveAnalyticsSetupDialog 
+          open={showPredictiveGuide} 
+          onOpenChange={setShowPredictiveGuide}
+          segmentName={segment.name}
+        />
       )}
 
       {requiresInput && (

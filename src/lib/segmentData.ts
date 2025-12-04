@@ -327,6 +327,7 @@ export const SEGMENTS: Segment[] = [
     category: "Customer Lifecycle & Value",
     icon: "⚠️",
     definition: "Predicted high churn probability",
+    unavailable: true,
   },
   {
     id: "likely-purchase-soon",
@@ -335,6 +336,7 @@ export const SEGMENTS: Segment[] = [
     category: "Customer Lifecycle & Value",
     icon: "🎯",
     definition: "Predicted next order < 14 days",
+    unavailable: true,
   },
   {
     id: "predicted-vips",
@@ -343,6 +345,7 @@ export const SEGMENTS: Segment[] = [
     category: "Customer Lifecycle & Value",
     icon: "⭐",
     definition: "Predicted CLV high (365d)",
+    unavailable: true,
   },
   {
     id: "high-aov",
@@ -579,6 +582,7 @@ export const SEGMENTS: Segment[] = [
     category: "Exclusion Segments",
     icon: "🚨",
     definition: "Predicted churn > threshold",
+    unavailable: true,
   },
   {
     id: "received-5-opened-0",
@@ -625,7 +629,7 @@ export const BUNDLES = [
     id: "lifecycle-manager",
     name: "Lifecycle Manager",
     description: "Complete customer lifecycle tracking",
-    segments: ["new-subscribers", "recent-first-time", "repeat-customers", "one-time-buyers", "active-customers", "lapsed-customers", "churned-customers", "vip-customers", "big-spenders", "bargain-shoppers", "high-churn-risk", "likely-purchase-soon", "predicted-vips", "high-aov", "low-aov"],
+    segments: ["new-subscribers", "recent-first-time", "repeat-customers", "one-time-buyers", "active-customers", "lapsed-customers", "churned-customers", "vip-customers", "big-spenders", "bargain-shoppers", "high-aov", "low-aov"],
     icon: "🔄",
   },
   {
@@ -639,7 +643,7 @@ export const BUNDLES = [
     id: "smart-exclusions",
     name: "Smart Exclusions",
     description: "Suppression list for deliverability",
-    segments: ["unsubscribed", "bounced-emails", "not-opted-in", "recent-purchasers-exclude", "refunded-customers", "negative-feedback", "unengaged-exclusion", "sunset-segment", "high-churn-risk-exclude", "received-5-opened-0", "received-3-in-3-days", "marked-spam"],
+    segments: ["unsubscribed", "bounced-emails", "not-opted-in", "recent-purchasers-exclude", "refunded-customers", "negative-feedback", "unengaged-exclusion", "sunset-segment", "received-5-opened-0", "received-3-in-3-days", "marked-spam"],
     icon: "🚫",
   },
 ];
