@@ -79,10 +79,10 @@ export const SEGMENTS = [
   {
     id: "highly-engaged",
     name: "Highly Engaged",
-    description: "Opened email 5+ times in last 30 days",
+    description: "Opened email 6+ times in last 30 days",
     category: "Engagement & Activity",
     icon: "🔥",
-    definition: "5+ email opens in 30 days",
+    definition: "6+ email opens in 30 days",
   },
   {
     id: "recent-clickers-90",
