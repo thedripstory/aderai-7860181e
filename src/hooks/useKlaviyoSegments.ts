@@ -107,10 +107,20 @@ export const useKlaviyoSegments = () => {
     });
     // Remove duplicates
     expandedSegmentIds = [...new Set(expandedSegmentIds)];
+    
+    // Filter out unavailable segments (like birthday-month)
+    const availableSegmentIds = expandedSegmentIds.filter(id => {
+      const segment = segmentsList.find((s: any) => s.id === id);
+      return segment && !segment.unavailable;
+    });
+
+    if (availableSegmentIds.length === 0) {
+      throw new Error('No available segments to create. Some segments require manual setup in Klaviyo.');
+    }
 
     setLoading(true);
     setResults([]);
-    setProgress({ current: 0, total: expandedSegmentIds.length });
+    setProgress({ current: 0, total: availableSegmentIds.length });
 
     try {
       const currencySymbol = activeKey.currency_symbol || '$';
@@ -135,14 +145,14 @@ export const useKlaviyoSegments = () => {
           .update({
             status: 'in_progress',
             segments_processed: 0,
-            total_segments: expandedSegmentIds.length
+            total_segments: availableSegmentIds.length
           })
           .eq('id', jobId);
       }
 
       const requestBody = {
         apiKey: activeKey.klaviyo_api_key_hash,
-        segmentIds: expandedSegmentIds,
+        segmentIds: availableSegmentIds,
         currencySymbol,
         settings,
       };
@@ -190,7 +200,7 @@ export const useKlaviyoSegments = () => {
         }
       });
 
-      const newResults: SegmentResult[] = expandedSegmentIds.map((segmentId) => {
+      const newResults: SegmentResult[] = availableSegmentIds.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
         const segmentName = segment?.name || segmentId;
         const result = resultsMap.get(segmentId);
@@ -246,7 +256,7 @@ export const useKlaviyoSegments = () => {
           segments_created: successCount,
           segments_skipped: newResults.filter(r => r.status === 'skipped').length,
           segments_failed: newResults.filter(r => r.status === 'error').length,
-          total_attempted: expandedSegmentIds.length,
+          total_attempted: availableSegmentIds.length,
         });
       }
 
@@ -256,7 +266,7 @@ export const useKlaviyoSegments = () => {
           .from('segment_creation_jobs')
           .update({
             status: 'completed',
-            segments_processed: expandedSegmentIds.length,
+            segments_processed: availableSegmentIds.length,
             completed_at: new Date().toISOString(),
             success_count: successCount,
             error_count: newResults.filter(r => r.status === 'error').length
@@ -267,15 +277,15 @@ export const useKlaviyoSegments = () => {
       return newResults;
     } catch (error: any) {
       await ErrorLogger.logSegmentError(error, 'create_segments', {
-        segmentCount: expandedSegmentIds.length,
+        segmentCount: availableSegmentIds.length,
       });
       
       // Log error to database for production monitoring
       await ErrorLogger.logSegmentError(
-        `Batch creation (${expandedSegmentIds.length} segments)`,
+        `Batch creation (${availableSegmentIds.length} segments)`,
         error,
         { 
-          expandedSegmentIds, 
+          availableSegmentIds, 
           activeKeyId: activeKey.id,
           jobId 
         }
@@ -291,7 +301,7 @@ export const useKlaviyoSegments = () => {
           .eq('id', jobId);
       }
 
-      const errorResults: SegmentResult[] = expandedSegmentIds.map((segmentId) => {
+      const errorResults: SegmentResult[] = availableSegmentIds.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
         return {
           segmentId,
