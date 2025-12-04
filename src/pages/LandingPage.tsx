@@ -785,14 +785,16 @@ export default function LandingPage() {
                 segmentation strategies
               </p>
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className="flex-1 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  required
-                />
+                <label className="flex-1 px-4 py-3 rounded-full border border-border bg-background focus-within:ring-2 focus-within:ring-primary/20 cursor-text">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    className="w-full bg-transparent focus:outline-none"
+                    required
+                  />
+                </label>
                 <button 
                   type="submit"
                   disabled={newsletterLoading}
