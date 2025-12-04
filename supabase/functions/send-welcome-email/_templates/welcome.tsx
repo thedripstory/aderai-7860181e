@@ -13,6 +13,9 @@ import {
 } from 'https://esm.sh/@react-email/components@0.0.22';
 import * as React from 'https://esm.sh/react@18.3.1';
 
+const ADERAI_LOGO_URL = 'https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png';
+const BRAND_COLOR = '#FF6B35';
+
 interface WelcomeEmailProps {
   userName: string;
   dashboardUrl: string;
@@ -31,10 +34,13 @@ export const WelcomeEmail = ({
       <Container style={container}>
         {/* Header with Aderai Logo */}
         <Section style={header}>
-          <div style={logoContainer}>
-            <span style={logoText}>aderai</span>
-            <span style={logoDot}>.</span>
-          </div>
+          <Img 
+            src={ADERAI_LOGO_URL} 
+            width="140" 
+            height="auto" 
+            alt="Aderai" 
+            style={logo}
+          />
         </Section>
 
         {/* Main Content */}
@@ -72,13 +78,20 @@ export const WelcomeEmail = ({
 
           <Hr style={hr} />
 
-          <Text style={footerText}>
-            Need help? Check out our <Link href="https://aderai.lovable.app/help" style={link}>Help Center</Link> or reply to this email.
+          <Text style={footerContentText}>
+            Need help? Check out our <Link href="https://aderai.io/help" style={link}>Help Center</Link> or reply to this email.
           </Text>
         </Section>
 
         {/* Footer */}
         <Section style={footer}>
+          <Img 
+            src={ADERAI_LOGO_URL} 
+            width="80" 
+            height="auto" 
+            alt="Aderai" 
+            style={{ margin: '0 auto 15px' }}
+          />
           <Text style={footerText}>
             © {new Date().getFullYear()} Aderai. All rights reserved.
           </Text>
@@ -101,8 +114,7 @@ export default WelcomeEmail;
 // Styles
 const main = {
   backgroundColor: '#f6f6f6',
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
 };
 
 const container = {
@@ -116,26 +128,11 @@ const header = {
   padding: '30px 20px',
   textAlign: 'center' as const,
   borderRadius: '10px 10px 0 0',
-  borderBottom: '3px solid #FF6B35',
+  borderBottom: `3px solid ${BRAND_COLOR}`,
 };
 
-const logoContainer = {
-  display: 'inline-block',
-};
-
-const logoText = {
-  fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
-  fontWeight: 'bold',
-  color: '#1a1a1a',
-  letterSpacing: '-0.5px',
-};
-
-const logoDot = {
-  fontSize: '32px',
-  fontFamily: "'Playfair Display', serif",
-  fontWeight: 'bold',
-  color: '#FF6B35',
+const logo = {
+  margin: '0 auto',
 };
 
 const content = {
@@ -165,7 +162,7 @@ const buttonContainer = {
 };
 
 const button = {
-  backgroundColor: '#FF6B35',
+  backgroundColor: BRAND_COLOR,
   borderRadius: '8px',
   color: '#ffffff',
   fontSize: '16px',
@@ -231,13 +228,21 @@ const hr = {
 };
 
 const link = {
-  color: '#FF6B35',
+  color: BRAND_COLOR,
   textDecoration: 'underline',
 };
 
 const footer = {
   textAlign: 'center' as const,
   padding: '20px',
+};
+
+const footerContentText = {
+  color: '#666666',
+  fontSize: '14px',
+  lineHeight: '22px',
+  margin: '16px 0',
+  textAlign: 'center' as const,
 };
 
 const footerText = {
