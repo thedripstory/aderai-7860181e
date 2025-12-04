@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { trackEvent, resetAnalytics } from '@/lib/analytics';
 
 interface DashboardHeaderProps {
   onStartTour?: () => void;
@@ -28,6 +29,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    trackEvent('User Signed Out');
+    resetAnalytics();
     await supabase.auth.signOut();
     navigate('/login');
   };

@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { trackEvent } from '@/lib/analytics';
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -221,7 +222,10 @@ export default function Settings() {
         description: "Your account settings have been saved.",
       });
 
-      // Track settings updated event
+      // Track with PostHog
+      trackEvent('Settings Updated', { section: 'account' });
+
+      // Track settings updated event in Supabase
       try {
         await supabase.from('analytics_events').insert({
           user_id: currentUser.id,
@@ -304,7 +308,10 @@ export default function Settings() {
         description: "Your segmentation settings have been saved.",
       });
 
-      // Track settings updated event
+      // Track with PostHog
+      trackEvent('Settings Updated', { section: 'thresholds', currency });
+
+      // Track settings updated event in Supabase
       try {
         await supabase.from('analytics_events').insert({
           user_id: currentUser.id,
@@ -362,6 +369,9 @@ export default function Settings() {
         description: "Your password has been changed successfully.",
       });
 
+      // Track with PostHog
+      trackEvent('Password Changed');
+
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -402,7 +412,10 @@ export default function Settings() {
         description: "Your notification settings have been saved.",
       });
 
-      // Track settings updated event
+      // Track with PostHog
+      trackEvent('Settings Updated', { section: 'notifications' });
+
+      // Track settings updated event in Supabase
       try {
         await supabase.from('analytics_events').insert({
           user_id: currentUser.id,
@@ -436,6 +449,7 @@ export default function Settings() {
       if (error) throw error;
       
       if (data?.url) {
+        trackEvent('Billing Portal Opened');
         window.location.href = data.url;
       }
     } catch (error) {
@@ -465,9 +479,12 @@ export default function Settings() {
       });
       
       setShowCancelConfirm(false);
-      loadSubscriptionDetails(); // Refresh data
+      loadSubscriptionDetails();
       
-      // Track cancellation
+      // Track with PostHog
+      trackEvent('Subscription Canceled', { cancelAt: 'period_end' });
+      
+      // Track cancellation in Supabase
       await supabase.from('analytics_events').insert({
         user_id: currentUser.id,
         event_name: 'subscription_canceled',
@@ -498,9 +515,12 @@ export default function Settings() {
         description: "Your subscription is now active again.",
       });
       
-      loadSubscriptionDetails(); // Refresh data
+      loadSubscriptionDetails();
       
-      // Track resumption
+      // Track with PostHog
+      trackEvent('Subscription Resumed');
+      
+      // Track resumption in Supabase
       await supabase.from('analytics_events').insert({
         user_id: currentUser.id,
         event_name: 'subscription_resumed',

@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { sanitizeString } from '@/lib/inputSanitization';
 import { SegmentCreationModal } from '@/components/SegmentCreationModal';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { trackEvent } from '@/lib/analytics';
 
 interface AISegmentSuggesterProps {
   activeKey: KlaviyoKey;
@@ -71,7 +72,14 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
       // Increment usage counter after successful generation
       await incrementUsage();
 
-      // Track AI suggestion used event
+      // Track with PostHog
+      trackEvent('AI Suggestions Requested', {
+        industry: activeKey.client_name,
+        goal: sanitizedPrompt.substring(0, 100),
+        suggestionsCount: response.segments?.length || 0,
+      });
+
+      // Track AI suggestion used event in Supabase
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -162,7 +170,13 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
             });
           }, 1500);
         } else if (response.status === 'created') {
-          // Track segment created event
+          // Track with PostHog
+          trackEvent('AI Suggestion Applied', {
+            suggestionName: suggestion.name,
+            source: 'ai_suggestion',
+          });
+
+          // Track segment created event in Supabase
           try {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
