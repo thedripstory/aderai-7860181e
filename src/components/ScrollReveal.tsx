@@ -14,11 +14,12 @@ export function ScrollReveal({
   delay = 0,
   direction = "up" 
 }: ScrollRevealProps) {
+  // Reduced offset for smoother, less jarring animations
   const directionOffset = {
-    up: { y: 40, x: 0 },
-    down: { y: -40, x: 0 },
-    left: { y: 0, x: 40 },
-    right: { y: 0, x: -40 },
+    up: { y: 20, x: 0 },
+    down: { y: -20, x: 0 },
+    left: { y: 0, x: 20 },
+    right: { y: 0, x: -20 },
   };
 
   return (
@@ -32,13 +33,14 @@ export function ScrollReveal({
         y: 0, 
         x: 0 
       }}
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-50px", amount: 0.1 }}
       transition={{ 
-        duration: 0.6, 
+        duration: 0.4, 
         delay,
-        ease: [0.21, 0.47, 0.32, 0.98]
+        ease: "easeOut"
       }}
-      className={className}
+      className={`${className} will-change-transform`}
+      style={{ transform: 'translateZ(0)' }}
     >
       {children}
     </motion.div>

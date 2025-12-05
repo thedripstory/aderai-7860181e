@@ -215,3 +215,28 @@ body {
   contain: strict;
 }
 
+/* GPU acceleration for smooth scrolling */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Reduced motion for animations - smoother scrolling */
+.smooth-scroll-section {
+  transform: translateZ(0);
+  will-change: auto;
+}
+
+/* Optimized blur - uses less resources */
+.blur-optimized {
+  filter: blur(40px);
+  transform: translateZ(0);
+}
+
+/* Prevent layout thrashing on scroll */
+.scroll-stable {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
