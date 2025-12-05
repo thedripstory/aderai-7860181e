@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Sparkles, Package, HelpCircle, AlertTriangle } from 'lucide-react';
+import { SegmentMismatchBanner } from './SegmentMismatchBanner';
 import { SegmentPreviewModal } from './SegmentPreviewModal';
 import { SegmentFilters } from './segments/SegmentFilters';
 import { FavoritesSection } from './segments/FavoritesSection';
@@ -329,6 +330,9 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
         isSegmentCreated={isSegmentCreated}
         getSegmentInfo={getSegmentInfo}
       />
+
+      {/* Segment Mismatch Report Banner */}
+      <SegmentMismatchBanner />
     </div>
   );
 };

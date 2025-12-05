@@ -879,6 +879,48 @@ export type Database = {
         }
         Relationships: []
       }
+      segment_mismatch_reports: {
+        Row: {
+          actual_behavior: string
+          additional_notes: string | null
+          admin_notes: string | null
+          created_at: string
+          expected_behavior: string
+          id: string
+          resolved_at: string | null
+          segment_name: string
+          status: string
+          user_email: string
+          user_id: string
+        }
+        Insert: {
+          actual_behavior: string
+          additional_notes?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          expected_behavior: string
+          id?: string
+          resolved_at?: string | null
+          segment_name: string
+          status?: string
+          user_email: string
+          user_id: string
+        }
+        Update: {
+          actual_behavior?: string
+          additional_notes?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          expected_behavior?: string
+          id?: string
+          resolved_at?: string | null
+          segment_name?: string
+          status?: string
+          user_email?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       segment_operations: {
         Row: {
           created_at: string
