@@ -91,7 +91,7 @@ export const AutomationFlow = () => {
   return (
     <div ref={flowRef} className="relative w-full max-w-2xl mx-auto lg:mx-0">
       {/* Gradient Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent rounded-full blur-2xl" />
       
       <div className="relative">
         {/* Dashboard Header */}

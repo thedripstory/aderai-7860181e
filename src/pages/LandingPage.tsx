@@ -306,10 +306,10 @@ export default function LandingPage() {
       </section>
 
       {/* Automation Section */}
-      <section className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden">
+      <section className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden contain-layout">
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-2xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-2xl" />
 
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -392,7 +392,7 @@ export default function LandingPage() {
       </section>
 
       {/* Discover Hidden Segments */}
-      <section id="how-it-works" className="py-20 px-6 bg-background">
+      <section id="how-it-works" className="py-20 px-6 bg-background contain-layout">
         <div className="max-w-7xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-4">
@@ -543,10 +543,10 @@ export default function LandingPage() {
       </div>
 
       {/* Success Stories */}
-      <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden contain-layout">
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-2xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-2xl" />
 
         <div className="max-w-7xl mx-auto relative">
           {/* Header Section */}
@@ -697,7 +697,7 @@ export default function LandingPage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-20 px-4 bg-background">
+        <section className="py-20 px-4 bg-background contain-layout">
           <div className="max-w-7xl mx-auto">
             <ScrollReveal>
             <div className="text-center mb-16">
@@ -770,8 +770,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-2xl" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-2xl" />
         
         <div className="max-w-7xl mx-auto px-6 relative">
           {/* Segment Flow Effect Section */}

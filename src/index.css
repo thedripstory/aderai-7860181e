@@ -202,4 +202,16 @@ body {
   }
 }
 
+/* Performance optimization - containment */
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-strict {
+  contain: strict;
+}
 
