@@ -2021,9 +2021,11 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 // MAIN HANDLER
 // ==========================================
 
-const BATCH_SIZE = 4; // Stay under Klaviyo's 5 segment processing limit
-const BATCH_DELAY = 3000; // 3 seconds between batches
-const INTRA_BATCH_DELAY = 500; // 500ms between requests within a batch
+// Klaviyo Segment API limits: Burst 1/s, Steady 15/min, Daily 100/day
+// We use 1 segment every 4.5 seconds = ~13/min to stay safely under limits
+const BATCH_SIZE = 1;           // One segment at a time to respect burst limit
+const BATCH_DELAY = 4500;       // 4.5 seconds between requests (13/min, under 15/min steady limit)
+const INTRA_BATCH_DELAY = 0;    // N/A with batch size 1
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

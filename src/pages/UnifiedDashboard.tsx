@@ -57,7 +57,7 @@ export default function UnifiedDashboard() {
   const { trackAction } = useFeatureTracking('unified_dashboard');
   
   // Track which segments are already created in Klaviyo
-  const { isSegmentCreated, syncSegmentStatus, createdCount } = useKlaviyoSegmentStatus(
+  const { isSegmentCreated, syncSegmentStatus, createdCount, getSegmentInfo } = useKlaviyoSegmentStatus(
     klaviyoKeys.length > 0 ? klaviyoKeys[activeKeyIndex]?.id : null
   );
   const { 
@@ -394,6 +394,9 @@ export default function UnifiedDashboard() {
               } : DEFAULT_SEGMENT_SETTINGS}
               customInputs={segmentCustomInputs}
               onCustomInputChange={handleCustomInputChange}
+              isSegmentCreated={isSegmentCreated}
+              getSegmentInfo={getSegmentInfo}
+              createdCount={createdCount}
             />
 
           </TabsContent>

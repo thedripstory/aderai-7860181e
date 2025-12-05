@@ -117,23 +117,19 @@ export default function JobHistory() {
     setLoading(false);
   }
 
-  function getStatusBadge(status: string) {
-    switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400">Completed</Badge>;
-      case 'in_progress':
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400">In Progress</Badge>;
-      case 'waiting_retry':
-        return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400">Waiting</Badge>;
-      case 'failed':
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400">Failed</Badge>;
-      case 'cancelled':
-        return <Badge className="bg-muted text-muted-foreground hover:bg-muted">Cancelled</Badge>;
-      case 'pending':
-        return <Badge className="bg-muted text-muted-foreground hover:bg-muted">Pending</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+  function getStatusBadge(status: string, rateLimitType?: string | null) {
+    const variants: Record<string, { className: string; label: string }> = {
+      completed: { className: 'bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400', label: 'Completed' },
+      in_progress: { className: 'bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400', label: 'In Progress' },
+      waiting_retry: { className: 'bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400', label: rateLimitType === 'daily' ? 'Resuming tomorrow' : 'Retrying soon' },
+      failed: { className: 'bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400', label: 'Failed' },
+      cancelled: { className: 'bg-muted text-muted-foreground hover:bg-muted', label: 'Cancelled' },
+      pending: { className: 'bg-muted text-muted-foreground hover:bg-muted', label: 'Pending' },
+    };
+    
+    const config = variants[status] || { className: 'bg-muted text-muted-foreground', label: status };
+    
+    return <Badge className={config.className}>{config.label}</Badge>;
   }
 
   function getStatusIcon(status: string) {
@@ -325,7 +321,7 @@ export default function JobHistory() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {getStatusBadge(job.status)}
+                          {getStatusBadge(job.status, job.rate_limit_type)}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
