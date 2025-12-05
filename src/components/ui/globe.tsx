@@ -93,15 +93,15 @@ export function Globe({
   const markers = useMemo(() => getRandomMarkers(18), [])
   
   const GLOBE_CONFIG: COBEOptions = {
-    width: 800,
-    height: 800,
+    width: 600,
+    height: 600,
     onRender: () => {},
-    devicePixelRatio: 2,
+    devicePixelRatio: 1.5,
     phi: 0,
     theta: 0.3,
     dark: 0,
     diffuse: 0.4,
-    mapSamples: 16000,
+    mapSamples: 8000,
     mapBrightness: 1.2,
     baseColor: [1, 1, 1],
     markerColor: [251 / 255, 100 / 255, 21 / 255],

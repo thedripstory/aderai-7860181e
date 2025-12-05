@@ -7,10 +7,10 @@ const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/K
 
 export const AnimatedSegmentVisual = () => {
   return (
-    <div className="relative w-full py-20 overflow-hidden">
-      {/* Large ambient glow */}
+    <div className="relative w-full py-20 overflow-hidden contain-layout">
+      {/* Large ambient glow - reduced blur */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[150px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[100px]" />
       
       <div className="relative max-w-7xl mx-auto px-4">
         {/* Section header */}
@@ -44,7 +44,7 @@ export const AnimatedSegmentVisual = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <div className="p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
+            <div className="p-6 rounded-2xl bg-card/50 border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
               <div className="flex items-center gap-4 mb-3">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Users className="w-6 h-6 text-primary" />
@@ -57,7 +57,7 @@ export const AnimatedSegmentVisual = () => {
               <p className="text-sm text-muted-foreground">Agency-grade segmentation strategies ready to deploy</p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
+            <div className="p-6 rounded-2xl bg-card/50 border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
               <div className="flex items-center gap-4 mb-3">
                 <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
                   <Target className="w-6 h-6 text-accent" />
@@ -70,7 +70,7 @@ export const AnimatedSegmentVisual = () => {
               <p className="text-sm text-muted-foreground">Engagement, Lifecycle, Demographics, Behavior & Exclusions</p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
+            <div className="p-6 rounded-2xl bg-card/50 border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
               <div className="flex items-center gap-4 mb-3">
                 <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
                   <Rocket className="w-6 h-6 text-green-500" />
@@ -126,7 +126,7 @@ export const AnimatedSegmentVisual = () => {
             ].map((item, i) => (
               <motion.div
                 key={item.step}
-                className="flex items-center gap-4 p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/30 hover:border-primary/30 hover:bg-card/50 transition-all group cursor-default"
+                className="flex items-center gap-4 p-4 rounded-xl bg-card/30 border border-border/30 hover:border-primary/30 hover:bg-card/50 transition-all group cursor-default"
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
@@ -155,7 +155,7 @@ export const AnimatedSegmentVisual = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent rounded-3xl" />
           
-          <div className="relative flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-12 px-8 rounded-3xl border border-border/30 bg-card/20 backdrop-blur-sm">
+          <div className="relative flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-12 px-8 rounded-3xl border border-border/30 bg-card/20">
             {/* Manual way */}
             <motion.div 
               className="text-center"
@@ -185,8 +185,8 @@ export const AnimatedSegmentVisual = () => {
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-2xl shadow-primary/30">
                 <Zap className="w-10 h-10 md:w-12 md:h-12 text-white" />
               </div>
-              <div className="absolute -inset-3 rounded-full border-2 border-primary/30 animate-ping" style={{ animationDuration: "2s" }} />
-              <div className="absolute -inset-6 rounded-full border border-primary/20 animate-pulse" style={{ animationDuration: "3s" }} />
+              <div className="absolute -inset-3 rounded-full border-2 border-primary/30 opacity-50" />
+              <div className="absolute -inset-6 rounded-full border border-primary/20 opacity-30" />
             </motion.div>
             
             {/* Aderai way */}
