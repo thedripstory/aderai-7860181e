@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Sparkles, Package, HelpCircle } from 'lucide-react';
+import { Sparkles, Package, HelpCircle, AlertTriangle } from 'lucide-react';
 import { SegmentPreviewModal } from './SegmentPreviewModal';
 import { SegmentFilters } from './segments/SegmentFilters';
 import { FavoritesSection } from './segments/FavoritesSection';
@@ -197,6 +197,69 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
             </a>
           </p>
         </div>
+
+        {/* Rate Limit Warning Banner */}
+        {selectedCount > 0 && (
+          <div className={`rounded-xl p-4 border ${
+            selectedCount > 10 
+              ? 'bg-destructive/10 border-destructive/30' 
+              : selectedCount > 7 
+                ? 'bg-amber-500/10 border-amber-500/30' 
+                : 'bg-green-500/10 border-green-500/30'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${
+                  selectedCount > 10 
+                    ? 'bg-destructive/20' 
+                    : selectedCount > 7 
+                      ? 'bg-amber-500/20' 
+                      : 'bg-green-500/20'
+                }`}>
+                  <AlertTriangle className={`w-4 h-4 ${
+                    selectedCount > 10 
+                      ? 'text-destructive' 
+                      : selectedCount > 7 
+                        ? 'text-amber-600' 
+                        : 'text-green-600'
+                  }`} />
+                </div>
+                <div>
+                  <p className={`text-sm font-medium ${
+                    selectedCount > 10 
+                      ? 'text-destructive' 
+                      : selectedCount > 7 
+                        ? 'text-amber-700 dark:text-amber-500' 
+                        : 'text-green-700 dark:text-green-500'
+                  }`}>
+                    {selectedCount > 10 
+                      ? `⚠️ ${selectedCount} segments selected — Risk of hitting Klaviyo limits!` 
+                      : selectedCount > 7 
+                        ? `${selectedCount}/10 segments — Approaching safe limit` 
+                        : `${selectedCount}/10 segments — Safe to create`}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {selectedCount > 10 
+                      ? 'Exceeding 10 segments may trigger a 24-hour creation block. Consider creating in smaller batches.' 
+                      : 'We recommend creating max 10 segments at a time to avoid Klaviyo rate limits.'}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className={`text-2xl font-bold ${
+                  selectedCount > 10 
+                    ? 'text-destructive' 
+                    : selectedCount > 7 
+                      ? 'text-amber-600' 
+                      : 'text-green-600'
+                }`}>
+                  {Math.max(0, 10 - selectedCount)}
+                </div>
+                <div className="text-xs text-muted-foreground">remaining</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Search and Filters */}
         <SegmentFilters
