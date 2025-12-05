@@ -240,35 +240,51 @@ export const useKlaviyoSegments = () => {
       
       if (!jobRecordId) {
         console.log('[useKlaviyoSegments] Creating new job record for', availableSegmentIds.length, 'segments');
+        console.log('[useKlaviyoSegments] User ID:', user.id);
+        console.log('[useKlaviyoSegments] Klaviyo Key ID:', activeKey.id);
+        
+        const insertPayload = {
+          user_id: user.id,
+          klaviyo_key_id: activeKey.id,
+          status: 'in_progress',
+          segments_to_create: availableSegmentIds,
+          pending_segment_ids: availableSegmentIds,
+          completed_segment_ids: [],
+          failed_segment_ids: [],
+          total_segments: availableSegmentIds.length,
+          user_email: email,
+          custom_inputs: customInputs || {}
+        };
+        
+        console.log('[useKlaviyoSegments] Insert payload:', JSON.stringify(insertPayload, null, 2));
+        
         const { data: job, error: jobError } = await supabase
           .from('segment_creation_jobs')
-          .insert({
-            user_id: user.id,
-            klaviyo_key_id: activeKey.id,
-            status: 'in_progress',
-            segments_to_create: availableSegmentIds,
-            pending_segment_ids: availableSegmentIds,
-            completed_segment_ids: [],
-            failed_segment_ids: [],
-            total_segments: availableSegmentIds.length,
-            user_email: email,
-            custom_inputs: customInputs || {}
-          })
+          .insert(insertPayload)
           .select()
           .single();
 
         if (jobError) {
-          console.error('[useKlaviyoSegments] Failed to create job:', jobError.message, jobError.details);
+          console.error('[useKlaviyoSegments] Failed to create job:', {
+            message: jobError.message,
+            details: jobError.details,
+            hint: jobError.hint,
+            code: jobError.code
+          });
           toast({
-            title: "Failed to create job",
-            description: `Database error: ${jobError.message}. Please try again.`,
+            title: "Job tracking unavailable",
+            description: "Segments will still be created, but won't appear in Job History.",
             variant: "destructive"
           });
-          throw jobError;
+          // Don't throw - continue without job tracking
+        } else {
+          console.log('[useKlaviyoSegments] Job created successfully:', {
+            id: job.id,
+            status: job.status,
+            totalSegments: job.total_segments
+          });
+          jobRecordId = job.id;
         }
-        
-        console.log('[useKlaviyoSegments] Job created successfully with ID:', job.id);
-        jobRecordId = job.id;
       } else {
         console.log('[useKlaviyoSegments] Updating existing job:', existingJobId);
         const { error: updateError } = await supabase

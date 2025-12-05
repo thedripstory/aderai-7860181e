@@ -83,51 +83,91 @@ export default function JobHistory() {
 
   async function fetchJobs() {
     setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    let query = supabase
-      .from('segment_creation_jobs')
-      .select(`
-        *,
-        klaviyo_keys(client_name)
-      `)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (statusFilter !== 'all') {
-      if (statusFilter === 'active') {
-        query = query.in('status', ['in_progress', 'waiting_retry', 'pending']);
-      } else {
-        query = query.eq('status', statusFilter);
+    
+    try {
+      // Debug: Check auth state
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      console.log('[JobHistory] Auth check:', { 
+        userId: user?.id, 
+        email: user?.email,
+        authError: authError?.message 
+      });
+      
+      if (!user) {
+        console.error('[JobHistory] No authenticated user - showing empty state');
+        setLoading(false);
+        return;
       }
-    }
 
-    const { data, error } = await query.limit(100);
+      // Debug: Try a simple count first
+      const { count, error: countError } = await supabase
+        .from('segment_creation_jobs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      
+      console.log('[JobHistory] Count query:', { count, error: countError?.message });
 
-    if (error) {
-      console.error('Error fetching jobs:', error);
+      // Main query with join
+      let query = supabase
+        .from('segment_creation_jobs')
+        .select(`
+          *,
+          klaviyo_keys(client_name)
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (statusFilter !== 'all') {
+        if (statusFilter === 'active') {
+          query = query.in('status', ['in_progress', 'waiting_retry', 'pending']);
+        } else {
+          query = query.eq('status', statusFilter);
+        }
+      }
+
+      const { data, error } = await query.limit(100);
+
+      console.log('[JobHistory] Main query result:', { 
+        count: data?.length, 
+        error: error?.message,
+        errorDetails: error?.details,
+        errorHint: error?.hint,
+        firstJob: data?.[0] ? { id: data[0].id, status: data[0].status } : null
+      });
+
+      if (error) {
+        console.error('[JobHistory] Query error:', error);
+        setLoading(false);
+        return;
+      }
+
+      setJobs(data || []);
+      
+      // Calculate stats
+      const allJobs = data || [];
+      const completedJobs = allJobs.filter(j => j.status === 'completed');
+      const totalSegments = completedJobs.reduce((sum, j) => sum + (j.success_count || 0), 0);
+      const totalAttempted = allJobs.reduce((sum, j) => sum + (j.total_segments || 0), 0);
+      const totalSucceeded = allJobs.reduce((sum, j) => sum + (j.success_count || 0), 0);
+      
+      setStats({
+        totalJobs: allJobs.length,
+        totalSegmentsCreated: totalSegments,
+        successRate: totalAttempted > 0 ? Math.round((totalSucceeded / totalAttempted) * 100) : 0,
+        activeJobs: allJobs.filter(j => ['in_progress', 'waiting_retry', 'pending'].includes(j.status)).length
+      });
+      
+      console.log('[JobHistory] Stats calculated:', {
+        totalJobs: allJobs.length,
+        totalSegments,
+        activeJobs: allJobs.filter(j => ['in_progress', 'waiting_retry', 'pending'].includes(j.status)).length
+      });
+      
+    } catch (err) {
+      console.error('[JobHistory] Unexpected error:', err);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setJobs(data || []);
-    
-    // Calculate stats
-    const allJobs = data || [];
-    const completedJobs = allJobs.filter(j => j.status === 'completed');
-    const totalSegments = completedJobs.reduce((sum, j) => sum + (j.success_count || 0), 0);
-    const totalAttempted = allJobs.reduce((sum, j) => sum + j.total_segments, 0);
-    const totalSucceeded = allJobs.reduce((sum, j) => sum + (j.success_count || 0), 0);
-    
-    setStats({
-      totalJobs: allJobs.length,
-      totalSegmentsCreated: totalSegments,
-      successRate: totalAttempted > 0 ? Math.round((totalSucceeded / totalAttempted) * 100) : 0,
-      activeJobs: allJobs.filter(j => ['in_progress', 'waiting_retry', 'pending'].includes(j.status)).length
-    });
-    
-    setLoading(false);
   }
 
   function getStatusBadge(status: string, rateLimitType?: string | null) {
