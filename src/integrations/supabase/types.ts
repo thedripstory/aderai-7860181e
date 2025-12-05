@@ -761,8 +761,10 @@ export type Database = {
         Row: {
           completed_at: string | null
           completed_segment_ids: Json | null
+          completion_email_sent: boolean | null
           created_at: string | null
           custom_inputs: Json | null
+          daily_limit_email_sent: boolean | null
           email_notifications_sent: Json | null
           error_count: number | null
           error_message: string | null
@@ -773,6 +775,7 @@ export type Database = {
           last_klaviyo_error: string | null
           next_retry_at: string | null
           pending_segment_ids: Json | null
+          rate_limit_email_sent: boolean | null
           rate_limit_type: string | null
           retry_after: string | null
           retry_count: number | null
@@ -788,8 +791,10 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           completed_segment_ids?: Json | null
+          completion_email_sent?: boolean | null
           created_at?: string | null
           custom_inputs?: Json | null
+          daily_limit_email_sent?: boolean | null
           email_notifications_sent?: Json | null
           error_count?: number | null
           error_message?: string | null
@@ -800,6 +805,7 @@ export type Database = {
           last_klaviyo_error?: string | null
           next_retry_at?: string | null
           pending_segment_ids?: Json | null
+          rate_limit_email_sent?: boolean | null
           rate_limit_type?: string | null
           retry_after?: string | null
           retry_count?: number | null
@@ -815,8 +821,10 @@ export type Database = {
         Update: {
           completed_at?: string | null
           completed_segment_ids?: Json | null
+          completion_email_sent?: boolean | null
           created_at?: string | null
           custom_inputs?: Json | null
+          daily_limit_email_sent?: boolean | null
           email_notifications_sent?: Json | null
           error_count?: number | null
           error_message?: string | null
@@ -827,6 +835,7 @@ export type Database = {
           last_klaviyo_error?: string | null
           next_retry_at?: string | null
           pending_segment_ids?: Json | null
+          rate_limit_email_sent?: boolean | null
           rate_limit_type?: string | null
           retry_after?: string | null
           retry_count?: number | null

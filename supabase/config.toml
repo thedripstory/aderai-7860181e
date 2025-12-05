@@ -113,3 +113,9 @@ verify_jwt = true
 
 [functions.send-billing-email]
 verify_jwt = false
+
+[functions.send-inactivity-reminder]
+verify_jwt = false
+
+[functions.send-security-alert]
+verify_jwt = false

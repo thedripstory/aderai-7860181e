@@ -393,6 +393,49 @@ serve(async (req) => {
         }
         break;
       }
+
+      case "customer.subscription.trial_will_end": {
+        // Stripe sends this 3 days before trial ends
+        const subscription = event.data.object as Stripe.Subscription;
+        let userId = subscription.metadata?.supabase_user_id;
+
+        if (!userId && subscription.customer) {
+          try {
+            const customer = await stripe.customers.retrieve(subscription.customer as string);
+            if (customer && !customer.deleted && 'email' in customer && customer.email) {
+              userId = await findUserByEmail(customer.email);
+            }
+          } catch (e) {
+            logStep("Error fetching customer for trial ending", { error: (e as Error).message });
+          }
+        }
+
+        logStep("Trial will end soon", { userId, subscriptionId: subscription.id });
+
+        if (userId) {
+          await supabaseAdmin.from("subscription_events").insert({
+            user_id: userId,
+            stripe_event_id: event.id,
+            event_type: event.type,
+            event_data: { 
+              subscription_id: subscription.id,
+              trial_end: subscription.trial_end 
+            },
+          });
+
+          // Send trial ending email
+          await sendBillingEmail(userId, "trial_ending", {
+            nextBillingDate: subscription.trial_end 
+              ? new Date(subscription.trial_end * 1000).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long", 
+                  day: "numeric",
+                })
+              : undefined,
+          });
+        }
+        break;
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
