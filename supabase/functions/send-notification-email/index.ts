@@ -228,52 +228,96 @@ const handler = async (req: Request): Promise<Response> => {
         <html>
         <head>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
             .header h1 { color: white; margin: 0; font-size: 24px; }
             .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; }
-            .status-box { background: #fef3c7; padding: 20px; margin: 20px 0; border-radius: 6px; border: 1px solid #f59e0b; }
-            .stat { display: inline-block; margin-right: 30px; margin-bottom: 10px; }
-            .stat-value { font-size: 24px; font-weight: bold; color: #d97706; }
-            .stat-label { font-size: 14px; color: #666; }
+            .status-box { background: #fef3c7; padding: 24px; margin: 24px 0; border-radius: 8px; border: 1px solid #f59e0b; }
+            .stat-row { display: flex; justify-content: space-around; text-align: center; }
+            .stat { flex: 1; }
+            .stat-value { font-size: 32px; font-weight: bold; color: #d97706; }
+            .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
             .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa; border-radius: 0 0 10px 10px; }
-            .note { background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 13px; color: #666; }
-            .checkmark { color: #22c55e; font-size: 18px; }
+            .info-section { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #3b82f6; }
+            .info-section h3 { margin: 0 0 12px 0; color: #1e40af; font-size: 15px; }
+            .info-section p { margin: 0; font-size: 14px; color: #374151; }
+            .checkmark-item { display: flex; align-items: flex-start; margin: 12px 0; }
+            .checkmark { color: #22c55e; font-size: 18px; margin-right: 10px; flex-shrink: 0; }
+            .timeline { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 24px 0; }
+            .timeline h3 { margin: 0 0 16px 0; font-size: 15px; color: #374151; }
+            .timeline-item { display: flex; align-items: center; margin: 10px 0; }
+            .timeline-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
+            .dot-complete { background: #22c55e; }
+            .dot-pending { background: #f59e0b; }
+            .timeline-text { font-size: 14px; color: #4b5563; }
+            .preferences-link { color: #FF6B35; text-decoration: none; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>⏸️ Daily Limit Reached</h1>
+              <h1>⏸️ Segment Creation Paused</h1>
             </div>
             <div class="content">
               <p>Hi there,</p>
-              <p>We've hit Klaviyo's daily limit of 100 segments. Here's where we're at:</p>
+              <p>We've reached Klaviyo's daily segment creation limit. <strong>Don't worry — your remaining segments will be created automatically tomorrow.</strong></p>
               
               <div class="status-box">
-                <div class="stat">
-                  <div class="stat-value">${data.completedToday}</div>
-                  <div class="stat-label">✅ Created today</div>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td width="50%" align="center" style="padding: 10px;">
+                      <div style="font-size: 32px; font-weight: bold; color: #22c55e;">${data.completedToday || 0}</div>
+                      <div style="font-size: 13px; color: #666; margin-top: 4px;">✅ Created today</div>
+                    </td>
+                    <td width="50%" align="center" style="padding: 10px;">
+                      <div style="font-size: 32px; font-weight: bold; color: #f59e0b;">${data.remaining || 0}</div>
+                      <div style="font-size: 13px; color: #666; margin-top: 4px;">⏳ Queued for tomorrow</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <div class="info-section">
+                <h3>📚 Why does this happen?</h3>
+                <p>Klaviyo enforces a <strong>100 segments per day</strong> limit on their API to:</p>
+                <ul style="margin: 12px 0 0 0; padding-left: 20px; font-size: 14px; color: #374151;">
+                  <li style="margin: 6px 0;">Maintain platform stability for all users</li>
+                  <li style="margin: 6px 0;">Prevent accidental mass-creation of segments</li>
+                  <li style="margin: 6px 0;">Ensure segment processing completes reliably</li>
+                </ul>
+                <p style="margin-top: 12px; font-size: 13px; color: #6b7280;">This is standard practice — Mailchimp, HubSpot, and other platforms have similar limits.</p>
+              </div>
+
+              <div class="timeline">
+                <h3>📋 What happens next</h3>
+                <div class="timeline-item">
+                  <div class="timeline-dot dot-complete"></div>
+                  <div class="timeline-text"><strong>Today:</strong> ${data.completedToday || 0} segments created successfully</div>
                 </div>
-                <div class="stat">
-                  <div class="stat-value">${data.remaining}</div>
-                  <div class="stat-label">⏳ Remaining</div>
+                <div class="timeline-item">
+                  <div class="timeline-dot dot-pending"></div>
+                  <div class="timeline-text"><strong>Tomorrow:</strong> ${data.remaining || 0} remaining segment${(data.remaining || 0) !== 1 ? 's' : ''} will be created automatically</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot dot-complete"></div>
+                  <div class="timeline-text"><strong>When complete:</strong> We'll email you with confirmation</div>
                 </div>
               </div>
-              
-              <p><span class="checkmark">✓</span> <strong>You don't need to do anything</strong> — we'll automatically continue tomorrow and email you when complete.</p>
-              
-              <div class="note">
-                <strong>Why does Klaviyo have these limits?</strong><br>
-                Like most platforms, Klaviyo rate-limits their API to ensure system stability for all users. 
-                We work within these limits to keep your account in good standing.
+
+              <div class="checkmark-item">
+                <span class="checkmark">✓</span>
+                <span><strong>No action needed from you.</strong> Aderai handles everything automatically.</span>
               </div>
               
               <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
             </div>
             <div class="footer">
+              <p>You can manage your email notification preferences in your account settings.</p>
               <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
+              <p>
+                <a href="${dashboardUrl}/settings" class="preferences-link">Manage Email Preferences</a>
+              </p>
             </div>
           </div>
         </body>
