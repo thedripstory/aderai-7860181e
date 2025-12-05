@@ -32,6 +32,69 @@ async function findUserByEmail(email: string): Promise<string | null> {
   return user.id;
 }
 
+// Helper to get user details for email
+async function getUserDetails(userId: string): Promise<{ email: string; firstName: string } | null> {
+  const { data: user, error } = await supabaseAdmin
+    .from("users")
+    .select("email, first_name")
+    .eq("id", userId)
+    .maybeSingle();
+  
+  if (error || !user) {
+    logStep("Could not get user details", { userId, error: error?.message });
+    return null;
+  }
+  
+  return { email: user.email, firstName: user.first_name || "there" };
+}
+
+// Helper to send billing email
+async function sendBillingEmail(
+  userId: string,
+  emailType: string,
+  details?: { amount?: number; currency?: string; nextBillingDate?: string }
+) {
+  try {
+    const userDetails = await getUserDetails(userId);
+    if (!userDetails) {
+      logStep("Cannot send billing email - user details not found", { userId });
+      return;
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      logStep("Cannot send billing email - missing Supabase config");
+      return;
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-billing-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseAnonKey}`,
+      },
+      body: JSON.stringify({
+        userId,
+        email: userDetails.email,
+        firstName: userDetails.firstName,
+        emailType,
+        ...details,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logStep("Failed to send billing email", { emailType, error: errorText });
+    } else {
+      logStep("Billing email sent successfully", { emailType, email: userDetails.email });
+    }
+  } catch (error) {
+    logStep("Error sending billing email", { emailType, error: (error as Error).message });
+  }
+}
+
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
@@ -96,6 +159,17 @@ serve(async (req) => {
             logStep("ERROR updating user subscription", { userId, error: updateError.message });
           } else {
             logStep("Updated user subscription status to active", { userId, subscriptionId: subscription.id });
+            
+            // Send subscription confirmation email
+            await sendBillingEmail(userId, "subscription_confirmed", {
+              amount: session.amount_total ? session.amount_total / 100 : 9,
+              currency: session.currency?.toUpperCase() || "USD",
+              nextBillingDate: new Date(subscription.current_period_end * 1000).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }),
+            });
           }
 
           await supabaseAdmin.from("subscription_events").insert({
@@ -216,7 +290,55 @@ serve(async (req) => {
             event_data: { subscription_id: subscription.id },
           });
 
+          // Send subscription canceled email
+          await sendBillingEmail(userId, "subscription_canceled");
+
           logStep("Marked subscription as canceled", { userId });
+        }
+        break;
+      }
+
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string;
+
+        // Only send renewal email for recurring payments (not first payment)
+        if (subscriptionId && invoice.billing_reason === "subscription_cycle") {
+          logStep("Invoice payment succeeded (renewal)", { invoiceId: invoice.id, subscriptionId });
+
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          let userId = subscription.metadata?.supabase_user_id;
+
+          if (!userId && subscription.customer) {
+            try {
+              const customer = await stripe.customers.retrieve(subscription.customer as string);
+              if (customer && !customer.deleted && 'email' in customer && customer.email) {
+                userId = await findUserByEmail(customer.email);
+              }
+            } catch (e) {
+              logStep("Error fetching customer for payment success", { error: (e as Error).message });
+            }
+          }
+
+          if (userId) {
+            // Send renewal confirmation email
+            await sendBillingEmail(userId, "subscription_renewed", {
+              amount: invoice.amount_paid ? invoice.amount_paid / 100 : 9,
+              currency: invoice.currency?.toUpperCase() || "USD",
+              nextBillingDate: new Date(subscription.current_period_end * 1000).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }),
+            });
+
+            await supabaseAdmin.from("subscription_events").insert({
+              user_id: userId,
+              stripe_event_id: event.id,
+              event_type: event.type,
+              event_data: { invoice_id: invoice.id, subscription_id: subscriptionId, amount: invoice.amount_paid },
+            });
+          }
         }
         break;
       }
@@ -258,6 +380,12 @@ serve(async (req) => {
               stripe_event_id: event.id,
               event_type: event.type,
               event_data: { invoice_id: invoice.id, subscription_id: subscriptionId },
+            });
+
+            // Send payment failed email
+            await sendBillingEmail(userId, "payment_failed", {
+              amount: invoice.amount_due ? invoice.amount_due / 100 : 9,
+              currency: invoice.currency?.toUpperCase() || "USD",
             });
 
             logStep("Marked subscription as past_due", { userId });
