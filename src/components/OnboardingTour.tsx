@@ -159,10 +159,12 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
       stepIndex={stepIndex}
       continuous
       showProgress
-      showSkipButton
+      showSkipButton={false}
       scrollToFirstStep
       scrollOffset={100}
       disableOverlayClose
+      disableCloseOnEsc
+      hideCloseButton
       callback={onCallback}
       styles={{
         options: {
@@ -170,27 +172,24 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
           textColor: 'hsl(var(--foreground))',
           backgroundColor: 'hsl(var(--card))',
           arrowColor: 'hsl(var(--card))',
-          overlayColor: 'rgba(0, 0, 0, 0.6)',
+          overlayColor: 'rgba(0, 0, 0, 0.7)',
           zIndex: 10000,
         },
         tooltip: {
-          borderRadius: '8px',
-          padding: '16px',
+          borderRadius: '12px',
+          padding: '20px',
         },
         buttonNext: {
           backgroundColor: 'hsl(var(--primary))',
           color: 'hsl(var(--primary-foreground))',
           borderRadius: '6px',
-          padding: '8px 16px',
+          padding: '10px 20px',
           fontSize: '14px',
-          fontWeight: 500,
+          fontWeight: 600,
         },
         buttonBack: {
           color: 'hsl(var(--muted-foreground))',
           marginRight: '8px',
-        },
-        buttonSkip: {
-          color: 'hsl(var(--muted-foreground))',
         },
       }}
       locale={{
@@ -198,7 +197,6 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
         close: 'Close',
         last: 'Complete Tour',
         next: 'Next',
-        skip: 'Skip Tour',
       }}
     />
   );
