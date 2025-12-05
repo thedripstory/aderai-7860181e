@@ -26,6 +26,7 @@ import { WelcomeBackModal } from '@/components/WelcomeBackModal';
 
 import { AchievementsPanel } from '@/components/AchievementsPanel';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
+import { useKlaviyoSegmentStatus } from '@/hooks/useKlaviyoSegmentStatus';
 import { useFeatureTracking } from '@/hooks/useFeatureTracking';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { PageErrorBoundary } from '@/components/PageErrorBoundary';
@@ -54,6 +55,11 @@ export default function UnifiedDashboard() {
 
   const { loading: creatingSegments, results, createSegments, setResults, batchProgress } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
+  
+  // Track which segments are already created in Klaviyo
+  const { isSegmentCreated, syncSegmentStatus, createdCount } = useKlaviyoSegmentStatus(
+    klaviyoKeys.length > 0 ? klaviyoKeys[activeKeyIndex]?.id : null
+  );
   const { 
     run: runTour, 
     stepIndex, 
@@ -145,9 +151,15 @@ export default function UnifiedDashboard() {
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    // Only select available segments (filter out unavailable like birthday-month)
-    setSelectedSegments(SEGMENTS.filter(s => !s.unavailable).map(s => s.id));
-  }, []);
+    // Only select available segments that are NOT already created in Klaviyo
+    const availableSegments = SEGMENTS.filter(s => {
+      if (s.unavailable) return false;
+      // Skip segments already created in Klaviyo
+      if (isSegmentCreated(s.name)) return false;
+      return true;
+    });
+    setSelectedSegments(availableSegments.map(s => s.id));
+  }, [isSegmentCreated]);
 
   const handleClearAll = useCallback(() => {
     setSelectedSegments([]);
