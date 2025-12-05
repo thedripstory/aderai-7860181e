@@ -20,7 +20,8 @@ interface NotificationEmailRequest {
     | "klaviyo_connected"
     | "segment_progress"
     | "segment_complete"
-    | "segment_daily_limit";
+    | "segment_daily_limit"
+    | "segment_rate_limit";
   data: {
     title: string;
     message: string;
@@ -34,7 +35,29 @@ interface NotificationEmailRequest {
     segmentCount?: number;
     completedToday?: number;
     estimatedTimeRemaining?: string;
+    jobId?: string;
   };
+}
+
+// Email deduplication - prevent spam by checking recent emails
+async function shouldSendEmail(
+  supabase: any, 
+  userId: string, 
+  emailType: string, 
+  dedupeWindowMinutes: number = 30
+): Promise<boolean> {
+  const windowStart = new Date(Date.now() - dedupeWindowMinutes * 60 * 1000).toISOString();
+  
+  const { data: recentEmails } = await supabase
+    .from('email_audit_log')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('email_type', emailType)
+    .gte('sent_at', windowStart)
+    .limit(1);
+  
+  // If we found a recent email of this type, don't send another
+  return !recentEmails || recentEmails.length === 0;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -57,12 +80,21 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     let shouldSend = false;
+    let dedupeWindow = 0; // minutes - 0 means no deduplication
+    
     switch (notificationType) {
       case "segment_created":
       case "segment_progress":
       case "segment_complete":
+        shouldSend = prefs?.email_on_segment_creation ?? true;
+        break;
       case "segment_daily_limit":
         shouldSend = prefs?.email_on_segment_creation ?? true;
+        dedupeWindow = 60 * 12; // Only one daily limit email per 12 hours
+        break;
+      case "segment_rate_limit":
+        shouldSend = prefs?.email_on_segment_creation ?? true;
+        dedupeWindow = 30; // Only one rate limit email per 30 minutes
         break;
       case "client_added":
         shouldSend = prefs?.email_on_client_added ?? true;
@@ -85,11 +117,24 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Check for email deduplication (prevent spam)
+    if (dedupeWindow > 0) {
+      const canSend = await shouldSendEmail(supabase, userId, notificationType, dedupeWindow);
+      if (!canSend) {
+        console.log(`[send-notification-email] Skipping ${notificationType} - already sent within ${dedupeWindow} minutes`);
+        return new Response(
+          JSON.stringify({ success: true, message: "Email deduplicated - recent email already sent" }),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+    }
+
     const iconMap: Record<string, string> = {
       segment_created: "✨",
       segment_progress: "⏳",
       segment_complete: "✅",
       segment_daily_limit: "⏸️",
+      segment_rate_limit: "⏱️",
       client_added: "👥",
       api_key_added: "🔑",
       settings_updated: "⚙️",
@@ -234,10 +279,6 @@ const handler = async (req: Request): Promise<Response> => {
             .header h1 { color: white; margin: 0; font-size: 24px; }
             .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; }
             .status-box { background: #fef3c7; padding: 24px; margin: 24px 0; border-radius: 8px; border: 1px solid #f59e0b; }
-            .stat-row { display: flex; justify-content: space-around; text-align: center; }
-            .stat { flex: 1; }
-            .stat-value { font-size: 32px; font-weight: bold; color: #d97706; }
-            .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
             .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa; border-radius: 0 0 10px 10px; }
             .info-section { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #3b82f6; }
             .info-section h3 { margin: 0 0 12px 0; color: #1e40af; font-size: 15px; }
@@ -251,6 +292,7 @@ const handler = async (req: Request): Promise<Response> => {
             .dot-complete { background: #22c55e; }
             .dot-pending { background: #f59e0b; }
             .timeline-text { font-size: 14px; color: #4b5563; }
+            .button { display: inline-block; background: #FF6B35; color: white; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 16px 0; }
             .preferences-link { color: #FF6B35; text-decoration: none; }
           </style>
         </head>
@@ -267,11 +309,11 @@ const handler = async (req: Request): Promise<Response> => {
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td width="50%" align="center" style="padding: 10px;">
-                      <div style="font-size: 32px; font-weight: bold; color: #22c55e;">${data.completedToday || 0}</div>
+                      <div style="font-size: 32px; font-weight: bold; color: #22c55e;">\${data.completedToday || 0}</div>
                       <div style="font-size: 13px; color: #666; margin-top: 4px;">✅ Created today</div>
                     </td>
                     <td width="50%" align="center" style="padding: 10px;">
-                      <div style="font-size: 32px; font-weight: bold; color: #f59e0b;">${data.remaining || 0}</div>
+                      <div style="font-size: 32px; font-weight: bold; color: #f59e0b;">\${data.remaining || 0}</div>
                       <div style="font-size: 13px; color: #666; margin-top: 4px;">⏳ Queued for tomorrow</div>
                     </td>
                   </tr>
@@ -293,11 +335,11 @@ const handler = async (req: Request): Promise<Response> => {
                 <h3>📋 What happens next</h3>
                 <div class="timeline-item">
                   <div class="timeline-dot dot-complete"></div>
-                  <div class="timeline-text"><strong>Today:</strong> ${data.completedToday || 0} segments created successfully</div>
+                  <div class="timeline-text"><strong>Today:</strong> \${data.completedToday || 0} segments created successfully</div>
                 </div>
                 <div class="timeline-item">
                   <div class="timeline-dot dot-pending"></div>
-                  <div class="timeline-text"><strong>Tomorrow:</strong> ${data.remaining || 0} remaining segment${(data.remaining || 0) !== 1 ? 's' : ''} will be created automatically</div>
+                  <div class="timeline-text"><strong>Tomorrow:</strong> \${data.remaining || 0} remaining segment\${(data.remaining || 0) !== 1 ? 's' : ''} will be created automatically</div>
                 </div>
                 <div class="timeline-item">
                   <div class="timeline-dot dot-complete"></div>
@@ -310,13 +352,101 @@ const handler = async (req: Request): Promise<Response> => {
                 <span><strong>No action needed from you.</strong> Aderai handles everything automatically.</span>
               </div>
               
+              <div style="text-align: center; margin-top: 24px;">
+                <a href="\${dashboardUrl}/jobs" class="button">View Job Progress →</a>
+              </div>
+              
               <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
             </div>
             <div class="footer">
               <p>You can manage your email notification preferences in your account settings.</p>
-              <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
+              <p>© \${new Date().getFullYear()} Aderai. All rights reserved.</p>
               <p>
-                <a href="${dashboardUrl}/settings" class="preferences-link">Manage Email Preferences</a>
+                <a href="\${dashboardUrl}/settings" class="preferences-link">Manage Email Preferences</a>
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+    // Per-minute rate limit email template  
+    else if (notificationType === "segment_rate_limit") {
+      subject = `⏱️ Aderai: Segments queued - processing in background`;
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; }
+            .status-box { background: #dbeafe; padding: 24px; margin: 24px 0; border-radius: 8px; border: 1px solid #3b82f6; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa; border-radius: 0 0 10px 10px; }
+            .info-section { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #3b82f6; }
+            .info-section h3 { margin: 0 0 12px 0; color: #1e40af; font-size: 15px; }
+            .info-section p { margin: 0; font-size: 14px; color: #374151; }
+            .checkmark-item { display: flex; align-items: flex-start; margin: 12px 0; }
+            .checkmark { color: #22c55e; font-size: 18px; margin-right: 10px; flex-shrink: 0; }
+            .button { display: inline-block; background: #FF6B35; color: white; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 16px 0; }
+            .preferences-link { color: #FF6B35; text-decoration: none; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>⏱️ Segments Queued for Processing</h1>
+            </div>
+            <div class="content">
+              <p>Hi there,</p>
+              <p>Your segment creation request has been queued. <strong>We're processing them in the background to stay within Klaviyo's rate limits.</strong></p>
+              
+              <div class="status-box">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td width="50%" align="center" style="padding: 10px;">
+                      <div style="font-size: 32px; font-weight: bold; color: #22c55e;">\${data.completed || 0}</div>
+                      <div style="font-size: 13px; color: #666; margin-top: 4px;">✅ Created so far</div>
+                    </td>
+                    <td width="50%" align="center" style="padding: 10px;">
+                      <div style="font-size: 32px; font-weight: bold; color: #3b82f6;">\${data.remaining || 0}</div>
+                      <div style="font-size: 13px; color: #666; margin-top: 4px;">⏳ In queue</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <div class="info-section">
+                <h3>📚 Why are segments queued?</h3>
+                <p>Klaviyo limits segment creation to <strong>~15 segments per minute</strong> to ensure:</p>
+                <ul style="margin: 12px 0 0 0; padding-left: 20px; font-size: 14px; color: #374151;">
+                  <li style="margin: 6px 0;">Each segment is properly processed and populated</li>
+                  <li style="margin: 6px 0;">Your Klaviyo account remains in good standing</li>
+                  <li style="margin: 6px 0;">Platform performance stays stable for everyone</li>
+                </ul>
+                <p style="margin-top: 12px; font-size: 13px; color: #6b7280;">Aderai automatically manages this pacing for you.</p>
+              </div>
+
+              <p><strong>Estimated time to complete:</strong> ~\${data.estimatedTimeRemaining || 'a few minutes'}</p>
+
+              <div class="checkmark-item">
+                <span class="checkmark">✓</span>
+                <span><strong>No action needed.</strong> You can close Aderai — we'll continue processing in the background and email you when complete.</span>
+              </div>
+              
+              <div style="text-align: center; margin-top: 24px;">
+                <a href="\${dashboardUrl}/jobs" class="button">View Job Progress →</a>
+              </div>
+              
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+            </div>
+            <div class="footer">
+              <p>You can manage your email notification preferences in your account settings.</p>
+              <p>© \${new Date().getFullYear()} Aderai. All rights reserved.</p>
+              <p>
+                <a href="\${dashboardUrl}/settings" class="preferences-link">Manage Email Preferences</a>
               </p>
             </div>
           </div>

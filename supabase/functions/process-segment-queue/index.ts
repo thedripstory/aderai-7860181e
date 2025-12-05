@@ -251,6 +251,9 @@ serve(async (req) => {
         await sendCompletionEmail(supabase, job, newCompletedIds);
       } else if (rateLimitType === 'daily') {
         await sendDailyLimitEmail(supabase, job, newCompletedIds.length, remainingPendingIds.length);
+      } else if (rateLimitType === 'steady' && remainingPendingIds.length > 0) {
+        // Only send rate limit email if this is the first time we're queueing segments
+        await sendRateLimitEmail(supabase, job, newCompletedIds.length, remainingPendingIds.length);
       }
 
       results.push({
@@ -356,7 +359,8 @@ async function sendDailyLimitEmail(supabase: any, job: any, completed: number, r
           title: `⏸️ Segment creation paused until tomorrow`,
           message: `We've hit Klaviyo's daily limit of 100 segments. Created today: ${completed}. Remaining (will auto-resume tomorrow): ${remaining}. You don't need to do anything!`,
           completedToday: completed,
-          remaining
+          remaining,
+          jobId: job.id
         }
       }
     });
@@ -369,5 +373,43 @@ async function sendDailyLimitEmail(supabase: any, job: any, completed: number, r
       .eq('id', job.id);
   } catch (err) {
     console.error('[process-segment-queue] Failed to send daily limit email:', err);
+  }
+}
+
+async function sendRateLimitEmail(supabase: any, job: any, completed: number, remaining: number) {
+  const notificationsSent = job.email_notifications_sent || [];
+  const rateLimitKey = 'rate_limit_initial';
+
+  // Only send this email once per job
+  if (notificationsSent.includes(rateLimitKey)) return;
+
+  const estimatedMinutes = Math.ceil(remaining / 12 * 5);
+
+  try {
+    await supabase.functions.invoke('send-notification-email', {
+      body: {
+        userId: job.user_id,
+        email: job.user_email,
+        notificationType: 'segment_rate_limit',
+        data: {
+          title: `⏱️ Segments queued - processing in background`,
+          message: `Your segments are being created in the background. ${completed} done, ${remaining} remaining.`,
+          completed,
+          remaining,
+          total: completed + remaining,
+          estimatedTimeRemaining: `${estimatedMinutes} minutes`,
+          jobId: job.id
+        }
+      }
+    });
+
+    await supabase
+      .from('segment_creation_jobs')
+      .update({
+        email_notifications_sent: [...notificationsSent, rateLimitKey]
+      })
+      .eq('id', job.id);
+  } catch (err) {
+    console.error('[process-segment-queue] Failed to send rate limit email:', err);
   }
 }
