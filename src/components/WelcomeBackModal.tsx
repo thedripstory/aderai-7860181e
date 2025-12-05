@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PartyPopper, ExternalLink, Sparkles } from 'lucide-react';
+import { PartyPopper, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
   Dialog,
@@ -180,16 +180,7 @@ export function WelcomeBackModal() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-2 pt-2">
-            <Button 
-              variant="outline"
-              className="w-full gap-2"
-              onClick={() => window.open('https://www.klaviyo.com/lists-segments', '_blank')}
-            >
-              <ExternalLink className="h-4 w-4" />
-              View in Klaviyo
-            </Button>
-            
-            <Button 
+            <Button
               className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
               onClick={handleDismiss}
             >
