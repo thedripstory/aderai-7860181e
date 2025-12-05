@@ -79,8 +79,8 @@ export const emailStyles = {
     margin: '25px 0',
   },
   tipBox: {
-    backgroundColor: '#E3F2FD',
-    border: '2px solid #BBDEFB',
+    backgroundColor: '#FFF8F3',
+    border: '2px solid #FFE8D9',
     borderRadius: '8px',
     padding: '20px',
     margin: '25px 0',

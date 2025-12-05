@@ -73,7 +73,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const emailResponse = await resend.emails.send({
-      from: "Akshat from Aderai <akshat@updates.aderai.io>",
+      from: "Aderai <hello@updates.aderai.io>",
       to: [email],
       subject: "Reset Your Aderai Password",
       html,
