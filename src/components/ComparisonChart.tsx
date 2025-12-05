@@ -365,3 +365,5 @@ export const ComparisonChart = () => {
     </section>
   );
 };
+
+export default ComparisonChart;

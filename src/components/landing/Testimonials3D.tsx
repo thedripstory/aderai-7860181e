@@ -233,3 +233,5 @@ export function Testimonials3D() {
     </section>
   );
 }
+
+export default Testimonials3D;

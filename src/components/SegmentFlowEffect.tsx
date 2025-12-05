@@ -35,3 +35,5 @@ export const SegmentFlowEffect = () => {
     </div>
   );
 };
+
+export default SegmentFlowEffect;

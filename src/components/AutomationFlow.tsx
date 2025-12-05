@@ -237,3 +237,5 @@ export const AutomationFlow = () => {
     </div>
   );
 };
+
+export default AutomationFlow;

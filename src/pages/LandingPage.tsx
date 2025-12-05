@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,22 +9,24 @@ import { AnimatedSignUpCTA } from "@/components/AnimatedSignUpCTA";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
-import { AnimatedSegmentVisual } from "@/components/AnimatedSegmentVisual";
 import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
 import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
-import { AutomationFlow } from "@/components/AutomationFlow";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
-import { SegmentFlowEffect } from "@/components/SegmentFlowEffect";
-import { ComparisonChart } from "@/components/ComparisonChart";
 import { AderaiLogo } from "@/components/AderaiLogo";
-
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { Testimonials3D } from "@/components/landing/Testimonials3D";
 import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
+import { SectionPlaceholder } from "@/components/ui/SectionPlaceholder";
+
+// Lazy load heavy components
+const ComparisonChart = lazy(() => import('@/components/ComparisonChart').then(m => ({ default: m.ComparisonChart })));
+const Testimonials3D = lazy(() => import('@/components/landing/Testimonials3D').then(m => ({ default: m.Testimonials3D })));
+const SegmentFlowEffect = lazy(() => import('@/components/SegmentFlowEffect').then(m => ({ default: m.SegmentFlowEffect })));
+const AnimatedSegmentVisual = lazy(() => import('@/components/AnimatedSegmentVisual').then(m => ({ default: m.AnimatedSegmentVisual })));
+const AutomationFlow = lazy(() => import('@/components/AutomationFlow').then(m => ({ default: m.AutomationFlow })));
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -283,7 +285,9 @@ export default function LandingPage() {
           </div>
 
           {/* Visual Demo */}
-          <AnimatedSegmentVisual />
+          <Suspense fallback={<SectionPlaceholder height="400px" />}>
+            <AnimatedSegmentVisual />
+          </Suspense>
 
           {/* CTA Button */}
           <div className="mt-20 text-center">
@@ -378,7 +382,9 @@ export default function LandingPage() {
             {/* Right Workflow Visual */}
             <ScrollReveal direction="right" delay={0.2}>
               <div className="relative">
-                <AutomationFlow />
+                <Suspense fallback={<SectionPlaceholder height="500px" />}>
+                  <AutomationFlow />
+                </Suspense>
               </div>
             </ScrollReveal>
           </div>
@@ -596,12 +602,16 @@ export default function LandingPage() {
 
         {/* Comparison Chart Section */}
         <ScrollReveal>
-          <ComparisonChart />
+          <Suspense fallback={<SectionPlaceholder height="500px" />}>
+            <ComparisonChart />
+          </Suspense>
         </ScrollReveal>
 
 
         {/* 3D Testimonials Wall */}
-        <Testimonials3D />
+        <Suspense fallback={<SectionPlaceholder height="600px" />}>
+          <Testimonials3D />
+        </Suspense>
 
         {/* Live Aderai Users Globe Section */}
         <section className="py-20 px-4 bg-background relative overflow-hidden">
@@ -765,7 +775,9 @@ export default function LandingPage() {
         
         <div className="max-w-7xl mx-auto px-6 relative">
           {/* Segment Flow Effect Section */}
-          <SegmentFlowEffect />
+          <Suspense fallback={<SectionPlaceholder height="80vh" />}>
+            <SegmentFlowEffect />
+          </Suspense>
 
           {/* Newsletter Section - Unique Element */}
           <div className="py-16 mt-16 border-b border-border/50">
