@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { X, Sparkles, BarChart3, Users, Zap, CheckCircle } from "lucide-react";
+import { X, BarChart3, Users, Zap, CheckCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ADERAI_LOGO_URL } from "@/components/AderaiLogo";
 
 interface ProductTourModalProps {
   onClose: () => void;
@@ -54,9 +55,12 @@ export function ProductTourModal({ onClose, onDontShowAgain }: ProductTourModalP
       <div className="bg-card rounded-lg border-2 border-border max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95">
         {/* Header */}
         <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-1">Welcome to aderai 🎉</h2>
-            <p className="text-muted-foreground">Let's show you what you can do</p>
+          <div className="flex items-center gap-4">
+            <img src={ADERAI_LOGO_URL} alt="Aderai" className="h-8 dark:invert" />
+            <div>
+              <h2 className="text-xl font-bold">Welcome! 🎉</h2>
+              <p className="text-sm text-muted-foreground">Let's show you what you can do</p>
+            </div>
           </div>
           <Button variant="ghost" size="sm" onClick={handleClose}>
             <X className="w-5 h-5" />

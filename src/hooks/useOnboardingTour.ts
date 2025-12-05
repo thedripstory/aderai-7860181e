@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAnalyticsTracking } from './useAnalyticsTracking';
+import { CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
 
 interface OnboardingTourState {
   run: boolean;
@@ -79,17 +80,28 @@ export function useOnboardingTour() {
     }
   };
 
-  const handleJoyrideCallback = (data: any) => {
-    const { status, index, type } = data;
+  const handleJoyrideCallback = useCallback((data: CallBackProps) => {
+    const { status, index, type, action } = data;
 
-    if (status === 'finished') {
-      completeTour();
-    } else if (status === 'skipped') {
-      skipTour(index);
-    } else if (type === 'step:after') {
-      trackEvent('tour_step_completed', { step: index });
+    // Handle step navigation
+    if (type === EVENTS.STEP_AFTER) {
+      if (action === ACTIONS.NEXT) {
+        setTourState(prev => ({ ...prev, stepIndex: index + 1 }));
+        trackEvent('tour_step_completed', { step: index });
+      } else if (action === ACTIONS.PREV) {
+        setTourState(prev => ({ ...prev, stepIndex: index - 1 }));
+      }
     }
-  };
+
+    // Handle tour completion
+    if (status === STATUS.FINISHED) {
+      completeTour();
+    } else if (status === STATUS.SKIPPED || action === ACTIONS.SKIP) {
+      skipTour(index);
+    } else if (action === ACTIONS.CLOSE) {
+      setTourState(prev => ({ ...prev, run: false }));
+    }
+  }, [trackEvent]);
 
   return {
     ...tourState,
