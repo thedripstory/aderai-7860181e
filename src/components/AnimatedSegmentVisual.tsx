@@ -227,3 +227,5 @@ export const AnimatedSegmentVisual = () => {
     </div>
   );
 };
+
+export default AnimatedSegmentVisual;
