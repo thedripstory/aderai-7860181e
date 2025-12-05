@@ -13,22 +13,30 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    // Use anon key client for auth verification
+    const supabaseAuth = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData } = await supabaseClient.auth.getUser(token);
+    const { data: userData } = await supabaseAuth.auth.getUser(token);
     const user = userData.user;
 
     if (!user) {
       throw new Error("User not authenticated");
     }
 
+    // Use service role client to bypass RLS for database query
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
     // Get user's subscription info from database
-    const { data: profile, error: profileError } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from("users")
       .select("stripe_customer_id, stripe_subscription_id, subscription_status, subscription_start_date, subscription_end_date, subscription_canceled_at")
       .eq("id", user.id)
@@ -41,6 +49,7 @@ serve(async (req) => {
 
     // If no profile exists, return inactive status
     if (!profile) {
+      console.log("No profile found for user:", user.id);
       return new Response(
         JSON.stringify({
           status: "inactive",
