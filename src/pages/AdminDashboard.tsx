@@ -39,6 +39,7 @@ import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilt
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
 import { AdminSubscriptionMonitoring } from "@/components/AdminSubscriptionMonitoring";
+import { AdminSegmentMismatchReports } from "@/components/AdminSegmentMismatchReports";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 const AdminDashboard = () => {
@@ -395,6 +396,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
+            <TabsTrigger value="mismatch">Mismatch Reports</TabsTrigger>
             <TabsTrigger value="abtests">A/B Tests</TabsTrigger>
             <TabsTrigger value="audit">Audit</TabsTrigger>
           </TabsList>
@@ -791,6 +793,11 @@ const AdminDashboard = () => {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Segment Mismatch Reports Tab */}
+          <TabsContent value="mismatch">
+            <AdminSegmentMismatchReports />
           </TabsContent>
 
           {/* A/B Tests Tab */}
