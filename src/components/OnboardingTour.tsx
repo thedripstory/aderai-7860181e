@@ -2,7 +2,8 @@ import React from 'react';
 import Joyride, { Step, CallBackProps, STATUS } from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Sparkles, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import { ADERAI_LOGO_URL } from '@/components/AderaiLogo';
 
 interface OnboardingTourProps {
   run: boolean;
@@ -24,14 +25,18 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
       target: 'body',
       content: (
         <div className="space-y-4 p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <Sparkles className="w-8 h-8 text-primary" />
-            <h2 className="text-2xl font-bold">Welcome to Aderai!</h2>
+          <div className="flex flex-col items-center gap-4 mb-4">
+            <img 
+              src={ADERAI_LOGO_URL} 
+              alt="Aderai" 
+              className="h-10 dark:invert"
+            />
+            <h2 className="text-2xl font-bold text-center">Welcome to Aderai!</h2>
           </div>
-          <p className="text-lg mb-4">
+          <p className="text-lg mb-4 text-center">
             Let's take a quick tour to help you get started with AI-powered customer segmentation.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground text-center">
             This will only take 30 seconds. You can skip or restart this tour anytime.
           </p>
         </div>
@@ -113,14 +118,16 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
       target: 'body',
       content: (
         <div className="space-y-4 p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <CheckCircle className="w-8 h-8 text-primary" />
-            <h2 className="text-2xl font-bold">You're All Set!</h2>
+          <div className="flex flex-col items-center gap-4 mb-4">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+              <CheckCircle className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-center">You're All Set!</h2>
           </div>
-          <p className="text-lg mb-4">
+          <p className="text-lg mb-4 text-center">
             Ready to supercharge your email marketing with smart customer segments?
           </p>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground mb-4 text-center">
             Start by connecting your Klaviyo account to unlock all features.
           </p>
           <Button 
