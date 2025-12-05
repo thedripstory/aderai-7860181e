@@ -594,7 +594,7 @@ const KlaviyoSetup = () => {
                       <Users className="w-5 h-5 text-primary" />
                     </div>
                     <h3 className="text-lg font-semibold">Customer Lifecycle (Days)</h3>
-                    <TooltipProvider>
+                    <TooltipProvider delayDuration={0}>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button type="button" className="ml-auto p-1.5 rounded-full hover:bg-muted transition-colors">
@@ -614,7 +614,7 @@ const KlaviyoSetup = () => {
                     <div className="space-y-2">
                       <div className="flex items-center gap-1.5">
                         <Label htmlFor="newCustomerDays">New Customer</Label>
-                        <TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button type="button" className="p-0.5 rounded-full hover:bg-muted transition-colors">
@@ -643,7 +643,7 @@ const KlaviyoSetup = () => {
                     <div className="space-y-2">
                       <div className="flex items-center gap-1.5">
                         <Label htmlFor="lapsedDays">Lapsed</Label>
-                        <TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button type="button" className="p-0.5 rounded-full hover:bg-muted transition-colors">
@@ -672,7 +672,7 @@ const KlaviyoSetup = () => {
                     <div className="space-y-2">
                       <div className="flex items-center gap-1.5">
                         <Label htmlFor="churnedDays">Churned</Label>
-                        <TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button type="button" className="p-0.5 rounded-full hover:bg-muted transition-colors">
