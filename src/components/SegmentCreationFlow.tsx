@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle, AlertCircle, Target, Info } from 'lucide-react';
+import { CheckCircle, AlertCircle, Target, Info, Clock, SkipForward } from 'lucide-react';
 import { SegmentResult, BatchProgress } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS, applySegmentSettings, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
 import { Progress } from '@/components/ui/progress';
@@ -213,25 +213,41 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                 <div className="space-y-2">
                   {results.map((result, idx) => {
                     const segment = SEGMENTS.find((s) => s.id === result.segmentId);
+                    
+                    const statusConfig: Record<string, { bg: string; text: string; icon: any; label?: string }> = {
+                      success: { bg: 'bg-green-500/10', text: 'text-green-600', icon: CheckCircle },
+                      error: { bg: 'bg-red-500/10', text: 'text-red-600', icon: AlertCircle },
+                      queued: { bg: 'bg-blue-500/10', text: 'text-blue-600', icon: Clock, label: 'Queued' },
+                      skipped: { bg: 'bg-amber-500/10', text: 'text-amber-600', icon: SkipForward, label: 'Skipped' },
+                    };
+                    
+                    const config = statusConfig[result.status] || statusConfig.error;
+                    const IconComponent = config.icon;
+                    
                     return (
                       <div
                         key={idx}
-                        className={`flex items-center gap-2 p-2 rounded-lg text-sm ${
-                          result.status === "success"
-                            ? "bg-green-500/10 text-green-600"
-                            : "bg-red-500/10 text-red-600"
-                        }`}
+                        className={`flex items-center gap-2 p-2 rounded-lg text-sm ${config.bg} ${config.text}`}
                       >
-                        {result.status === "success" ? (
-                          <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                        <IconComponent className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate flex-1">{segment?.name || result.segmentId}</span>
+                        {config.label && (
+                          <span className="text-xs opacity-75 flex-shrink-0">{config.label}</span>
                         )}
-                        <span className="truncate">{segment?.name || result.segmentId}</span>
                       </div>
                     );
                   })}
                 </div>
+              </div>
+            )}
+            
+            {/* Queued segments explanation banner */}
+            {!loading && results.some(r => r.status === 'queued') && (
+              <div className="mx-6 mb-4 flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  Some segments are queued due to Klaviyo's rate limits. They'll be created automatically in the background and you'll receive an email when complete.
+                </p>
               </div>
             )}
 

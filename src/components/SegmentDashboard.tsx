@@ -12,6 +12,12 @@ export interface SegmentCustomInputs {
   [segmentId: string]: string;
 }
 
+interface KlaviyoSegmentInfo {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 interface SegmentDashboardProps {
   selectedSegments: string[];
   onToggleSegment: (segmentId: string) => void;
@@ -23,6 +29,9 @@ interface SegmentDashboardProps {
   userSettings?: UserSegmentSettings;
   customInputs?: SegmentCustomInputs;
   onCustomInputChange?: (segmentId: string, value: string) => void;
+  isSegmentCreated?: (segmentName: string) => boolean;
+  getSegmentInfo?: (segmentName: string) => KlaviyoSegmentInfo | undefined;
+  createdCount?: number;
 }
 
 export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
@@ -36,6 +45,9 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
   userSettings = DEFAULT_SEGMENT_SETTINGS,
   customInputs = {},
   onCustomInputChange,
+  isSegmentCreated,
+  getSegmentInfo,
+  createdCount = 0,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -111,6 +123,7 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
   );
 
   const selectedCount = selectedSegments.length;
+  const availableCount = segmentsWithSettings.filter(s => !s.unavailable && !(isSegmentCreated?.(s.name))).length;
 
   return (
     <div className="animate-fade-in">
@@ -189,6 +202,30 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
           showShortcutsHint={showShortcutsHint}
           onDismissHint={() => setShowShortcutsHint(false)}
         />
+        
+        {/* Segment Status Summary */}
+        <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-xl border border-border/50">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-500" />
+            <span className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{createdCount}</span> already in Klaviyo
+            </span>
+          </div>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-primary" />
+            <span className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{selectedCount}</span> selected
+            </span>
+          </div>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-muted-foreground/30" />
+            <span className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{availableCount}</span> available
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Favorites Section */}
@@ -222,6 +259,8 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
         segments={segmentsWithSettings}
         customInputs={customInputs}
         onCustomInputChange={onCustomInputChange}
+        isSegmentCreated={isSegmentCreated}
+        getSegmentInfo={getSegmentInfo}
       />
     </div>
   );

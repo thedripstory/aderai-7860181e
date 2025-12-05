@@ -5,6 +5,12 @@ import { SegmentCard } from './SegmentCard';
 import type { Segment } from '@/lib/segmentData';
 import type { SegmentCustomInputs } from '@/components/SegmentDashboard';
 
+interface KlaviyoSegmentInfo {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 interface CategorySectionProps {
   category: string;
   icon: string;
@@ -20,6 +26,8 @@ interface CategorySectionProps {
   defaultExpanded?: boolean;
   customInputs?: SegmentCustomInputs;
   onCustomInputChange?: (segmentId: string, value: string) => void;
+  isSegmentCreated?: (segmentName: string) => boolean;
+  getSegmentInfo?: (segmentName: string) => KlaviyoSegmentInfo | undefined;
 }
 
 export function CategorySection({
@@ -37,6 +45,8 @@ export function CategorySection({
   defaultExpanded = false,
   customInputs = {},
   onCustomInputChange,
+  isSegmentCreated,
+  getSegmentInfo,
 }: CategorySectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const categorySelectedCount = segments.filter(s => selectedSegments.includes(s.id)).length;
@@ -115,6 +125,8 @@ export function CategorySection({
                 index={segmentIndex}
                 customInputValue={customInputs[segment.id]}
                 onCustomInputChange={onCustomInputChange ? (value) => onCustomInputChange(segment.id, value) : undefined}
+                isCreatedInKlaviyo={isSegmentCreated?.(segment.name) || false}
+                klaviyoInfo={getSegmentInfo?.(segment.name)}
               />
             ))}
           </div>

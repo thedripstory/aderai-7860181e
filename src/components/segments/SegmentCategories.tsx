@@ -5,6 +5,12 @@ import { CATEGORIES, CATEGORY_ICONS } from '@/lib/segmentData';
 import type { Segment } from '@/lib/segmentData';
 import type { SegmentCustomInputs } from '@/components/SegmentDashboard';
 
+interface KlaviyoSegmentInfo {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 interface SegmentCategoriesProps {
   searchQuery: string;
   selectedSegments: string[];
@@ -16,6 +22,8 @@ interface SegmentCategoriesProps {
   segments: Segment[];
   customInputs?: SegmentCustomInputs;
   onCustomInputChange?: (segmentId: string, value: string) => void;
+  isSegmentCreated?: (segmentName: string) => boolean;
+  getSegmentInfo?: (segmentName: string) => KlaviyoSegmentInfo | undefined;
 }
 
 export function SegmentCategories({
@@ -29,6 +37,8 @@ export function SegmentCategories({
   segments,
   customInputs = {},
   onCustomInputChange,
+  isSegmentCreated,
+  getSegmentInfo,
 }: SegmentCategoriesProps) {
   const filteredSegments = segments.filter(segment => 
     segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -90,6 +100,8 @@ export function SegmentCategories({
             defaultExpanded={category === "Engagement & Activity"}
             customInputs={customInputs}
             onCustomInputChange={onCustomInputChange}
+            isSegmentCreated={isSegmentCreated}
+            getSegmentInfo={getSegmentInfo}
           />
         );
       })}
