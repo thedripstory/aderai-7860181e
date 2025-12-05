@@ -30,7 +30,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow, differenceInHours, differenceInMinutes } from 'date-fns';
+
+// Helper to calculate time until midnight UTC
+function getTimeUntilMidnightUTC(): string {
+  const now = new Date();
+  const midnightUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
+  const hoursRemaining = differenceInHours(midnightUTC, now);
+  const minutesRemaining = differenceInMinutes(midnightUTC, now) % 60;
+  
+  if (hoursRemaining > 0) {
+    return `${hoursRemaining}h ${minutesRemaining}m`;
+  }
+  return `${minutesRemaining}m`;
+}
 import { ActiveJobDetailModal } from '@/components/ActiveJobDetailModal';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { ActiveJob } from '@/components/ActiveJobsButton';
@@ -226,6 +239,21 @@ export default function JobHistory() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Daily Limit Warning Banner */}
+        {jobs.some(j => j.status === 'waiting_retry' && j.rate_limit_type === 'daily') && (
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-amber-600 dark:text-amber-400">
+                Klaviyo's daily segment limit reached
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                You've hit Klaviyo's 100 segments/day limit. Your queued segments will automatically resume at midnight UTC (~{getTimeUntilMidnightUTC()}).
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">

@@ -259,6 +259,11 @@ export const useKlaviyoSegments = () => {
 
         if (jobError) {
           console.error('[useKlaviyoSegments] Failed to create job:', jobError.message, jobError.details);
+          toast({
+            title: "Failed to create job",
+            description: `Database error: ${jobError.message}. Please try again.`,
+            variant: "destructive"
+          });
           throw jobError;
         }
         
