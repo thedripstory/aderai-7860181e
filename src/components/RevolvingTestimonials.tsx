@@ -46,7 +46,7 @@ export function RevolvingTestimonials() {
 
   return (
     <div className="mt-8 relative">
-      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-10 border border-border overflow-hidden relative">
+      <div className="bg-card/80 rounded-xl p-10 border border-border overflow-hidden relative gpu-accelerated">
         {/* Quote icon */}
         <div className="absolute top-6 left-6 opacity-5">
           <Quote className="w-10 h-10 text-foreground" />
@@ -54,7 +54,7 @@ export function RevolvingTestimonials() {
         
         {/* Testimonial content */}
         <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <div className={`transition-all duration-300 ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
+          <div className={`transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-1' : 'opacity-100 translate-y-0'}`} style={{ transform: 'translateZ(0)' }}>
             {/* 5 Star Rating */}
             <div className="flex justify-center gap-1 mb-4">
               {[...Array(5)].map((_, i) => (
