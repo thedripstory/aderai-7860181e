@@ -1,10 +1,26 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+// Safe date conversion helper - handles null/undefined/invalid timestamps
+const safeToISOString = (timestamp: number | null | undefined): string | null => {
+  if (timestamp === null || timestamp === undefined || isNaN(timestamp)) {
+    return null;
+  }
+  try {
+    const date = new Date(timestamp * 1000);
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+    return date.toISOString();
+  } catch {
+    return null;
+  }
 };
 
 serve(async (req) => {
@@ -64,6 +80,10 @@ serve(async (req) => {
 
     // If no Stripe customer or subscription, return basic info
     if (!profile?.stripe_customer_id || !profile?.stripe_subscription_id) {
+      console.log("No Stripe subscription for user:", user.id, { 
+        hasCustomer: !!profile?.stripe_customer_id, 
+        hasSubscription: !!profile?.stripe_subscription_id 
+      });
       return new Response(
         JSON.stringify({
           status: profile?.subscription_status || "inactive",
@@ -85,8 +105,18 @@ serve(async (req) => {
     let paymentMethod = null;
 
     try {
+      console.log("Fetching subscription from Stripe:", profile.stripe_subscription_id);
       subscription = await stripe.subscriptions.retrieve(profile.stripe_subscription_id, {
         expand: ["default_payment_method"],
+      });
+
+      console.log("Stripe subscription data:", {
+        id: subscription.id,
+        status: subscription.status,
+        current_period_start: subscription.current_period_start,
+        current_period_end: subscription.current_period_end,
+        canceled_at: subscription.canceled_at,
+        cancel_at_period_end: subscription.cancel_at_period_end,
       });
 
       // Get payment method details
@@ -127,22 +157,25 @@ serve(async (req) => {
       }
     }
 
+    // Use safe date conversion for all timestamps
+    const responseData = {
+      status: subscription.status,
+      hasSubscription: true,
+      currentPeriodStart: safeToISOString(subscription.current_period_start),
+      currentPeriodEnd: safeToISOString(subscription.current_period_end),
+      nextBillingDate: safeToISOString(subscription.current_period_end),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      canceledAt: safeToISOString(subscription.canceled_at),
+      amount: amount,
+      currency: subscription.currency?.toUpperCase() || 'USD',
+      interval: subscription.items.data[0]?.price?.recurring?.interval || "month",
+      paymentMethod,
+    };
+
+    console.log("Returning subscription details:", responseData);
+
     return new Response(
-      JSON.stringify({
-        status: subscription.status,
-        hasSubscription: true,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
-        nextBillingDate: new Date(subscription.current_period_end * 1000).toISOString(),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        canceledAt: subscription.canceled_at 
-          ? new Date(subscription.canceled_at * 1000).toISOString() 
-          : null,
-        amount: amount,
-        currency: subscription.currency.toUpperCase(),
-        interval: subscription.items.data[0]?.price?.recurring?.interval || "month",
-        paymentMethod,
-      }),
+      JSON.stringify(responseData),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
