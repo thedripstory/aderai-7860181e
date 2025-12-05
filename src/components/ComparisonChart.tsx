@@ -130,7 +130,7 @@ export const ComparisonChart = () => {
             <Zap className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-primary">The Smart Choice</span>
           </motion.div>
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent pb-1 leading-tight">
             Aderai vs Manual Segmentation
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
