@@ -58,7 +58,7 @@ serve(async (req) => {
       // Re-fetch job to check if it was cancelled while we were processing
       const { data: freshJob } = await supabase
         .from('segment_creation_jobs')
-        .select('status, pending_segment_ids, completed_segment_ids')
+        .select('status, pending_segment_ids, completed_segment_ids, daily_limit_email_sent, rate_limit_email_sent, completion_email_sent')
         .eq('id', job.id)
         .single();
       
@@ -83,8 +83,8 @@ serve(async (req) => {
           })
           .eq('id', job.id);
         
-        // Send completion email for this cleaned up job
-        await sendCompletionEmail(supabase, job, freshCompletedIds);
+        // Send completion email for this cleaned up job (using fresh job data for flags)
+        await sendCompletionEmail(supabase, { ...job, ...freshJob }, freshCompletedIds);
         continue;
       }
 
@@ -258,7 +258,7 @@ serve(async (req) => {
         })
         .eq('id', job.id);
 
-      // Send progress email at milestones
+      // Send progress email at milestones (every 10 segments)
       if (newCompletedIds.length > completedIds.length) {
         const progressMilestone = Math.floor(newCompletedIds.length / 10) * 10;
         const previousMilestone = Math.floor(completedIds.length / 10) * 10;
@@ -268,13 +268,12 @@ serve(async (req) => {
         }
       }
 
-      // Send completion email if done
+      // Send emails based on job state - using bulletproof flag-first pattern
       if (isComplete) {
         await sendCompletionEmail(supabase, job, newCompletedIds);
       } else if (rateLimitType === 'daily') {
         await sendDailyLimitEmail(supabase, job, newCompletedIds.length, remainingPendingIds.length);
       } else if (rateLimitType === 'steady' && remainingPendingIds.length > 0) {
-        // Only send rate limit email if this is the first time we're queueing segments
         await sendRateLimitEmail(supabase, job, newCompletedIds.length, remainingPendingIds.length);
       }
 
@@ -305,7 +304,8 @@ serve(async (req) => {
   }
 });
 
-// Helper functions for emails
+// Helper functions for emails with BULLETPROOF deduplication
+
 async function sendProgressEmail(supabase: any, job: any, completed: number, remaining: number) {
   const notificationsSent = job.email_notifications_sent || [];
   const progressKey = `progress_${Math.floor(completed / 10) * 10}`;
@@ -345,6 +345,24 @@ async function sendProgressEmail(supabase: any, job: any, completed: number, rem
 }
 
 async function sendCompletionEmail(supabase: any, job: any, completedIds: string[]) {
+  // BULLETPROOF: Check database flag first to prevent duplicate emails
+  const { data: currentJob } = await supabase
+    .from('segment_creation_jobs')
+    .select('completion_email_sent')
+    .eq('id', job.id)
+    .single();
+
+  if (currentJob?.completion_email_sent) {
+    console.log(`[process-segment-queue] Completion email already sent for job ${job.id}, skipping`);
+    return;
+  }
+
+  // Set flag BEFORE sending to prevent race conditions
+  await supabase
+    .from('segment_creation_jobs')
+    .update({ completion_email_sent: true })
+    .eq('id', job.id);
+
   try {
     await supabase.functions.invoke('send-notification-email', {
       body: {
@@ -352,7 +370,7 @@ async function sendCompletionEmail(supabase: any, job: any, completedIds: string
         email: job.user_email,
         notificationType: 'segment_complete',
         data: {
-          title: `✅ All ${completedIds.length} segments are ready!`,
+          title: `All ${completedIds.length} segments are ready!`,
           message: `Great news! All your segments have been created in Klaviyo. They're now ready to use in your campaigns and flows!`,
           segmentCount: completedIds.length,
           actionUrl: 'https://www.klaviyo.com/lists-segments',
@@ -360,16 +378,31 @@ async function sendCompletionEmail(supabase: any, job: any, completedIds: string
         }
       }
     });
+    console.log(`[process-segment-queue] Completion email sent for job ${job.id}`);
   } catch (err) {
     console.error('[process-segment-queue] Failed to send completion email:', err);
+    // Don't reset the flag - better to miss an email than send duplicates
   }
 }
 
 async function sendDailyLimitEmail(supabase: any, job: any, completed: number, remaining: number) {
-  const notificationsSent = job.email_notifications_sent || [];
-  const dailyKey = `daily_limit_${new Date().toISOString().split('T')[0]}`;
+  // BULLETPROOF: Check database flag first to prevent duplicate emails
+  const { data: currentJob } = await supabase
+    .from('segment_creation_jobs')
+    .select('daily_limit_email_sent')
+    .eq('id', job.id)
+    .single();
 
-  if (notificationsSent.includes(dailyKey)) return;
+  if (currentJob?.daily_limit_email_sent) {
+    console.log(`[process-segment-queue] Daily limit email already sent for job ${job.id}, skipping`);
+    return;
+  }
+
+  // Set flag BEFORE sending to prevent race conditions
+  await supabase
+    .from('segment_creation_jobs')
+    .update({ daily_limit_email_sent: true })
+    .eq('id', job.id);
 
   try {
     await supabase.functions.invoke('send-notification-email', {
@@ -378,7 +411,7 @@ async function sendDailyLimitEmail(supabase: any, job: any, completed: number, r
         email: job.user_email,
         notificationType: 'segment_daily_limit',
         data: {
-          title: `⏸️ Segment creation paused until tomorrow`,
+          title: `Segment creation paused until tomorrow`,
           message: `We've hit Klaviyo's daily limit of 100 segments. Created today: ${completed}. Remaining (will auto-resume tomorrow): ${remaining}. You don't need to do anything!`,
           completedToday: completed,
           remaining,
@@ -386,24 +419,30 @@ async function sendDailyLimitEmail(supabase: any, job: any, completed: number, r
         }
       }
     });
-
-    await supabase
-      .from('segment_creation_jobs')
-      .update({
-        email_notifications_sent: [...notificationsSent, dailyKey]
-      })
-      .eq('id', job.id);
+    console.log(`[process-segment-queue] Daily limit email sent for job ${job.id}`);
   } catch (err) {
     console.error('[process-segment-queue] Failed to send daily limit email:', err);
   }
 }
 
 async function sendRateLimitEmail(supabase: any, job: any, completed: number, remaining: number) {
-  const notificationsSent = job.email_notifications_sent || [];
-  const rateLimitKey = 'rate_limit_initial';
+  // BULLETPROOF: Check database flag first to prevent duplicate emails
+  const { data: currentJob } = await supabase
+    .from('segment_creation_jobs')
+    .select('rate_limit_email_sent')
+    .eq('id', job.id)
+    .single();
 
-  // Only send this email once per job
-  if (notificationsSent.includes(rateLimitKey)) return;
+  if (currentJob?.rate_limit_email_sent) {
+    console.log(`[process-segment-queue] Rate limit email already sent for job ${job.id}, skipping`);
+    return;
+  }
+
+  // Set flag BEFORE sending to prevent race conditions
+  await supabase
+    .from('segment_creation_jobs')
+    .update({ rate_limit_email_sent: true })
+    .eq('id', job.id);
 
   const estimatedMinutes = Math.ceil(remaining / 12 * 5);
 
@@ -414,7 +453,7 @@ async function sendRateLimitEmail(supabase: any, job: any, completed: number, re
         email: job.user_email,
         notificationType: 'segment_rate_limit',
         data: {
-          title: `⏱️ Segments queued - processing in background`,
+          title: `Segments queued - processing in background`,
           message: `Your segments are being created in the background. ${completed} done, ${remaining} remaining.`,
           completed,
           remaining,
@@ -424,13 +463,7 @@ async function sendRateLimitEmail(supabase: any, job: any, completed: number, re
         }
       }
     });
-
-    await supabase
-      .from('segment_creation_jobs')
-      .update({
-        email_notifications_sent: [...notificationsSent, rateLimitKey]
-      })
-      .eq('id', job.id);
+    console.log(`[process-segment-queue] Rate limit email sent for job ${job.id}`);
   } catch (err) {
     console.error('[process-segment-queue] Failed to send rate limit email:', err);
   }
