@@ -32,10 +32,25 @@ serve(async (req) => {
       .from("users")
       .select("stripe_customer_id, stripe_subscription_id, subscription_status, subscription_start_date, subscription_end_date, subscription_canceled_at")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError) {
+      console.error("Error fetching user profile:", profileError);
       throw profileError;
+    }
+
+    // If no profile exists, return inactive status
+    if (!profile) {
+      return new Response(
+        JSON.stringify({
+          status: "inactive",
+          hasSubscription: false,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
     }
 
     // If no Stripe customer or subscription, return basic info
