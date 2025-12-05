@@ -1348,7 +1348,7 @@ function getSegmentDefinition(
     // =====================================
 
     'refunded-customers': refundedOrderId ? {
-      name: `🚫 Refunded Customers (30 Days)${ADERAI_SUFFIX}`,
+      name: `Refunded Customers (30 Days)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1359,7 +1359,7 @@ function getSegmentDefinition(
     } : null,
 
     'negative-feedback': submittedFeedbackId ? {
-      name: `🚫 Negative Feedback${ADERAI_SUFFIX}`,
+      name: `Negative Feedback${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
@@ -1384,7 +1384,7 @@ function getSegmentDefinition(
         }]
       }
     } : (openedEmailId ? {
-      name: `🚫 Unengaged (Potential Negative Experience)${ADERAI_SUFFIX}`,
+      name: `Unengaged (Potential Negative Experience)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1395,7 +1395,7 @@ function getSegmentDefinition(
     } : null),
 
     'marked-spam': openedEmailId ? {
-      name: `🚫 Unengaged 90+ Days (Spam Risk)${ADERAI_SUFFIX}`,
+      name: `Unengaged 90+ Days (Spam Risk)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1410,7 +1410,7 @@ function getSegmentDefinition(
     // =====================================
 
     'not-opted-in': {
-      name: `🚫 Not Opted In (Email)${ADERAI_SUFFIX}`,
+      name: `Not Opted In (Email)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
@@ -1429,7 +1429,7 @@ function getSegmentDefinition(
 
     // No opens AND no clicks - MUST use separate condition_groups for AND logic!
     'unengaged-exclusion': (openedEmailId && clickedEmailId) ? {
-      name: `🚫 Unengaged Exclusion (180+ Days)${ADERAI_SUFFIX}`,
+      name: `Unengaged Exclusion (180+ Days)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [
           {
@@ -1451,7 +1451,7 @@ function getSegmentDefinition(
     // =====================================
 
     'received-3-in-3-days': openedEmailId ? {
-      name: `🚫 3+ Opens in 3 Days (Highly Active)${ADERAI_SUFFIX}`,
+      name: `3+ Opens in 3 Days (Highly Active)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1462,7 +1462,7 @@ function getSegmentDefinition(
     } : null,
 
     'received-5-opened-0': openedEmailId ? {
-      name: `🚫 Never Opened (All Time)${ADERAI_SUFFIX}`,
+      name: `Never Opened (All Time)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1478,7 +1478,7 @@ function getSegmentDefinition(
 
     // Sunset: some opens AND low opens - MUST use separate condition_groups for AND logic!
     'sunset-segment': openedEmailId ? {
-      name: `🚫 Sunset Segment${ADERAI_SUFFIX}`,
+      name: `Sunset Segment${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [
           {
