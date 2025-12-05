@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { SparklesCore } from "@/components/ui/sparkles";
+import React, { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AderaiLogo } from "@/components/AderaiLogo";
+
+// Lazy load sparkles to prevent crashes in sandboxed environments
+const SparklesCore = React.lazy(() => 
+  import("@/components/ui/sparkles").then(mod => ({ default: mod.SparklesCore })).catch(() => ({ default: () => null }))
+);
 
 interface AderaiPreloaderProps {
   minDisplayTime?: number;
@@ -9,7 +13,7 @@ interface AderaiPreloaderProps {
 }
 
 export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({ 
-  minDisplayTime = 3000,
+  minDisplayTime = 2000,
   onComplete
 }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -25,9 +29,7 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
 
   useEffect(() => {
     if (hasMinTimeElapsed && onComplete) {
-      // Start exit animation
       setIsVisible(false);
-      // Call onComplete after exit animation
       const exitTimer = setTimeout(onComplete, 500);
       return () => clearTimeout(exitTimer);
     }
@@ -74,7 +76,7 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
             
           </motion.div>
 
-          {/* Sparkles container below logo */}
+          {/* Sparkles container below logo - wrapped in Suspense with fallback */}
           <div className="w-[40rem] max-w-full h-40 relative mt-4">
             {/* Gradient lines */}
             <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-accent to-transparent h-[2px] w-3/4 blur-sm" />
@@ -82,15 +84,17 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
             <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-[5px] w-1/4 blur-sm" />
             <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-px w-1/4" />
 
-            {/* Core sparkles component */}
-            <SparklesCore
-              background="transparent"
-              minSize={0.4}
-              maxSize={1}
-              particleDensity={1200}
-              className="w-full h-full"
-              particleColor="#F97316"
-            />
+            {/* Core sparkles component - fail gracefully */}
+            <Suspense fallback={<div className="w-full h-full" />}>
+              <SparklesCore
+                background="transparent"
+                minSize={0.4}
+                maxSize={1}
+                particleDensity={1200}
+                className="w-full h-full"
+                particleColor="#F97316"
+              />
+            </Suspense>
 
             {/* Radial gradient mask to prevent sharp edges */}
             <div className="absolute inset-0 w-full h-full bg-background [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]" />
