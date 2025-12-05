@@ -4,7 +4,7 @@
 
 ### Development (.env)
 ```env
-# Supabase
+# Supabase (auto-set by Lovable Cloud)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_SUPABASE_PROJECT_ID=your_project_id
@@ -14,42 +14,73 @@ VITE_SITE_URL=http://localhost:5173
 ```
 
 ### Production (Supabase Dashboard → Edge Functions → Secrets)
+
+#### Required for Core Functionality
 ```env
-# Supabase (set automatically by Lovable Cloud)
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# Email (Resend)
-RESEND_API_KEY=your_resend_api_key
-
-# Site URL
 SITE_URL=https://aderai.io
-
-# Encryption
 ENCRYPTION_KEY=your_32_character_encryption_key
-
-# OpenAI (for AI suggestions)
-OPENAI_API_KEY=your_openai_api_key
 ```
 
-## How to Set
+#### Required for Payments ($9/month subscription)
+```env
+STRIPE_SECRET_KEY=sk_live_xxx        # Stripe Dashboard → Developers → API Keys
+STRIPE_WEBHOOK_SECRET=whsec_xxx      # Stripe Dashboard → Developers → Webhooks
+STRIPE_PRICE_ID=price_xxx            # Stripe Dashboard → Products → Your $9/month price
+```
 
-### Development
+#### Required for Email
+```env
+RESEND_API_KEY=re_xxx                # Resend Dashboard → API Keys
+```
 
-1. Variables are automatically set by Lovable Cloud
-2. No manual configuration needed for development
+#### Required for AI Features
+```env
+OPENAI_API_KEY=sk-xxx                # OpenAI Platform → API Keys
+```
 
-### Production
+## Stripe Setup Checklist
 
-1. Go to Lovable Dashboard
-2. Click on your project
-3. Go to Settings → Integrations → Lovable Cloud
-4. Click "Manage Secrets"
-5. Add each secret with name and value:
-   - `RESEND_API_KEY` - Your Resend API key for sending emails
-   - `ENCRYPTION_KEY` - 32-character random string for encrypting Klaviyo keys
-   - `OPENAI_API_KEY` - Your OpenAI API key for AI features
-   - `SITE_URL` - Your production domain (e.g., https://aderai.io)
+### 1. Create Stripe Account
+- Go to https://dashboard.stripe.com
+- Complete account setup for live payments
+
+### 2. Get API Keys
+- Go to Developers → API Keys
+- Copy the **Secret key** (starts with `sk_live_` for production)
+- Add as `STRIPE_SECRET_KEY` in Supabase secrets
+
+### 3. Create Product & Price
+- Go to Products → Add Product
+- Name: "Aderai Monthly"
+- Price: $9.00 USD, Recurring monthly
+- Copy the **Price ID** (starts with `price_`)
+- Add as `STRIPE_PRICE_ID` in Supabase secrets
+
+### 4. Set Up Webhook
+- Go to Developers → Webhooks → Add endpoint
+- Endpoint URL: `https://kfsvgcijligxschxyuyb.supabase.co/functions/v1/stripe-webhook`
+- Events to send:
+  - `checkout.session.completed`
+  - `customer.subscription.updated`
+  - `customer.subscription.deleted`
+  - `invoice.payment_failed`
+- Copy the **Signing secret** (starts with `whsec_`)
+- Add as `STRIPE_WEBHOOK_SECRET` in Supabase secrets
+
+### 5. Verify Setup
+- Go to /admin/setup in your Aderai app
+- All Stripe checks should show green ✓
+
+## How to Set Supabase Secrets
+
+1. Go to your Supabase project dashboard
+2. Navigate to Edge Functions → Secrets
+3. Click "Add Secret"
+4. Enter the name (e.g., `STRIPE_SECRET_KEY`)
+5. Enter the value
+6. Click "Save"
 
 ## Generating Encryption Key
 
@@ -76,21 +107,29 @@ console.log({
 ```
 
 ### Check Edge Function Variables
-In Lovable Dashboard:
-1. Go to Cloud → Edge Functions
-2. Click on any function
-3. Check "Environment Variables" section
-4. Verify all required secrets are listed
-
-## Security Notes
-
-- **Never commit** `.env` files to version control
-- **Never expose** service role keys in frontend code
-- **Always use** encrypted storage for API keys
-- **Rotate keys** regularly (every 90 days recommended)
-- **Use different keys** for development and production
+Go to /admin/setup in your Aderai app to see which variables are configured.
 
 ## Troubleshooting
+
+### Payments Not Working
+1. Check /admin/setup page for specific issues
+2. Verify all 3 Stripe secrets are set
+3. Verify webhook URL is correct
+4. Check Stripe Dashboard → Developers → Logs
+
+### Webhook Not Receiving Events
+1. Verify webhook URL in Stripe Dashboard
+2. Check webhook signing secret matches
+3. Verify all 4 event types are selected
+4. Check Supabase Edge Function logs
+
+### "Payment system not configured" Error
+- Missing `STRIPE_SECRET_KEY` secret
+- Add it in Supabase Dashboard → Edge Functions → Secrets
+
+### "Subscription plan not found" Error
+- Missing or invalid `STRIPE_PRICE_ID`
+- Create a price in Stripe and add the ID to secrets
 
 ### Variables Not Loading
 1. Check spelling (case-sensitive)
@@ -112,6 +151,11 @@ In Lovable Dashboard:
 
 ## Required Secrets by Feature
 
+### Payment System
+- `STRIPE_SECRET_KEY` - Required for all payment operations
+- `STRIPE_WEBHOOK_SECRET` - Required for webhook verification
+- `STRIPE_PRICE_ID` - Required for subscription checkout
+
 ### Email System
 - `RESEND_API_KEY` - Required for all transactional emails
 
@@ -123,3 +167,11 @@ In Lovable Dashboard:
 
 ### All Features
 - `SITE_URL` - Required for generating links in emails
+
+## Security Notes
+
+- **Never commit** `.env` files to version control
+- **Never expose** service role keys in frontend code
+- **Always use** encrypted storage for API keys
+- **Rotate keys** regularly (every 90 days recommended)
+- **Use different keys** for development and production

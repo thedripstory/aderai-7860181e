@@ -7,8 +7,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Fixed price ID for Aderai Monthly subscription ($9/month)
-const ADERAI_MONTHLY_PRICE_ID = "price_1SacRA0lE1soQQfxnQig4ytO";
+// Use environment variable with fallback to hardcoded price
+const STRIPE_PRICE_ID = Deno.env.get("STRIPE_PRICE_ID") || "price_1SacRA0lE1soQQfxnQig4ytO";
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -22,6 +22,38 @@ serve(async (req) => {
 
   try {
     logStep("Function started");
+
+    // Validate Stripe configuration
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY not configured");
+      return new Response(
+        JSON.stringify({ 
+          error: "Payment system not configured. Please contact support.",
+          code: "STRIPE_NOT_CONFIGURED",
+          setupRequired: true
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 503,
+        }
+      );
+    }
+
+    if (!STRIPE_PRICE_ID) {
+      logStep("ERROR: STRIPE_PRICE_ID not configured");
+      return new Response(
+        JSON.stringify({ 
+          error: "Subscription pricing not configured. Please contact support.",
+          code: "PRICE_NOT_CONFIGURED",
+          setupRequired: true
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 503,
+        }
+      );
+    }
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -39,9 +71,28 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
+
+    // Verify price exists in Stripe
+    try {
+      await stripe.prices.retrieve(STRIPE_PRICE_ID);
+      logStep("Price verified", { priceId: STRIPE_PRICE_ID });
+    } catch (priceError) {
+      logStep("ERROR: Price not found in Stripe", { priceId: STRIPE_PRICE_ID, error: priceError });
+      return new Response(
+        JSON.stringify({ 
+          error: "Subscription plan not found. Please contact support.",
+          code: "PRICE_NOT_FOUND",
+          setupRequired: true
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 503,
+        }
+      );
+    }
 
     // Check if customer already exists
     const existingCustomers = await stripe.customers.list({
@@ -55,7 +106,6 @@ serve(async (req) => {
       customerId = existingCustomers.data[0].id;
       logStep("Found existing Stripe customer", { customerId });
     } else {
-      // Create new customer
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: {
@@ -79,7 +129,6 @@ serve(async (req) => {
 
     logStep("Updated user with Stripe customer ID");
 
-    // Create checkout session with fixed price
     const reqData = await req.json().catch(() => ({}));
     const origin = reqData?.origin || Deno.env.get("SITE_URL") || "https://aderai.io";
 
@@ -87,7 +136,7 @@ serve(async (req) => {
       customer: customerId,
       line_items: [
         {
-          price: ADERAI_MONTHLY_PRICE_ID,
+          price: STRIPE_PRICE_ID,
           quantity: 1,
         },
       ],
