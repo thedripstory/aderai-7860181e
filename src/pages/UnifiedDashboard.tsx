@@ -81,32 +81,45 @@ export default function UnifiedDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate('/login');
-        return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          navigate('/login');
+          return;
+        }
+
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching user data:', error);
+          toast.error('Error loading your profile. Please try refreshing.');
+          setLoading(false);
+          return;
+        }
+
+        if (!userData) {
+          navigate('/login');
+          return;
+        }
+
+        setEmailVerified(userData.email_verified || false);
+        setCurrentUser(session.user);
+        await loadKlaviyoKeys(session.user.id);
+        setLoading(false);
+      } catch (err) {
+        console.error('Dashboard auth check failed:', err);
+        toast.error('Something went wrong. Please refresh the page.');
+        setLoading(false);
       }
-
-      const { data: userData } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (!userData) {
-        navigate('/login');
-        return;
-      }
-
-      setEmailVerified(userData.email_verified || false);
-      setCurrentUser(session.user);
-      await loadKlaviyoKeys(session.user.id);
-      setLoading(false);
     };
 
     checkAuth();
-  }, []);
+  }, [navigate]);
 
   const loadKlaviyoKeys = async (userId: string) => {
     const { data } = await supabase
