@@ -839,7 +839,15 @@ export type Database = {
           user_email?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "segment_creation_jobs_klaviyo_key_id_fkey"
+            columns: ["klaviyo_key_id"]
+            isOneToOne: false
+            referencedRelation: "klaviyo_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       segment_historical_data: {
         Row: {
