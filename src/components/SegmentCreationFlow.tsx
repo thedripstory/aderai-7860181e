@@ -33,10 +33,13 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
     [results]
   );
   
-  const hasFailures = useMemo(() => 
-    failedResults.length > 0,
-    [failedResults]
+  const queuedResults = useMemo(() => 
+    results.filter(r => r.status === 'queued'),
+    [results]
   );
+  
+  const hasFailures = failedResults.length > 0;
+  const hasQueued = queuedResults.length > 0;
   
   const successfulCount = useMemo(() => 
     results.filter(r => r.status === 'success').length,
@@ -44,6 +47,11 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
   );
   
   const totalCount = results.length;
+  
+  // Determine the overall status
+  const isFullyComplete = successfulCount > 0 && !hasQueued && !hasFailures;
+  const isPartialWithQueued = hasQueued;
+  const isAllFailed = hasFailures && successfulCount === 0 && !hasQueued;
   
   const progressPercent = useMemo(() => {
     if (batchProgress && loading) {
@@ -64,19 +72,19 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
     return null;
   }, [results, userSettings]);
 
-  // Show success animation when all segments complete successfully
+  // Show success animation ONLY when all segments complete successfully (no queued, no failed)
   useEffect(() => {
-    if (!loading && results.length > 0 && !hasFailures) {
+    if (!loading && results.length > 0 && isFullyComplete) {
       setShowSuccess(true);
     }
-  }, [loading, results, hasFailures]);
+  }, [loading, results, isFullyComplete]);
 
   return (
     <>
       <SuccessAnimation
         show={showSuccess}
         title="Segments Created!"
-        description={`Successfully created ${successfulCount} segments in Klaviyo`}
+        description={`Successfully created ${successfulCount} segment${successfulCount !== 1 ? 's' : ''} in Klaviyo`}
         onComplete={() => {
           setShowSuccess(false);
           navigate('/dashboard');
@@ -115,9 +123,13 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-orange-500" />
                     </div>
                   </div>
-                ) : hasFailures ? (
+                ) : hasFailures && !hasQueued ? (
                   <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
-                    <Target className="w-6 h-6 text-destructive" />
+                    <AlertCircle className="w-6 h-6 text-destructive" />
+                  </div>
+                ) : hasQueued ? (
+                  <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-blue-500" />
                   </div>
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -126,8 +138,21 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                 )}
               </div>
               <h2 className="text-xl font-semibold text-foreground">
-                {loading ? 'Creating Segments...' : hasFailures ? 'Some Segments Failed' : 'Segments Created!'}
+                {loading 
+                  ? 'Creating Segments...' 
+                  : hasQueued 
+                    ? 'Segments Queued'
+                    : hasFailures 
+                      ? 'Some Segments Failed' 
+                      : 'Segments Created!'}
               </h2>
+              {!loading && hasQueued && (
+                <p className="text-sm text-muted-foreground mt-1 text-center px-4">
+                  {successfulCount > 0 
+                    ? `${successfulCount} created, ${queuedResults.length} processing in background`
+                    : `${queuedResults.length} segment${queuedResults.length !== 1 ? 's' : ''} processing in background`}
+                </p>
+              )}
             </div>
 
             {/* Current segment card */}
