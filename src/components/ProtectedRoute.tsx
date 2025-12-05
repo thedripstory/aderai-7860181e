@@ -308,6 +308,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               <RefreshCw className="w-4 h-4" />
               {isCheckingSubscription ? 'Setting up...' : 'Retry Payment'}
             </button>
+            <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1 mt-2">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Payments securely processed by The Drip Story FZE LLC
+            </p>
             <button
               onClick={() => supabase.auth.signOut()}
               className="w-full text-muted-foreground hover:text-foreground px-4 py-2 transition-colors"
@@ -378,6 +384,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               >
                 {isCheckingSubscription ? 'Setting up...' : subscriptionStatus === 'canceled' ? 'Resubscribe - $9/month' : isComingFromCheckout ? 'Try Again - $9/month' : 'Complete Subscription - $9/month'}
               </button>
+              <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1 mb-3">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Payments securely processed by The Drip Story FZE LLC
+              </p>
               <button
                 onClick={() => supabase.auth.signOut()}
                 className="w-full text-muted-foreground hover:text-foreground px-4 py-2 transition-colors"
