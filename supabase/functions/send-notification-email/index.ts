@@ -12,13 +12,28 @@ const corsHeaders = {
 interface NotificationEmailRequest {
   userId: string;
   email: string;
-  notificationType: "segment_created" | "client_added" | "api_key_added" | "settings_updated" | "klaviyo_connected";
+  notificationType: 
+    | "segment_created" 
+    | "client_added" 
+    | "api_key_added" 
+    | "settings_updated" 
+    | "klaviyo_connected"
+    | "segment_progress"
+    | "segment_complete"
+    | "segment_daily_limit";
   data: {
     title: string;
     message: string;
     actionUrl?: string;
     actionLabel?: string;
     accountName?: string;
+    // For segment progress/completion
+    completed?: number;
+    remaining?: number;
+    total?: number;
+    segmentCount?: number;
+    completedToday?: number;
+    estimatedTimeRemaining?: string;
   };
 }
 
@@ -44,6 +59,9 @@ const handler = async (req: Request): Promise<Response> => {
     let shouldSend = false;
     switch (notificationType) {
       case "segment_created":
+      case "segment_progress":
+      case "segment_complete":
+      case "segment_daily_limit":
         shouldSend = prefs?.email_on_segment_creation ?? true;
         break;
       case "client_added":
@@ -69,6 +87,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     const iconMap: Record<string, string> = {
       segment_created: "✨",
+      segment_progress: "⏳",
+      segment_complete: "✅",
+      segment_daily_limit: "⏸️",
       client_added: "👥",
       api_key_added: "🔑",
       settings_updated: "⚙️",
@@ -77,9 +98,189 @@ const handler = async (req: Request): Promise<Response> => {
 
     const dashboardUrl = Deno.env.get('SITE_URL') || 'https://aderai.io';
 
-    // Handle klaviyo_connected template specially
+    // Handle different templates
     let subject = data.title;
     let htmlContent = "";
+
+    // Segment progress email template
+    if (notificationType === "segment_progress") {
+      subject = `Aderai: Segment creation in progress (${data.completed} of ${data.total} done)`;
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; }
+            .progress-box { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 6px; border-left: 4px solid #FF6B35; }
+            .stat { display: inline-block; margin-right: 30px; }
+            .stat-value { font-size: 24px; font-weight: bold; color: #FF6B35; }
+            .stat-label { font-size: 14px; color: #666; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa; border-radius: 0 0 10px 10px; }
+            .klaviyo-note { background: #fff3cd; padding: 15px; border-radius: 6px; margin-top: 20px; border: 1px solid #ffc107; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>⏳ Segment Creation in Progress</h1>
+            </div>
+            <div class="content">
+              <p>Hi there,</p>
+              <p>Your segment creation is progressing smoothly! Here's your status update:</p>
+              
+              <div class="progress-box">
+                <div class="stat">
+                  <div class="stat-value">${data.completed}</div>
+                  <div class="stat-label">Segments created</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">${data.remaining}</div>
+                  <div class="stat-label">Remaining</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">~${data.estimatedTimeRemaining}</div>
+                  <div class="stat-label">Est. time left</div>
+                </div>
+              </div>
+              
+              <div class="klaviyo-note">
+                <strong>Why does this take time?</strong><br>
+                This is being paced to stay within Klaviyo's API limits (15 segments/minute). 
+                We're handling everything automatically — no action needed from you.
+              </div>
+              
+              <p style="margin-top: 20px;">We'll email you again when everything is complete!</p>
+              
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+    // Segment completion email template
+    else if (notificationType === "segment_complete") {
+      subject = `✅ Aderai: All ${data.segmentCount} segments are ready!`;
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; }
+            .success-box { background: #dcfce7; padding: 20px; margin: 20px 0; border-radius: 6px; border: 1px solid #22c55e; text-align: center; }
+            .success-number { font-size: 48px; font-weight: bold; color: #16a34a; }
+            .button { display: inline-block; background: #FF6B35; color: white; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa; border-radius: 0 0 10px 10px; }
+            .klaviyo-note { background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 13px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>✅ All Segments Are Ready!</h1>
+            </div>
+            <div class="content">
+              <p>Hi there,</p>
+              <p>Great news! All your segments have been created in Klaviyo.</p>
+              
+              <div class="success-box">
+                <div class="success-number">${data.segmentCount}</div>
+                <div>segments created</div>
+              </div>
+              
+              <p>Your segments are now ready to use in your campaigns and flows!</p>
+              
+              <div style="text-align: center;">
+                <a href="${data.actionUrl || 'https://www.klaviyo.com/lists-segments'}" class="button">View in Klaviyo</a>
+              </div>
+              
+              <div class="klaviyo-note">
+                <strong>Why did this take some time?</strong> Klaviyo's API limits segment creation to 15/minute 
+                and 100/day. Aderai automatically paced your request to work within these limits.
+              </div>
+              
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+    // Daily limit reached email template
+    else if (notificationType === "segment_daily_limit") {
+      subject = `⏸️ Aderai: Segment creation paused until tomorrow`;
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: #ffffff; padding: 40px; border: 1px solid #e5e5e5; border-top: none; }
+            .status-box { background: #fef3c7; padding: 20px; margin: 20px 0; border-radius: 6px; border: 1px solid #f59e0b; }
+            .stat { display: inline-block; margin-right: 30px; margin-bottom: 10px; }
+            .stat-value { font-size: 24px; font-weight: bold; color: #d97706; }
+            .stat-label { font-size: 14px; color: #666; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa; border-radius: 0 0 10px 10px; }
+            .note { background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 13px; color: #666; }
+            .checkmark { color: #22c55e; font-size: 18px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>⏸️ Daily Limit Reached</h1>
+            </div>
+            <div class="content">
+              <p>Hi there,</p>
+              <p>We've hit Klaviyo's daily limit of 100 segments. Here's where we're at:</p>
+              
+              <div class="status-box">
+                <div class="stat">
+                  <div class="stat-value">${data.completedToday}</div>
+                  <div class="stat-label">✅ Created today</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">${data.remaining}</div>
+                  <div class="stat-label">⏳ Remaining</div>
+                </div>
+              </div>
+              
+              <p><span class="checkmark">✓</span> <strong>You don't need to do anything</strong> — we'll automatically continue tomorrow and email you when complete.</p>
+              
+              <div class="note">
+                <strong>Why does Klaviyo have these limits?</strong><br>
+                Like most platforms, Klaviyo rate-limits their API to ensure system stability for all users. 
+                We work within these limits to keep your account in good standing.
+              </div>
+              
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+    // Handle klaviyo_connected template
     
     if (notificationType === "klaviyo_connected") {
       subject = "✅ Klaviyo Connected Successfully!";
