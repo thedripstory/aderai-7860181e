@@ -3,9 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
+import { CommandPalette } from "@/components/CommandPalette";
+import { KeyboardShortcutsHelp } from "@/components/KeyboardShortcutsHelp";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
@@ -74,6 +76,8 @@ const App = () => {
               closeButton
             />
             <BrowserRouter>
+              <CommandPalette />
+              <KeyboardShortcutsHelp />
               <Suspense fallback={<LoaderComponent />}>
                 <Routes>
                 <Route path="/" element={<LandingPage />} />
