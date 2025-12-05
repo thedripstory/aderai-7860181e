@@ -101,3 +101,6 @@ verify_jwt = false
 
 [functions.track-email-event]
 verify_jwt = false
+
+[functions.klaviyo-get-aderai-segments]
+verify_jwt = true

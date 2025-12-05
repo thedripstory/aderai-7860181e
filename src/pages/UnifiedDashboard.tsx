@@ -22,6 +22,7 @@ import { SegmentHistoricalTrends } from '@/components/SegmentHistoricalTrends';
 import { SegmentOperationHistory } from '@/components/SegmentOperationHistory';
 import { AderaiSegmentManager } from '@/components/AderaiSegmentManager';
 import { PremiumInviteGate } from '@/components/PremiumInviteGate';
+import { WelcomeBackModal } from '@/components/WelcomeBackModal';
 
 import { AchievementsPanel } from '@/components/AchievementsPanel';
 import { useKlaviyoSegments, KlaviyoKey } from '@/hooks/useKlaviyoSegments';
@@ -288,6 +289,9 @@ export default function UnifiedDashboard() {
           onComplete={completeTour}
         />
       )}
+
+      {/* Welcome Back Modal - shows when segments were created while user was away */}
+      <WelcomeBackModal />
 
       {currentUser && !emailVerified && (
         <EmailVerificationBanner 

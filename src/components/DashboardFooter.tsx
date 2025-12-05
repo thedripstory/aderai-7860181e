@@ -1,6 +1,6 @@
 import React from 'react';
 import { AderaiLogo } from '@/components/AderaiLogo';
-import { Heart, ExternalLink } from 'lucide-react';
+import { Heart, ExternalLink, Shield, Lock, Eye, Server } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const KLAVIYO_LOGO_URL = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
@@ -14,12 +14,71 @@ export const DashboardFooter: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-muted/30 to-transparent pointer-events-none" />
       
       <div className="relative max-w-7xl mx-auto px-4 py-12">
+        {/* Privacy Badge Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-10"
+        >
+          <div className="bg-slate-900 rounded-xl p-6 text-white">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-green-500/20">
+                <Shield className="h-6 w-6 text-green-400" />
+              </div>
+              <h3 className="text-lg font-semibold">Your Data Privacy, Guaranteed</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-white/10 flex-shrink-0">
+                  <Lock className="h-5 w-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">No Customer Data Stored</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Your customer information never touches our servers
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-white/10 flex-shrink-0">
+                  <Eye className="h-5 w-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">No Data Reading</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    We only create segments, never read your profiles
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-white/10 flex-shrink-0">
+                  <Server className="h-5 w-5 text-purple-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">Encrypted API Keys</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Your Klaviyo credentials are encrypted at rest
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-400 text-center border-t border-slate-700 pt-4">
+              Aderai only communicates with Klaviyo to create segment definitions. We never access, store, or process your customer data.
+            </p>
+          </div>
+        </motion.div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           {/* Left - Branding */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="flex flex-col items-center md:items-start gap-3"
           >
             <AderaiLogo size="lg" href="/dashboard" />
