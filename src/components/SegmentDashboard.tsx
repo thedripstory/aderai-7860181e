@@ -5,6 +5,7 @@ import { SegmentFilters } from './segments/SegmentFilters';
 import { FavoritesSection } from './segments/FavoritesSection';
 import { BundlesSection } from './segments/BundlesSection';
 import { SegmentCategories } from './segments/SegmentCategories';
+import { KlaviyoRateLimitWarning } from './KlaviyoRateLimitWarning';
 import { SEGMENTS, applySettingsToSegments, DEFAULT_SEGMENT_SETTINGS, UserSegmentSettings, Segment } from '@/lib/segmentData';
 import { toast } from 'sonner';
 
@@ -127,6 +128,9 @@ export const SegmentDashboard: React.FC<SegmentDashboardProps> = ({
 
   return (
     <div className="animate-fade-in">
+      {/* Klaviyo Rate Limit Warning - shows on first visit */}
+      <KlaviyoRateLimitWarning />
+
       {/* Preview Modal */}
       <SegmentPreviewModal
         segment={previewSegment}
