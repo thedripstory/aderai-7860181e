@@ -731,20 +731,19 @@ export default function LandingPage() {
         </section>
 
       {/* Footer */}
-      <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted overflow-hidden contain-layout">
-        {/* Decorative Elements - optimized */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
+      <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted contain-layout">
+        {/* Decorative Elements - moved inside with proper positioning */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-xl contain-paint -translate-x-1/4 -translate-y-1/4" style={{ transform: 'translateZ(0) translate(-25%, -25%)' }} />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-xl contain-paint translate-x-1/4 translate-y-1/4" style={{ transform: 'translateZ(0) translate(25%, 25%)' }} />
         
         <div className="max-w-7xl mx-auto px-6 relative">
           {/* Segment Flow Effect Section */}
-          <Suspense fallback={<SectionPlaceholder height="80vh" />}>
+          <Suspense fallback={<SectionPlaceholder height="60vh" />}>
             <SegmentFlowEffect />
           </Suspense>
 
-
           {/* Main Footer Content */}
-          <div className="py-12">
+          <div className="py-8">
             <div className="grid md:grid-cols-4 gap-8 mb-12">
               {/* Brand Column - Larger */}
               <div className="md:col-span-2">
