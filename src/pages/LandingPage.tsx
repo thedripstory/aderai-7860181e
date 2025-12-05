@@ -121,16 +121,16 @@ export default function LandingPage() {
               </span>
             </div>
 
-            <h1 className="text-6xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-8xl font-bold mb-12 tracking-tight leading-tight">
               {heroVariant === 'A' ? (
                 <>
-                  70 Klaviyo Segments<br />
-                  <span className="text-accent block my-4">in 30 Seconds</span>
+                  <span className="block">70 Klaviyo Segments</span>
+                  <span className="text-accent block my-2 md:my-4">in 30 Seconds</span>
                 </>
               ) : (
                 <>
-                  Segment like a<br />
-                  <span className="text-accent block my-4">$50M brand.</span>
+                  <span className="block">Segment like a</span>
+                  <span className="text-accent block my-2 md:my-4">$50M brand.</span>
                 </>
               )}
             </h1>
