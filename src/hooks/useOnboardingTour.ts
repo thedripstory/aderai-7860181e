@@ -82,23 +82,32 @@ export function useOnboardingTour() {
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { status, index, type, action } = data;
+    
+    // Debug logging
+    console.log('Joyride callback:', { status, index, type, action });
 
-    // Handle step navigation
-    if (type === EVENTS.STEP_AFTER) {
+    // Handle step navigation - must handle both STEP_AFTER and TARGET_NOT_FOUND
+    if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type as any)) {
+      // Update stepIndex based on action
+      const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
+      setTourState(prev => ({ ...prev, stepIndex: nextIndex }));
+      
       if (action === ACTIONS.NEXT) {
-        setTourState(prev => ({ ...prev, stepIndex: index + 1 }));
         trackEvent('tour_step_completed', { step: index });
-      } else if (action === ACTIONS.PREV) {
-        setTourState(prev => ({ ...prev, stepIndex: index - 1 }));
       }
     }
 
     // Handle tour completion
-    if (status === STATUS.FINISHED) {
-      completeTour();
-    } else if (status === STATUS.SKIPPED || action === ACTIONS.SKIP) {
-      skipTour(index);
-    } else if (action === ACTIONS.CLOSE) {
+    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
+      if (status === STATUS.FINISHED) {
+        completeTour();
+      } else {
+        skipTour(index);
+      }
+    }
+    
+    // Handle close action
+    if (action === ACTIONS.CLOSE) {
       setTourState(prev => ({ ...prev, run: false }));
     }
   }, [trackEvent]);
