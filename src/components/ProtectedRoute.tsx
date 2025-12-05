@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/errorLogger';
@@ -14,11 +14,45 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
+  const [isVerifyingWithStripe, setIsVerifyingWithStripe] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Check if email has free access (bypass subscription)
   const hasFreeAccess = userEmail?.toLowerCase().endsWith('@thedripstory.com') ?? false;
+
+  // Verify subscription directly with Stripe (safety net for webhook delays)
+  const verifyWithStripe = useCallback(async () => {
+    setIsVerifyingWithStripe(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-check-subscription');
+      
+      if (error) {
+        ErrorLogger.logError(error, { context: 'Stripe verification failed' });
+        return false;
+      }
+      
+      if (data?.subscribed) {
+        // Stripe says active! Update local state
+        setSubscriptionStatus('active');
+        toast.success('Payment confirmed! Welcome to Aderai.');
+        
+        // Clear the payment=success param to prevent re-verification on refresh
+        searchParams.delete('payment');
+        setSearchParams(searchParams, { replace: true });
+        
+        return true;
+      }
+      
+      return false;
+    } catch (err) {
+      ErrorLogger.logError(err as Error, { context: 'Stripe verification error' });
+      return false;
+    } finally {
+      setIsVerifyingWithStripe(false);
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -58,7 +92,26 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             });
           } else {
             setHasProfile(!!profile);
-            setSubscriptionStatus(profile?.subscription_status || 'inactive');
+            const dbStatus = profile?.subscription_status || 'inactive';
+            setSubscriptionStatus(dbStatus);
+            
+            // Safety net: If coming from Stripe checkout and DB shows inactive,
+            // verify directly with Stripe (webhook may not have processed yet)
+            const paymentParam = searchParams.get('payment');
+            if (paymentParam === 'success' && dbStatus !== 'active' && dbStatus !== 'trialing') {
+              // Wait a moment for webhook to process, then verify with Stripe
+              setTimeout(async () => {
+                const verified = await verifyWithStripe();
+                if (!verified) {
+                  // Still not active, show a helpful message
+                  toast.info('Verifying your payment... This may take a moment.', {
+                    duration: 5000,
+                  });
+                  // Try again after a few seconds
+                  setTimeout(verifyWithStripe, 3000);
+                }
+              }, 1500);
+            }
           }
         } catch (err) {
           await ErrorLogger.logError(err as Error, {
@@ -118,7 +171,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [searchParams, verifyWithStripe]);
 
   const handleSubscribe = async () => {
     setIsCheckingSubscription(true);
@@ -147,6 +200,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       toast.error('Error opening billing portal. Please try again.');
     } finally {
       setIsCheckingSubscription(false);
+    }
+  };
+
+  const handleRefreshSubscription = async () => {
+    setIsCheckingSubscription(true);
+    const verified = await verifyWithStripe();
+    setIsCheckingSubscription(false);
+    
+    if (!verified) {
+      toast.error('Subscription not found. Please complete payment or contact support.');
     }
   };
 
@@ -245,35 +308,70 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Authenticated but no active subscription (inactive, canceled, etc.)
   if (!hasActiveSubscription) {
+    // Check if we're currently verifying with Stripe (coming from checkout)
+    const isComingFromCheckout = searchParams.get('payment') === 'success';
+    
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         <div className="max-w-md mx-auto p-8 bg-card rounded-2xl border border-border shadow-xl text-center">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
-            <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+            {isVerifyingWithStripe ? (
+              <div className="relative w-8 h-8">
+                <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+              </div>
+            ) : (
+              <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            )}
           </div>
           <h2 className="text-2xl font-bold mb-3">
-            {subscriptionStatus === 'canceled' ? 'Subscription Ended' : 'Subscription Required'}
+            {isVerifyingWithStripe 
+              ? 'Verifying Payment...' 
+              : isComingFromCheckout 
+                ? 'Payment Processing' 
+                : subscriptionStatus === 'canceled' 
+                  ? 'Subscription Ended' 
+                  : 'Subscription Required'}
           </h2>
           <p className="text-muted-foreground mb-6">
-            {subscriptionStatus === 'canceled' 
-              ? 'Your subscription has been canceled. Resubscribe to regain access to Aderai.'
-              : 'To access Aderai, please complete your subscription setup.'}
+            {isVerifyingWithStripe 
+              ? 'Please wait while we confirm your payment with Stripe...'
+              : isComingFromCheckout
+                ? 'Your payment is being processed. This usually takes a few seconds.'
+                : subscriptionStatus === 'canceled' 
+                  ? 'Your subscription has been canceled. Resubscribe to regain access to Aderai.'
+                  : 'To access Aderai, please complete your subscription setup.'}
           </p>
-          <button
-            onClick={handleSubscribe}
-            disabled={isCheckingSubscription}
-            className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold mb-3 disabled:opacity-50"
-          >
-            {isCheckingSubscription ? 'Setting up...' : subscriptionStatus === 'canceled' ? 'Resubscribe - $9/month' : 'Complete Subscription - $9/month'}
-          </button>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            className="w-full text-muted-foreground hover:text-foreground px-4 py-2 transition-colors"
-          >
-            Sign Out
-          </button>
+          
+          {isComingFromCheckout && !isVerifyingWithStripe && (
+            <button
+              onClick={handleRefreshSubscription}
+              disabled={isCheckingSubscription}
+              className="w-full bg-accent text-accent-foreground px-6 py-3 rounded-lg hover:bg-accent/90 transition-colors font-semibold mb-3 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isCheckingSubscription ? 'animate-spin' : ''}`} />
+              {isCheckingSubscription ? 'Checking...' : 'Check Payment Status'}
+            </button>
+          )}
+          
+          {!isVerifyingWithStripe && (
+            <>
+              <button
+                onClick={handleSubscribe}
+                disabled={isCheckingSubscription}
+                className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold mb-3 disabled:opacity-50"
+              >
+                {isCheckingSubscription ? 'Setting up...' : subscriptionStatus === 'canceled' ? 'Resubscribe - $9/month' : isComingFromCheckout ? 'Try Again - $9/month' : 'Complete Subscription - $9/month'}
+              </button>
+              <button
+                onClick={() => supabase.auth.signOut()}
+                className="w-full text-muted-foreground hover:text-foreground px-4 py-2 transition-colors"
+              >
+                Sign Out
+              </button>
+            </>
+          )}
         </div>
       </div>
     );

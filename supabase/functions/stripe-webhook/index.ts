@@ -16,6 +16,22 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
+// Helper to find user by email if metadata is missing
+async function findUserByEmail(email: string): Promise<string | null> {
+  const { data: user, error } = await supabaseAdmin
+    .from("users")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+  
+  if (error || !user) {
+    logStep("Could not find user by email", { email, error: error?.message });
+    return null;
+  }
+  
+  return user.id;
+}
+
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
@@ -27,23 +43,46 @@ serve(async (req) => {
 
   try {
     const body = await req.text();
-    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    
+    // CRITICAL FIX: Use constructEventAsync instead of constructEvent
+    // constructEvent uses synchronous crypto which fails in Deno/Edge runtime
+    const event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
 
     logStep(`Processing webhook event: ${event.type}`, { eventId: event.id });
 
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        const userId = session.metadata?.supabase_user_id;
         
-        logStep("Checkout session completed", { userId, sessionId: session.id });
+        // Try to get userId from metadata first, then fallback to email lookup
+        let userId = session.metadata?.supabase_user_id;
+        
+        if (!userId && session.customer_email) {
+          logStep("No userId in metadata, trying email lookup", { email: session.customer_email });
+          userId = await findUserByEmail(session.customer_email);
+        }
+        
+        // If still no userId, try to get email from customer object
+        if (!userId && session.customer) {
+          try {
+            const customer = await stripe.customers.retrieve(session.customer as string);
+            if (customer && !customer.deleted && 'email' in customer && customer.email) {
+              logStep("Trying customer email lookup", { email: customer.email });
+              userId = await findUserByEmail(customer.email);
+            }
+          } catch (e) {
+            logStep("Error fetching customer", { error: (e as Error).message });
+          }
+        }
+        
+        logStep("Checkout session completed", { userId, sessionId: session.id, customerEmail: session.customer_email });
         
         if (userId && session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription as string
           );
 
-          await supabaseAdmin
+          const { error: updateError } = await supabaseAdmin
             .from("users")
             .update({
               stripe_subscription_id: subscription.id,
@@ -53,21 +92,43 @@ serve(async (req) => {
             })
             .eq("id", userId);
 
+          if (updateError) {
+            logStep("ERROR updating user subscription", { userId, error: updateError.message });
+          } else {
+            logStep("Updated user subscription status to active", { userId, subscriptionId: subscription.id });
+          }
+
           await supabaseAdmin.from("subscription_events").insert({
             user_id: userId,
             stripe_event_id: event.id,
             event_type: event.type,
             event_data: { session_id: session.id, subscription_id: subscription.id },
           });
-
-          logStep("Updated user subscription status to active", { userId, subscriptionId: subscription.id });
+        } else {
+          logStep("WARNING: Could not link payment to user", { 
+            hasUserId: !!userId, 
+            hasSubscription: !!session.subscription,
+            customerEmail: session.customer_email 
+          });
         }
         break;
       }
 
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.supabase_user_id;
+        let userId = subscription.metadata?.supabase_user_id;
+
+        // Fallback: try to find user by customer email
+        if (!userId && subscription.customer) {
+          try {
+            const customer = await stripe.customers.retrieve(subscription.customer as string);
+            if (customer && !customer.deleted && 'email' in customer && customer.email) {
+              userId = await findUserByEmail(customer.email);
+            }
+          } catch (e) {
+            logStep("Error fetching customer for subscription update", { error: (e as Error).message });
+          }
+        }
 
         logStep("Subscription updated", { userId, subscriptionId: subscription.id, status: subscription.status });
 
@@ -90,7 +151,7 @@ serve(async (req) => {
               status = "inactive";
           }
 
-          await supabaseAdmin
+          const { error: updateError } = await supabaseAdmin
             .from("users")
             .update({
               subscription_status: status,
@@ -100,6 +161,10 @@ serve(async (req) => {
                 : null,
             })
             .eq("id", userId);
+
+          if (updateError) {
+            logStep("ERROR updating subscription status", { userId, error: updateError.message });
+          }
 
           await supabaseAdmin.from("subscription_events").insert({
             user_id: userId,
@@ -115,18 +180,34 @@ serve(async (req) => {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.supabase_user_id;
+        let userId = subscription.metadata?.supabase_user_id;
+
+        // Fallback: try to find user by customer email
+        if (!userId && subscription.customer) {
+          try {
+            const customer = await stripe.customers.retrieve(subscription.customer as string);
+            if (customer && !customer.deleted && 'email' in customer && customer.email) {
+              userId = await findUserByEmail(customer.email);
+            }
+          } catch (e) {
+            logStep("Error fetching customer for subscription delete", { error: (e as Error).message });
+          }
+        }
 
         logStep("Subscription deleted", { userId, subscriptionId: subscription.id });
 
         if (userId) {
-          await supabaseAdmin
+          const { error: updateError } = await supabaseAdmin
             .from("users")
             .update({
               subscription_status: "canceled",
               subscription_canceled_at: new Date().toISOString(),
             })
             .eq("id", userId);
+
+          if (updateError) {
+            logStep("ERROR marking subscription as canceled", { userId, error: updateError.message });
+          }
 
           await supabaseAdmin.from("subscription_events").insert({
             user_id: userId,
@@ -148,13 +229,29 @@ serve(async (req) => {
 
         if (subscriptionId) {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-          const userId = subscription.metadata?.supabase_user_id;
+          let userId = subscription.metadata?.supabase_user_id;
+
+          // Fallback: try to find user by customer email
+          if (!userId && subscription.customer) {
+            try {
+              const customer = await stripe.customers.retrieve(subscription.customer as string);
+              if (customer && !customer.deleted && 'email' in customer && customer.email) {
+                userId = await findUserByEmail(customer.email);
+              }
+            } catch (e) {
+              logStep("Error fetching customer for payment failed", { error: (e as Error).message });
+            }
+          }
 
           if (userId) {
-            await supabaseAdmin
+            const { error: updateError } = await supabaseAdmin
               .from("users")
               .update({ subscription_status: "past_due" })
               .eq("id", userId);
+
+            if (updateError) {
+              logStep("ERROR marking subscription as past_due", { userId, error: updateError.message });
+            }
 
             await supabaseAdmin.from("subscription_events").insert({
               user_id: userId,
