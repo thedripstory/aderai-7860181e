@@ -46,7 +46,7 @@ export function RevolvingTestimonials() {
 
   return (
     <div className="mt-8 relative">
-      <div className="bg-card/50 rounded-xl p-10 border border-border overflow-hidden relative">
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-10 border border-border overflow-hidden relative">
         {/* Quote icon */}
         <div className="absolute top-6 left-6 opacity-5">
           <Quote className="w-10 h-10 text-foreground" />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { CheckCircle, CheckCircle2, ArrowRight, Zap, Clock, MousePointerClick, Star, Sparkles, X, Wand2, BarChart3, HelpCircle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -23,24 +23,14 @@ import { AderaiLogo } from "@/components/AderaiLogo";
 
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Testimonials3D } from "@/components/landing/Testimonials3D";
+import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
-
-// Lazy load heavy components
-const Globe = lazy(() => import("@/components/ui/globe").then(m => ({ default: m.Globe })));
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterLoading, setNewsletterLoading] = useState(false);
   const navigate = useNavigate();
   const heroVariant = useABTest('hero-headline');
-
-  // Memoize random stats to prevent recalculation on every render
-  const globeStats = useMemo(() => ({
-    segmentsDeployed: (2500 + Math.floor(Math.random() * 500)).toLocaleString(),
-    countriesActive: 42 + Math.floor(Math.random() * 15),
-    engagementLift: 115 + Math.floor(Math.random() * 25),
-    profilesSegmented: (1.1 + Math.random() * 0.3).toFixed(1),
-  }), []);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,11 +116,13 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 pt-40 pb-12 px-6 overflow-visible">
-        {/* Animated Background Elements - static for performance */}
+        {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-2xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-2xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-2xl" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{
+          animationDelay: "1s"
+        }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto">
@@ -251,13 +243,13 @@ export default function LandingPage() {
 
               {/* After Card */}
               <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-3xl p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl animate-[slide-in-right_0.8s_ease-out_0.3s_both]">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-2xl" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-2xl animate-pulse" />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-6">
                     <div className="p-3 bg-primary/10 rounded-xl border border-primary/20">
                       <Zap className="w-6 h-6 text-primary" />
                     </div>
-                    <div className="px-3 py-1 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/30">
+                    <div className="px-3 py-1 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/30 animate-pulse">
                       NEW WAY
                     </div>
                   </div>
@@ -281,7 +273,7 @@ export default function LandingPage() {
               {/* Arrow Connection */}
               <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                 <div className="bg-background border-2 border-primary rounded-full p-4 shadow-xl">
-                  <ArrowRight className="w-8 h-8 text-primary" />
+                  <ArrowRight className="w-8 h-8 text-primary animate-pulse" />
                 </div>
               </div>
             </div>
@@ -312,8 +304,8 @@ export default function LandingPage() {
       {/* Automation Section */}
       <section className="pt-16 pb-20 px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-2xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-2xl" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -321,9 +313,9 @@ export default function LandingPage() {
             <ScrollReveal direction="left">
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                <div className="w-2 h-2 rounded-full bg-primary" />
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-1">
-                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" loading="lazy" /> Official API Partner
+                  <img src={klaviyoLogo} alt="Klaviyo" className="h-[1em] inline-block align-text-bottom" /> Official API Partner
                 </span>
               </div>
 
@@ -399,7 +391,7 @@ export default function LandingPage() {
           <ScrollReveal>
             <div className="text-center mb-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                <div className="w-2 h-2 rounded-full bg-primary" />
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">
                   Segment Discovery
                 </span>
@@ -428,11 +420,11 @@ export default function LandingPage() {
                       </div>
                       <div className="text-sm font-semibold text-black">LTV &gt; $5k, no purchase 60d</div>
                     </div>
-                    <div className="bg-white rounded-lg p-3 border-2 border-dashed border-black">
+                    <div className="bg-white backdrop-blur-sm rounded-lg p-3 border-2 border-dashed border-black">
                       <div className="text-xs text-black mb-1">Suggested action</div>
                       <div className="text-sm font-semibold text-black">Exclusive 20% VIP comeback</div>
                     </div>
-                    <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
                       Hidden gem
                     </div>
                   </div>
@@ -532,9 +524,9 @@ export default function LandingPage() {
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full shadow-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: '1s' }} />
               </div>
             </div>
             
@@ -547,8 +539,8 @@ export default function LandingPage() {
       {/* Success Stories */}
       <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-2xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-2xl" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto relative">
           {/* Header Section */}
@@ -617,7 +609,7 @@ export default function LandingPage() {
             <ScrollReveal>
               <div className="text-center mb-8">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                   <span className="text-sm font-semibold text-green-600 uppercase tracking-wider">
                     Live Activity
                   </span>
@@ -651,47 +643,45 @@ export default function LandingPage() {
               </svg>
               
               {/* Floating Stat Cards */}
-              <div className="absolute left-4 md:left-16 top-20 md:top-32 z-20 animate-[float_6s_ease-in-out_infinite] will-change-transform">
-                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-gray-200 relative">
-                  <div className="text-2xl md:text-3xl font-bold text-black">{globeStats.segmentsDeployed}</div>
+              <div className="absolute left-4 md:left-16 top-20 md:top-32 z-20 animate-[float_6s_ease-in-out_infinite]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-black">{(2500 + Math.floor(Math.random() * 500)).toLocaleString()}</div>
                   <div className="text-xs md:text-sm text-gray-600">segments deployed today</div>
                   <div className="absolute -right-2 top-1/2 w-4 h-px bg-gradient-to-r from-primary/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
-              <div className="absolute right-4 md:right-16 top-28 md:top-40 z-20 animate-[float_6s_ease-in-out_infinite_1s] will-change-transform">
-                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-gray-200 relative">
-                  <div className="text-2xl md:text-3xl font-bold text-primary">{globeStats.countriesActive}</div>
+              <div className="absolute right-4 md:right-16 top-28 md:top-40 z-20 animate-[float_6s_ease-in-out_infinite_1s]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-primary">{42 + Math.floor(Math.random() * 15)}</div>
                   <div className="text-xs md:text-sm text-gray-600">countries active</div>
                   <div className="absolute -left-2 top-1/2 w-4 h-px bg-gradient-to-l from-primary/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
-              <div className="absolute left-8 md:left-24 bottom-16 md:bottom-24 z-20 animate-[float_6s_ease-in-out_infinite_2s] will-change-transform">
-                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-gray-200 relative">
-                  <div className="text-2xl md:text-3xl font-bold text-green-600">+{globeStats.engagementLift}%</div>
+              <div className="absolute left-8 md:left-24 bottom-16 md:bottom-24 z-20 animate-[float_6s_ease-in-out_infinite_2s]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-green-600">+{115 + Math.floor(Math.random() * 25)}%</div>
                   <div className="text-xs md:text-sm text-gray-600">avg. engagement lift</div>
                   <div className="absolute -right-2 top-1/2 w-4 h-px bg-gradient-to-r from-green-500/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
-              <div className="absolute right-8 md:right-20 bottom-24 md:bottom-32 z-20 animate-[float_6s_ease-in-out_infinite_3s] will-change-transform">
-                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-gray-200 relative">
-                  <div className="text-2xl md:text-3xl font-bold text-black">{globeStats.profilesSegmented}M+</div>
+              <div className="absolute right-8 md:right-20 bottom-24 md:bottom-32 z-20 animate-[float_6s_ease-in-out_infinite_3s]">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-gray-200 relative">
+                  <div className="text-2xl md:text-3xl font-bold text-black">{(1.1 + Math.random() * 0.3).toFixed(1)}M+</div>
                   <div className="text-xs md:text-sm text-gray-600">profiles segmented</div>
                   <div className="absolute -left-2 top-1/2 w-4 h-px bg-gradient-to-l from-primary/40 to-transparent hidden md:block" />
                 </div>
               </div>
               
               {/* Floating Globe with parallax */}
-              <div className="relative w-full max-w-[650px] md:max-w-[750px] aspect-square mx-auto transform-gpu">
-                <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><div className="w-12 h-12 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
-                  <Globe className="inset-0 scale-100 md:scale-110" />
-                </Suspense>
+              <div className="relative w-full max-w-[650px] md:max-w-[750px] aspect-square mx-auto transform-gpu hover:scale-[1.02] transition-transform duration-700">
+                <Globe className="inset-0 scale-100 md:scale-110" />
               </div>
               
               {/* Subtle glow underneath */}
-              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-2xl" />
+              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-3xl" />
             </div>
           </div>
         </section>
@@ -770,8 +760,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-2xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-2xl" />
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
         
         <div className="max-w-7xl mx-auto px-6 relative">
           {/* Segment Flow Effect Section */}
