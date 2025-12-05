@@ -104,6 +104,15 @@ const KlaviyoSetup = () => {
       return;
     }
 
+    if (!clientName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your business name",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validate API key format (Klaviyo private keys start with "pk_")
     if (!apiKey.startsWith("pk_")) {
       toast({
@@ -187,7 +196,7 @@ const KlaviyoSetup = () => {
         .insert({
           user_id: user.id,
           klaviyo_api_key_hash: encryptedKey,
-          client_name: clientName || "My Business",
+          client_name: clientName.trim(),
           currency,
           currency_symbol: currencySymbol,
           aov: parseFloat(aov),
@@ -484,14 +493,15 @@ const KlaviyoSetup = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="clientName">Business Name (Optional)</Label>
+                    <Label htmlFor="clientName">Business Name *</Label>
                     <Input
                       id="clientName"
                       type="text"
-                      placeholder="My Business"
+                      placeholder="Enter your business name"
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
                       className="h-12"
+                      required
                     />
                   </div>
                 </div>
