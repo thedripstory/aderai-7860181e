@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Loader, Target, Sparkles } from 'lucide-react';
+import { Loader, Target, Sparkles, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -429,7 +429,7 @@ export default function UnifiedDashboard() {
 
           <TabsContent value="more">
             <div className="grid gap-6">
-              {klaviyoKeys.length > 0 && (
+              {klaviyoKeys.length > 0 ? (
                 <>
                   <KlaviyoHealthDashboard 
                     klaviyoKeyId={klaviyoKeys[activeKeyIndex].id}
@@ -439,6 +439,14 @@ export default function UnifiedDashboard() {
                   <SegmentOperationHistory klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
                   <AderaiSegmentManager klaviyoKeyId={klaviyoKeys[activeKeyIndex].id} />
                 </>
+              ) : (
+                <EmptyState
+                  icon={Settings}
+                  title="Connect Klaviyo to access tools"
+                  description="The More tab includes Klaviyo health monitoring, segment history trends, operation logs, and segment management tools. Connect your Klaviyo account to unlock these features."
+                  actionLabel="Connect Klaviyo"
+                  onAction={() => navigate('/klaviyo-setup')}
+                />
               )}
             </div>
           </TabsContent>
