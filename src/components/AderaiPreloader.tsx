@@ -1,11 +1,7 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AderaiLogo } from "@/components/AderaiLogo";
-
-// Lazy load sparkles to prevent crashes in sandboxed environments
-const SparklesCore = React.lazy(() => 
-  import("@/components/ui/sparkles").then(mod => ({ default: mod.SparklesCore })).catch(() => ({ default: () => null }))
-);
+import { SparklesCore } from "@/components/ui/sparkles";
 
 interface AderaiPreloaderProps {
   minDisplayTime?: number;
@@ -84,17 +80,15 @@ export const AderaiPreloader: React.FC<AderaiPreloaderProps> = ({
             <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-[5px] w-1/4 blur-sm" />
             <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-px w-1/4" />
 
-            {/* Core sparkles component - fail gracefully */}
-            <Suspense fallback={<div className="w-full h-full" />}>
-              <SparklesCore
-                background="transparent"
-                minSize={0.4}
-                maxSize={1}
-                particleDensity={1200}
-                className="w-full h-full"
-                particleColor="#F97316"
-              />
-            </Suspense>
+            {/* Core sparkles component */}
+            <SparklesCore
+              background="transparent"
+              minSize={0.4}
+              maxSize={1}
+              particleDensity={1200}
+              className="w-full h-full"
+              particleColor="#F97316"
+            />
 
             {/* Radial gradient mask to prevent sharp edges */}
             <div className="absolute inset-0 w-full h-full bg-background [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]" />
