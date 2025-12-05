@@ -239,6 +239,7 @@ export const useKlaviyoSegments = () => {
       let jobRecordId = existingJobId;
       
       if (!jobRecordId) {
+        console.log('[useKlaviyoSegments] Creating new job record for', availableSegmentIds.length, 'segments');
         const { data: job, error: jobError } = await supabase
           .from('segment_creation_jobs')
           .insert({
@@ -256,10 +257,16 @@ export const useKlaviyoSegments = () => {
           .select()
           .single();
 
-        if (jobError) throw jobError;
+        if (jobError) {
+          console.error('[useKlaviyoSegments] Failed to create job:', jobError.message, jobError.details);
+          throw jobError;
+        }
+        
+        console.log('[useKlaviyoSegments] Job created successfully with ID:', job.id);
         jobRecordId = job.id;
       } else {
-        await supabase
+        console.log('[useKlaviyoSegments] Updating existing job:', existingJobId);
+        const { error: updateError } = await supabase
           .from('segment_creation_jobs')
           .update({
             status: 'in_progress',
@@ -270,6 +277,10 @@ export const useKlaviyoSegments = () => {
             failed_segment_ids: []
           })
           .eq('id', existingJobId);
+          
+        if (updateError) {
+          console.error('[useKlaviyoSegments] Failed to update job:', updateError.message);
+        }
       }
 
       setJobId(jobRecordId);
