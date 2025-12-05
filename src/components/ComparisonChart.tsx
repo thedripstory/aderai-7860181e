@@ -88,7 +88,7 @@ export const ComparisonChart = () => {
       {/* Animated background elements - more subtle */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
-          className="absolute top-20 left-10 w-72 h-72 bg-muted/30 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-72 h-72 bg-muted/30 rounded-full blur-2xl"
           animate={{ 
             scale: [1, 1.2, 1],
             opacity: [0.2, 0.3, 0.2],
@@ -97,7 +97,7 @@ export const ComparisonChart = () => {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute bottom-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+          className="absolute bottom-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-2xl"
           animate={{ 
             scale: [1.2, 1, 1.2],
             opacity: [0.2, 0.1, 0.2],

@@ -159,8 +159,8 @@ export function Testimonials3D() {
   return (
     <section className="py-20 bg-gradient-to-br from-muted/50 via-background to-muted/50 relative overflow-hidden">
       {/* Decorative Elements */}
-      <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-2xl" />
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-2xl" />
       
       <div className="relative">
         <ScrollReveal>
