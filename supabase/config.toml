@@ -107,3 +107,6 @@ verify_jwt = true
 
 [functions.klaviyo-delete-aderai-segments]
 verify_jwt = true
+
+[functions.check-setup-status]
+verify_jwt = true

@@ -32,6 +32,7 @@ const SegmentHealthDashboard = lazy(() => import("./pages/SegmentHealthDashboard
 const AIFeaturesDashboard = lazy(() => import("./pages/AIFeaturesDashboard"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const JobHistory = lazy(() => import("./pages/JobHistory"));
+const AdminSetup = lazy(() => import("./pages/AdminSetup"));
 
 const queryClient = new QueryClient();
 
@@ -95,6 +96,7 @@ const App = () => {
                 <Route path="/jobs" element={<ProtectedRoute><JobHistory /></ProtectedRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+                <Route path="/admin/setup" element={<AdminProtectedRoute><AdminSetup /></AdminProtectedRoute>} />
                 <Route path="/help" element={<HelpCenter />} />
                 <Route path="*" element={<NotFound />} />
                 </Routes>
