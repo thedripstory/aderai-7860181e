@@ -99,18 +99,32 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             // verify directly with Stripe (webhook may not have processed yet)
             const paymentParam = searchParams.get('payment');
             if (paymentParam === 'success' && dbStatus !== 'active' && dbStatus !== 'trialing') {
-              // Wait a moment for webhook to process, then verify with Stripe
-              setTimeout(async () => {
+              // Give webhook 2.5 seconds to process first
+              const verifyWithRetries = async (attempt = 1, maxAttempts = 4) => {
                 const verified = await verifyWithStripe();
-                if (!verified) {
-                  // Still not active, show a helpful message
-                  toast.info('Verifying your payment... This may take a moment.', {
-                    duration: 5000,
+                if (verified) return;
+                
+                if (attempt < maxAttempts) {
+                  // Exponential backoff: 2s, 4s, 6s
+                  const delay = attempt * 2000;
+                  toast.info(`Verifying payment... (attempt ${attempt}/${maxAttempts})`, {
+                    duration: delay - 500,
                   });
-                  // Try again after a few seconds
-                  setTimeout(verifyWithStripe, 3000);
+                  setTimeout(() => verifyWithRetries(attempt + 1, maxAttempts), delay);
+                } else {
+                  toast.error('Payment verification taking longer than expected. Click "Check Payment Status" to retry.', {
+                    duration: 8000,
+                  });
                 }
-              }, 1500);
+              };
+              
+              setTimeout(() => verifyWithRetries(), 2500);
+            } else if (paymentParam === 'success' && (dbStatus === 'active' || dbStatus === 'trialing')) {
+              // Payment already processed by webhook, show success and clean URL
+              toast.success('Payment confirmed! Welcome to Aderai.');
+              searchParams.delete('payment');
+              searchParams.delete('session_id');
+              setSearchParams(searchParams, { replace: true });
             }
           }
         } catch (err) {
