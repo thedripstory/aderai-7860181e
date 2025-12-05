@@ -5,10 +5,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
   CheckCircle2, Clock, Loader2, 
   ExternalLink, AlertTriangle,
-  Package
+  Package, XCircle
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -19,6 +29,7 @@ import { ActiveJob } from './ActiveJobsButton';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { SEGMENTS } from '@/lib/segmentData';
+import { toast } from '@/hooks/use-toast';
 
 interface ActiveJobDetailModalProps {
   job: ActiveJob;
@@ -27,6 +38,8 @@ interface ActiveJobDetailModalProps {
 
 export function ActiveJobDetailModal({ job, onClose }: ActiveJobDetailModalProps) {
   const [liveJob, setLiveJob] = useState<ActiveJob>(job);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   
   // Subscribe to real-time updates for this specific job
   useEffect(() => {
@@ -51,6 +64,9 @@ export function ActiveJobDetailModal({ job, onClose }: ActiveJobDetailModalProps
   const isWaiting = liveJob.status === 'waiting_retry';
   const isComplete = liveJob.status === 'completed';
   const isPending = liveJob.status === 'pending';
+  const isCancelled = liveJob.status === 'cancelled';
+  const isFailed = liveJob.status === 'failed';
+  const isActive = ['in_progress', 'waiting_retry', 'pending'].includes(liveJob.status);
 
   // Get segment names for display
   const completedSegments = ((liveJob.completed_segment_ids || []) as string[]).map(id => {
@@ -75,156 +91,303 @@ export function ActiveJobDetailModal({ job, onClose }: ActiveJobDetailModalProps
   const remainingSegments = liveJob.total_segments - (liveJob.segments_processed || 0);
   const estimatedMinutes = Math.ceil(remainingSegments / 12 * 5);
 
+  async function handleCancelJob() {
+    setCancelling(true);
+    try {
+      const { error } = await supabase
+        .from('segment_creation_jobs')
+        .update({
+          status: 'cancelled',
+          completed_at: new Date().toISOString(),
+          error_message: 'Cancelled by user'
+        })
+        .eq('id', liveJob.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setLiveJob(prev => ({ ...prev, status: 'cancelled' }));
+      setShowCancelDialog(false);
+      
+      toast({
+        title: "Job Cancelled",
+        description: `${liveJob.segments_processed || 0} segments were created before cancellation.`,
+      });
+    } catch (error) {
+      console.error('Error cancelling job:', error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel job. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setCancelling(false);
+    }
+  }
+
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[85vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {isComplete ? (
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-            ) : isWaiting ? (
-              <Clock className="h-5 w-5 text-amber-500" />
-            ) : isPending ? (
-              <Clock className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
-            )}
-            {liveJob.client_name || 'Segment Creation'} Job
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {/* Status Banner */}
-          <div className={`p-3 rounded-lg mb-4 ${
-            isComplete 
-              ? 'bg-green-50 border border-green-200 dark:bg-green-950/50 dark:border-green-800' 
-              : isWaiting 
-                ? 'bg-amber-50 border border-amber-200 dark:bg-amber-950/50 dark:border-amber-800'
-                : 'bg-blue-50 border border-blue-200 dark:bg-blue-950/50 dark:border-blue-800'
-          }`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className={`font-medium ${
-                isComplete ? 'text-green-800 dark:text-green-200' : isWaiting ? 'text-amber-800 dark:text-amber-200' : 'text-blue-800 dark:text-blue-200'
-              }`}>
-                {isComplete 
-                  ? '✅ All segments created!' 
-                  : isWaiting 
-                    ? `⏸️ Paused - Resumes in ${waitMinutes} minutes`
-                    : isPending 
-                      ? '⏳ Queued - Starting soon...'
-                      : `🔄 Creating segments... (~${estimatedMinutes} min left)`
-                }
-              </span>
-              <Badge variant="outline">
-                {progress}%
-              </Badge>
+    <>
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center gap-2">
+                {isComplete ? (
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                ) : isCancelled ? (
+                  <XCircle className="h-5 w-5 text-muted-foreground" />
+                ) : isFailed ? (
+                  <XCircle className="h-5 w-5 text-red-500" />
+                ) : isWaiting ? (
+                  <Clock className="h-5 w-5 text-amber-500" />
+                ) : isPending ? (
+                  <Clock className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+                )}
+                {liveJob.client_name || 'Segment Creation'} Job
+              </DialogTitle>
+              
+              {/* Cancel Button - only show for active jobs */}
+              {isActive && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                  onClick={() => setShowCancelDialog(true)}
+                >
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+              )}
             </div>
-            <Progress value={progress} className="h-2" />
-            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-              <span>{liveJob.segments_processed || 0} completed</span>
-              <span>{remainingSegments} remaining</span>
-            </div>
-          </div>
+          </DialogHeader>
 
-          {/* Klaviyo Rate Limit Explanation */}
-          {isWaiting && (
-            <div className="p-3 bg-muted/50 rounded-lg mb-4 border">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
-                <div className="text-sm">
-                  <p className="font-medium text-foreground">Why is this paused?</p>
-                  <p className="text-muted-foreground mt-1">
-                    {liveJob.rate_limit_type === 'daily' 
-                      ? "Klaviyo limits segment creation to 100 per day per account. This is a Klaviyo platform restriction, not an Aderai limitation."
-                      : "Klaviyo limits segment creation to 15 per minute. We're automatically waiting to stay within their limits."
-                    }
-                  </p>
-                  <p className="text-muted-foreground mt-2 text-xs">
-                    ⚡ Don't worry - we'll automatically resume and email you when done.
-                  </p>
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {/* Cancelled State Banner */}
+            {isCancelled && (
+              <div className="p-3 bg-muted/50 rounded-lg mb-4 border">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <XCircle className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium text-foreground">Job Cancelled</p>
+                    <p className="text-sm">
+                      {liveJob.segments_processed || 0} segments were created before cancellation.
+                      {pendingSegments.length > 0 && (
+                        <> {pendingSegments.length} segments were not created.</>
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Segment Lists */}
-          <Tabs defaultValue="completed" className="flex-1 flex flex-col overflow-hidden">
-            <TabsList className="w-full">
-              <TabsTrigger value="completed" className="flex-1 gap-1">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Completed ({completedSegments.length})
-              </TabsTrigger>
-              <TabsTrigger value="pending" className="flex-1 gap-1">
-                <Clock className="h-3.5 w-3.5" />
-                Pending ({pendingSegments.length})
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="completed" className="flex-1 overflow-hidden mt-2">
-              <ScrollArea className="h-[200px] rounded border">
-                {completedSegments.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground text-sm">
-                    No segments completed yet
+            {/* Failed State Banner */}
+            {isFailed && (
+              <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg mb-4 border border-red-200 dark:border-red-800">
+                <div className="flex items-start gap-2 text-red-800 dark:text-red-200">
+                  <XCircle className="h-5 w-5 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Job Failed</p>
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      {(liveJob as any).error_message || 'An unexpected error occurred'}
+                    </p>
                   </div>
-                ) : (
-                  <div className="divide-y divide-border">
-                    {completedSegments.map((segment) => (
-                      <div key={segment.id} className="px-3 py-2 flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                        <span className="text-sm truncate">{segment.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </TabsContent>
-            
-            <TabsContent value="pending" className="flex-1 overflow-hidden mt-2">
-              <ScrollArea className="h-[200px] rounded border">
-                {pendingSegments.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground text-sm">
-                    All segments have been created! 🎉
-                  </div>
-                ) : (
-                  <div className="divide-y divide-border">
-                    {pendingSegments.map((segment) => (
-                      <div key={segment.id} className="px-3 py-2 flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground truncate">{segment.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </TabsContent>
-          </Tabs>
-
-          {/* Footer Info */}
-          <div className="mt-4 pt-3 border-t space-y-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Package className="h-3.5 w-3.5" />
-              <span>Started {formatDistanceToNow(new Date(liveJob.created_at), { addSuffix: true })}</span>
-            </div>
-            {isComplete && liveJob.completed_at && (
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>Completed {formatDistanceToNow(new Date(liveJob.completed_at), { addSuffix: true })}</span>
+                </div>
               </div>
             )}
-          </div>
 
-          {/* Action Button */}
-          {isComplete && (
-            <Button 
-              className="w-full mt-4 gap-2"
-              onClick={() => window.open('https://www.klaviyo.com/lists-segments', '_blank')}
+            {/* Status Banner */}
+            {!isCancelled && !isFailed && (
+              <div className={`p-3 rounded-lg mb-4 ${
+                isComplete 
+                  ? 'bg-green-50 border border-green-200 dark:bg-green-950/50 dark:border-green-800' 
+                  : isWaiting 
+                    ? 'bg-amber-50 border border-amber-200 dark:bg-amber-950/50 dark:border-amber-800'
+                    : 'bg-blue-50 border border-blue-200 dark:bg-blue-950/50 dark:border-blue-800'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`font-medium ${
+                    isComplete ? 'text-green-800 dark:text-green-200' : isWaiting ? 'text-amber-800 dark:text-amber-200' : 'text-blue-800 dark:text-blue-200'
+                  }`}>
+                    {isComplete 
+                      ? '✅ All segments created!' 
+                      : isWaiting 
+                        ? `⏸️ Paused - Resumes in ${waitMinutes} minutes`
+                        : isPending 
+                          ? '⏳ Queued - Starting soon...'
+                          : `🔄 Creating segments... (~${estimatedMinutes} min left)`
+                    }
+                  </span>
+                  <Badge variant="outline">
+                    {progress}%
+                  </Badge>
+                </div>
+                <Progress value={progress} className="h-2" />
+                <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                  <span>{liveJob.segments_processed || 0} completed</span>
+                  <span>{remainingSegments} remaining</span>
+                </div>
+              </div>
+            )}
+
+            {/* Klaviyo Rate Limit Explanation */}
+            {isWaiting && (
+              <div className="p-3 bg-muted/50 rounded-lg mb-4 border">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-foreground">Why is this paused?</p>
+                    <p className="text-muted-foreground mt-1">
+                      {liveJob.rate_limit_type === 'daily' 
+                        ? "Klaviyo limits segment creation to 100 per day per account. This is a Klaviyo platform restriction, not an Aderai limitation."
+                        : "Klaviyo limits segment creation to 15 per minute. We're automatically waiting to stay within their limits."
+                      }
+                    </p>
+                    <p className="text-muted-foreground mt-2 text-xs">
+                      ⚡ Don't worry - we'll automatically resume and email you when done.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Segment Lists */}
+            <Tabs defaultValue="completed" className="flex-1 flex flex-col overflow-hidden">
+              <TabsList className="w-full">
+                <TabsTrigger value="completed" className="flex-1 gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Completed ({completedSegments.length})
+                </TabsTrigger>
+                <TabsTrigger value="pending" className="flex-1 gap-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  Pending ({pendingSegments.length})
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="completed" className="flex-1 overflow-hidden mt-2">
+                <ScrollArea className="h-[200px] rounded border">
+                  {completedSegments.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground text-sm">
+                      No segments completed yet
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-border">
+                      {completedSegments.map((segment) => (
+                        <div key={segment.id} className="px-3 py-2 flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <span className="text-sm truncate">{segment.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </TabsContent>
+              
+              <TabsContent value="pending" className="flex-1 overflow-hidden mt-2">
+                <ScrollArea className="h-[200px] rounded border">
+                  {pendingSegments.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground text-sm">
+                      {isCancelled ? 'No pending segments (job was cancelled)' : 'All segments have been created! 🎉'}
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-border">
+                      {pendingSegments.map((segment) => (
+                        <div key={segment.id} className="px-3 py-2 flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground truncate">{segment.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </TabsContent>
+            </Tabs>
+
+            {/* Footer Info */}
+            <div className="mt-4 pt-3 border-t space-y-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Package className="h-3.5 w-3.5" />
+                <span>Started {formatDistanceToNow(new Date(liveJob.created_at), { addSuffix: true })}</span>
+              </div>
+              {(isComplete || isCancelled || isFailed) && liveJob.completed_at && (
+                <div className="flex items-center gap-2">
+                  {isComplete ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
+                  <span>
+                    {isComplete ? 'Completed' : isCancelled ? 'Cancelled' : 'Failed'}{' '}
+                    {formatDistanceToNow(new Date(liveJob.completed_at), { addSuffix: true })}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Action Button */}
+            {isComplete && (
+              <Button 
+                className="w-full mt-4 gap-2"
+                onClick={() => window.open('https://www.klaviyo.com/lists-segments', '_blank')}
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Segments in Klaviyo
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Cancel Segment Creation?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  Are you sure you want to cancel this job?
+                </p>
+                
+                <div className="bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+                    What happens when you cancel:
+                  </p>
+                  <ul className="text-sm text-amber-700 dark:text-amber-300 mt-2 space-y-1">
+                    <li>✅ <strong>{liveJob.segments_processed || 0}</strong> segments already created will remain in Klaviyo</li>
+                    <li>❌ <strong>{pendingSegments.length}</strong> pending segments will NOT be created</li>
+                    <li>⚠️ You can start a new job later to create the remaining segments</li>
+                  </ul>
+                </div>
+                
+                <p className="text-sm text-muted-foreground">
+                  Note: Segments already created in Klaviyo cannot be automatically removed. 
+                  You'll need to delete them manually in Klaviyo if needed.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelling}>
+              Keep Running
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelJob}
+              disabled={cancelling}
+              className="bg-destructive hover:bg-destructive/90"
             >
-              <ExternalLink className="h-4 w-4" />
-              View Segments in Klaviyo
-            </Button>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+              {cancelling ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                'Yes, Cancel Job'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

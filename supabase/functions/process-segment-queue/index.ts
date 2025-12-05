@@ -53,6 +53,19 @@ serve(async (req) => {
     for (const job of readyJobs) {
       console.log(`[process-segment-queue] Processing job ${job.id}...`);
 
+      // Re-fetch job to check if it was cancelled while we were processing
+      const { data: freshJob } = await supabase
+        .from('segment_creation_jobs')
+        .select('status')
+        .eq('id', job.id)
+        .single();
+      
+      // Skip if job was cancelled
+      if (freshJob?.status === 'cancelled') {
+        console.log(`[process-segment-queue] Job ${job.id} was cancelled, skipping`);
+        continue;
+      }
+
       // Update status to in_progress
       await supabase
         .from('segment_creation_jobs')
