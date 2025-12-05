@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Quote, TrendingUp } from 'lucide-react';
 
 interface FlipTestimonialCardProps {
@@ -24,23 +24,56 @@ export const FlipTestimonialCard = ({
   delay = "0s"
 }: FlipTestimonialCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   
-  // Auto-flip randomly to hint at back content
+  // Auto-flip only when card is visible (performance optimization)
   useEffect(() => {
-    const randomDelay = Math.random() * 10000 + 5000; // Random between 5-15 seconds
+    const cardElement = cardRef.current;
+    if (!cardElement) return;
     
-    const autoFlipInterval = setInterval(() => {
-      setIsFlipped(true);
-      setTimeout(() => {
-        setIsFlipped(false);
-      }, 3000); // Show back for 3 seconds
-    }, randomDelay + 15000); // Then repeat every 15+ seconds
+    let autoFlipInterval: NodeJS.Timeout | null = null;
+    let flipBackTimeout: NodeJS.Timeout | null = null;
     
-    return () => clearInterval(autoFlipInterval);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Start timer only when visible
+          if (!autoFlipInterval) {
+            const randomDelay = Math.random() * 10000 + 5000;
+            autoFlipInterval = setInterval(() => {
+              setIsFlipped(true);
+              flipBackTimeout = setTimeout(() => {
+                setIsFlipped(false);
+              }, 3000);
+            }, randomDelay + 15000);
+          }
+        } else {
+          // Stop timer when not visible
+          if (autoFlipInterval) {
+            clearInterval(autoFlipInterval);
+            autoFlipInterval = null;
+          }
+          if (flipBackTimeout) {
+            clearTimeout(flipBackTimeout);
+            flipBackTimeout = null;
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    observer.observe(cardElement);
+    
+    return () => {
+      observer.disconnect();
+      if (autoFlipInterval) clearInterval(autoFlipInterval);
+      if (flipBackTimeout) clearTimeout(flipBackTimeout);
+    };
   }, []);
 
   return (
     <div 
+      ref={cardRef}
       className="group perspective-1000 h-[480px] cursor-pointer animate-fade-in"
       style={{ animationDelay: delay }}
       onClick={() => setIsFlipped(!isFlipped)}
