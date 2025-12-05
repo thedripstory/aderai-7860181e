@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, Settings as SettingsIcon, HelpCircle, Sparkles, ArrowLeft } from 'lucide-react';
+import { LogOut, Settings as SettingsIcon, HelpCircle, Sparkles, ArrowLeft, Clock } from 'lucide-react';
 import { AderaiLogo } from '@/components/AderaiLogo';
 import { Button } from '@/components/ui/button';
 import {
@@ -104,6 +104,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 >
                   <HelpCircle className="w-4 h-4 mr-3 text-muted-foreground" />
                   <span className="font-medium">Help Center</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem 
+                  onClick={() => navigate('/jobs')}
+                  className="cursor-pointer py-2.5"
+                >
+                  <Clock className="w-4 h-4 mr-3 text-muted-foreground" />
+                  <span className="font-medium">Job History</span>
                 </DropdownMenuItem>
                 
                 {onStartTour && (
