@@ -37,7 +37,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
             Let's take a quick tour to help you get started with AI-powered customer segmentation.
           </p>
           <p className="text-sm text-muted-foreground text-center">
-            This will only take 30 seconds. You can skip or restart this tour anytime.
+            This will only take 30 seconds.
           </p>
         </div>
       ),
