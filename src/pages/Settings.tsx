@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/DashboardHeader";
+import { PrivacyBadge } from "@/components/PrivacyBadge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -676,10 +677,21 @@ export default function Settings() {
           <TabsContent value="thresholds">
             <Card className="border-border/50 shadow-lg">
               <CardHeader>
-                <CardTitle>Segmentation Thresholds</CardTitle>
-                <CardDescription>Configure your customer value and lifecycle parameters</CardDescription>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle>Segmentation Thresholds</CardTitle>
+                    <CardDescription>Configure your customer value and lifecycle parameters</CardDescription>
+                  </div>
+                  <PrivacyBadge variant="compact" />
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Privacy note */}
+                <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg flex items-center gap-2">
+                  <Lock className="h-4 w-4 flex-shrink-0" />
+                  <span>Your API key is encrypted and used only to create segments. We never access your customer data.</span>
+                </div>
+                
                 <div className="space-y-2">
                   <Label>Currency</Label>
                   <Select value={currency} onValueChange={setCurrency}>

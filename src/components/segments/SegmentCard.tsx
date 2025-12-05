@@ -1,5 +1,12 @@
 import { memo, useState } from 'react';
-import { CheckCircle2, Eye, Star, Info, Sparkles, MapPin, TrendingUp, MessageSquareWarning } from 'lucide-react';
+import { CheckCircle2, Eye, Star, Info, Sparkles, MapPin, TrendingUp, MessageSquareWarning, ExternalLink } from 'lucide-react';
+import { format } from 'date-fns';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { Segment } from '@/lib/segmentData';
 import {
   Dialog,
@@ -18,6 +25,12 @@ const PREDICTIVE_ANALYTICS_SEGMENTS = ['high-churn-risk', 'likely-purchase-soon'
 // Category-based segment IDs
 const CATEGORY_SEGMENTS = ['cross-sell', 'category-buyers', 'multi-category'];
 
+interface KlaviyoSegmentInfo {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 interface SegmentCardProps {
   segment: Segment;
   isSelected: boolean;
@@ -28,6 +41,8 @@ interface SegmentCardProps {
   index: number;
   customInputValue?: string;
   onCustomInputChange?: (value: string) => void;
+  isCreatedInKlaviyo?: boolean;
+  klaviyoInfo?: KlaviyoSegmentInfo;
 }
 
 const BirthdaySetupDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => (
@@ -696,6 +711,8 @@ export const SegmentCard = memo(function SegmentCard({
   index,
   customInputValue,
   onCustomInputChange,
+  isCreatedInKlaviyo = false,
+  klaviyoInfo,
 }: SegmentCardProps) {
   const [showBirthdayGuide, setShowBirthdayGuide] = useState(false);
   const [showProximityGuide, setShowProximityGuide] = useState(false);
@@ -742,18 +759,55 @@ export const SegmentCard = memo(function SegmentCard({
   return (
     <>
       <div
-        className={`group relative p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer animate-fade-in ${
-          isUnavailable
-            ? "border-dashed border-amber-500/50 bg-amber-500/5 hover:border-amber-500/70"
+        className={`group relative p-5 rounded-xl border-2 transition-all duration-300 animate-fade-in ${
+          isCreatedInKlaviyo
+            ? "border-green-300 bg-green-50 dark:bg-green-950/20 cursor-default opacity-75"
+            : isUnavailable
+            ? "border-dashed border-amber-500/50 bg-amber-500/5 hover:border-amber-500/70 cursor-pointer"
             : isSelected
-            ? "border-primary bg-primary/10 shadow-md"
-            : "border-border hover:border-primary/50 hover:shadow-sm bg-card"
+            ? "border-primary bg-primary/10 shadow-md cursor-pointer"
+            : "border-border hover:border-primary/50 hover:shadow-sm bg-card cursor-pointer"
         }`}
         style={{ animationDelay: `${index * 30}ms` }}
-        onClick={handleClick}
+        onClick={isCreatedInKlaviyo ? undefined : handleClick}
       >
+        {/* Created in Klaviyo badge */}
+        {isCreatedInKlaviyo && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute -top-2 -right-2 z-10">
+                  <div className="flex items-center gap-1 bg-green-600 text-white px-2.5 py-1 rounded-full text-xs font-medium shadow-sm">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    <span>Created</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <div className="space-y-2">
+                  <p className="font-medium">Already in Klaviyo ✓</p>
+                  {klaviyoInfo?.createdAt && (
+                    <p className="text-xs text-muted-foreground">
+                      Created {format(new Date(klaviyoInfo.createdAt), 'MMM d, yyyy')}
+                    </p>
+                  )}
+                  <a 
+                    href="https://www.klaviyo.com/lists-segments" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline flex items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    View in Klaviyo <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+
         {/* Manual setup badge for unavailable segments */}
-        {isUnavailable && (
+        {isUnavailable && !isCreatedInKlaviyo && (
           <div className="absolute -top-2 left-4 px-2 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center gap-1">
             <Info className="w-3 h-3" />
             SETUP GUIDE
@@ -761,7 +815,7 @@ export const SegmentCard = memo(function SegmentCard({
         )}
 
         {/* Custom input badge for segments requiring input */}
-        {requiresInput && !isUnavailable && (
+        {requiresInput && !isUnavailable && !isCreatedInKlaviyo && (
           <div className="absolute -top-2 left-4 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center gap-1">
             <MapPin className="w-3 h-3" />
             CUSTOMIZABLE
