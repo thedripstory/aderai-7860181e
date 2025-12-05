@@ -306,7 +306,7 @@ export const DashboardOverview = () => {
           {/* CTA section */}
           <div className="flex-shrink-0">
             <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:shadow-primary/40 group-hover:scale-105 transition-all duration-300">
-              <span>Access Free Guide</span>
+              <span>Access Guide</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
