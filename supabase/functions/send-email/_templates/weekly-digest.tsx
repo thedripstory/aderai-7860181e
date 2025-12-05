@@ -251,8 +251,8 @@ const motivationText = {
 };
 
 const celebrationBox = {
-  backgroundColor: '#D4EDDA',
-  border: '2px solid #C3E6CB',
+  backgroundColor: '#FFF8F3',
+  border: '2px solid #FFE8D9',
   borderRadius: '8px',
   padding: '20px',
   margin: '25px 0',
@@ -260,14 +260,14 @@ const celebrationBox = {
 };
 
 const celebrationTitle = {
-  color: '#155724',
+  color: '#EA580C',
   fontSize: '18px',
   fontWeight: 'bold',
   margin: '0 0 12px',
 };
 
 const celebrationText = {
-  color: '#155724',
+  color: '#333333',
   fontSize: '14px',
   lineHeight: '22px',
   margin: '0',
@@ -304,15 +304,15 @@ const secondaryButton = {
 };
 
 const tipBox = {
-  backgroundColor: '#E3F2FD',
-  border: '2px solid #BBDEFB',
+  backgroundColor: '#FFF8F3',
+  border: '2px solid #FFE8D9',
   borderRadius: '8px',
   padding: '20px',
   margin: '25px 0',
 };
 
 const tipTitle = {
-  color: '#1565C0',
+  color: '#EA580C',
   fontSize: '16px',
   fontWeight: 'bold',
   margin: '0 0 8px',

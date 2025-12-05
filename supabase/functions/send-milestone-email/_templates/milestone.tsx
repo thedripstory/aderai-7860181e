@@ -248,15 +248,15 @@ const statDivider = {
 };
 
 const nextStepsBox = {
-  backgroundColor: '#E8F5E9',
-  border: '2px solid #C8E6C9',
+  backgroundColor: '#FFF8F3',
+  border: '2px solid #FFE8D9',
   borderRadius: '8px',
   padding: '20px',
   margin: '25px 0',
 };
 
 const nextStepsTitle = {
-  color: '#2E7D32',
+  color: '#EA580C',
   fontSize: '16px',
   fontWeight: 'bold',
   margin: '0 0 12px',
@@ -265,7 +265,7 @@ const nextStepsTitle = {
 const nextStepsList = {
   margin: '0',
   padding: '0 0 0 20px',
-  color: '#2E7D32',
+  color: '#333333',
 };
 
 const nextStepsItem = {

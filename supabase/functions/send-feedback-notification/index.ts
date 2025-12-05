@@ -68,8 +68,8 @@ const handler = async (req: Request): Promise<Response> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: "Akshat from Aderai <akshat@updates.aderai.io>",
-        to: ["akshat@aderai.io"],
+        from: "Aderai <hello@updates.aderai.io>",
+        to: ["hello@aderai.io"],
         subject: `New ${typeDisplay} from ${userName}`,
         html: `
           <h2>New ${typeDisplay} Received</h2>

@@ -201,15 +201,15 @@ const featureItem = {
 };
 
 const tipBox = {
-  backgroundColor: '#E3F2FD',
-  border: '2px solid #BBDEFB',
+  backgroundColor: '#FFF8F3',
+  border: '2px solid #FFE8D9',
   borderRadius: '8px',
   padding: '20px',
   margin: '25px 0',
 };
 
 const tipTitle = {
-  color: '#1565C0',
+  color: '#EA580C',
   fontSize: '16px',
   fontWeight: 'bold',
   margin: '0 0 8px',
