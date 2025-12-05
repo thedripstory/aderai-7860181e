@@ -393,15 +393,31 @@ function getSegmentDefinition(
     // CUSTOMER LIFECYCLE & VALUE (per Notion guide)
     // =====================================
     
-    // #18 New Subscribers - 0 purchases all time
+    // #18 New Subscribers - 0 purchases all time AND joined list in last 30 days
     'new-subscribers': placedOrderId ? {
       name: `New Subscribers${ADERAI_SUFFIX}`,
       definition: {
-        condition_groups: [{
-          conditions: [
-            buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
-          ]
-        }]
+        condition_groups: [
+          {
+            conditions: [
+              buildMetricCondition(placedOrderId, 'count', 'equals', 0, { type: 'over-all-time' })
+            ]
+          },
+          {
+            conditions: [
+              {
+                type: 'profile-property',
+                property: 'created',
+                filter: {
+                  type: 'date',
+                  operator: 'in-the-last',
+                  quantity: 30,
+                  unit: 'day'
+                }
+              }
+            ]
+          }
+        ]
       }
     } : null,
     
