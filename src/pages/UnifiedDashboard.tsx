@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Loader, Target, Sparkles, Settings } from 'lucide-react';
+import { Target, Sparkles, Settings } from 'lucide-react';
+import { AderaiPreloader } from '@/components/AderaiPreloader';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -261,11 +262,7 @@ export default function UnifiedDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader className="w-12 h-12 animate-spin text-primary" />
-      </div>
-    );
+    return <AderaiPreloader minDisplayTime={1500} />;
   }
 
   if (view === 'creating' || view === 'results') {
