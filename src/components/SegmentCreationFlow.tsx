@@ -1,11 +1,39 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle, AlertCircle, Target, Info, Clock, SkipForward } from 'lucide-react';
+import { CheckCircle, AlertCircle, Target, Info, Clock, SkipForward, AlertTriangle } from 'lucide-react';
 import { SegmentResult, BatchProgress } from '@/hooks/useKlaviyoSegments';
 import { SEGMENTS, applySegmentSettings, UserSegmentSettings, DEFAULT_SEGMENT_SETTINGS } from '@/lib/segmentData';
-import { Progress } from '@/components/ui/progress';
 import { SuccessAnimation } from '@/components/SuccessAnimation';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Helper types and functions for result state management
+interface ResultStats {
+  created: number;
+  queued: number;
+  failed: number;
+  skipped: number;
+  total: number;
+}
+
+type ResultState = 'all_queued' | 'partial_success' | 'all_success' | 'all_failed' | 'mixed';
+
+function calculateResultStats(results: Array<{ status: string }>): ResultStats {
+  return {
+    created: results.filter(r => r.status === 'success').length,
+    queued: results.filter(r => r.status === 'queued').length,
+    failed: results.filter(r => r.status === 'error').length,
+    skipped: results.filter(r => r.status === 'skipped').length,
+    total: results.length,
+  };
+}
+
+function getResultState(stats: ResultStats): ResultState {
+  if (stats.created === 0 && stats.queued > 0 && stats.failed === 0) return 'all_queued';
+  if (stats.created > 0 && stats.queued === 0 && stats.failed === 0) return 'all_success';
+  if (stats.created === 0 && stats.queued === 0 && stats.failed > 0) return 'all_failed';
+  if (stats.created > 0 && stats.queued > 0 && stats.failed === 0) return 'partial_success';
+  return 'mixed';
+}
 
 interface SegmentCreationFlowProps {
   loading: boolean;
@@ -26,39 +54,22 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
 }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Calculate stats and state
+  const stats = useMemo(() => calculateResultStats(results), [results]);
+  const resultState = useMemo(() => getResultState(stats), [stats]);
   
   const failedResults = useMemo(() => 
     results.filter(r => r.status === 'error'),
     [results]
   );
   
-  const queuedResults = useMemo(() => 
-    results.filter(r => r.status === 'queued'),
-    [results]
-  );
-  
-  const hasFailures = failedResults.length > 0;
-  const hasQueued = queuedResults.length > 0;
-  
-  const successfulCount = useMemo(() => 
-    results.filter(r => r.status === 'success').length,
-    [results]
-  );
-  
-  const totalCount = results.length;
-  
-  // Determine the overall status
-  const isFullyComplete = successfulCount > 0 && !hasQueued && !hasFailures;
-  const isPartialWithQueued = hasQueued;
-  const isAllFailed = hasFailures && successfulCount === 0 && !hasQueued;
-  
   const progressPercent = useMemo(() => {
     if (batchProgress && loading) {
       return (batchProgress.segmentsProcessed / batchProgress.totalSegments) * 100;
     }
-    return totalCount > 0 ? (results.length / Math.max(totalCount, 1)) * 100 : 0;
-  }, [totalCount, results.length, batchProgress, loading]);
+    return stats.total > 0 ? ((stats.created + stats.queued + stats.failed + stats.skipped) / stats.total) * 100 : 0;
+  }, [stats, batchProgress, loading]);
 
   // Get current segment being processed with settings applied
   const currentSegment = useMemo(() => {
@@ -72,19 +83,61 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
     return null;
   }, [results, userSettings]);
 
-  // Show success animation ONLY when all segments complete successfully (no queued, no failed)
+  // Show success animation ONLY for all_success state
   useEffect(() => {
-    if (!loading && results.length > 0 && isFullyComplete) {
+    if (!loading && results.length > 0 && resultState === 'all_success') {
       setShowSuccess(true);
     }
-  }, [loading, results, isFullyComplete]);
+  }, [loading, results, resultState]);
+
+  // State configuration for different result states
+  const stateConfig = {
+    all_queued: {
+      icon: Clock,
+      iconBg: 'bg-blue-500/10',
+      iconColor: 'text-blue-500',
+      title: 'Segments Queued',
+      subtitle: `${stats.queued} segment${stats.queued !== 1 ? 's' : ''} will be created in the background`,
+    },
+    partial_success: {
+      icon: CheckCircle,
+      iconBg: 'bg-green-500/10',
+      iconColor: 'text-green-500',
+      title: `${stats.created} Segment${stats.created !== 1 ? 's' : ''} Created`,
+      subtitle: `${stats.queued} more queued for background processing`,
+    },
+    all_success: {
+      icon: CheckCircle,
+      iconBg: 'bg-green-500/10',
+      iconColor: 'text-green-500',
+      title: 'Segments Created!',
+      subtitle: `Successfully created ${stats.created} segment${stats.created !== 1 ? 's' : ''} in Klaviyo`,
+    },
+    all_failed: {
+      icon: AlertCircle,
+      iconBg: 'bg-destructive/10',
+      iconColor: 'text-destructive',
+      title: 'Creation Failed',
+      subtitle: `${stats.failed} segment${stats.failed !== 1 ? 's' : ''} could not be created`,
+    },
+    mixed: {
+      icon: AlertTriangle,
+      iconBg: 'bg-amber-500/10',
+      iconColor: 'text-amber-500',
+      title: 'Partially Complete',
+      subtitle: `${stats.created} created${stats.queued > 0 ? `, ${stats.queued} queued` : ''}${stats.failed > 0 ? `, ${stats.failed} failed` : ''}`,
+    },
+  };
+
+  const currentConfig = stateConfig[resultState];
+  const HeaderIcon = currentConfig.icon;
 
   return (
     <>
       <SuccessAnimation
         show={showSuccess}
         title="Segments Created!"
-        description={`Successfully created ${successfulCount} segment${successfulCount !== 1 ? 's' : ''} in Klaviyo`}
+        description={`Successfully created ${stats.created} segment${stats.created !== 1 ? 's' : ''} in Klaviyo`}
         onComplete={() => {
           setShowSuccess(false);
           navigate('/dashboard');
@@ -104,18 +157,11 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                 {loading ? (
                   /* Aggressive rotating loader */
                   <div className="relative w-12 h-12">
-                    {/* Outer rotating ring */}
                     <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
-                    
-                    {/* Middle counter-rotating ring */}
                     <div className="absolute inset-1.5 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
-                    
-                    {/* Inner pulsing core */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-3 h-3 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
                     </div>
-                    
-                    {/* Orbiting particles */}
                     <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent" />
                     </div>
@@ -123,34 +169,18 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-orange-500" />
                     </div>
                   </div>
-                ) : hasFailures && !hasQueued ? (
-                  <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
-                    <AlertCircle className="w-6 h-6 text-destructive" />
-                  </div>
-                ) : hasQueued ? (
-                  <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-blue-500" />
-                  </div>
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-green-500" />
+                  <div className={`w-12 h-12 rounded-full ${currentConfig.iconBg} flex items-center justify-center`}>
+                    <HeaderIcon className={`w-6 h-6 ${currentConfig.iconColor}`} />
                   </div>
                 )}
               </div>
               <h2 className="text-xl font-semibold text-foreground">
-                {loading 
-                  ? 'Creating Segments...' 
-                  : hasQueued 
-                    ? 'Segments Queued'
-                    : hasFailures 
-                      ? 'Some Segments Failed' 
-                      : 'Segments Created!'}
+                {loading ? 'Creating Segments...' : currentConfig.title}
               </h2>
-              {!loading && hasQueued && (
+              {!loading && (
                 <p className="text-sm text-muted-foreground mt-1 text-center px-4">
-                  {successfulCount > 0 
-                    ? `${successfulCount} created, ${queuedResults.length} processing in background`
-                    : `${queuedResults.length} segment${queuedResults.length !== 1 ? 's' : ''} processing in background`}
+                  {currentConfig.subtitle}
                 </p>
               )}
             </div>
@@ -195,11 +225,10 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                     <span>Processing batch {batchProgress.currentBatch} of {batchProgress.totalBatches}</span>
                   </div>
                   
-                  {/* API limitation notice */}
                   <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                     <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
                     <p className="text-xs text-blue-600 dark:text-blue-400">
-                      Klaviyo limits segment creation to 5 at a time. We're processing your {batchProgress.totalSegments} segments in {batchProgress.totalBatches} batches with automatic retry to ensure 100% success.
+                      Klaviyo limits segment creation to 5 at a time. We're processing your {batchProgress.totalSegments} segments in {batchProgress.totalBatches} batches.
                     </p>
                   </div>
                   
@@ -219,7 +248,7 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                     ? `${batchProgress.segmentsProcessed} of ${batchProgress.totalSegments}` 
                     : loading 
                       ? 'Processing...' 
-                      : `${successfulCount} of ${totalCount} complete`}
+                      : `${stats.created} of ${stats.total} complete`}
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -232,14 +261,14 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
               </div>
             </div>
 
-            {/* Results list (collapsed view) */}
+            {/* Results list */}
             {!loading && results.length > 0 && (
               <div className="px-6 pb-4 max-h-48 overflow-y-auto">
                 <div className="space-y-2">
                   {results.map((result, idx) => {
                     const segment = SEGMENTS.find((s) => s.id === result.segmentId);
                     
-                    const statusConfig: Record<string, { bg: string; text: string; icon: any; label?: string }> = {
+                    const statusConfig: Record<string, { bg: string; text: string; icon: React.ElementType; label?: string }> = {
                       success: { bg: 'bg-green-500/10', text: 'text-green-600', icon: CheckCircle },
                       error: { bg: 'bg-red-500/10', text: 'text-red-600', icon: AlertCircle },
                       queued: { bg: 'bg-blue-500/10', text: 'text-blue-600', icon: Clock, label: 'Queued' },
@@ -267,31 +296,34 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
             )}
             
             {/* Queued segments explanation banner */}
-            {!loading && results.some(r => r.status === 'queued') && (
+            {!loading && stats.queued > 0 && (
               <div className="mx-6 mb-4 flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                 <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  Some segments are queued due to Klaviyo's rate limits. They'll be created automatically in the background and you'll receive an email when complete.
-                </p>
+                <div className="text-xs text-blue-600 dark:text-blue-400">
+                  <p>Segments are queued due to Klaviyo's rate limits. They'll be created automatically in the background.</p>
+                  <Link to="/jobs" className="underline font-medium mt-1 inline-block">
+                    View Job Progress →
+                  </Link>
+                </div>
               </div>
             )}
 
             {/* Action buttons */}
             {!loading && (
               <div className="px-6 pb-6 space-y-2">
-                {hasFailures && onRetryFailed && (
+                {stats.failed > 0 && onRetryFailed && (
                   <button
                     onClick={() => onRetryFailed(failedResults.map(r => r.segmentId))}
                     className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition-colors"
                   >
-                    Retry Failed ({failedResults.length})
+                    Retry Failed ({stats.failed})
                   </button>
                 )}
                 <button
                   onClick={onViewResults}
                   className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
                 >
-                  {hasFailures ? 'Continue' : 'Done'}
+                  {stats.failed > 0 ? 'Continue' : 'Done'}
                 </button>
               </div>
             )}
