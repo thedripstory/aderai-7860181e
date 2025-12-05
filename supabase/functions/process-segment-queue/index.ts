@@ -22,12 +22,14 @@ serve(async (req) => {
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
-    // Find jobs ready for retry
+    const now = new Date().toISOString();
+    
+    // Find jobs ready for retry (handle both NULL and past retry_after times)
     const { data: readyJobs, error } = await supabase
       .from('segment_creation_jobs')
       .select('*')
       .eq('status', 'waiting_retry')
-      .lte('retry_after', new Date().toISOString())
+      .or(`retry_after.lte.${now},retry_after.is.null`)
       .order('created_at', { ascending: true })
       .limit(MAX_JOBS_PER_RUN);
 
@@ -56,13 +58,33 @@ serve(async (req) => {
       // Re-fetch job to check if it was cancelled while we were processing
       const { data: freshJob } = await supabase
         .from('segment_creation_jobs')
-        .select('status')
+        .select('status, pending_segment_ids, completed_segment_ids')
         .eq('id', job.id)
         .single();
       
       // Skip if job was cancelled
       if (freshJob?.status === 'cancelled') {
         console.log(`[process-segment-queue] Job ${job.id} was cancelled, skipping`);
+        continue;
+      }
+
+      // FIX: Handle stuck jobs with empty pending_segment_ids
+      const freshPendingIds = freshJob?.pending_segment_ids || [];
+      const freshCompletedIds = freshJob?.completed_segment_ids || [];
+      if (freshPendingIds.length === 0 && freshCompletedIds.length > 0) {
+        console.log(`[process-segment-queue] Job ${job.id} has no pending segments but is still waiting_retry - marking as completed`);
+        await supabase
+          .from('segment_creation_jobs')
+          .update({
+            status: 'completed',
+            completed_at: new Date().toISOString(),
+            segments_processed: freshCompletedIds.length,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', job.id);
+        
+        // Send completion email for this cleaned up job
+        await sendCompletionEmail(supabase, job, freshCompletedIds);
         continue;
       }
 

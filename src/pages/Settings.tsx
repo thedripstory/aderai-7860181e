@@ -111,7 +111,7 @@ export default function Settings() {
         .eq("is_active", true)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (keyData) {
         setActiveKey(keyData);
@@ -129,7 +129,7 @@ export default function Settings() {
         .from("notification_preferences")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (notifPrefs) {
         setEmailOnSegmentCreation(notifPrefs.email_on_segment_creation ?? true);
