@@ -19,7 +19,7 @@ Before deploying to production, complete these steps:
 - [ ] Verify error handling
 
 ### 3. Environment Variables
-- [ ] All production secrets configured in Lovable Cloud
+- [ ] All production secrets configured in Cloud dashboard
 - [ ] SITE_URL set to production domain
 - [ ] RESEND_API_KEY configured
 - [ ] ENCRYPTION_KEY generated and set
@@ -39,12 +39,12 @@ Before deploying to production, complete these steps:
 
 ## Deploy Frontend
 
-Aderai uses **Lovable's built-in deployment** - no external hosting required!
+Aderai uses **automatic deployment** - no external hosting required!
 
 ### Deploy Steps
 
 1. **Click Publish Button**
-   - Located in top-right corner of Lovable editor
+   - Located in top-right corner of the editor
    - On mobile: Bottom-right when in Preview mode
 
 2. **Review Changes**
@@ -64,13 +64,13 @@ Aderai uses **Lovable's built-in deployment** - no external hosting required!
 
 To use your own domain (e.g., aderai.io):
 
-1. Go to Project Settings → Domains in Lovable
+1. Go to Project Settings → Domains
 2. Click "Add Custom Domain"
 3. Enter your domain name
 4. Follow DNS configuration instructions
 5. Wait for SSL certificate to provision (up to 24 hours)
 
-**Note**: Custom domains require a paid Lovable plan.
+**Note**: Custom domains require a paid plan.
 
 ## Deploy Edge Functions
 
@@ -78,14 +78,14 @@ Edge functions deploy **automatically** when you make changes:
 
 1. Edit function code in `supabase/functions/`
 2. Functions redeploy automatically on save
-3. Check deployment status in Lovable Cloud tab
+3. Check deployment status in Cloud tab
 4. Verify function logs show no errors
 
 ### Manual Edge Function Deployment
 
 If you need to manually trigger deployment:
 
-1. Go to Cloud → Edge Functions in Lovable
+1. Go to Cloud → Edge Functions
 2. Click on the function you want to redeploy
 3. Click "Deploy" button
 4. Wait for deployment to complete
@@ -131,7 +131,7 @@ If you need to manually trigger deployment:
 After deployment, monitor these metrics:
 
 1. **Application Health**
-   - Go to Cloud → Logs in Lovable
+   - Go to Cloud → Logs
    - Check for error spikes
    - Monitor response times
    - Verify function execution
@@ -160,7 +160,7 @@ If deployment fails or introduces critical bugs:
 
 ### Frontend Rollback
 
-1. Go to Lovable project history
+1. Go to project history
 2. Click "Restore" on previous working version
 3. Click "Publish" to deploy
 4. Verify rollback successful
@@ -169,14 +169,14 @@ If deployment fails or introduces critical bugs:
 
 1. Git checkout previous working commit
 2. Functions will automatically redeploy
-3. Or manually restore function code in Lovable editor
+3. Or manually restore function code in editor
 4. Verify function logs show no errors
 
 ### Database Rollback
 
 **WARNING**: Database rollbacks are destructive and should be last resort.
 
-1. Go to Cloud → Database in Lovable
+1. Go to Cloud → Database
 2. Click "Backups"
 3. Select backup to restore
 4. **This will overwrite current data**
@@ -186,14 +186,14 @@ If deployment fails or introduces critical bugs:
 
 ### Deployment Fails
 
-1. Check build logs in Lovable
+1. Check build logs
 2. Verify all dependencies installed
 3. Check for TypeScript errors
 4. Review recent code changes
 
 ### Edge Functions Not Working
 
-1. Check function logs in Lovable Cloud
+1. Check function logs in Cloud
 2. Verify environment variables set
 3. Check function deployment status
 4. Test function with curl/Postman
@@ -227,7 +227,7 @@ If deployment fails or introduces critical bugs:
    - Consider read replicas
 
 3. **CDN Optimization**
-   - Leverage Lovable's built-in CDN
+   - Leverage built-in CDN
    - Optimize images
    - Enable compression
 
@@ -240,7 +240,7 @@ If deployment fails or introduces critical bugs:
 
 After deployment, verify:
 
-- [ ] HTTPS enabled (automatic with Lovable)
+- [ ] HTTPS enabled (automatic)
 - [ ] CORS configured correctly
 - [ ] Rate limiting active
 - [ ] Input validation working
@@ -271,13 +271,9 @@ After deployment, verify:
 
 ## Emergency Contacts
 
-- **Lovable Support**: support@lovable.dev
-- **Lovable Discord**: https://discord.gg/lovable
-- **Project Owner**: akshat@aderai.io
+- **Project Owner**: hello@aderai.io
 
 ## Additional Resources
 
-- [Lovable Documentation](https://docs.lovable.dev/)
-- [Lovable Cloud Features](https://docs.lovable.dev/features/cloud)
 - [Supabase Documentation](https://supabase.com/docs)
 - [Resend Documentation](https://resend.com/docs)

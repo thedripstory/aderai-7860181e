@@ -4,7 +4,7 @@
 
 ### Development (.env)
 ```env
-# Supabase (auto-set by Lovable Cloud)
+# Supabase (auto-configured)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_SUPABASE_PROJECT_ID=your_project_id
@@ -13,7 +13,7 @@ VITE_SUPABASE_PROJECT_ID=your_project_id
 VITE_SITE_URL=http://localhost:5173
 ```
 
-### Production (Supabase Dashboard → Edge Functions → Secrets)
+### Production (Cloud Dashboard → Edge Functions → Secrets)
 
 #### Required for Core Functionality
 ```env
@@ -49,14 +49,14 @@ OPENAI_API_KEY=sk-xxx                # OpenAI Platform → API Keys
 ### 2. Get API Keys
 - Go to Developers → API Keys
 - Copy the **Secret key** (starts with `sk_live_` for production)
-- Add as `STRIPE_SECRET_KEY` in Supabase secrets
+- Add as `STRIPE_SECRET_KEY` in Cloud secrets
 
 ### 3. Create Product & Price
 - Go to Products → Add Product
 - Name: "Aderai Monthly"
 - Price: $9.00 USD, Recurring monthly
 - Copy the **Price ID** (starts with `price_`)
-- Add as `STRIPE_PRICE_ID` in Supabase secrets
+- Add as `STRIPE_PRICE_ID` in Cloud secrets
 
 ### 4. Set Up Webhook
 - Go to Developers → Webhooks → Add endpoint
@@ -67,15 +67,15 @@ OPENAI_API_KEY=sk-xxx                # OpenAI Platform → API Keys
   - `customer.subscription.deleted`
   - `invoice.payment_failed`
 - Copy the **Signing secret** (starts with `whsec_`)
-- Add as `STRIPE_WEBHOOK_SECRET` in Supabase secrets
+- Add as `STRIPE_WEBHOOK_SECRET` in Cloud secrets
 
 ### 5. Verify Setup
 - Go to /admin/setup in your Aderai app
 - All Stripe checks should show green ✓
 
-## How to Set Supabase Secrets
+## How to Set Cloud Secrets
 
-1. Go to your Supabase project dashboard
+1. Go to your project dashboard
 2. Navigate to Edge Functions → Secrets
 3. Click "Add Secret"
 4. Enter the name (e.g., `STRIPE_SECRET_KEY`)
@@ -121,11 +121,11 @@ Go to /admin/setup in your Aderai app to see which variables are configured.
 1. Verify webhook URL in Stripe Dashboard
 2. Check webhook signing secret matches
 3. Verify all 4 event types are selected
-4. Check Supabase Edge Function logs
+4. Check Edge Function logs
 
 ### "Payment system not configured" Error
 - Missing `STRIPE_SECRET_KEY` secret
-- Add it in Supabase Dashboard → Edge Functions → Secrets
+- Add it in Cloud Dashboard → Edge Functions → Secrets
 
 ### "Subscription plan not found" Error
 - Missing or invalid `STRIPE_PRICE_ID`
@@ -138,7 +138,7 @@ Go to /admin/setup in your Aderai app to see which variables are configured.
 4. Verify `.env` file location (project root)
 
 ### Edge Functions Not Working
-1. Verify secrets are set in Lovable Cloud
+1. Verify secrets are set in Cloud dashboard
 2. Check Edge Function logs for errors
 3. Ensure function is deployed
 4. Verify function has access to secrets

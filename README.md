@@ -16,7 +16,7 @@ Free SaaS tool that simplifies Klaviyo email segmentation for e-commerce brands.
 ## Tech Stack
 
 - React 18, TypeScript, Tailwind CSS
-- Lovable Cloud (Supabase)
+- Supabase (Database, Auth, Edge Functions)
 - Resend API for emails
 - OpenAI for AI features
 
@@ -38,8 +38,4 @@ See [TESTING_CHECKLIST.md](./TESTING_CHECKLIST.md) for testing guide.
 
 ## Support
 
-Email: akshat@aderai.io
-
----
-
-Built with [Lovable](https://lovable.dev)
+Email: hello@aderai.io
