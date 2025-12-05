@@ -1079,16 +1079,6 @@ export default function Settings() {
                               )}
                             </Button>
 
-                            {subscriptionDetails.status === 'active' && 
-                             !subscriptionDetails.cancelAtPeriodEnd && (
-                              <Button
-                                variant="outline"
-                                onClick={() => setShowCancelConfirm(true)}
-                                className="text-muted-foreground hover:text-destructive hover:border-destructive"
-                              >
-                                Cancel Subscription
-                              </Button>
-                            )}
                           </>
                         ) : (
                           <Button
