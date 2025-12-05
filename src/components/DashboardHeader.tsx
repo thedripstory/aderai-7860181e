@@ -12,6 +12,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { trackEvent, resetAnalytics } from '@/lib/analytics';
+import { ActiveJobsButton } from './ActiveJobsButton';
 
 interface DashboardHeaderProps {
   onStartTour?: () => void;
@@ -60,6 +61,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <span className="hidden sm:inline">Dashboard</span>
               </Button>
             )}
+            
+            {/* Active Jobs Button */}
+            <ActiveJobsButton />
             
             {/* Dynamic content slot */}
             {children}
