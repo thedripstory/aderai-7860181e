@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, User, Lock, AlertCircle, Bell, CreditCard, ExternalLink, Calendar, CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, User, Lock, AlertCircle, Bell, CreditCard, ExternalLink, Calendar, CheckCircle2, XCircle, AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { PrivacyBadge } from "@/components/PrivacyBadge";
+import { CleanupAderaiSegments } from "@/components/CleanupAderaiSegments";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1167,6 +1168,30 @@ export default function Settings() {
                   </p>
                 </CardContent>
               </Card>
+
+              {/* Danger Zone Card */}
+              {activeKey && (
+                <Card id="danger-zone" className="border-destructive/30 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2 text-destructive">
+                      <Trash2 className="w-5 h-5" />
+                      Danger Zone
+                    </CardTitle>
+                    <CardDescription>Irreversible actions - proceed with caution</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CleanupAderaiSegments 
+                      klaviyoKeyId={activeKey.id}
+                      onComplete={() => {
+                        toast({
+                          title: "Cleanup Complete",
+                          description: "All Aderai segments have been removed from Klaviyo",
+                        });
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Cancel Confirmation Dialog */}
