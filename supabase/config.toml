@@ -95,3 +95,9 @@ verify_jwt = true
 
 [functions.stripe-resume-subscription]
 verify_jwt = true
+
+[functions.process-segment-queue]
+verify_jwt = false
+
+[functions.track-email-event]
+verify_jwt = false

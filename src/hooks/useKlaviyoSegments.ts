@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorLogger } from '@/lib/errorLogger';
+import { useToast } from '@/hooks/use-toast';
 
 // Helper to track analytics events
 async function trackAnalyticsEvent(eventName: string, metadata?: Record<string, any>) {
@@ -61,7 +62,7 @@ const SEGMENT_BUNDLES: Record<string, string[]> = {
 
 export interface SegmentResult {
   segmentId: string;
-  status: "success" | "error" | "skipped";
+  status: "success" | "error" | "skipped" | "queued";
   message: string;
   klaviyoId?: string;
 }
@@ -86,7 +87,18 @@ export interface BatchProgress {
   totalBatches: number;
   segmentsProcessed: number;
   totalSegments: number;
-  estimatedTimeRemaining: number; // in seconds
+  estimatedTimeRemaining: number;
+}
+
+export interface JobStatus {
+  id: string;
+  status: 'pending' | 'in_progress' | 'waiting_retry' | 'completed' | 'failed';
+  totalSegments: number;
+  segmentsProcessed: number;
+  successCount: number;
+  errorCount: number;
+  rateLimitType?: string;
+  rateLimitMessage?: string;
 }
 
 export const useKlaviyoSegments = () => {
@@ -94,13 +106,76 @@ export const useKlaviyoSegments = () => {
   const [results, setResults] = useState<SegmentResult[]>([]);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [jobStatus, setJobStatus] = useState<JobStatus | null>(null);
+  const { toast } = useToast();
+
+  // Subscribe to job updates for real-time progress
+  useEffect(() => {
+    if (!jobId) return;
+
+    const channel = supabase
+      .channel(`job-${jobId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'segment_creation_jobs',
+          filter: `id=eq.${jobId}`
+        },
+        (payload) => {
+          const job = payload.new as any;
+          
+          setProgress({
+            current: job.segments_processed || 0,
+            total: job.total_segments || 0
+          });
+
+          setJobStatus({
+            id: job.id,
+            status: job.status,
+            totalSegments: job.total_segments,
+            segmentsProcessed: job.segments_processed || 0,
+            successCount: job.success_count || 0,
+            errorCount: job.error_count || 0,
+            rateLimitType: job.rate_limit_type,
+            rateLimitMessage: job.last_klaviyo_error
+          });
+
+          if (job.status === 'completed') {
+            toast({
+              title: "✅ All segments created!",
+              description: `Successfully created ${job.success_count || job.segments_processed} segments.`,
+            });
+            setLoading(false);
+          } else if (job.status === 'waiting_retry' && job.rate_limit_type) {
+            // Show rate limit toast
+            const message = job.rate_limit_type === 'daily'
+              ? "Klaviyo's daily limit reached. We'll automatically continue tomorrow and email you when complete."
+              : "Klaviyo's rate limit reached. We'll automatically retry in a few minutes.";
+            
+            toast({
+              title: "⏸️ Segment creation paused",
+              description: message,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [jobId, toast]);
 
   const createSegments = async (
     selectedSegments: string[],
     activeKey: KlaviyoKey,
     segmentsList: any[],
-    jobId?: string,
-    customInputs?: Record<string, string>
+    existingJobId?: string,
+    customInputs?: Record<string, string>,
+    userEmail?: string
   ) => {
     if (selectedSegments.length === 0) {
       throw new Error('Please select at least one segment to create');
@@ -110,15 +185,13 @@ export const useKlaviyoSegments = () => {
     let expandedSegmentIds = [...selectedSegments];
     selectedSegments.forEach(id => {
       if (SEGMENT_BUNDLES[id]) {
-        // Remove the bundle ID and add its component segments
         expandedSegmentIds = expandedSegmentIds.filter(s => s !== id);
         expandedSegmentIds.push(...SEGMENT_BUNDLES[id]);
       }
     });
-    // Remove duplicates
     expandedSegmentIds = [...new Set(expandedSegmentIds)];
     
-    // Filter out unavailable segments (like birthday-month)
+    // Filter out unavailable segments
     const availableSegmentIds = expandedSegmentIds.filter(id => {
       const segment = segmentsList.find((s: any) => s.id === id);
       return segment && !segment.unavailable;
@@ -132,12 +205,12 @@ export const useKlaviyoSegments = () => {
     setResults([]);
     setProgress({ current: 0, total: availableSegmentIds.length });
     
-    // Calculate batch progress info for UI feedback
+    // Calculate batch progress info
     const BATCH_SIZE = 4;
     const BATCH_DELAY_SECONDS = 3;
     const INTRA_BATCH_DELAY_SECONDS = 0.5;
     const totalBatches = Math.ceil(availableSegmentIds.length / BATCH_SIZE);
-    const estimatedTimePerBatch = (BATCH_SIZE * INTRA_BATCH_DELAY_SECONDS) + BATCH_DELAY_SECONDS + 2; // +2s for API calls
+    const estimatedTimePerBatch = (BATCH_SIZE * INTRA_BATCH_DELAY_SECONDS) + BATCH_DELAY_SECONDS + 2;
     
     setBatchProgress({
       currentBatch: 1,
@@ -146,29 +219,62 @@ export const useKlaviyoSegments = () => {
       totalSegments: availableSegmentIds.length,
       estimatedTimeRemaining: totalBatches * estimatedTimePerBatch
     });
-    
-    // Simulate batch progress updates for better UX
-    let batchInterval: NodeJS.Timeout | null = null;
-    if (totalBatches > 1) {
-      let currentBatch = 1;
-      batchInterval = setInterval(() => {
-        currentBatch = Math.min(currentBatch + 1, totalBatches);
-        const segmentsProcessed = Math.min(currentBatch * BATCH_SIZE, availableSegmentIds.length);
-        const remainingBatches = totalBatches - currentBatch;
-        setBatchProgress({
-          currentBatch,
-          totalBatches,
-          segmentsProcessed,
-          totalSegments: availableSegmentIds.length,
-          estimatedTimeRemaining: remainingBatches * estimatedTimePerBatch
-        });
-      }, estimatedTimePerBatch * 1000);
-    }
 
     try {
-      const currencySymbol = activeKey.currency_symbol || '$';
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Get user email if not provided
+      let email = userEmail;
+      if (!email) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('email')
+          .eq('id', user.id)
+          .single();
+        email = userData?.email;
+      }
+
+      // Create or update job record
+      let jobRecordId = existingJobId;
       
-      // CRITICAL: Settings keys must match edge function expectations exactly
+      if (!jobRecordId) {
+        const { data: job, error: jobError } = await supabase
+          .from('segment_creation_jobs')
+          .insert({
+            user_id: user.id,
+            klaviyo_key_id: activeKey.id,
+            status: 'in_progress',
+            segments_to_create: availableSegmentIds,
+            pending_segment_ids: availableSegmentIds,
+            completed_segment_ids: [],
+            failed_segment_ids: [],
+            total_segments: availableSegmentIds.length,
+            user_email: email,
+            custom_inputs: customInputs || {}
+          })
+          .select()
+          .single();
+
+        if (jobError) throw jobError;
+        jobRecordId = job.id;
+      } else {
+        await supabase
+          .from('segment_creation_jobs')
+          .update({
+            status: 'in_progress',
+            segments_processed: 0,
+            total_segments: availableSegmentIds.length,
+            pending_segment_ids: availableSegmentIds,
+            completed_segment_ids: [],
+            failed_segment_ids: []
+          })
+          .eq('id', existingJobId);
+      }
+
+      setJobId(jobRecordId);
+
+      const currencySymbol = activeKey.currency_symbol || '$';
       const settings = {
         aov: activeKey.aov || 100,
         vipThreshold: activeKey.vip_threshold || 1000,
@@ -177,18 +283,6 @@ export const useKlaviyoSegments = () => {
         lapsedDays: activeKey.lapsed_days || 90,
         churnedDays: activeKey.churned_days || 180,
       };
-
-      // Save progress if jobId provided
-      if (jobId) {
-        await supabase
-          .from('segment_creation_jobs')
-          .update({
-            status: 'in_progress',
-            segments_processed: 0,
-            total_segments: availableSegmentIds.length
-          })
-          .eq('id', jobId);
-      }
 
       const requestBody = {
         apiKey: activeKey.klaviyo_api_key_hash,
@@ -203,37 +297,15 @@ export const useKlaviyoSegments = () => {
       });
 
       if (error) {
-        await ErrorLogger.logError(error, {
-          context: 'Supabase function error in segment creation',
-        });
+        await ErrorLogger.logError(error, { context: 'Supabase function error in segment creation' });
         throw error;
       }
 
       if (!response) {
-        const err = new Error('No response from segment creation service');
-        await ErrorLogger.logError(err, {
-          context: 'Empty response from klaviyo-create-segments',
-        });
-        throw err;
+        throw new Error('No response from segment creation service');
       }
 
-      // Handle case where response doesn't have results array
       const resultsArray = response.results || [];
-
-      // Log metrics availability for debugging
-      if (response.missingMetrics && response.missingMetrics.length > 0) {
-        await ErrorLogger.logWarning('Missing Klaviyo metrics detected', {
-          missingMetrics: response.missingMetrics,
-          note: response.metricsNote,
-        });
-      }
-
-      // Notify user about missing metrics
-      if (response.missingMetrics && response.missingMetrics.length > 0 && response.summary?.skipped > 0) {
-        console.info(`Note: ${response.summary.skipped} segments were skipped. ${response.metricsNote}`);
-      }
-
-      // Create a map of results by segmentId for reliable lookup
       const resultsMap = new Map<string, any>();
       resultsArray.forEach((result: any) => {
         if (result && result.segmentId) {
@@ -241,12 +313,91 @@ export const useKlaviyoSegments = () => {
         }
       });
 
+      // Determine if job needs to be queued for background processing
+      const hasRateLimitErrors = resultsArray.some((r: any) => 
+        r.status === 'error' && r.error?.toLowerCase().includes('rate limit')
+      );
+      
+      const completedIds = resultsArray
+        .filter((r: any) => r.status === 'created' || r.status === 'exists')
+        .map((r: any) => r.segmentId);
+      
+      const failedIds = resultsArray
+        .filter((r: any) => r.status === 'error' && !r.error?.toLowerCase().includes('rate limit'))
+        .map((r: any) => r.segmentId);
+      
+      const pendingIds = availableSegmentIds.filter(
+        id => !completedIds.includes(id) && !failedIds.includes(id)
+      );
+
+      // Update job with results
+      if (pendingIds.length > 0 && hasRateLimitErrors) {
+        // Queue remaining segments for background processing
+        const retryAfter = new Date(Date.now() + 2 * 60 * 1000).toISOString();
+        
+        await supabase
+          .from('segment_creation_jobs')
+          .update({
+            status: 'waiting_retry',
+            completed_segment_ids: completedIds,
+            pending_segment_ids: pendingIds,
+            failed_segment_ids: failedIds,
+            segments_processed: completedIds.length,
+            success_count: completedIds.length,
+            error_count: failedIds.length,
+            retry_after: retryAfter,
+            rate_limit_type: 'steady',
+            last_klaviyo_error: "Klaviyo's rate limit reached. Automatic retry scheduled."
+          })
+          .eq('id', jobRecordId);
+
+        setJobStatus({
+          id: jobRecordId,
+          status: 'waiting_retry',
+          totalSegments: availableSegmentIds.length,
+          segmentsProcessed: completedIds.length,
+          successCount: completedIds.length,
+          errorCount: failedIds.length,
+          rateLimitType: 'steady',
+          rateLimitMessage: "Klaviyo's rate limit reached. Automatic retry scheduled."
+        });
+
+        toast({
+          title: "Segments being created in background",
+          description: `Created ${completedIds.length} segments. ${pendingIds.length} remaining will be processed automatically. We'll email you when complete.`,
+          duration: 10000,
+        });
+      } else {
+        // All done or no rate limits
+        await supabase
+          .from('segment_creation_jobs')
+          .update({
+            status: failedIds.length === availableSegmentIds.length ? 'failed' : 'completed',
+            completed_segment_ids: completedIds,
+            pending_segment_ids: [],
+            failed_segment_ids: failedIds,
+            segments_processed: completedIds.length,
+            success_count: completedIds.length,
+            error_count: failedIds.length,
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', jobRecordId);
+      }
+
+      // Build results for UI
       const newResults: SegmentResult[] = availableSegmentIds.map((segmentId) => {
         const segment = segmentsList.find((s: any) => s.id === segmentId);
         const segmentName = segment?.name || segmentId;
         const result = resultsMap.get(segmentId);
 
         if (!result) {
+          if (pendingIds.includes(segmentId)) {
+            return {
+              segmentId,
+              status: "queued" as const,
+              message: `"${segmentName}" queued for background processing`,
+            };
+          }
           return {
             segmentId,
             status: "error" as const,
@@ -254,10 +405,7 @@ export const useKlaviyoSegments = () => {
           };
         }
 
-        const resultStatus = result.status;
-
-        if (resultStatus === 'created') {
-          // Log the operation for audit trail
+        if (result.status === 'created') {
           logSegmentOperation(segmentId, segmentName, 'created', 'success', activeKey.id, result.klaviyoId);
           return {
             segmentId,
@@ -265,54 +413,48 @@ export const useKlaviyoSegments = () => {
             message: `Successfully created "${segmentName}"`,
             klaviyoId: result.data?.data?.id || result.klaviyoId,
           };
-        } else if (resultStatus === 'exists') {
+        } else if (result.status === 'exists') {
           return {
             segmentId,
             status: "skipped" as const,
             message: `"${segmentName}" already exists`,
           };
-        } else if (resultStatus === 'skipped' || resultStatus === 'missing_metrics') {
+        } else if (result.status === 'skipped' || result.status === 'missing_metrics') {
           return {
             segmentId,
             status: "skipped" as const,
-            message: `"${segmentName}" skipped: Required metrics not available in your Klaviyo account`,
+            message: `"${segmentName}" skipped: Required metrics not available`,
           };
         } else {
-          // Log failed operations
+          const isRateLimit = result.error?.toLowerCase().includes('rate limit');
+          if (isRateLimit) {
+            return {
+              segmentId,
+              status: "queued" as const,
+              message: `"${segmentName}" queued - Klaviyo rate limit reached`,
+            };
+          }
           logSegmentOperation(segmentId, segmentName, 'created', 'failed', activeKey.id, undefined, result.error);
           return {
             segmentId,
             status: "error" as const,
-            message: `Failed to create "${segmentName}": ${result.error || 'Unknown error'}`,
+            message: `Failed: ${result.error || 'Unknown error'}`,
           };
         }
       });
 
       setResults(newResults);
 
-      // Track successful segment creation event
+      // Track analytics
       const successCount = newResults.filter(r => r.status === 'success').length;
       if (successCount > 0) {
         await trackAnalyticsEvent('create_segments', {
           segments_created: successCount,
+          segments_queued: newResults.filter(r => r.status === 'queued').length,
           segments_skipped: newResults.filter(r => r.status === 'skipped').length,
           segments_failed: newResults.filter(r => r.status === 'error').length,
           total_attempted: availableSegmentIds.length,
         });
-      }
-
-      // Update job completion
-      if (jobId) {
-        await supabase
-          .from('segment_creation_jobs')
-          .update({
-            status: 'completed',
-            segments_processed: availableSegmentIds.length,
-            completed_at: new Date().toISOString(),
-            success_count: successCount,
-            error_count: newResults.filter(r => r.status === 'error').length
-          })
-          .eq('id', jobId);
       }
 
       return newResults;
@@ -320,17 +462,6 @@ export const useKlaviyoSegments = () => {
       await ErrorLogger.logSegmentError(error, 'create_segments', {
         segmentCount: availableSegmentIds.length,
       });
-      
-      // Log error to database for production monitoring
-      await ErrorLogger.logSegmentError(
-        `Batch creation (${availableSegmentIds.length} segments)`,
-        error,
-        { 
-          availableSegmentIds, 
-          activeKeyId: activeKey.id,
-          jobId 
-        }
-      );
       
       if (jobId) {
         await supabase
@@ -347,18 +478,18 @@ export const useKlaviyoSegments = () => {
         return {
           segmentId,
           status: "error" as const,
-          message: `Failed to create "${segment?.name || segmentId}": ${error.message || 'Unknown error'}`,
+          message: `Failed: ${error.message || 'Unknown error'}`,
         };
       });
       
       setResults(errorResults);
       throw error;
     } finally {
-      if (batchInterval) {
-        clearInterval(batchInterval);
-      }
       setBatchProgress(null);
-      setLoading(false);
+      // Don't set loading to false if job is queued for background
+      if (!jobStatus || jobStatus.status === 'completed' || jobStatus.status === 'failed') {
+        setLoading(false);
+      }
     }
   };
 
@@ -367,12 +498,14 @@ export const useKlaviyoSegments = () => {
     results,
     progress,
     batchProgress,
+    jobId,
+    jobStatus,
     createSegments,
     setResults,
   };
 };
 
-// Helper function to log segment operations for audit trail
+// Helper function to log segment operations
 async function logSegmentOperation(
   segmentId: string,
   segmentName: string | undefined,

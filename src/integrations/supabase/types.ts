@@ -760,14 +760,21 @@ export type Database = {
       segment_creation_jobs: {
         Row: {
           completed_at: string | null
+          completed_segment_ids: Json | null
           created_at: string | null
           custom_inputs: Json | null
+          email_notifications_sent: Json | null
           error_count: number | null
           error_message: string | null
+          failed_segment_ids: Json | null
           failed_segments: Json | null
           id: string
           klaviyo_key_id: string
+          last_klaviyo_error: string | null
           next_retry_at: string | null
+          pending_segment_ids: Json | null
+          rate_limit_type: string | null
+          retry_after: string | null
           retry_count: number | null
           segments_processed: number | null
           segments_to_create: Json
@@ -775,18 +782,26 @@ export type Database = {
           success_count: number | null
           total_segments: number
           updated_at: string | null
+          user_email: string | null
           user_id: string
         }
         Insert: {
           completed_at?: string | null
+          completed_segment_ids?: Json | null
           created_at?: string | null
           custom_inputs?: Json | null
+          email_notifications_sent?: Json | null
           error_count?: number | null
           error_message?: string | null
+          failed_segment_ids?: Json | null
           failed_segments?: Json | null
           id?: string
           klaviyo_key_id: string
+          last_klaviyo_error?: string | null
           next_retry_at?: string | null
+          pending_segment_ids?: Json | null
+          rate_limit_type?: string | null
+          retry_after?: string | null
           retry_count?: number | null
           segments_processed?: number | null
           segments_to_create: Json
@@ -794,18 +809,26 @@ export type Database = {
           success_count?: number | null
           total_segments: number
           updated_at?: string | null
+          user_email?: string | null
           user_id: string
         }
         Update: {
           completed_at?: string | null
+          completed_segment_ids?: Json | null
           created_at?: string | null
           custom_inputs?: Json | null
+          email_notifications_sent?: Json | null
           error_count?: number | null
           error_message?: string | null
+          failed_segment_ids?: Json | null
           failed_segments?: Json | null
           id?: string
           klaviyo_key_id?: string
+          last_klaviyo_error?: string | null
           next_retry_at?: string | null
+          pending_segment_ids?: Json | null
+          rate_limit_type?: string | null
+          retry_after?: string | null
           retry_count?: number | null
           segments_processed?: number | null
           segments_to_create?: Json
@@ -813,6 +836,7 @@ export type Database = {
           success_count?: number | null
           total_segments?: number
           updated_at?: string | null
+          user_email?: string | null
           user_id?: string
         }
         Relationships: []
