@@ -67,7 +67,7 @@ export default function LandingPage() {
             
             <button
               onClick={() => navigate("/login")}
-              className="text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors font-medium hidden xs:block"
+              className="text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Log in
             </button>
