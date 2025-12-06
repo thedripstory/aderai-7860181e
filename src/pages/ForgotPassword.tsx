@@ -44,22 +44,22 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-10 sm:top-20 left-5 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
       </div>
 
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <AderaiLogo href="/" size="xl" />
         </div>
 
         <Card className="border-border/50 shadow-2xl bg-card/80 backdrop-blur-sm">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 px-4 sm:px-6">
             <Button
               variant="ghost"
               size="sm"
@@ -70,12 +70,12 @@ export default function ForgotPassword() {
               Back to login
             </Button>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-                <Mail className="w-5 h-5 text-primary" />
+              <div className="p-2 sm:p-2.5 rounded-xl bg-primary/10 border border-primary/20 shrink-0">
+                <Mail className="w-4 sm:w-5 h-4 sm:h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">Reset Password</CardTitle>
-                <CardDescription className="text-sm">
+                <CardTitle className="text-lg sm:text-xl">Reset Password</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                   {emailSent
                     ? "Check your email for reset instructions"
                     : "We'll send you a link to reset your password"}
@@ -83,7 +83,7 @@ export default function ForgotPassword() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-4">
+          <CardContent className="pt-4 px-4 sm:px-6">
             {!emailSent ? (
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
@@ -96,13 +96,13 @@ export default function ForgotPassword() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
-                      className="pl-10 h-12"
+                      className="pl-10 h-11 sm:h-12 text-base"
                       required
                     />
                   </div>
                 </div>
 
-                <Button type="submit" disabled={loading} className="w-full h-12 font-semibold">
+                <Button type="submit" disabled={loading} className="w-full h-11 sm:h-12 font-semibold">
                   {loading ? (
                     <div className="relative w-5 h-5">
                       <div className="absolute inset-0 border-2 border-transparent border-t-primary-foreground border-r-primary-foreground rounded-full animate-spin" />
@@ -125,7 +125,7 @@ export default function ForgotPassword() {
                 <Button
                   variant="outline"
                   onClick={() => navigate("/login")}
-                  className="w-full h-12"
+                  className="w-full h-11 sm:h-12"
                 >
                   Return to Login
                 </Button>
