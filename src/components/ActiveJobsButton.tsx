@@ -128,10 +128,10 @@ export function ActiveJobsButton() {
           variant="outline"
           size="sm"
           className={`
-            relative gap-2 
+            relative gap-2 font-medium
             ${totalActive > 0 
-              ? 'border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900 dark:text-blue-300' 
-              : 'border-green-300 bg-green-50 hover:bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-950 dark:hover:bg-green-900 dark:text-green-300'
+              ? 'border-blue-400 bg-blue-100 hover:bg-blue-200 text-blue-800 dark:border-blue-600 dark:bg-blue-950 dark:hover:bg-blue-900 dark:text-blue-200' 
+              : 'border-green-400 bg-green-100 hover:bg-green-200 text-green-800 dark:border-green-600 dark:bg-green-950 dark:hover:bg-green-900 dark:text-green-200'
             }
           `}
         >
