@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Check, X, Zap, Clock, DollarSign, TrendingUp, ArrowRight, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export const ComparisonChart = () => {
   const [activeView, setActiveView] = useState<'manual' | 'aderai'>('aderai');
+  const navigate = useNavigate();
 
   const comparisons = [
     {
@@ -182,14 +184,6 @@ export const ComparisonChart = () => {
                     {item.feature}
                   </span>
 
-                  {/* Highlight badge */}
-                  {item.highlight && isAderai && (
-                    <motion.div 
-                      className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-primary"
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
                 </motion.div>
               );
             })}
@@ -205,8 +199,8 @@ export const ComparisonChart = () => {
           transition={{ delay: 0.4 }}
         >
           <motion.button 
-            onClick={() => window.location.href = '/signup'}
-            className="group inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+            onClick={() => navigate('/signup')}
+            className="group inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 cursor-pointer"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
