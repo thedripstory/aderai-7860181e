@@ -1,9 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 import { Resend } from "https://esm.sh/resend@4.0.0";
-import React from "https://esm.sh/react@18.3.1";
-import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22";
-import { TestUserInvitationEmail } from "./_templates/test-user-invitation.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -19,7 +16,7 @@ interface CreateTestUserRequest {
   brandName: string;
   notes?: string;
   sendEmail: boolean;
-  testUserId?: string; // For resend action
+  testUserId?: string;
 }
 
 const generateTempPassword = (): string => {
@@ -31,8 +28,90 @@ const generateTempPassword = (): string => {
   return password;
 };
 
+const generateEmailHtml = (firstName: string, brandName: string, email: string, tempPassword: string, loginUrl: string): string => {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #FFF8F3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+    <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png" alt="Aderai" style="height: 40px; width: auto;" />
+      </div>
+      
+      <h1 style="color: #1a1a1a; font-size: 24px; font-weight: 600; margin: 0 0 16px 0; text-align: center;">
+        Welcome to Aderai Beta! 🎉
+      </h1>
+      
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+        Hi ${firstName},
+      </p>
+      
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+        You've been invited to test <strong>Aderai</strong> - the fastest way to create expert-level Klaviyo segments for <strong>${brandName}</strong>.
+      </p>
+      
+      <div style="background: #FFF8F3; border-radius: 12px; padding: 24px; margin: 24px 0;">
+        <h3 style="color: #1a1a1a; font-size: 14px; font-weight: 600; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+          Your Login Credentials
+        </h3>
+        <div style="margin-bottom: 12px;">
+          <span style="color: #666; font-size: 14px;">Email:</span>
+          <div style="color: #1a1a1a; font-size: 16px; font-weight: 500; font-family: monospace; background: white; padding: 8px 12px; border-radius: 6px; margin-top: 4px;">
+            ${email}
+          </div>
+        </div>
+        <div>
+          <span style="color: #666; font-size: 14px;">Temporary Password:</span>
+          <div style="color: #1a1a1a; font-size: 16px; font-weight: 500; font-family: monospace; background: white; padding: 8px 12px; border-radius: 6px; margin-top: 4px;">
+            ${tempPassword}
+          </div>
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${loginUrl}" style="display: inline-block; background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+          Log In to Aderai
+        </a>
+      </div>
+      
+      <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; border-radius: 0 8px 8px 0; margin: 24px 0;">
+        <p style="color: #166534; font-size: 14px; margin: 0; font-weight: 500;">
+          🔐 Security Tip: Please change your password after your first login.
+        </p>
+      </div>
+      
+      <h3 style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 32px 0 16px 0;">
+        What you can do:
+      </h3>
+      <ul style="color: #4a4a4a; font-size: 14px; line-height: 1.8; padding-left: 20px; margin: 0;">
+        <li>Create 70+ pre-built Klaviyo segments in seconds</li>
+        <li>Generate AI-powered custom segments</li>
+        <li>View segment performance analytics</li>
+        <li>Test the complete Aderai experience</li>
+      </ul>
+      
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6; margin: 32px 0 0 0;">
+        We'd love your feedback! Reply to this email with any thoughts, bugs, or suggestions.
+      </p>
+      
+      <div style="border-top: 1px solid #e5e5e5; margin-top: 32px; padding-top: 24px; text-align: center;">
+        <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+          © ${new Date().getFullYear()} Aderai. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+};
+
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -40,7 +119,6 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log("create-test-user: Starting request processing");
 
-    // Verify admin authorization
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
       console.error("create-test-user: No authorization header");
@@ -50,14 +128,10 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Initialize Supabase clients
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    
-    // Client for verifying admin
     const supabaseAuth = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Verify the requesting user is an admin
     const token = authHeader.replace("Bearer ", "");
     const { data: { user: adminUser }, error: authError } = await supabaseAuth.auth.getUser(token);
     
@@ -69,7 +143,6 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check if user is admin using the has_role function
     const { data: isAdmin, error: roleError } = await supabaseAuth.rpc("has_role", {
       _user_id: adminUser.id,
       _role: "admin"
@@ -83,8 +156,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Parse request body
     const { action = "create", email, firstName, brandName, notes, sendEmail, testUserId }: CreateTestUserRequest = await req.json();
+    const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
 
     // Handle resend invitation action
     if (action === "resend") {
@@ -97,7 +170,6 @@ const handler = async (req: Request): Promise<Response> => {
 
       console.log(`create-test-user: Resending invitation for test user ${testUserId}`);
 
-      // Get the test user record
       const { data: testUser, error: fetchError } = await supabaseAuth
         .from("test_users")
         .select("*")
@@ -118,19 +190,13 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
-      // Send the invitation email
       try {
-        const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
-        
-        const html = await renderAsync(
-          React.createElement(TestUserInvitationEmail, {
-            firstName: testUser.first_name || "there",
-            brandName: testUser.brand_name || "Your Brand",
-            email: testUser.email,
-            tempPassword: testUser.temp_password,
-            loginUrl: `${siteUrl}/login`,
-            dashboardUrl: `${siteUrl}/dashboard`
-          })
+        const html = generateEmailHtml(
+          testUser.first_name || "there",
+          testUser.brand_name || "Your Brand",
+          testUser.email,
+          testUser.temp_password,
+          `${siteUrl}/login`
         );
 
         const { error: emailError } = await resend.emails.send({
@@ -148,7 +214,6 @@ const handler = async (req: Request): Promise<Response> => {
           );
         }
 
-        // Update test_users record
         await supabaseAuth
           .from("test_users")
           .update({
@@ -157,7 +222,6 @@ const handler = async (req: Request): Promise<Response> => {
           })
           .eq("id", testUserId);
 
-        // Log email in audit
         await supabaseAuth.from("email_audit_log").insert({
           user_id: testUser.user_id,
           email_type: "test_user_invitation_resend",
@@ -166,7 +230,6 @@ const handler = async (req: Request): Promise<Response> => {
           status: "sent"
         });
 
-        // Log admin action
         await supabaseAuth.from("admin_audit_log").insert({
           admin_user_id: adminUser.id,
           action_type: "test_user_invitation_resent",
@@ -194,7 +257,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // CREATE action - original logic
+    // CREATE action
     if (!email || !firstName || !brandName) {
       return new Response(
         JSON.stringify({ error: "Email, first name, and brand name are required" }),
@@ -204,7 +267,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`create-test-user: Creating test user for ${email}`);
 
-    // Check if user already exists
     const { data: existingUsers } = await supabaseAuth
       .from("users")
       .select("id, email")
@@ -218,25 +280,37 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Generate temporary password
     const tempPassword = generateTempPassword();
+    console.log(`create-test-user: Attempting to create auth user`);
 
-    // Create the user in auth.users using admin API
-    const { data: authData, error: createAuthError } = await supabaseAuth.auth.admin.createUser({
-      email: email.toLowerCase(),
-      password: tempPassword,
-      email_confirm: true, // Auto-confirm the email
-      user_metadata: {
-        first_name: firstName,
-        account_name: brandName,
-        is_test_user: true
-      }
-    });
+    let authData;
+    let createAuthError;
+    try {
+      const result = await supabaseAuth.auth.admin.createUser({
+        email: email.toLowerCase(),
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: {
+          first_name: firstName,
+          account_name: brandName,
+          is_test_user: true
+        }
+      });
+      authData = result.data;
+      createAuthError = result.error;
+      console.log(`create-test-user: Auth creation result - user: ${authData?.user?.id}, error: ${createAuthError?.message}`);
+    } catch (authException) {
+      console.error("create-test-user: Exception during auth creation", authException);
+      return new Response(
+        JSON.stringify({ error: `Auth creation exception: ${authException instanceof Error ? authException.message : 'Unknown error'}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    if (createAuthError || !authData.user) {
+    if (createAuthError || !authData?.user) {
       console.error("create-test-user: Failed to create auth user", createAuthError);
       return new Response(
-        JSON.stringify({ error: `Failed to create user: ${createAuthError?.message}` }),
+        JSON.stringify({ error: `Failed to create user: ${createAuthError?.message || 'No user returned'}` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -244,13 +318,13 @@ const handler = async (req: Request): Promise<Response> => {
     const newUserId = authData.user.id;
     console.log(`create-test-user: Auth user created with ID ${newUserId}`);
 
-    // Update users table to mark as test user with subscription bypassed
+    // Update users table
     const { error: updateError } = await supabaseAuth
       .from("users")
       .update({
         subscription_status: "active",
         subscription_start_date: new Date().toISOString(),
-        subscription_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() // 1 year from now
+        subscription_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
       })
       .eq("id", newUserId);
 
@@ -258,12 +332,10 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("create-test-user: Failed to update user subscription", updateError);
     }
 
-    // Create notification preferences for the user
     await supabaseAuth
       .from("notification_preferences")
       .insert({ user_id: newUserId });
 
-    // Record in test_users table
     const { data: testUserRecord, error: testUserError } = await supabaseAuth
       .from("test_users")
       .insert({
@@ -272,7 +344,7 @@ const handler = async (req: Request): Promise<Response> => {
         email: email.toLowerCase(),
         first_name: firstName,
         brand_name: brandName,
-        temp_password: tempPassword, // Store for admin reference
+        temp_password: tempPassword,
         status: sendEmail ? "invited" : "created",
         invitation_sent_at: sendEmail ? new Date().toISOString() : null,
         notes: notes || null,
@@ -285,7 +357,6 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("create-test-user: Failed to record test user", testUserError);
     }
 
-    // Log audit action
     await supabaseAuth.from("admin_audit_log").insert({
       admin_user_id: adminUser.id,
       action_type: "test_user_created",
@@ -299,22 +370,11 @@ const handler = async (req: Request): Promise<Response> => {
       }
     });
 
-    // Send invitation email if requested
     let emailSent = false;
     if (sendEmail) {
       try {
-        const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
-        
-        const html = await renderAsync(
-          React.createElement(TestUserInvitationEmail, {
-            firstName,
-            brandName,
-            email: email.toLowerCase(),
-            tempPassword,
-            loginUrl: `${siteUrl}/login`,
-            dashboardUrl: `${siteUrl}/dashboard`
-          })
-        );
+        console.log(`create-test-user: Sending invitation email`);
+        const html = generateEmailHtml(firstName, brandName, email.toLowerCase(), tempPassword, `${siteUrl}/login`);
 
         const { error: emailError } = await resend.emails.send({
           from: "Aderai <hello@updates.aderai.io>",
@@ -329,7 +389,6 @@ const handler = async (req: Request): Promise<Response> => {
           emailSent = true;
           console.log(`create-test-user: Invitation email sent to ${email}`);
           
-          // Log email in audit
           await supabaseAuth.from("email_audit_log").insert({
             user_id: newUserId,
             email_type: "test_user_invitation",
@@ -356,7 +415,7 @@ const handler = async (req: Request): Promise<Response> => {
           email: email.toLowerCase(),
           firstName,
           brandName,
-          tempPassword: sendEmail ? undefined : tempPassword, // Only show password if email not sent
+          tempPassword: sendEmail ? undefined : tempPassword,
           emailSent
         },
         testUserRecord
