@@ -53,19 +53,43 @@ const AdminPortal = () => {
   };
 
   useEffect(() => {
-    // 1) Set up listener first (sync state only inside callback)
+    setLoading(true);
+
+    const handleSession = async (session: any) => {
+      const user = session?.user ?? null;
+      setSignedIn(!!user);
+
+      if (!user) {
+        setIsAdmin(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.rpc("is_admin");
+        if (error) throw error;
+        setIsAdmin(Boolean(data));
+      } catch (e) {
+        console.error("Admin check failed", e);
+        setIsAdmin(false);
+        toast.error("Access check failed");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Initial session
+    supabase.auth.getSession().then(({ data }) => {
+      handleSession(data.session);
+    });
+
+    // Listen for changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSignedIn(!!session?.user);
-      // Defer any Supabase calls to avoid deadlocks
-      setTimeout(() => {
-        checkSessionAndRole();
-      }, 0);
+      setLoading(true);
+      handleSession(session);
     });
-
-    // 2) Then check existing session
-    checkSessionAndRole();
 
     return () => subscription.unsubscribe();
   }, []);
