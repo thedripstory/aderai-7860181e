@@ -35,6 +35,7 @@ export const AdminTestUserManagement = () => {
   const [testUsers, setTestUsers] = useState<TestUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [resending, setResending] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   
@@ -142,18 +143,46 @@ export const AdminTestUserManagement = () => {
   };
 
   const resendInvitation = async (testUser: TestUser) => {
+    if (testUser.first_login_at) {
+      toast.error("Cannot resend invitation - user has already logged in");
+      return;
+    }
+
     try {
+      setResending(testUser.id);
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error("Session expired. Please log in again.");
         return;
       }
 
-      // For resending, we'd need a separate endpoint or reuse create-test-user logic
-      // For now, show a message
-      toast.info("Resend functionality coming soon. Please create a new test user for now.");
+      const response = await supabase.functions.invoke("create-test-user", {
+        body: {
+          action: "resend",
+          testUserId: testUser.id,
+          email: testUser.email,
+          firstName: testUser.first_name,
+          brandName: testUser.brand_name,
+          sendEmail: true
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to resend invitation");
+      }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast.success(`Invitation resent to ${testUser.email}`);
+      loadTestUsers();
     } catch (error: any) {
-      toast.error("Failed to resend invitation");
+      console.error("Error resending invitation:", error);
+      toast.error(error.message || "Failed to resend invitation");
+    } finally {
+      setResending(null);
     }
   };
 
@@ -448,15 +477,22 @@ export const AdminTestUserManagement = () => {
                           >
                             <Copy className="h-4 w-4" />
                           </Button>
-                          {user.status === "invited" && !user.first_login_at && (
+                          {!user.first_login_at && (
                             <Button
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
                               onClick={() => resendInvitation(user)}
                               title="Resend invitation"
+                              disabled={resending === user.id}
                             >
-                              <Send className="h-4 w-4" />
+                              {resending === user.id ? (
+                                <div className="relative w-4 h-4">
+                                  <div className="absolute inset-0 border-2 border-transparent border-t-current rounded-full animate-spin" />
+                                </div>
+                              ) : (
+                                <Send className="h-4 w-4" />
+                              )}
                             </Button>
                           )}
                         </div>

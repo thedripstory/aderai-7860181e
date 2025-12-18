@@ -13,11 +13,13 @@ const corsHeaders = {
 };
 
 interface CreateTestUserRequest {
+  action?: "create" | "resend";
   email: string;
   firstName: string;
   brandName: string;
   notes?: string;
   sendEmail: boolean;
+  testUserId?: string; // For resend action
 }
 
 const generateTempPassword = (): string => {
@@ -82,8 +84,117 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Parse request body
-    const { email, firstName, brandName, notes, sendEmail }: CreateTestUserRequest = await req.json();
+    const { action = "create", email, firstName, brandName, notes, sendEmail, testUserId }: CreateTestUserRequest = await req.json();
 
+    // Handle resend invitation action
+    if (action === "resend") {
+      if (!testUserId) {
+        return new Response(
+          JSON.stringify({ error: "Test user ID required for resend" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      console.log(`create-test-user: Resending invitation for test user ${testUserId}`);
+
+      // Get the test user record
+      const { data: testUser, error: fetchError } = await supabaseAuth
+        .from("test_users")
+        .select("*")
+        .eq("id", testUserId)
+        .single();
+
+      if (fetchError || !testUser) {
+        return new Response(
+          JSON.stringify({ error: "Test user not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (testUser.first_login_at) {
+        return new Response(
+          JSON.stringify({ error: "User has already logged in - cannot resend invitation" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Send the invitation email
+      try {
+        const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
+        
+        const html = await renderAsync(
+          React.createElement(TestUserInvitationEmail, {
+            firstName: testUser.first_name || "there",
+            brandName: testUser.brand_name || "Your Brand",
+            email: testUser.email,
+            tempPassword: testUser.temp_password,
+            loginUrl: `${siteUrl}/login`,
+            dashboardUrl: `${siteUrl}/dashboard`
+          })
+        );
+
+        const { error: emailError } = await resend.emails.send({
+          from: "Aderai <hello@updates.aderai.io>",
+          to: [testUser.email],
+          subject: `Reminder: Your Aderai Beta Account is Ready!`,
+          html
+        });
+
+        if (emailError) {
+          console.error("create-test-user: Failed to resend email", emailError);
+          return new Response(
+            JSON.stringify({ error: "Failed to send invitation email" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Update test_users record
+        await supabaseAuth
+          .from("test_users")
+          .update({
+            invitation_sent_at: new Date().toISOString(),
+            status: "invited"
+          })
+          .eq("id", testUserId);
+
+        // Log email in audit
+        await supabaseAuth.from("email_audit_log").insert({
+          user_id: testUser.user_id,
+          email_type: "test_user_invitation_resend",
+          recipient_email: testUser.email,
+          subject: "Reminder: Your Aderai Beta Account is Ready!",
+          status: "sent"
+        });
+
+        // Log admin action
+        await supabaseAuth.from("admin_audit_log").insert({
+          admin_user_id: adminUser.id,
+          action_type: "test_user_invitation_resent",
+          target_table: "test_users",
+          target_id: testUserId,
+          new_values: { email: testUser.email }
+        });
+
+        console.log(`create-test-user: Invitation resent to ${testUser.email}`);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: `Invitation resent to ${testUser.email}`
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+
+      } catch (emailErr) {
+        console.error("create-test-user: Resend email error", emailErr);
+        return new Response(
+          JSON.stringify({ error: "Failed to send invitation email" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // CREATE action - original logic
     if (!email || !firstName || !brandName) {
       return new Response(
         JSON.stringify({ error: "Email, first name, and brand name are required" }),
