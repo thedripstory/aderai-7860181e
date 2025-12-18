@@ -1004,6 +1004,65 @@ export type Database = {
           },
         ]
       }
+      test_users: {
+        Row: {
+          brand_name: string | null
+          created_at: string
+          created_by_admin_id: string
+          email: string
+          first_login_at: string | null
+          first_name: string | null
+          id: string
+          invitation_sent_at: string | null
+          notes: string | null
+          status: string
+          subscription_bypassed: boolean | null
+          temp_password: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          brand_name?: string | null
+          created_at?: string
+          created_by_admin_id: string
+          email: string
+          first_login_at?: string | null
+          first_name?: string | null
+          id?: string
+          invitation_sent_at?: string | null
+          notes?: string | null
+          status?: string
+          subscription_bypassed?: boolean | null
+          temp_password?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          brand_name?: string | null
+          created_at?: string
+          created_by_admin_id?: string
+          email?: string
+          first_login_at?: string | null
+          first_name?: string | null
+          id?: string
+          invitation_sent_at?: string | null
+          notes?: string | null
+          status?: string
+          subscription_bypassed?: boolean | null
+          temp_password?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       two_factor_auth: {
         Row: {
           backup_codes: string[] | null

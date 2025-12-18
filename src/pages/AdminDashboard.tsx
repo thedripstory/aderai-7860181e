@@ -40,6 +40,7 @@ import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
 import { AdminSubscriptionMonitoring } from "@/components/AdminSubscriptionMonitoring";
 import { AdminSegmentMismatchReports } from "@/components/AdminSegmentMismatchReports";
+import { AdminTestUserManagement } from "@/components/AdminTestUserManagement";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 const AdminDashboard = () => {
@@ -380,8 +381,9 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-8 xl:grid-cols-17 w-full mb-8 gap-2">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-8 xl:grid-cols-19 w-full mb-8 gap-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="testusers">Test Users</TabsTrigger>
             <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
             <TabsTrigger value="cohorts">Cohorts</TabsTrigger>
             <TabsTrigger value="segments">Segments</TabsTrigger>
@@ -401,7 +403,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="audit">Audit</TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
+          {/* Test Users Tab */}
+          <TabsContent value="testusers">
+            <AdminTestUserManagement />
+          </TabsContent>
           <TabsContent value="overview" className="space-y-6">
             <div className="flex justify-end">
               <AdminDateRangeFilter value={dateRange} onChange={setDateRange} />
