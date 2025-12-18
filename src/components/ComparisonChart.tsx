@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, X, Zap, Clock, DollarSign, TrendingUp, ArrowRight, Sparkles } from "lucide-react";
+import { Check, X, Zap, Clock, DollarSign, TrendingUp, ArrowRight, Sparkles, Code, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -7,48 +7,58 @@ export const ComparisonChart = () => {
   const [activeView, setActiveView] = useState<'manual' | 'aderai'>('aderai');
   const navigate = useNavigate();
 
+  const handleGetStarted = () => {
+    navigate('/signup');
+  };
+
   const comparisons = [
     {
       feature: "Setup Time",
       manual: "2-3 weeks",
       aderai: "30 seconds",
       icon: Clock,
-      highlight: true
     },
     {
       feature: "Segments",
       manual: "10-15",
       aderai: "70+",
       icon: TrendingUp,
-      highlight: false
     },
     {
       feature: "Monthly Cost",
       manual: "$1,500+",
       aderai: "$9",
       icon: DollarSign,
-      highlight: true
+    },
+    {
+      feature: "Skills Needed",
+      manual: "Advanced",
+      aderai: "None",
+      icon: Code,
     },
     {
       feature: "Maintenance",
       manual: "10+ hrs/mo",
       aderai: "Zero",
       icon: Clock,
-      highlight: false
+    },
+    {
+      feature: "Updates",
+      manual: "Manual",
+      aderai: "One-click",
+      icon: RefreshCw,
     },
     {
       feature: "AI Suggestions",
       manual: false,
       aderai: true,
       icon: Sparkles,
-      highlight: false
     },
     {
       feature: "Analytics",
       manual: "Manual",
       aderai: "Real-time",
       icon: TrendingUp,
-      highlight: false
     }
   ];
 
@@ -84,8 +94,9 @@ export const ComparisonChart = () => {
         >
           <div className="inline-flex items-center p-1 rounded-full bg-muted/50 border border-border/50">
             <button
+              type="button"
               onClick={() => setActiveView('manual')}
-              className={`relative px-4 sm:px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+              className={`relative px-4 sm:px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeView === 'manual' 
                   ? 'text-foreground' 
                   : 'text-muted-foreground hover:text-foreground/70'
@@ -101,8 +112,9 @@ export const ComparisonChart = () => {
               <span className="relative z-10">Manual Way</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveView('aderai')}
-              className={`relative px-4 sm:px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+              className={`relative px-4 sm:px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeView === 'aderai' 
                   ? 'text-primary-foreground' 
                   : 'text-muted-foreground hover:text-foreground/70'
@@ -125,7 +137,7 @@ export const ComparisonChart = () => {
 
         {/* Comparison Cards Grid */}
         <motion.div 
-          className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -157,7 +169,7 @@ export const ComparisonChart = () => {
                       ? 'bg-primary/15 text-primary' 
                       : 'bg-muted text-muted-foreground'
                   }`}>
-                    <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                    <Icon className="w-4 h-4" />
                   </div>
                   
                   {/* Value */}
@@ -183,7 +195,6 @@ export const ComparisonChart = () => {
                   <span className="text-xs sm:text-sm text-muted-foreground">
                     {item.feature}
                   </span>
-
                 </motion.div>
               );
             })}
@@ -199,16 +210,17 @@ export const ComparisonChart = () => {
           transition={{ delay: 0.4 }}
         >
           <motion.button 
-            onClick={() => navigate('/signup')}
+            type="button"
+            onClick={handleGetStarted}
             className="group inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 cursor-pointer"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span>Start Free</span>
+            <span>Get Started for $9/month</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </motion.button>
           <p className="mt-3 text-xs text-muted-foreground">
-            No credit card required • Setup in 30 seconds
+            Cancel anytime • Setup in 30 seconds
           </p>
         </motion.div>
       </div>
