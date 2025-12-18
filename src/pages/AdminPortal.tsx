@@ -11,27 +11,46 @@ const AdminPortal = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
+  // Timeout wrapper for async operations
+  const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
+    ]);
+  };
+
   // Check current session and admin role
   const checkSessionAndRole = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const user = session?.user ?? null;
-    setSignedIn(!!user);
+    try {
+      const { data: { session } } = await withTimeout(supabase.auth.getSession(), 10000);
+      const user = session?.user ?? null;
+      setSignedIn(!!user);
 
-    if (user) {
-      // Use RPC (security definer) to check admin without exposing table policies
-      try {
-        const { data, error } = await supabase.rpc("is_admin");
-        if (error) throw error;
-        setIsAdmin(Boolean(data));
-      } catch (e) {
-        console.error("Admin check failed", e);
-        setIsAdmin(false);
-        toast.error("Access check failed. Please try again.");
+      if (user) {
+        // Use RPC (security definer) to check admin without exposing table policies
+        try {
+          const rpcPromise = new Promise<{ data: boolean | null; error: Error | null }>((resolve) => {
+            supabase.rpc("is_admin").then(resolve);
+          });
+          const { data, error } = await withTimeout(rpcPromise, 10000);
+          if (error) throw error;
+          setIsAdmin(Boolean(data));
+        } catch (e) {
+          console.error("Admin check failed", e);
+          setIsAdmin(false);
+          toast.error("Access check failed. Please try again.");
+        }
+      } else {
+        setIsAdmin(null);
       }
-    } else {
+    } catch (e) {
+      console.error("Session check failed or timed out", e);
+      setSignedIn(false);
       setIsAdmin(null);
+      toast.error("Connection timed out. Please refresh.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
