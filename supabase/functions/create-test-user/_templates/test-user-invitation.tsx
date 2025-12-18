@@ -1,17 +1,4 @@
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Section,
-  Text,
-  Hr,
-  Img,
-} from "https://esm.sh/@react-email/components@0.0.22";
-import * as React from "https://esm.sh/react@18.3.1";
+import * as React from "npm:react@18.3.1";
 
 interface TestUserInvitationEmailProps {
   firstName: string;
@@ -28,297 +15,163 @@ export const TestUserInvitationEmail = ({
   email,
   tempPassword,
   loginUrl,
-  dashboardUrl,
-}: TestUserInvitationEmailProps) => (
-  <Html>
-    <Head />
-    <Preview>Welcome to Aderai Beta - Your exclusive test account is ready!</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        {/* Logo */}
-        <Section style={logoSection}>
-          <Img
-            src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png"
-            width="120"
-            height="auto"
-            alt="Aderai"
-            style={logo}
-          />
-        </Section>
+}: TestUserInvitationEmailProps): string => {
+  // Return raw HTML string to avoid React rendering issues
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Aderai Beta</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; background-color: #FFF8F3;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #FFE8D9; border-radius: 8px;">
+    <tr>
+      <td style="padding: 40px 20px;">
+        <!-- Logo -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <img src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png" width="120" alt="Aderai" style="display: block;">
+            </td>
+          </tr>
+        </table>
 
-        {/* Header */}
-        <Heading style={h1}>Welcome to Aderai Beta! 🎉</Heading>
+        <!-- Header -->
+        <h1 style="color: #1a1a1a; font-size: 28px; font-weight: 700; margin: 30px 0 20px; text-align: center;">
+          Welcome to Aderai Beta! 🎉
+        </h1>
 
-        <Text style={text}>Hi {firstName},</Text>
+        <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
+          Hi ${firstName},
+        </p>
 
-        <Text style={text}>
+        <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
           Great news! You've been selected to be one of our exclusive beta testers for <strong>Aderai</strong> - 
           the AI-powered Klaviyo segmentation tool that creates 70+ expert-grade segments in seconds.
-        </Text>
+        </p>
 
-        <Text style={text}>
-          Your test account for <strong>{brandName}</strong> is now ready to use.
-        </Text>
+        <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
+          Your test account for <strong>${brandName}</strong> is now ready to use.
+        </p>
 
-        <Hr style={hr} />
+        <hr style="border: none; border-top: 1px solid #FFE8D9; margin: 24px 0;">
 
-        {/* Credentials Section */}
-        <Section style={credentialsSection}>
-          <Heading style={h2}>Your Login Credentials</Heading>
+        <!-- Credentials Section -->
+        <div style="background-color: #FFF8F3; border-radius: 8px; padding: 20px; margin: 16px 0;">
+          <h2 style="color: #1a1a1a; font-size: 20px; font-weight: 600; margin: 0 0 16px;">
+            Your Login Credentials
+          </h2>
           
-          <Section style={credentialBox}>
-            <Text style={credentialLabel}>Email Address:</Text>
-            <Text style={credentialValue}>{email}</Text>
-          </Section>
+          <div style="margin: 12px 0;">
+            <p style="color: #6b7280; font-size: 13px; font-weight: 500; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+              Email Address:
+            </p>
+            <p style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 0; font-family: monospace;">
+              ${email}
+            </p>
+          </div>
 
-          <Section style={credentialBox}>
-            <Text style={credentialLabel}>Temporary Password:</Text>
-            <Text style={credentialValueHighlight}>{tempPassword}</Text>
-          </Section>
+          <div style="margin: 12px 0;">
+            <p style="color: #6b7280; font-size: 13px; font-weight: 500; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+              Temporary Password:
+            </p>
+            <p style="color: #FF6B35; font-size: 18px; font-weight: 700; margin: 0; font-family: monospace; background-color: #FFE8D9; padding: 8px 12px; border-radius: 4px; display: inline-block;">
+              ${tempPassword}
+            </p>
+          </div>
 
-          <Text style={warningText}>
+          <p style="color: #92400e; font-size: 13px; margin: 16px 0 0; background-color: #fef3c7; padding: 8px 12px; border-radius: 4px;">
             ⚠️ Please change your password after your first login for security.
-          </Text>
-        </Section>
+          </p>
+        </div>
 
-        <Hr style={hr} />
+        <hr style="border: none; border-top: 1px solid #FFE8D9; margin: 24px 0;">
 
-        {/* Getting Started Section */}
-        <Section>
-          <Heading style={h2}>Getting Started</Heading>
-          
-          <Text style={stepText}>
-            <strong>Step 1:</strong> Click the button below to log in
-          </Text>
-          
-          <Section style={buttonContainer}>
-            <Link href={loginUrl} style={button}>
-              Log In to Aderai →
-            </Link>
-          </Section>
+        <!-- Getting Started Section -->
+        <h2 style="color: #1a1a1a; font-size: 20px; font-weight: 600; margin: 24px 0 16px;">
+          Getting Started
+        </h2>
+        
+        <p style="color: #374151; font-size: 15px; line-height: 24px; margin: 12px 0;">
+          <strong>Step 1:</strong> Click the button below to log in
+        </p>
+        
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="center" style="padding: 24px 0;">
+              <a href="${loginUrl}" style="background-color: #FF6B35; border-radius: 8px; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; text-align: center; display: inline-block; padding: 14px 32px;">
+                Log In to Aderai →
+              </a>
+            </td>
+          </tr>
+        </table>
 
-          <Text style={stepText}>
-            <strong>Step 2:</strong> Connect your Klaviyo account by adding your API key
-          </Text>
+        <p style="color: #374151; font-size: 15px; line-height: 24px; margin: 12px 0;">
+          <strong>Step 2:</strong> Connect your Klaviyo account by adding your API key
+        </p>
 
-          <Text style={stepText}>
-            <strong>Step 3:</strong> Start creating AI-powered segments instantly!
-          </Text>
-        </Section>
+        <p style="color: #374151; font-size: 15px; line-height: 24px; margin: 12px 0;">
+          <strong>Step 3:</strong> Start creating AI-powered segments instantly!
+        </p>
 
-        <Hr style={hr} />
+        <hr style="border: none; border-top: 1px solid #FFE8D9; margin: 24px 0;">
 
-        {/* What to Test Section */}
-        <Section>
-          <Heading style={h2}>What We'd Love Your Feedback On</Heading>
-          
-          <Text style={text}>
-            As a beta tester, your feedback is incredibly valuable. Here are some things we'd love for you to explore:
-          </Text>
+        <!-- What to Test Section -->
+        <h2 style="color: #1a1a1a; font-size: 20px; font-weight: 600; margin: 24px 0 16px;">
+          What We'd Love Your Feedback On
+        </h2>
+        
+        <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
+          As a beta tester, your feedback is incredibly valuable. Here are some things we'd love for you to explore:
+        </p>
 
-          <ul style={list}>
-            <li style={listItem}>Creating segments from our pre-built library</li>
-            <li style={listItem}>Using AI suggestions for custom segments</li>
-            <li style={listItem}>The overall user experience and navigation</li>
-            <li style={listItem}>Any bugs or issues you encounter</li>
-            <li style={listItem}>Features you'd like to see added</li>
-          </ul>
+        <ul style="margin: 16px 0; padding-left: 24px;">
+          <li style="color: #374151; font-size: 15px; line-height: 28px;">Creating segments from our pre-built library</li>
+          <li style="color: #374151; font-size: 15px; line-height: 28px;">Using AI suggestions for custom segments</li>
+          <li style="color: #374151; font-size: 15px; line-height: 28px;">The overall user experience and navigation</li>
+          <li style="color: #374151; font-size: 15px; line-height: 28px;">Any bugs or issues you encounter</li>
+          <li style="color: #374151; font-size: 15px; line-height: 28px;">Features you'd like to see added</li>
+        </ul>
 
-          <Text style={text}>
-            There's a feedback widget in the app (bottom-right corner) where you can share your thoughts anytime!
-          </Text>
-        </Section>
+        <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
+          There's a feedback widget in the app (bottom-right corner) where you can share your thoughts anytime!
+        </p>
 
-        <Hr style={hr} />
+        <hr style="border: none; border-top: 1px solid #FFE8D9; margin: 24px 0;">
 
-        {/* Support Section */}
-        <Section>
-          <Heading style={h2}>Need Help?</Heading>
-          
-          <Text style={text}>
-            If you run into any issues or have questions, we're here to help:
-          </Text>
+        <!-- Support Section -->
+        <h2 style="color: #1a1a1a; font-size: 20px; font-weight: 600; margin: 24px 0 16px;">
+          Need Help?
+        </h2>
+        
+        <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
+          If you run into any issues or have questions, we're here to help:
+        </p>
 
-          <Text style={text}>
-            📧 Email us at <Link href="mailto:hello@aderai.io" style={link}>hello@aderai.io</Link>
-          </Text>
-        </Section>
+        <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
+          📧 Email us at <a href="mailto:hello@aderai.io" style="color: #FF6B35; text-decoration: underline;">hello@aderai.io</a>
+        </p>
 
-        {/* Footer */}
-        <Section style={footer}>
-          <Text style={footerText}>
+        <!-- Footer -->
+        <div style="margin-top: 32px; text-align: center;">
+          <p style="color: #6b7280; font-size: 14px; margin: 8px 0;">
             Thank you for being part of the Aderai beta program!
-          </Text>
-          <Text style={footerText}>
+          </p>
+          <p style="color: #6b7280; font-size: 14px; margin: 8px 0;">
             — The Aderai Team
-          </Text>
-          <Text style={footerDisclaimer}>
+          </p>
+          <p style="color: #9ca3af; font-size: 12px; margin: 16px 0 0; font-style: italic;">
             This is an exclusive beta invitation. Please do not share your credentials with others.
-          </Text>
-        </Section>
-      </Container>
-    </Body>
-  </Html>
-);
+          </p>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+};
 
 export default TestUserInvitationEmail;
-
-// Styles
-const main = {
-  backgroundColor: "#FFF8F3",
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
-};
-
-const container = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "40px 20px",
-  maxWidth: "600px",
-  borderRadius: "8px",
-  border: "1px solid #FFE8D9",
-};
-
-const logoSection = {
-  textAlign: "center" as const,
-  marginBottom: "24px",
-};
-
-const logo = {
-  margin: "0 auto",
-};
-
-const h1 = {
-  color: "#1a1a1a",
-  fontSize: "28px",
-  fontWeight: "700",
-  margin: "30px 0 20px",
-  padding: "0",
-  textAlign: "center" as const,
-};
-
-const h2 = {
-  color: "#1a1a1a",
-  fontSize: "20px",
-  fontWeight: "600",
-  margin: "24px 0 16px",
-  padding: "0",
-};
-
-const text = {
-  color: "#374151",
-  fontSize: "16px",
-  lineHeight: "26px",
-  margin: "16px 0",
-};
-
-const stepText = {
-  color: "#374151",
-  fontSize: "15px",
-  lineHeight: "24px",
-  margin: "12px 0",
-};
-
-const hr = {
-  borderColor: "#FFE8D9",
-  margin: "24px 0",
-};
-
-const credentialsSection = {
-  backgroundColor: "#FFF8F3",
-  borderRadius: "8px",
-  padding: "20px",
-  margin: "16px 0",
-};
-
-const credentialBox = {
-  margin: "12px 0",
-};
-
-const credentialLabel = {
-  color: "#6b7280",
-  fontSize: "13px",
-  fontWeight: "500",
-  margin: "0 0 4px 0",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.5px",
-};
-
-const credentialValue = {
-  color: "#1a1a1a",
-  fontSize: "16px",
-  fontWeight: "600",
-  margin: "0",
-  fontFamily: "monospace",
-};
-
-const credentialValueHighlight = {
-  color: "#FF6B35",
-  fontSize: "18px",
-  fontWeight: "700",
-  margin: "0",
-  fontFamily: "monospace",
-  backgroundColor: "#FFE8D9",
-  padding: "8px 12px",
-  borderRadius: "4px",
-  display: "inline-block",
-};
-
-const warningText = {
-  color: "#92400e",
-  fontSize: "13px",
-  margin: "16px 0 0 0",
-  backgroundColor: "#fef3c7",
-  padding: "8px 12px",
-  borderRadius: "4px",
-};
-
-const buttonContainer = {
-  textAlign: "center" as const,
-  margin: "24px 0",
-};
-
-const button = {
-  backgroundColor: "#FF6B35",
-  borderRadius: "8px",
-  color: "#ffffff",
-  fontSize: "16px",
-  fontWeight: "600",
-  textDecoration: "none",
-  textAlign: "center" as const,
-  display: "inline-block",
-  padding: "14px 32px",
-};
-
-const link = {
-  color: "#FF6B35",
-  textDecoration: "underline",
-};
-
-const list = {
-  margin: "16px 0",
-  paddingLeft: "24px",
-};
-
-const listItem = {
-  color: "#374151",
-  fontSize: "15px",
-  lineHeight: "28px",
-};
-
-const footer = {
-  marginTop: "32px",
-  textAlign: "center" as const,
-};
-
-const footerText = {
-  color: "#6b7280",
-  fontSize: "14px",
-  margin: "8px 0",
-};
-
-const footerDisclaimer = {
-  color: "#9ca3af",
-  fontSize: "12px",
-  margin: "16px 0 0 0",
-  fontStyle: "italic",
-};

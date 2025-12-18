@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 import { Resend } from "https://esm.sh/resend@4.0.0";
-import React from "https://esm.sh/react@18.3.1";
-import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22";
 import { TestUserInvitationEmail } from "./_templates/test-user-invitation.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -14,11 +12,11 @@ const corsHeaders = {
 
 interface CreateTestUserRequest {
   action?: "create" | "resend";
-  email: string;
-  firstName: string;
-  brandName: string;
+  email?: string;
+  firstName?: string;
+  brandName?: string;
   notes?: string;
-  sendEmail: boolean;
+  sendEmail?: boolean;
   testUserId?: string; // For resend action
 }
 
@@ -84,7 +82,8 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Parse request body
-    const { action = "create", email, firstName, brandName, notes, sendEmail, testUserId }: CreateTestUserRequest = await req.json();
+    const { action = "create", email, firstName, brandName, notes, sendEmail = true, testUserId }: CreateTestUserRequest = await req.json();
+    const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
 
     // Handle resend invitation action
     if (action === "resend") {
@@ -105,6 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
         .single();
 
       if (fetchError || !testUser) {
+        console.error("create-test-user: Test user not found", fetchError);
         return new Response(
           JSON.stringify({ error: "Test user not found" }),
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -118,80 +118,69 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
-      // Send the invitation email
-      try {
-        const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
-        
-        const html = await renderAsync(
-          React.createElement(TestUserInvitationEmail, {
-            firstName: testUser.first_name || "there",
-            brandName: testUser.brand_name || "Your Brand",
-            email: testUser.email,
-            tempPassword: testUser.temp_password,
-            loginUrl: `${siteUrl}/login`,
-            dashboardUrl: `${siteUrl}/dashboard`
-          })
-        );
+      // Generate HTML directly from template function
+      const html = TestUserInvitationEmail({
+        firstName: testUser.first_name || "there",
+        brandName: testUser.brand_name || "Your Brand",
+        email: testUser.email,
+        tempPassword: testUser.temp_password || "Password not available",
+        loginUrl: `${siteUrl}/login`,
+        dashboardUrl: `${siteUrl}/dashboard`
+      });
 
-        const { error: emailError } = await resend.emails.send({
-          from: "Aderai <hello@updates.aderai.io>",
-          to: [testUser.email],
-          subject: `Reminder: Your Aderai Beta Account is Ready!`,
-          html
-        });
+      console.log(`create-test-user: Sending resend email to ${testUser.email}`);
 
-        if (emailError) {
-          console.error("create-test-user: Failed to resend email", emailError);
-          return new Response(
-            JSON.stringify({ error: "Failed to send invitation email" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+      const { error: emailError } = await resend.emails.send({
+        from: "Aderai <hello@updates.aderai.io>",
+        to: [testUser.email],
+        subject: `Reminder: Your Aderai Beta Account is Ready!`,
+        html
+      });
 
-        // Update test_users record
-        await supabaseAuth
-          .from("test_users")
-          .update({
-            invitation_sent_at: new Date().toISOString(),
-            status: "invited"
-          })
-          .eq("id", testUserId);
-
-        // Log email in audit
-        await supabaseAuth.from("email_audit_log").insert({
-          user_id: testUser.user_id,
-          email_type: "test_user_invitation_resend",
-          recipient_email: testUser.email,
-          subject: "Reminder: Your Aderai Beta Account is Ready!",
-          status: "sent"
-        });
-
-        // Log admin action
-        await supabaseAuth.from("admin_audit_log").insert({
-          admin_user_id: adminUser.id,
-          action_type: "test_user_invitation_resent",
-          target_table: "test_users",
-          target_id: testUserId,
-          new_values: { email: testUser.email }
-        });
-
-        console.log(`create-test-user: Invitation resent to ${testUser.email}`);
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            message: `Invitation resent to ${testUser.email}`
-          }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-
-      } catch (emailErr) {
-        console.error("create-test-user: Resend email error", emailErr);
+      if (emailError) {
+        console.error("create-test-user: Failed to resend email", emailError);
         return new Response(
           JSON.stringify({ error: "Failed to send invitation email" }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      // Update test_users record
+      await supabaseAuth
+        .from("test_users")
+        .update({
+          invitation_sent_at: new Date().toISOString(),
+          status: "invited"
+        })
+        .eq("id", testUserId);
+
+      // Log email in audit
+      await supabaseAuth.from("email_audit_log").insert({
+        user_id: testUser.user_id,
+        email_type: "test_user_invitation_resend",
+        recipient_email: testUser.email,
+        subject: "Reminder: Your Aderai Beta Account is Ready!",
+        status: "sent"
+      });
+
+      // Log admin action
+      await supabaseAuth.from("admin_audit_log").insert({
+        admin_user_id: adminUser.id,
+        action_type: "test_user_invitation_resent",
+        target_table: "test_users",
+        target_id: testUserId,
+        new_values: { email: testUser.email }
+      });
+
+      console.log(`create-test-user: Invitation resent successfully to ${testUser.email}`);
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `Invitation resent to ${testUser.email}`
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // CREATE action - original logic
@@ -303,18 +292,17 @@ const handler = async (req: Request): Promise<Response> => {
     let emailSent = false;
     if (sendEmail) {
       try {
-        const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
-        
-        const html = await renderAsync(
-          React.createElement(TestUserInvitationEmail, {
-            firstName,
-            brandName,
-            email: email.toLowerCase(),
-            tempPassword,
-            loginUrl: `${siteUrl}/login`,
-            dashboardUrl: `${siteUrl}/dashboard`
-          })
-        );
+        // Generate HTML directly from template function
+        const html = TestUserInvitationEmail({
+          firstName,
+          brandName,
+          email: email.toLowerCase(),
+          tempPassword,
+          loginUrl: `${siteUrl}/login`,
+          dashboardUrl: `${siteUrl}/dashboard`
+        });
+
+        console.log(`create-test-user: Sending invitation email to ${email}`);
 
         const { error: emailError } = await resend.emails.send({
           from: "Aderai <hello@updates.aderai.io>",
