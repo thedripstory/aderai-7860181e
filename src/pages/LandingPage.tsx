@@ -6,7 +6,7 @@ const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/K
 import { AnimatedSignUpCTA } from "@/components/AnimatedSignUpCTA";
 import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
-import { FlipTestimonialCard } from "@/components/FlipTestimonialCard";
+
 import { AnimatedUnderline } from "@/components/AnimatedUnderline";
 import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
@@ -505,65 +505,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Success Stories */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden contain-layout gpu-accelerated">
-        {/* Decorative Elements - static */}
-        <div className="absolute top-20 right-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
-        <div className="absolute bottom-20 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
-
-        <div className="max-w-7xl mx-auto relative">
-          {/* Header Section */}
-          <ScrollReveal>
-            <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 px-2">
-                Success Stories that <span className="text-[#ff6b6b] font-bold">INSPIRE</span>
-              </h2>
-
-              <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
-                Discover how brands and agencies achieve results.
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
-            <ScrollReveal delay={0}>
-            <FlipTestimonialCard name="Sophia" role="Marketing Lead" company="Trendify" story="Sophia, the marketing lead at Trendify, used AI-driven analytics to dive deep into customer behavior. The insights led to a 40% increase in engagement and a 50% rise in repeat purchases, creating long-term customer relationships." metrics={[{
-            label: "gain in retention",
-            value: "40%"
-          }, {
-            label: "surge in profits",
-            value: "50%"
-          }]} delay="0s" />
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.1}>
-            <FlipTestimonialCard name="Marcus" role="Head of Growth" company="Premium Beauty Co." story="Marcus deployed 70 segments in under a minute using Aderai. Email revenue jumped 42% in the first month as personalized campaigns reached the right customers at the right time, transforming their email strategy." metrics={[{
-            label: "email revenue increase",
-            value: "+42%"
-          }, {
-            label: "deployment time",
-            value: "60 sec"
-          }]} delay="0.1s" />
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.2}>
-            <div className="sm:col-span-2 md:col-span-1">
-            <FlipTestimonialCard name="Sarah" role="Founder" company="Growth Labs Agency" story="What used to take Sarah's team 2 weeks now takes 30 seconds. This game-changing efficiency allowed her agency to serve 5x more clients while maintaining quality, leading to $200K+ in additional annual revenue." metrics={[{
-            label: "time saved",
-            value: "99%"
-          }, {
-            label: "revenue increase",
-            value: "+$200K"
-          }]} delay="0.2s" />
-            </div>
-            </ScrollReveal>
-          </div>
-
-          <div className="mt-10 sm:mt-16 text-center">
-            <PoweredByBadge />
-          </div>
-        </div>
-      </section>
 
         {/* Comparison Chart Section */}
         <ScrollReveal>
