@@ -97,16 +97,7 @@ export const TestUserInvitationEmail = ({
         <p style="color: #374151; font-size: 15px; line-height: 24px; margin: 12px 0;">
           <strong>Step 1:</strong> Click the button below to log in
         </p>
-        
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="center" style="padding: 24px 0;">
-              <a href="${loginUrl}" style="background-color: #FF6B35; border-radius: 8px; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; text-align: center; display: inline-block; padding: 14px 32px;">
-                Log In to Aderai →
-              </a>
-            </td>
-          </tr>
-        </table>
+
 
         <p style="color: #374151; font-size: 15px; line-height: 24px; margin: 12px 0;">
           <strong>Step 2:</strong> Connect your Klaviyo account by adding your API key
