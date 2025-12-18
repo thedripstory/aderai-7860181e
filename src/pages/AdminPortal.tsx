@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import AdminDashboard from "./AdminDashboard";
 import AdminLogin from "./AdminLogin";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,60 +11,44 @@ const AdminPortal = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
-  // Check current session and admin role with timeout protection
-  const checkSessionAndRole = useCallback(async () => {
-    try {
-      // Get session with timeout
-      const sessionPromise = supabase.auth.getSession();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Session timeout')), 10000)
-      );
-      
-      const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as { data: { session: any } };
-      const user = session?.user ?? null;
-      setSignedIn(!!user);
+  // Check current session and admin role
+  const checkSessionAndRole = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user ?? null;
+    setSignedIn(!!user);
 
-      if (user) {
-        // Check admin role with timeout
-        const rpcPromise = supabase.rpc("is_admin");
-        const rpcTimeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Admin check timeout')), 10000)
-        );
-        
-        try {
-          const { data, error } = await Promise.race([rpcPromise, rpcTimeoutPromise]) as { data: any; error: any };
-          if (error) throw error;
-          setIsAdmin(Boolean(data));
-        } catch (e) {
-          console.error("Admin check failed", e);
-          setIsAdmin(false);
-          toast.error("Access check failed. Please try again.");
-        }
-      } else {
-        setIsAdmin(null);
+    if (user) {
+      // Use RPC (security definer) to check admin without exposing table policies
+      try {
+        const { data, error } = await supabase.rpc("is_admin");
+        if (error) throw error;
+        setIsAdmin(Boolean(data));
+      } catch (e) {
+        console.error("Admin check failed", e);
+        setIsAdmin(false);
+        toast.error("Access check failed. Please try again.");
       }
-    } catch (e) {
-      console.error("Session check failed", e);
-      setSignedIn(false);
+    } else {
       setIsAdmin(null);
-    } finally {
-      setLoading(false);
     }
-  }, []);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    // Set up auth state listener
+    // 1) Set up listener first (sync state only inside callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSignedIn(!!session?.user);
-      // Defer check to avoid deadlocks
-      setTimeout(checkSessionAndRole, 0);
+      // Defer any Supabase calls to avoid deadlocks
+      setTimeout(() => {
+        checkSessionAndRole();
+      }, 0);
     });
 
-    // Initial check
+    // 2) Then check existing session
     checkSessionAndRole();
 
     return () => subscription.unsubscribe();
-  }, [checkSessionAndRole]);
+  }, []);
 
   if (loading) {
     return (
