@@ -123,7 +123,7 @@ export const ComparisonChart = () => {
               {activeView === 'aderai' && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                  className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25 pointer-events-none"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
