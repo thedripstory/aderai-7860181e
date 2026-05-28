@@ -21,7 +21,7 @@ export const AnimatedSignUpCTA = () => {
         whileTap={{ scale: 0.98 }}
       >
         {/* Particles Background */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <SparklesCore
             background="transparent"
             minSize={0.6}
@@ -33,10 +33,10 @@ export const AnimatedSignUpCTA = () => {
         </div>
 
         {/* Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-white/10 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-white/10 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
         {/* Animated Border */}
-        <div className="absolute inset-0 rounded-2xl">
+        <div className="absolute inset-0 rounded-2xl pointer-events-none">
           <div className="absolute inset-0 rounded-2xl border-2 border-white/20" />
           <div className="absolute inset-0 rounded-2xl border-2 border-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
