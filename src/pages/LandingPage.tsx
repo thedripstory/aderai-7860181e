@@ -114,7 +114,7 @@ export default function LandingPage() {
           {/* Main Hero Content */}
           <div className="text-center mb-10 sm:mb-16">
             <div className="inline-flex items-center gap-2 bg-gradient-to-br from-orange-400 via-yellow-500 to-orange-600 backdrop-blur-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-orange-300/30 mb-6 sm:mb-8 animate-fade-in shadow-lg shadow-orange-500/20 hover:scale-110 hover:rotate-2 hover:shadow-2xl hover:shadow-orange-400/40 transition-all duration-300 cursor-pointer relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
               <CheckCircle2 className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-white relative z-10" />
               <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wide relative z-10">
                 Official Klaviyo Partner
