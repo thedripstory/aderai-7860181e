@@ -105,7 +105,7 @@ export const ComparisonChart = () => {
               {activeView === 'manual' && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-background border border-border/50 rounded-full shadow-sm"
+                  className="absolute inset-0 bg-background border border-border/50 rounded-full shadow-sm pointer-events-none"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
