@@ -620,14 +620,14 @@ function getSegmentDefinition(
       }
     },
     
-    // #31 High AOV - Average Order Value above threshold
+    // #31 High AOV - Predictive Average Order Value above threshold
     'high-aov': {
       name: `High AOV Customers (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Average Order Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'average_order_value',
             filter: {
               type: 'numeric',
               operator: 'greater-than',
@@ -638,14 +638,14 @@ function getSegmentDefinition(
       }
     },
     
-    // #32 Low AOV - Average Order Value below threshold
+    // #32 Low AOV - Predictive Average Order Value below threshold
     'low-aov': {
       name: `Low AOV Customers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Average Order Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'average_order_value',
             filter: {
               type: 'numeric',
               operator: 'less-than',
