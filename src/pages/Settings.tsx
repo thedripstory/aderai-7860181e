@@ -55,6 +55,7 @@ export default function Settings() {
   const [emailOnClientInvitation, setEmailOnClientInvitation] = useState(true);
   const [emailWeeklySummary, setEmailWeeklySummary] = useState(true);
   const [emailMarketing, setEmailMarketing] = useState(false);
+  const [confettiEnabled, setConfettiEnabledState] = useState(() => getConfettiEnabled());
 
   // Account settings
   const [accountName, setAccountName] = useState("");
