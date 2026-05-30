@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PartyPopper, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
+import { getConfettiEnabled } from '@/lib/preferences';
 
 interface CompletedJob {
   id: string;
