@@ -12,13 +12,14 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    // Auth client (user-scoped) to identify the caller
+    const authClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     );
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { data: { user } } = await authClient.auth.getUser();
     if (!user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
@@ -26,8 +27,16 @@ serve(async (req) => {
       );
     }
 
+    // Service-role client for the write, so RLS can't silently no-op the counter
+    const adminClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    const today = new Date().toISOString().split('T')[0];
+
     // Get current limits
-    let { data: limits, error: fetchError } = await supabaseClient
+    const { data: limits, error: fetchError } = await adminClient
       .from('usage_limits')
       .select('*')
       .eq('user_id', user.id)
@@ -38,15 +47,15 @@ serve(async (req) => {
       throw fetchError;
     }
 
-    // If no record exists, create one
+    // If no record exists, create one with count = 1
     if (!limits) {
-      const { data: newLimits, error: insertError } = await supabaseClient
+      const { data: inserted, error: insertError } = await adminClient
         .from('usage_limits')
         .insert({
           user_id: user.id,
           ai_suggestions_today: 1,
           ai_suggestions_total: 1,
-          last_reset_date: new Date().toISOString().split('T')[0],
+          last_reset_date: today,
         })
         .select()
         .single();
@@ -57,47 +66,51 @@ serve(async (req) => {
       }
 
       return new Response(
-        JSON.stringify({ success: true, new_count: 1 }),
+        JSON.stringify({ success: true, new_count: inserted.ai_suggestions_today }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Check if we need to reset daily counter
-    const today = new Date().toISOString().split('T')[0];
-    let todayCount = limits.ai_suggestions_today;
-    
-    if (limits.last_reset_date !== today) {
-      todayCount = 0;
-    }
+    // Reset daily counter if last reset was a different day
+    const todayCount = limits.last_reset_date !== today ? 0 : limits.ai_suggestions_today;
 
-    // Increment both counters
-    const { error: updateError } = await supabaseClient
+    const { data: updated, error: updateError } = await adminClient
       .from('usage_limits')
       .update({
         ai_suggestions_today: todayCount + 1,
         ai_suggestions_total: limits.ai_suggestions_total + 1,
         last_reset_date: today,
       })
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .select()
+      .single();
 
     if (updateError) {
       console.error('Error updating limits:', updateError);
       throw updateError;
     }
 
-    // Track in analytics
-    await supabaseClient.from('analytics_events').insert({
-      user_id: user.id,
-      event_name: 'ai_suggestion_used',
-      event_metadata: {
-        daily_count: todayCount + 1,
-        total_count: limits.ai_suggestions_total + 1,
-      },
-      page_url: '/ai-suggestions',
-    });
+    if (!updated) {
+      throw new Error('Failed to increment usage — no row updated');
+    }
+
+    // Track in analytics (best-effort)
+    try {
+      await adminClient.from('analytics_events').insert({
+        user_id: user.id,
+        event_name: 'ai_suggestion_used',
+        event_metadata: {
+          daily_count: updated.ai_suggestions_today,
+          total_count: updated.ai_suggestions_total,
+        },
+        page_url: '/ai-suggestions',
+      });
+    } catch (e) {
+      console.error('analytics_events insert failed:', e);
+    }
 
     return new Response(
-      JSON.stringify({ success: true, new_count: todayCount + 1 }),
+      JSON.stringify({ success: true, new_count: updated.ai_suggestions_today, total: updated.ai_suggestions_total }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
