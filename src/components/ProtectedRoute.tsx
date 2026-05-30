@@ -94,11 +94,20 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             setHasProfile(!!profile);
             const dbStatus = profile?.subscription_status || 'inactive';
             setSubscriptionStatus(dbStatus);
-            
+
+            const sessionEmail = session.user.email?.toLowerCase() || '';
+            const isFreeAccessEmail = sessionEmail.endsWith('@thedripstory.com');
+
             // Safety net: If coming from Stripe checkout and DB shows inactive,
             // verify directly with Stripe (webhook may not have processed yet)
             const paymentParam = searchParams.get('payment');
-            if (paymentParam === 'success' && dbStatus !== 'active' && dbStatus !== 'trialing') {
+
+            if (isFreeAccessEmail && paymentParam === 'success') {
+              // Whitelisted free-access user — skip the entire Stripe retry/error chain.
+              searchParams.delete('payment');
+              searchParams.delete('session_id');
+              setSearchParams(searchParams, { replace: true });
+            } else if (paymentParam === 'success' && dbStatus !== 'active' && dbStatus !== 'trialing') {
               // Give webhook 2.5 seconds to process first
               const verifyWithRetries = async (attempt = 1, maxAttempts = 4) => {
                 const verified = await verifyWithStripe();
@@ -127,6 +136,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               setSearchParams(searchParams, { replace: true });
             }
           }
+
         } catch (err) {
           await ErrorLogger.logError(err as Error, {
             context: 'Profile check failed',
