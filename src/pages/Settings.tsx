@@ -889,7 +889,7 @@ export default function Settings() {
                     checked={confettiEnabled}
                     onCheckedChange={(v) => {
                       setConfettiEnabledState(v);
-                      setConfettiEnabled(v);
+                      void saveConfettiEnabled(v);
                       toast({
                         title: v ? "Confetti enabled" : "Confetti disabled",
                       });
