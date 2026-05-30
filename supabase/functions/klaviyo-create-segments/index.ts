@@ -1100,7 +1100,7 @@ function getSegmentDefinition(
     } : null,
     
     'never-engaged-exclusion': (openedEmailId && clickedEmailId) ? {
-      name: `🚫 Never Engaged${ADERAI_SUFFIX}`,
+      name: `Never Engaged${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [
           {
@@ -1118,7 +1118,7 @@ function getSegmentDefinition(
     } : null,
 
     'recent-purchasers-exclude': placedOrderId ? {
-      name: `🚫 Recent Purchasers Exclusion (14 Days)${ADERAI_SUFFIX}`,
+      name: `Recent Purchasers Exclusion (14 Days)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1129,7 +1129,7 @@ function getSegmentDefinition(
     } : null,
 
     'unsubscribed': {
-      name: `🚫 Not Receiving Marketing${ADERAI_SUFFIX}`,
+      name: `Not Receiving Marketing${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
@@ -1147,7 +1147,7 @@ function getSegmentDefinition(
     },
 
     'bounced-emails': openedEmailId ? {
-      name: `🚫 Never Opened Any Email${ADERAI_SUFFIX}`,
+      name: `Never Opened Any Email${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [
@@ -1156,6 +1156,7 @@ function getSegmentDefinition(
         }]
       }
     } : null,
+
 
     // =====================================
     // DEMOGRAPHIC SEGMENTS (Predictive)
@@ -1433,15 +1434,16 @@ function getSegmentDefinition(
             type: 'profile-marketing-consent',
             consent: {
               channel: 'email',
-              can_receive_marketing: false,
+              can_receive_marketing: true,
               consent_status: {
-                subscription: 'any'
+                subscription: 'never_subscribed'
               }
             }
           }]
         }]
       }
     },
+
 
     // No opens AND no clicks - MUST use separate condition_groups for AND logic!
     'unengaged-exclusion': (openedEmailId && clickedEmailId) ? {
@@ -1802,18 +1804,30 @@ async function createKlaviyoSegment(
       };
     }
 
+    // Sanitize name: strip non-ASCII (emojis cause ???? in Klaviyo) and add "(Exclude)" prefix for exclusion segments
+    const EXCLUSION_SEGMENT_IDS = new Set([
+      'unsubscribed', 'bounced-emails', 'not-opted-in', 'recent-purchasers-exclude',
+      'refunded-customers', 'unengaged-exclusion', 'sunset-segment', 'received-5-opened-0',
+      'received-3-in-3-days', 'marked-spam', 'never-engaged-exclusion',
+    ]);
+    let cleanName = segmentDef.name.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim();
+    if (EXCLUSION_SEGMENT_IDS.has(segmentId) && !/^\(Exclude\)/i.test(cleanName)) {
+      cleanName = `(Exclude) ${cleanName}`;
+    }
+
     const payload = {
       data: {
         type: 'segment',
         attributes: {
-          name: segmentDef.name,
+          name: cleanName,
           definition: segmentDef.definition
         }
       }
     };
 
-    console.log(`[klaviyo-create-segments] Creating segment: ${segmentDef.name}`);
+    console.log(`[klaviyo-create-segments] Creating segment: ${cleanName}`);
     console.log(`[klaviyo-create-segments] Payload:`, JSON.stringify(payload, null, 2));
+
 
     const response = await fetch('https://a.klaviyo.com/api/segments/', {
       method: 'POST',
