@@ -185,10 +185,10 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
               )}
             </div>
 
-            {/* Current segment card */}
-            <div className="px-6 pb-4">
-              <AnimatePresence mode="wait">
-                {currentSegment && (
+            {/* Current segment card - only when creating a SINGLE segment, never for bulk runs */}
+            {currentSegment && stats.total <= 1 && (batchProgress?.totalSegments ?? 1) <= 1 && (
+              <div className="px-6 pb-4">
+                <AnimatePresence mode="wait">
                   <motion.div
                     key={currentSegment.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -210,9 +210,9 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                       </div>
                     </div>
                   </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                </AnimatePresence>
+              </div>
+            )}
 
             {/* Batch progress indicator */}
             <div className="px-6 pb-6">
