@@ -826,7 +826,7 @@ function getSegmentDefinition(
               property: 'Discount Codes',
               filter: {
                 type: 'string',
-                operator: 'is-empty'
+                operator: 'is-not-set'
               }
             }]
           }]
