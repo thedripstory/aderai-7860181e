@@ -26,7 +26,7 @@ export const EmailFooter = () => {
         </div>
         
         <div className="text-center text-sm text-muted-foreground space-y-2">
-          <p>© 2025 Aderai. Powered by Klaviyo.</p>
+          <p>© {new Date().getFullYear()} Aderai. Powered by Klaviyo.</p>
           <p className="text-xs">
             You're receiving this because you signed up for updates.{" "}
             <a href="#" className="text-foreground hover:underline">

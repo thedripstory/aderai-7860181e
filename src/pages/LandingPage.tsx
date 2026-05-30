@@ -738,7 +738,7 @@ export default function LandingPage() {
             {/* Bottom Bar */}
             <div className="border-t border-border/50 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
               <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
-                © 2025 Aderai. All rights reserved.
+                © {new Date().getFullYear()} Aderai. All rights reserved.
               </div>
               <PoweredByBadge />
             </div>
