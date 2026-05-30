@@ -18,7 +18,7 @@ export const SegmentFlowEffect = () => {
 
   return (
     <div
-      className="h-[60vh] bg-background w-screen relative overflow-hidden -mx-[50vw] left-1/2 right-1/2 ml-[-50vw] mr-[-50vw]"
+      className="h-[75vh] sm:h-[85vh] min-h-[640px] bg-background w-screen relative overflow-hidden -mx-[50vw] left-1/2 right-1/2 ml-[-50vw] mr-[-50vw]"
       ref={ref}
     >
       <GoogleGeminiEffect

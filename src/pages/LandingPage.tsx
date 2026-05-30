@@ -682,7 +682,7 @@ export default function LandingPage() {
           </Suspense>
 
           {/* Main Footer Content */}
-          <div className="py-6 sm:py-8">
+          <div className="pt-20 sm:pt-28 md:pt-32 pb-6 sm:pb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
               {/* Brand Column - Larger */}
               <div className="col-span-2">
