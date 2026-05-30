@@ -166,6 +166,14 @@ export default function Settings() {
     }
   }, []);
 
+  // Sync confetti preference from server (cross-device)
+  useEffect(() => {
+    (async () => {
+      const v = await syncConfettiFromServer();
+      if (typeof v === 'boolean') setConfettiEnabledState(v);
+    })();
+  }, []);
+
   const loadSubscriptionDetails = async () => {
     setSubscriptionLoading(true);
     try {
