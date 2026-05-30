@@ -54,7 +54,7 @@ export default function UnifiedDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
 
 
-  const { loading: creatingSegments, results, createSegments, setResults, batchProgress } = useKlaviyoSegments();
+  const { loading: creatingSegments, results, createSegments, setResults, batchProgress, resumeJob } = useKlaviyoSegments();
   const { trackAction } = useFeatureTracking('unified_dashboard');
   
   // Track which segments are already created in Klaviyo
