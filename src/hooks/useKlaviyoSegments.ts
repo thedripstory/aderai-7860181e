@@ -601,7 +601,7 @@ export const useKlaviyoSegments = () => {
     });
     setJobStatus({
       id: job.id,
-      status: job.status,
+      status: job.status as JobStatus['status'],
       totalSegments: total,
       segmentsProcessed: processed,
       successCount: job.success_count || 0,
