@@ -2179,6 +2179,21 @@ serve(async (req) => {
         else if (result.status === 'exists') existsCount++;
         else if (result.status === 'skipped') skippedCount++;
         else errorCount++;
+
+        // Emit live progress to the job row so the client's realtime subscription updates immediately.
+        const completedIdsSoFar = results
+          .filter((r: any) => r.status === 'created' || r.status === 'exists' || r.status === 'skipped')
+          .map((r: any) => r.segmentId);
+        const failedIdsSoFar = results
+          .filter((r: any) => r.status !== 'created' && r.status !== 'exists' && r.status !== 'skipped')
+          .map((r: any) => r.segmentId);
+        await updateJobProgress(jobId, {
+          segments_processed: results.length,
+          success_count: successCount + existsCount,
+          error_count: errorCount,
+          completed_segment_ids: completedIdsSoFar,
+          failed_segment_ids: failedIdsSoFar,
+        });
         
         // Small delay between segments within a batch (except for last one in batch)
         if (i < batch.length - 1) {
