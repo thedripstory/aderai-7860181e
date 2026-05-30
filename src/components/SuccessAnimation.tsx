@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { getConfettiEnabled } from '@/lib/preferences';
 
 interface SuccessAnimationProps {
@@ -11,29 +11,42 @@ interface SuccessAnimationProps {
   onComplete?: () => void;
 }
 
-export function SuccessAnimation({ 
-  show, 
-  title, 
+export function SuccessAnimation({
+  show,
+  title,
   description,
-  onComplete 
+  onComplete,
 }: SuccessAnimationProps) {
+  const firedRef = useRef(false);
+  // Keep latest onComplete without retriggering the effect
+  const onCompleteRef = useRef(onComplete);
   useEffect(() => {
-    if (show && getConfettiEnabled()) {
-      // Trigger confetti only if the user has it enabled
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  useEffect(() => {
+    if (!show) {
+      // reset so the next show=true transition can fire once
+      firedRef.current = false;
+      return;
+    }
+    if (firedRef.current) return;
+    firedRef.current = true;
+
+    if (getConfettiEnabled()) {
       confetti({
-        particleCount: 100,
-        spread: 70,
+        particleCount: 60,
+        spread: 55,
         origin: { y: 0.6 },
         colors: ['#f97316', '#8b5cf6', '#ec4899'],
       });
-
-      // Auto-complete after 3 seconds
-      if (onComplete) {
-        const timer = setTimeout(onComplete, 3000);
-        return () => clearTimeout(timer);
-      }
     }
-  }, [show, onComplete]);
+
+    const timer = setTimeout(() => {
+      onCompleteRef.current?.();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [show]);
 
   if (!show) return null;
 

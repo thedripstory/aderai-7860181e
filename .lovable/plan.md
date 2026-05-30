@@ -1,73 +1,57 @@
-# Segment Creation Flow + Confetti Preference Fixes
+## Goal
 
-Four targeted fixes. No business logic changes beyond the edge function emitting per-segment progress.
+Make confetti rare and intentional, and replace hardcoded "2025" in footers with a dynamic year so it correctly shows 2026 (and future years).
 
-## 1. Remove the highlighted "currentSegment" card at the top. It should only show when there's just a SINGLE segment being pushed and not when there are multiple.
+## 1. Fix the multi-burst confetti bug (root cause of "3-4 confetti in a row")
 
-File: `src/components/SegmentCreationFlow.tsx`
+`src/components/SuccessAnimation.tsx`'s `useEffect` depends on `[show, onComplete]`. In `SegmentCreationFlow.tsx` the parent passes a fresh inline `onComplete={() => {...}}` arrow each render, so every parent re-render while `show === true` re-runs the effect and fires `confetti()` again. Combined with realtime job updates streaming in during/after completion, this produces 3–4 bursts.
 
-- The big block showing "Site Visitors (30 Days) — Visited site in last 30 days" is the `currentSegment` card (Target-icon card inside `<AnimatePresence>`).
-- Hide it entirely when `loading === false`. While loading, keep a small "Currently creating: &nbsp;" line (not a giant card) so the modal still feels alive, or drop the card entirely and rely on the list below. Simpler: remove the card block in all states — the per-segment list already communicates what's happening.
-- Net effect: completed modal shows only header + progress bar + scrollable result list + Done.
+Fix in `src/components/SuccessAnimation.tsx`:
+- Remove `onComplete` from the effect dependency array (depend on `[show]` only).
+- Add a `useRef<boolean>` "alreadyFired" guard so confetti fires exactly once per `show: false → true` transition. Reset the ref when `show` flips back to `false`.
+- Keep the `getConfettiEnabled()` gate.
 
-## 2. Real-time progress bar + "X of N" counter
+## 2. Make the single burst subtler
 
-Root cause: `klaviyo-create-segments` processes all batches server-side and only returns at the very end. The client's realtime subscription on `segment_creation_jobs` exists (`useKlaviyoSegments.ts` lines 113–170) but the row is never updated mid-flight, so it jumps from 0/14 → 14/14.
+Still in `SuccessAnimation.tsx`, soften the one remaining burst:
+- `particleCount: 100 → 60`
+- `spread: 70 → 55`
+- Keep brand colors.
+
+## 3. Remove the second confetti source on the welcome path
+
+`src/components/WelcomeBackModal.tsx` also fires a full `confetti()` 300ms after opening, unconditionally (no preference check, no guard). This is the other "out of nowhere" burst the user is seeing after returning to the app.
 
 Changes:
+- Gate it on `getConfettiEnabled()`.
+- Only fire when there is a "celebratory" amount of work to acknowledge (e.g. `totalSegments >= 5`), so quick small completions don't trigger it.
+- Use the same softer params (60 / 55).
+- Guard with a `useRef` so it cannot fire twice for the same mount.
 
-**a. `supabase/functions/klaviyo-create-segments/index.ts**`
+Net effect: at most one subtle confetti burst per meaningful success event, respecting the user's Settings toggle.
 
-- Accept an optional `jobId` in the request body (already passed from the hook via existing job record — wire it through `requestBody` in `useKlaviyoSegments.ts` around line 319).
-- Inside the batch loop (around line 2139), after each segment completes (success / exists / error / skipped), update `segment_creation_jobs` for that `jobId` with running counters:
-  - `segments_processed`, `success_count`, `error_count`, `completed_segment_ids`, `failed_segment_ids`.
-- Use a service-role Supabase client (already used elsewhere in the function or create with `SUPABASE_SERVICE_ROLE_KEY`) so RLS doesn't block writes.
-- Skip the update if `jobId` is null (defensive).
+## 4. Audit — no other confetti sources
 
-**b. `src/hooks/useKlaviyoSegments.ts**`
+`rg` confirms the only `canvas-confetti` call sites are `SuccessAnimation.tsx` and `WelcomeBackModal.tsx`. Nothing else to touch.
 
-- Pass `jobId: jobRecordId` into the `requestBody` sent to `klaviyo-create-segments`.
-- In the realtime subscription handler (lines 127–144), also update `batchProgress.segmentsProcessed` and append per-segment entries to `results` so the green checkmark list fills incrementally. Derive new completions by diffing `completed_segment_ids` / `failed_segment_ids` against current `results`.
-- Compute `currentBatch` from `Math.floor(segments_processed / BATCH_SIZE) + 1` so "Processing batch X of Y" advances.
+## 5. Dynamic year in footers (shows 2026 now, auto-updates later)
 
-**c. `src/components/SegmentCreationFlow.tsx**`
+Two files hardcode `© 2025`:
 
-- Remove the "~Xs remaining" line (the `batchProgress.estimatedTimeRemaining > 0` block).
-- Remove `estimatedTimeRemaining` calculation in the hook (optional cleanup) or just stop rendering it.
-- Keep the progress bar driven by `batchProgress.segmentsProcessed / totalSegments` — which now updates in real time.
+- `src/pages/LandingPage.tsx` line 741: `© 2025 Aderai. All rights reserved.` → replace with `© {new Date().getFullYear()} Aderai. All rights reserved.`
+- `src/components/EmailFooter.tsx` line 29: `© 2025 Aderai. Powered by Klaviyo.` → replace with `© {new Date().getFullYear()} Aderai. Powered by Klaviyo.`
 
-## 3. Confetti toggle in Settings
-
-**a. New preference**
-
-- Store in `localStorage` under `aderai:confetti_enabled` (default `true`). No DB migration needed — purely client preference.
-- Add tiny helper in `src/lib/utils.ts` or new `src/lib/preferences.ts`:
-  - `getConfettiEnabled(): boolean`
-  - `setConfettiEnabled(v: boolean): void`
-
-**b. `src/components/SuccessAnimation.tsx**`
-
-- Before calling `confetti(...)`, check `getConfettiEnabled()`. If `false`, skip the confetti call but still show the green check + title + auto-complete.
-
-**c. `src/pages/Settings.tsx**`
-
-- Add a "Preferences" section (or append to existing) with a `<Switch>`:
-  - Label: "Celebration confetti"
-  - Description: "Show a confetti burst when segments are created successfully."
-  - Default ON. Reads/writes via the helper. Persists immediately.
-
-## 4. Technical notes
-
-- The edge function must use the service-role client for the in-flight job updates to bypass RLS on `segment_creation_jobs`.
-- Realtime is already enabled on `segment_creation_jobs` (verified in `pg_publication_tables`).
-- No DB migration required.
-- Result list ordering in the modal: dedupe by `segmentId` when merging realtime updates so we don't double-render.
+`src/components/DashboardFooter.tsx` already uses `currentYear = new Date().getFullYear()` — no change needed.
 
 ## Files touched
 
-- `src/components/SegmentCreationFlow.tsx` — remove top card, remove ETA line
-- `src/hooks/useKlaviyoSegments.ts` — pass jobId, merge realtime updates into `results` + `batchProgress`
-- `supabase/functions/klaviyo-create-segments/index.ts` — per-segment job row updates via service role
-- `src/components/SuccessAnimation.tsx` — gate confetti on preference
-- `src/pages/Settings.tsx` — add confetti toggle
-- `src/lib/preferences.ts` (new, small) — localStorage helpers
+- `src/components/SuccessAnimation.tsx` — single-fire guard, softer params, effect dep fix
+- `src/components/WelcomeBackModal.tsx` — gate on preference + threshold + single-fire guard, softer params
+- `src/pages/LandingPage.tsx` — dynamic year in footer
+- `src/components/EmailFooter.tsx` — dynamic year in footer
+
+## Non-goals / guardrails
+
+- No changes to segment creation logic, realtime subscription, or Settings toggle behavior.
+- The existing "Celebration confetti" toggle in Settings continues to work and now fully suppresses both sources when off.
+- No new dependencies, no DB changes, no edge function changes.

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PartyPopper, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
+import { getConfettiEnabled } from '@/lib/preferences';
 
 interface CompletedJob {
   id: string;
@@ -24,6 +25,7 @@ export function WelcomeBackModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [completedJobs, setCompletedJobs] = useState<CompletedJob[]>([]);
   const [totalSegments, setTotalSegments] = useState(0);
+  const confettiFiredRef = useRef(false);
 
   useEffect(() => {
     checkForCompletedJobs();
@@ -88,14 +90,18 @@ export function WelcomeBackModal() {
       setTotalSegments(total);
       setIsOpen(true);
 
-      // Trigger confetti!
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      }, 300);
+      // Subtle, single confetti burst — only for meaningful completions and if user hasn't disabled it
+      if (!confettiFiredRef.current && getConfettiEnabled() && total >= 5) {
+        confettiFiredRef.current = true;
+        setTimeout(() => {
+          confetti({
+            particleCount: 60,
+            spread: 55,
+            origin: { y: 0.6 },
+            colors: ['#f97316', '#8b5cf6', '#ec4899'],
+          });
+        }, 300);
+      }
 
     } catch (err) {
       console.error('Error in WelcomeBackModal:', err);
