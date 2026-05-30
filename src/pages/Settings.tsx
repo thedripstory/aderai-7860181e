@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackEvent } from '@/lib/analytics';
+import { getConfettiEnabled, setConfettiEnabled } from '@/lib/preferences';
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
