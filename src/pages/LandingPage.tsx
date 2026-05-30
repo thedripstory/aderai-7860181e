@@ -220,9 +220,7 @@ export default function LandingPage() {
 
                   <div className="text-xs sm:text-sm text-primary mb-2 font-bold uppercase tracking-wide">With Aderai</div>
                   <div className="text-3xl sm:text-5xl font-bold mb-3 sm:mb-4 text-foreground">
-                    <CircleDoodle delay="1.5s">
-                      <AnimatedTimeCounter />
-                    </CircleDoodle>
+                    30 seconds
                   </div>
 
                   <div className="space-y-2 sm:space-y-3">
