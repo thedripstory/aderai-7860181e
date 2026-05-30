@@ -126,17 +126,49 @@ export const useKlaviyoSegments = () => {
         },
         (payload) => {
           const job = payload.new as any;
-          
-          setProgress({
-            current: job.segments_processed || 0,
-            total: job.total_segments || 0
+          const processed = job.segments_processed || 0;
+          const total = job.total_segments || 0;
+
+          setProgress({ current: processed, total });
+
+          // Keep batchProgress live so the modal's progress bar + "X of N" advance in real time
+          setBatchProgress((prev) => {
+            if (!prev) return prev;
+            const BATCH_SIZE = 4;
+            const currentBatch = Math.min(
+              prev.totalBatches,
+              Math.max(1, Math.floor(processed / BATCH_SIZE) + (processed < total ? 1 : 0))
+            );
+            return {
+              ...prev,
+              segmentsProcessed: processed,
+              currentBatch: processed >= total ? prev.totalBatches : currentBatch,
+            };
+          });
+
+          // Merge per-segment completions into results as they happen
+          const completedIds: string[] = Array.isArray(job.completed_segment_ids) ? job.completed_segment_ids : [];
+          const failedIds: string[] = Array.isArray(job.failed_segment_ids) ? job.failed_segment_ids : [];
+          setResults((prev) => {
+            const existing = new Map(prev.map((r) => [r.segmentId, r]));
+            for (const id of completedIds) {
+              if (!existing.has(id) || existing.get(id)?.status === 'queued') {
+                existing.set(id, { segmentId: id, status: 'success', message: 'Created' });
+              }
+            }
+            for (const id of failedIds) {
+              if (!existing.has(id) || existing.get(id)?.status === 'queued') {
+                existing.set(id, { segmentId: id, status: 'error', message: 'Failed' });
+              }
+            }
+            return Array.from(existing.values());
           });
 
           setJobStatus({
             id: job.id,
             status: job.status,
             totalSegments: job.total_segments,
-            segmentsProcessed: job.segments_processed || 0,
+            segmentsProcessed: processed,
             successCount: job.success_count || 0,
             errorCount: job.error_count || 0,
             rateLimitType: job.rate_limit_type,
@@ -322,6 +354,7 @@ export const useKlaviyoSegments = () => {
         currencySymbol,
         settings,
         customInputs: customInputs || {},
+        jobId: jobRecordId,
       };
 
       const { data: response, error } = await supabase.functions.invoke('klaviyo-create-segments', {
