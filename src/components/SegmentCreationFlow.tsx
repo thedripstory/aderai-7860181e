@@ -232,11 +232,6 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
                     </p>
                   </div>
                   
-                  {batchProgress.estimatedTimeRemaining > 0 && (
-                    <p className="text-xs text-muted-foreground mt-2 text-center">
-                      ~{Math.ceil(batchProgress.estimatedTimeRemaining)}s remaining
-                    </p>
-                  )}
                 </div>
               )}
 
