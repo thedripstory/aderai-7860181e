@@ -69,18 +69,29 @@ export function useAILimits() {
     try {
       // Check if user is authenticated first
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         console.error('Not authenticated');
         return;
       }
 
       // Let supabase client handle auth headers automatically
-      const { error } = await supabase.functions.invoke('increment-ai-usage');
+      const { data, error } = await supabase.functions.invoke('increment-ai-usage');
       if (error) throw error;
-      
-      // Refresh the limit status after incrementing
-      await checkLimit();
+
+      // Optimistically update local counter from the server-returned value so the UI moves immediately
+      if (data && typeof data.new_count === 'number') {
+        setLimitStatus(prev => ({
+          ...prev,
+          total_used: data.new_count,
+          total_lifetime: typeof data.total === 'number' ? data.total : prev.total_lifetime,
+          remaining: Math.max(0, prev.daily_limit - data.new_count),
+          allowed: data.new_count < prev.daily_limit,
+        }));
+      }
+
+      // Refresh the limit status from server in the background to stay in sync
+      checkLimit().catch(() => {});
     } catch (error) {
       console.error('Error incrementing AI usage:', error);
     }
