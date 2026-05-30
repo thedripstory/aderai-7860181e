@@ -1,57 +1,58 @@
 ## Goal
 
-Make confetti rare and intentional, and replace hardcoded "2025" in footers with a dynamic year so it correctly shows 2026 (and future years).
+The "Create This Segment" path in the AI section keeps failing against Klaviyo. Instead of fighting the Klaviyo segment-creation API for AI-generated definitions, pivot the AI section into an **inspiration/ideas generator**: the user describes a goal, and we return a richer list of related segment ideas with clear descriptions — no Klaviyo write call. Users can then create the ones they like manually in Klaviyo (or via the existing pre-built segments flow elsewhere in the app).
 
-## 1. Fix the multi-burst confetti bug (root cause of "3-4 confetti in a row")
+## What changes (UI / behavior)
 
-`src/components/SuccessAnimation.tsx`'s `useEffect` depends on `[show, onComplete]`. In `SegmentCreationFlow.tsx` the parent passes a fresh inline `onComplete={() => {...}}` arrow each render, so every parent re-render while `show === true` re-runs the effect and fires `confetti()` again. Combined with realtime job updates streaming in during/after completion, this produces 3–4 bursts.
+In `src/components/AISegmentSuggester.tsx`:
 
-Fix in `src/components/SuccessAnimation.tsx`:
-- Remove `onComplete` from the effect dependency array (depend on `[show]` only).
-- Add a `useRef<boolean>` "alreadyFired" guard so confetti fires exactly once per `show: false → true` transition. Reset the ref when `show` flips back to `false`.
-- Keep the `getConfettiEnabled()` gate.
+1. **Remove the "Create This Segment" button** and all `createAiSegment` logic, including:
+   - `creatingSegment` / `segmentCreationComplete` state
+   - `<SegmentCreationModal>` mount
+   - The `klaviyo-create-custom-segment` invoke and its analytics/PostHog "AI Suggestion Applied" tracking
+2. **Reframe copy** so it's clearly an idea/inspiration tool, not a builder:
+   - Header: "Get Segment Ideas" (was "Describe Your Goal")
+   - Sub: "Tell us what you're trying to achieve and we'll suggest related segment ideas you can build in Klaviyo."
+   - CTA button: "Generate Segment Ideas" (was "Generate AI Suggestions")
+   - Section title: "Suggested Segment Ideas" (was "AI Suggestions")
+   - Empty/Loading messages updated to match
+3. **Richer per-suggestion card** — for each idea show:
+   - Name (without the " | Aderai" suffix stripped for display only)
+   - 2–3 sentence description (why this segment matters + who it targets)
+   - A small bulleted "Criteria" summary in plain English (e.g. "Placed Order with Item Name = Jaadugar in the last 7 days")
+   - Optional "View technical definition" collapsible (kept as-is for power users)
+   - A "Copy idea" button (copies name + description + plain-English criteria to clipboard) — replaces the create button
+4. **Ask for more ideas at once**: bump server-side suggestion count from 3–5 to **6–10** related variants so the user truly gets adjacent/similar segments (e.g. "browsed X last 7 days", "bought X twice", "bought X + Y", "bought X then churned 30d").
 
-## 2. Make the single burst subtler
+## What changes (server)
 
-Still in `SuccessAnimation.tsx`, soften the one remaining burst:
-- `particleCount: 100 → 60`
-- `spread: 70 → 55`
-- Keep brand colors.
+In `supabase/functions/klaviyo-suggest-segments/index.ts`:
 
-## 3. Remove the second confetti source on the welcome path
+1. Update the system prompt so the AI returns **6–10 related variants** around the user's stated goal, explicitly varying:
+   - Time window (7d / 30d / 90d / all-time)
+   - Frequency (bought once / twice / 3+)
+   - Behavior type (browsed / added to cart / purchased)
+   - Adjacent products or categories if mentioned
+2. Add a new field to each segment object: `plain_english_criteria: string[]` — short human-readable bullets the UI renders directly (no JSON parsing on the client).
+3. Keep the existing `definition` object so the "technical definition" collapsible still works, but **do not** require it to be valid for Klaviyo creation (since we no longer POST it).
+4. No changes to auth, rate limiting, daily-limit counting, or `useAILimits` — one prompt still = one AI suggestion used.
 
-`src/components/WelcomeBackModal.tsx` also fires a full `confetti()` 300ms after opening, unconditionally (no preference check, no guard). This is the other "out of nowhere" burst the user is seeing after returning to the app.
+## What we explicitly keep
 
-Changes:
-- Gate it on `getConfettiEnabled()`.
-- Only fire when there is a "celebratory" amount of work to acknowledge (e.g. `totalSegments >= 5`), so quick small completions don't trigger it.
-- Use the same softer params (60 / 55).
-- Guard with a `useRef` so it cannot fire twice for the same mount.
+- `klaviyo-create-custom-segment` edge function stays deployed (used by other surfaces if any; verified only `AISegmentSuggester.tsx` calls it — safe to leave untouched to avoid breaking anything else).
+- All pre-built segments / bundles / bulk-creation flows in the rest of the app are untouched.
+- AI daily limits, usage counter UI, achievements, analytics events for `ai_suggestion_used`.
+- "View technical definition" accordion (collapsed by default, per existing memory).
+- No DB migrations, no new dependencies, no auth/routing changes.
 
-Net effect: at most one subtle confetti burst per meaningful success event, respecting the user's Settings toggle.
+## Risk / regression check
 
-## 4. Audit — no other confetti sources
-
-`rg` confirms the only `canvas-confetti` call sites are `SuccessAnimation.tsx` and `WelcomeBackModal.tsx`. Nothing else to touch.
-
-## 5. Dynamic year in footers (shows 2026 now, auto-updates later)
-
-Two files hardcode `© 2025`:
-
-- `src/pages/LandingPage.tsx` line 741: `© 2025 Aderai. All rights reserved.` → replace with `© {new Date().getFullYear()} Aderai. All rights reserved.`
-- `src/components/EmailFooter.tsx` line 29: `© 2025 Aderai. Powered by Klaviyo.` → replace with `© {new Date().getFullYear()} Aderai. Powered by Klaviyo.`
-
-`src/components/DashboardFooter.tsx` already uses `currentYear = new Date().getFullYear()` — no change needed.
+- Only one file calls `klaviyo-create-custom-segment` from the UI (`AISegmentSuggester.tsx`); removing that call cannot break other surfaces.
+- `SegmentCreationModal` is also used by other flows (`SegmentCreationFlow`, bulk creation); we only remove its usage *here*, not the component.
+- `useAILimits` and `incrementUsage` continue to work unchanged.
+- Confetti / footer / resume-job / preferences work from earlier turns is untouched.
 
 ## Files touched
 
-- `src/components/SuccessAnimation.tsx` — single-fire guard, softer params, effect dep fix
-- `src/components/WelcomeBackModal.tsx` — gate on preference + threshold + single-fire guard, softer params
-- `src/pages/LandingPage.tsx` — dynamic year in footer
-- `src/components/EmailFooter.tsx` — dynamic year in footer
-
-## Non-goals / guardrails
-
-- No changes to segment creation logic, realtime subscription, or Settings toggle behavior.
-- The existing "Celebration confetti" toggle in Settings continues to work and now fully suppresses both sources when off.
-- No new dependencies, no DB changes, no edge function changes.
+- `src/components/AISegmentSuggester.tsx` — remove create flow, add ideas-list UI with copy button + plain-English criteria
+- `supabase/functions/klaviyo-suggest-segments/index.ts` — return 6–10 variants + `plain_english_criteria[]`
