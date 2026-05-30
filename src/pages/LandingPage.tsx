@@ -8,9 +8,7 @@ import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 
 import { AnimatedUnderline } from "@/components/AnimatedUnderline";
-import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
-import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { AderaiLogo } from "@/components/AderaiLogo";
@@ -222,9 +220,7 @@ export default function LandingPage() {
 
                   <div className="text-xs sm:text-sm text-primary mb-2 font-bold uppercase tracking-wide">With Aderai</div>
                   <div className="text-3xl sm:text-5xl font-bold mb-3 sm:mb-4 text-foreground">
-                    <CircleDoodle delay="1.5s">
-                      <AnimatedTimeCounter />
-                    </CircleDoodle>
+                    30 seconds
                   </div>
 
                   <div className="space-y-2 sm:space-y-3">
