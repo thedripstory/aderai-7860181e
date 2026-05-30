@@ -8,9 +8,7 @@ import { PoweredByBadge } from "@/components/PoweredByBadge";
 import { TrustLogos } from "@/components/TrustLogos";
 
 import { AnimatedUnderline } from "@/components/AnimatedUnderline";
-import { CircleDoodle } from "@/components/CircleDoodle";
 import { ArrowDoodle } from "@/components/ArrowDoodle";
-import { AnimatedTimeCounter } from "@/components/AnimatedTimeCounter";
 import { RevolvingTestimonials } from "@/components/RevolvingTestimonials";
 import { TimeBasedPopup } from "@/components/TimeBasedPopup";
 import { AderaiLogo } from "@/components/AderaiLogo";
