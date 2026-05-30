@@ -529,14 +529,14 @@ function getSegmentDefinition(
       }
     } : null,
     
-    // #26 Big Spenders - Historic CLV above threshold (DIFFERENT from VIP!)
+    // #26 Big Spenders - Predictive Historic CLV above threshold (DIFFERENT from VIP!)
     'big-spenders': {
       name: `Big Spenders (${currencySymbol}${vipThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Historic Customer Lifetime Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'historic_clv',
             filter: {
               type: 'numeric',
               operator: 'greater-than',
@@ -547,14 +547,14 @@ function getSegmentDefinition(
       }
     },
     
-    // #27 Bargain Shoppers - Historic CLV below threshold
+    // #27 Bargain Shoppers - Predictive Historic CLV below threshold
     'bargain-shoppers': {
       name: `Bargain Shoppers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Historic Customer Lifetime Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'historic_clv',
             filter: {
               type: 'numeric',
               operator: 'less-than',
@@ -620,14 +620,14 @@ function getSegmentDefinition(
       }
     },
     
-    // #31 High AOV - Average Order Value above threshold
+    // #31 High AOV - Predictive Average Order Value above threshold
     'high-aov': {
       name: `High AOV Customers (${currencySymbol}${highValueThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Average Order Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'average_order_value',
             filter: {
               type: 'numeric',
               operator: 'greater-than',
@@ -638,14 +638,14 @@ function getSegmentDefinition(
       }
     },
     
-    // #32 Low AOV - Average Order Value below threshold
+    // #32 Low AOV - Predictive Average Order Value below threshold
     'low-aov': {
       name: `Low AOV Customers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Average Order Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'average_order_value',
             filter: {
               type: 'numeric',
               operator: 'less-than',
@@ -794,7 +794,7 @@ function getSegmentDefinition(
               property: 'Discount Codes',
               filter: {
                 type: 'string',
-                operator: 'is-not-empty'
+                operator: 'is-set'
               }
             }]
           }]
@@ -826,7 +826,7 @@ function getSegmentDefinition(
               property: 'Discount Codes',
               filter: {
                 type: 'string',
-                operator: 'is-empty'
+                operator: 'is-not-set'
               }
             }]
           }]
