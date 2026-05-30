@@ -1810,7 +1810,7 @@ async function createKlaviyoSegment(
       'refunded-customers', 'unengaged-exclusion', 'sunset-segment', 'received-5-opened-0',
       'received-3-in-3-days', 'marked-spam', 'never-engaged-exclusion',
     ]);
-    let cleanName = segmentDef.name.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim();
+    let cleanName = cleanName.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim();
     if (EXCLUSION_SEGMENT_IDS.has(segmentId) && !/^\(Exclude\)/i.test(cleanName)) {
       cleanName = `(Exclude) ${cleanName}`;
     }
@@ -1845,11 +1845,11 @@ async function createKlaviyoSegment(
     if (!response.ok) {
       // Check for duplicate/already exists error
       if (response.status === 409) {
-        console.log(`[klaviyo-create-segments] Segment already exists: ${segmentDef.name}`);
+        console.log(`[klaviyo-create-segments] Segment already exists: ${cleanName}`);
         
         // Try to find the existing segment and tag it
         if (tagId) {
-          const existingSegmentId = await findSegmentByName(apiKey, segmentDef.name);
+          const existingSegmentId = await findSegmentByName(apiKey, cleanName);
           if (existingSegmentId) {
             console.log(`[klaviyo-create-segments] Found existing segment ${existingSegmentId}, adding Aderai tag...`);
             await addTagToSegment(apiKey, tagId, existingSegmentId);
@@ -1859,7 +1859,7 @@ async function createKlaviyoSegment(
         return {
           segmentId,
           status: 'exists',
-          name: segmentDef.name
+          name: cleanName
         };
       }
       
@@ -1872,7 +1872,7 @@ async function createKlaviyoSegment(
       };
     }
 
-    console.log(`[klaviyo-create-segments] Successfully created: ${segmentDef.name}`);
+    console.log(`[klaviyo-create-segments] Successfully created: ${cleanName}`);
     
     // Tag the segment with Aderai
     if (tagId && responseData.data?.id) {
@@ -1882,7 +1882,7 @@ async function createKlaviyoSegment(
     return {
       segmentId,
       status: 'created',
-      name: segmentDef.name,
+      name: cleanName,
       klaviyoId: responseData.data?.id
     };
 
