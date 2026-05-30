@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
@@ -14,9 +13,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const DAILY_LIMIT = 10;
-
-// Decode JWT to get user ID (without full validation - gateway already validates)
 function getUserIdFromJWT(token: string): string | null {
   try {
     const parts = token.replace('Bearer ', '').split('.');
@@ -36,10 +32,8 @@ serve(async (req) => {
   console.log('[klaviyo-suggest-segments] Request received');
 
   try {
-    // Get user ID from JWT
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
-      console.error('[klaviyo-suggest-segments] No authorization header');
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -48,48 +42,29 @@ serve(async (req) => {
 
     const userId = getUserIdFromJWT(authHeader);
     if (!userId) {
-      console.error('[klaviyo-suggest-segments] Could not extract user ID from JWT');
       return new Response(
         JSON.stringify({ error: 'Invalid token' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('[klaviyo-suggest-segments] User ID:', userId);
-
     const body = await req.json();
     const validationResult = RequestSchema.safeParse(body);
-    
+
     if (!validationResult.success) {
-      console.error('[klaviyo-suggest-segments] Validation failed:', validationResult.error.issues);
       return new Response(
-        JSON.stringify({ 
-          error: 'Invalid input', 
-          details: validationResult.error.issues 
-        }),
+        JSON.stringify({ error: 'Invalid input', details: validationResult.error.issues }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
-    let { apiKey, answers } = validationResult.data;
-    console.log('[klaviyo-suggest-segments] Parsed request body, has apiKey:', !!apiKey, ', has answers:', !!answers);
 
-    // Decrypt API key if encrypted
+    let { apiKey, answers } = validationResult.data;
+
     if (isEncrypted(apiKey)) {
-      console.log('[klaviyo-suggest-segments] API key is encrypted, decrypting...');
-      try {
-        apiKey = await decryptApiKey(apiKey);
-        console.log('[klaviyo-suggest-segments] API key decrypted successfully');
-      } catch (decryptError) {
-        console.error('[klaviyo-suggest-segments] Decryption failed:', decryptError);
-        throw new Error(`Failed to decrypt API key: ${decryptError instanceof Error ? decryptError.message : 'Unknown error'}`);
-      }
-    } else {
-      console.log('[klaviyo-suggest-segments] API key is plaintext');
+      apiKey = await decryptApiKey(apiKey);
     }
 
-    // Fetch available metrics from Klaviyo
-    console.log('[klaviyo-suggest-segments] Fetching metrics from Klaviyo...');
+    // Fetch available metrics from Klaviyo (still useful context for the model)
     const metricsResponse = await fetch('https://a.klaviyo.com/api/metrics/', {
       headers: {
         'Authorization': `Klaviyo-API-Key ${apiKey}`,
@@ -99,7 +74,6 @@ serve(async (req) => {
 
     if (!metricsResponse.ok) {
       const errorText = await metricsResponse.text();
-      console.error('[klaviyo-suggest-segments] Klaviyo metrics API error:', metricsResponse.status, errorText);
       throw new Error(`Failed to fetch metrics from Klaviyo: ${metricsResponse.status} - ${errorText}`);
     }
 
@@ -108,48 +82,45 @@ serve(async (req) => {
       id: m.id,
       name: m.attributes.name,
     }));
-    console.log('[klaviyo-suggest-segments] Found', availableMetrics.length, 'metrics');
 
-    // Use Lovable AI Gateway
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!lovableApiKey) {
-      console.error('[klaviyo-suggest-segments] LOVABLE_API_KEY not configured');
       throw new Error('LOVABLE_API_KEY not configured');
     }
-    console.log('[klaviyo-suggest-segments] Using Lovable AI Gateway...');
 
-    const systemPrompt = `You are a Klaviyo segmentation expert. Based on the user's brand information and available Klaviyo metrics, suggest 3-5 highly relevant customer segments.
+    const systemPrompt = `You are a Klaviyo segmentation expert helping a brand brainstorm customer segment IDEAS. You are NOT creating segments in Klaviyo — you are returning a rich, varied list of related segment concepts the user can read, understand, and recreate themselves.
 
-Available Klaviyo metrics:
-${availableMetrics.map((m: any) => `- ${m.name} (ID: ${m.id})`).join('\n')}
+Available Klaviyo metrics (for grounding only):
+${availableMetrics.map((m: any) => `- ${m.name}`).join('\n')}
 
-CRITICAL: You must use the EXACT Klaviyo API format below. Any deviation will cause errors.
+Given the user's goal, return 6-10 RELATED segment ideas that vary across these axes:
+- Time window: last 7 days, last 30 days, last 90 days, all-time
+- Frequency: bought once, bought twice, bought 3+ times
+- Behavior type: browsed, added to cart, purchased, abandoned checkout
+- Adjacency: if a specific product/category is mentioned, include variants for related products/categories, "bought X and Y", "bought X then churned", etc.
 
-For each segment, respond with this EXACT JSON structure:
+Each idea must be DISTINCT and useful — do not return the same idea twice with cosmetic changes.
+
+Respond with EXACTLY this JSON shape:
 {
   "segments": [
     {
-      "name": "Segment Name | Aderai",
-      "description": "Why this segment matters",
+      "name": "Short clear segment name (no '| Aderai' suffix, no emojis)",
+      "description": "2-3 sentences explaining who this targets and why this segment is valuable for marketing.",
+      "plain_english_criteria": [
+        "Placed Order with Item Name equal to \\"Jaadugar\\" in the last 7 days",
+        "At least 1 order"
+      ],
       "definition": {
         "condition_groups": [
           {
             "conditions": [
               {
                 "type": "profile-metric",
-                "metric_id": "USE_EXACT_METRIC_ID_FROM_LIST",
+                "metric_name": "Placed Order",
                 "measurement": "count",
-                "measurement_filter": {
-                  "type": "numeric",
-                  "operator": "greater-than",
-                  "value": 0
-                },
-                "timeframe_filter": {
-                  "type": "date",
-                  "operator": "in-the-last",
-                  "quantity": 30,
-                  "unit": "day"
-                }
+                "measurement_filter": { "type": "numeric", "operator": "greater-than", "value": 0 },
+                "timeframe_filter": { "type": "date", "operator": "in-the-last", "quantity": 7, "unit": "day" }
               }
             ]
           }
@@ -160,22 +131,17 @@ For each segment, respond with this EXACT JSON structure:
 }
 
 RULES:
-1. metric_id must be an EXACT ID from the available metrics list above
-2. measurement can be: "count" or "sum"
-3. operator can be: "greater-than", "less-than", "equals", "greater-or-equal", "less-or-equal"
-4. For time-based conditions, use timeframe_filter with type: "date" and operator: "in-the-last" (requires quantity and unit)
-5. For "over all time" conditions, set timeframe_filter to null
-6. unit can be: "day", "week", "month"
-7. For multiple conditions that must ALL be true, put them in the same conditions array
-8. For conditions where ANY can be true (OR logic), use separate condition_groups
-9. Always append " | Aderai" to segment names`;
+1. Return 6-10 ideas (aim for 8).
+2. plain_english_criteria: 1-4 short bullets, written for a non-technical marketer.
+3. definition is illustrative reference only — do not invent metric IDs, you may use metric_name.
+4. No markdown, no commentary, JSON only.`;
 
     const userPrompt = `User's goal: ${answers?.businessGoal || 'Create useful customer segments'}
 
-Brand Information:
-${answers ? Object.entries(answers).map(([key, value]) => `${key}: ${value}`).join('\n') : 'No additional information provided'}
+Brand context:
+${answers ? Object.entries(answers).filter(([k]) => k !== 'businessGoal').map(([k, v]) => `- ${k}: ${v}`).join('\n') : 'None'}
 
-Based on this information and the available Klaviyo metrics, suggest segments that will help this brand achieve their goals.`;
+Return 6-10 related segment ideas as specified.`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -197,7 +163,7 @@ Based on this information and the available Klaviyo metrics, suggest segments th
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('[klaviyo-suggest-segments] AI Gateway error:', aiResponse.status, errorText);
-      
+
       if (aiResponse.status === 429) {
         return new Response(
           JSON.stringify({ error: 'AI rate limit exceeded. Please try again later.' }),
@@ -210,19 +176,16 @@ Based on this information and the available Klaviyo metrics, suggest segments th
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      
+
       throw new Error(`AI Gateway error: ${aiResponse.status} - ${errorText}`);
     }
 
-    console.log('[klaviyo-suggest-segments] AI response received successfully');
     const aiData = await aiResponse.json();
     const content = aiData.choices?.[0]?.message?.content;
-    const finishReason = aiData.choices?.[0]?.finish_reason;
 
     if (!content) {
-      console.error('[klaviyo-suggest-segments] Empty AI content. finish_reason:', finishReason, 'usage:', JSON.stringify(aiData.usage));
       return new Response(
-        JSON.stringify({ error: 'AI returned an incomplete response. Please try again with fewer details or contact support.' }),
+        JSON.stringify({ error: 'AI returned an incomplete response. Please try again.' }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -231,15 +194,14 @@ Based on this information and the available Klaviyo metrics, suggest segments th
     try {
       suggestedSegments = JSON.parse(content);
     } catch (parseError) {
-      console.error('[klaviyo-suggest-segments] Failed to parse AI response. finish_reason:', finishReason, 'content:', content);
+      console.error('[klaviyo-suggest-segments] Parse error:', parseError, 'content:', content);
       return new Response(
         JSON.stringify({ error: 'AI returned an unparseable response. Please try again.' }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    
-    console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
+    console.log('[klaviyo-suggest-segments] Returning', suggestedSegments.segments?.length || 0, 'ideas');
 
     return new Response(
       JSON.stringify(suggestedSegments),
@@ -247,13 +209,8 @@ Based on this information and the available Klaviyo metrics, suggest segments th
     );
   } catch (error) {
     console.error('[klaviyo-suggest-segments] Error:', error);
-    console.error('[klaviyo-suggest-segments] Stack:', error instanceof Error ? error.stack : 'No stack trace');
-    
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error',
-        details: error instanceof Error ? error.stack : undefined
-      }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
