@@ -2101,7 +2101,7 @@ serve(async (req) => {
       );
     }
     
-    let { apiKey, segmentIds, currencySymbol, settings, customInputs } = body;
+    let { apiKey, segmentIds, currencySymbol, settings, customInputs, jobId } = body;
     
     console.log('[klaviyo-create-segments] Request params:', {
       hasApiKey: !!apiKey,
