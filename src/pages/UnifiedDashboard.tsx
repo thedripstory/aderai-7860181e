@@ -111,6 +111,28 @@ export default function UnifiedDashboard() {
         setEmailVerified(userData.email_verified || false);
         setCurrentUser(session.user);
         await loadKlaviyoKeys(session.user.id);
+
+        // Sync confetti preference cache from server (cross-device)
+        void syncConfettiFromServer();
+
+        // Resume an in-progress segment creation job, if any
+        try {
+          const { data: activeJob } = await supabase
+            .from('segment_creation_jobs')
+            .select('id, status')
+            .eq('user_id', session.user.id)
+            .in('status', ['in_progress', 'pending', 'waiting_retry'])
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (activeJob?.id) {
+            const ok = await resumeJob(activeJob.id);
+            if (ok) setView('creating');
+          }
+        } catch (e) {
+          // non-fatal
+        }
+
         setLoading(false);
       } catch (err) {
         console.error('Dashboard auth check failed:', err);
