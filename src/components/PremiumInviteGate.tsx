@@ -469,12 +469,13 @@ export const PremiumInviteGate: React.FC<PremiumInviteGateProps> = ({ featureNam
 
         {/* Title */}
         <h2 className="text-2xl font-bold text-center mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-          Aderai Premium
+          Invite-only, currently under testing.
         </h2>
         
         <p className="text-muted-foreground text-center max-w-md mb-2 text-sm">
-          {featureName} is available exclusively for Aderai Premium members.
+          {featureName} is currently invite-only while we test with select brands.
         </p>
+
         
         {/* Invite-only badge */}
         <div className="flex items-center gap-2 mb-6">
