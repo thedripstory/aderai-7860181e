@@ -37,6 +37,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { MobileMenu } from '@/components/MobileMenu';
 import { DashboardFooter } from '@/components/DashboardFooter';
 import { toast } from 'sonner';
+import { syncConfettiFromServer } from '@/lib/preferences';
 
 export default function UnifiedDashboard() {
   useNetworkStatus();
