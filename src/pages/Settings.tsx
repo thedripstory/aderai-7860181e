@@ -871,6 +871,33 @@ export default function Settings() {
                 </Button>
               </CardContent>
             </Card>
+
+            <Card className="border-border/50 shadow-lg mt-6">
+              <CardHeader>
+                <CardTitle>Display preferences</CardTitle>
+                <CardDescription>Tweak small interface behaviors.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Celebration confetti</p>
+                    <p className="text-sm text-muted-foreground">
+                      Show a confetti burst when segments are created successfully.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={confettiEnabled}
+                    onCheckedChange={(v) => {
+                      setConfettiEnabledState(v);
+                      setConfettiEnabled(v);
+                      toast({
+                        title: v ? "Confetti enabled" : "Confetti disabled",
+                      });
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Billing Tab */}
