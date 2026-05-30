@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
+import { getConfettiEnabled } from '@/lib/preferences';
 
 interface SuccessAnimationProps {
   show: boolean;
@@ -17,8 +18,8 @@ export function SuccessAnimation({
   onComplete 
 }: SuccessAnimationProps) {
   useEffect(() => {
-    if (show) {
-      // Trigger confetti
+    if (show && getConfettiEnabled()) {
+      // Trigger confetti only if the user has it enabled
       confetti({
         particleCount: 100,
         spread: 70,

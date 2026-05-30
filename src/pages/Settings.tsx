@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackEvent } from '@/lib/analytics';
+import { getConfettiEnabled, setConfettiEnabled } from '@/lib/preferences';
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -54,6 +55,7 @@ export default function Settings() {
   const [emailOnClientInvitation, setEmailOnClientInvitation] = useState(true);
   const [emailWeeklySummary, setEmailWeeklySummary] = useState(true);
   const [emailMarketing, setEmailMarketing] = useState(false);
+  const [confettiEnabled, setConfettiEnabledState] = useState(() => getConfettiEnabled());
 
   // Account settings
   const [accountName, setAccountName] = useState("");
@@ -867,6 +869,33 @@ export default function Settings() {
                 <Button onClick={handleSaveNotifications} disabled={loading}>
                   {loading ? "Saving..." : "Save Preferences"}
                 </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50 shadow-lg mt-6">
+              <CardHeader>
+                <CardTitle>Display preferences</CardTitle>
+                <CardDescription>Tweak small interface behaviors.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Celebration confetti</p>
+                    <p className="text-sm text-muted-foreground">
+                      Show a confetti burst when segments are created successfully.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={confettiEnabled}
+                    onCheckedChange={(v) => {
+                      setConfettiEnabledState(v);
+                      setConfettiEnabled(v);
+                      toast({
+                        title: v ? "Confetti enabled" : "Confetti disabled",
+                      });
+                    }}
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

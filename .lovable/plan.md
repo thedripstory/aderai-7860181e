@@ -1,49 +1,73 @@
-# Fix AI segment product filter + AI counter
+# Segment Creation Flow + Confetti Preference Fixes
 
-## Problem 1 — AI segment misses product filter
+Four targeted fixes. No business logic changes beyond the edge function emitting per-segment progress.
 
-When the AI suggests "Recent Purchasers of Jaadugar | Aderai", `klaviyo-create-custom-segment` calls OpenAI with a system prompt that only knows how to emit a basic `profile-metric` block (metric_id + count + timeframe). It has no instructions for the per-event property filter, so the resulting Klaviyo segment is just "Ordered Product at least once in last 30 days" — Jaadugar is lost.
+## 1. Remove the highlighted "currentSegment" card at the top. It should only show when there's just a SINGLE segment being pushed and not when there are multiple.
 
-Klaviyo supports per-event property filtering via `metric_filters` on a `profile-metric` condition (already used elsewhere in the codebase for `Discount Codes`). For product-scoped segments we need:
+File: `src/components/SegmentCreationFlow.tsx`
 
-```json
-"metric_filters": [{
-  "property": "Item Name",
-  "filter": { "type": "string", "operator": "equals", "value": "Jaadugar" }
-}]
-```
+- The big block showing "Site Visitors (30 Days) — Visited site in last 30 days" is the `currentSegment` card (Target-icon card inside `<AnimatePresence>`).
+- Hide it entirely when `loading === false`. While loading, keep a small "Currently creating: &nbsp;" line (not a giant card) so the modal still feels alive, or drop the card entirely and rely on the list below. Simpler: remove the card block in all states — the per-segment list already communicates what's happening.
+- Net effect: completed modal shows only header + progress bar + scrollable result list + Done.
 
-## Problem 2 — "10 of 10 AI suggestions remaining" never decreases
+## 2. Real-time progress bar + "X of N" counter
 
-`increment-ai-usage` runs the UPDATE through the user-scoped client (anon key + user JWT). The function doesn't `.select()` after update, so if RLS silently blocks the UPDATE the call still returns success and the counter stays at 10. The frontend then calls `checkLimit()` which re-reads the same unchanged row.
+Root cause: `klaviyo-create-segments` processes all batches server-side and only returns at the very end. The client's realtime subscription on `segment_creation_jobs` exists (`useKlaviyoSegments.ts` lines 113–170) but the row is never updated mid-flight, so it jumps from 0/14 → 14/14.
 
-## Plan
+Changes:
 
-### A. Add product/property filter support to AI segment creation
-File: `supabase/functions/klaviyo-create-custom-segment/index.ts`
+**a. `supabase/functions/klaviyo-create-segments/index.ts**`
 
-1. Expand the system prompt with a new RULES section explaining `metric_filters` for event property filtering, including examples for:
-   - Product name filter: `{ property: "Item Name", filter: { type: "string", operator: "equals", value: "<PRODUCT>" } }`
-   - Discount filter: `{ property: "Discount Codes", filter: { type: "string", operator: "is-set" } }`
-2. Add a rule: if the segment name or description references a specific product, collection, category, SKU, coupon code, or other identifiable value, the AI MUST include a corresponding `metric_filters` entry on the relevant event (Placed Order / Ordered Product / Viewed Product). Never drop the qualifier silently.
-3. Switch model to `gpt-5` (project standard) and keep `response_format: json_object`.
-4. After parsing `segmentDef`, run a small server-side sanity check: if the original `segmentName`/`segmentDescription` contains a quoted or capitalized product token (heuristic: words appearing in both name and description that aren't common words) and the produced definition has zero `metric_filters`, return a 422 with a clear error so the UI surfaces "couldn't qualify segment by product" instead of silently creating a too-broad segment.
+- Accept an optional `jobId` in the request body (already passed from the hook via existing job record — wire it through `requestBody` in `useKlaviyoSegments.ts` around line 319).
+- Inside the batch loop (around line 2139), after each segment completes (success / exists / error / skipped), update `segment_creation_jobs` for that `jobId` with running counters:
+  - `segments_processed`, `success_count`, `error_count`, `completed_segment_ids`, `failed_segment_ids`.
+- Use a service-role Supabase client (already used elsewhere in the function or create with `SUPABASE_SERVICE_ROLE_KEY`) so RLS doesn't block writes.
+- Skip the update if `jobId` is null (defensive).
 
-### B. Make the AI counter decrement reliably
-File: `supabase/functions/increment-ai-usage/index.ts`
+**b. `src/hooks/useKlaviyoSegments.ts**`
 
-1. Use the service-role client for the UPDATE/INSERT (read user from JWT with anon client, then write with service role) so RLS can't silently no-op the increment.
-2. Add `.select().single()` to the UPDATE and return the actual new `ai_suggestions_today` value.
-3. If the row doesn't change (rowcount 0), throw — so the frontend's try/catch surfaces a real error instead of a phantom success.
+- Pass `jobId: jobRecordId` into the `requestBody` sent to `klaviyo-create-segments`.
+- In the realtime subscription handler (lines 127–144), also update `batchProgress.segmentsProcessed` and append per-segment entries to `results` so the green checkmark list fills incrementally. Derive new completions by diffing `completed_segment_ids` / `failed_segment_ids` against current `results`.
+- Compute `currentBatch` from `Math.floor(segments_processed / BATCH_SIZE) + 1` so "Processing batch X of Y" advances.
 
-File: `src/hooks/useAILimits.ts`
+**c. `src/components/SegmentCreationFlow.tsx**`
 
-4. In `incrementUsage`, optimistically decrement `remaining` and increment `total_used` immediately on success (using the returned `new_count`), then still call `checkLimit()` in the background. This makes the UI counter visibly move the instant the user clicks Generate, even before the refetch lands.
+- Remove the "~Xs remaining" line (the `batchProgress.estimatedTimeRemaining > 0` block).
+- Remove `estimatedTimeRemaining` calculation in the hook (optional cleanup) or just stop rendering it.
+- Keep the progress bar driven by `batchProgress.segmentsProcessed / totalSegments` — which now updates in real time.
 
-### C. No other surfaces touched
-- Frontend `AISegmentSuggester.tsx` already calls `incrementUsage()` on success — no change needed beyond the hook update.
-- `klaviyo-create-segments` (the 70+ pre-built bundle function) is untouched.
-- No DB migrations; `usage_limits` table and RLS stay as-is. Increment bypasses RLS via service role, which is correct for an authenticated server-side counter.
+## 3. Confetti toggle in Settings
 
-## Out of scope
-- Re-prompting strategy for non-product qualifiers (location, tag, custom property). Current heuristic only enforces product-token presence; broader heuristics can come later if needed.
+**a. New preference**
+
+- Store in `localStorage` under `aderai:confetti_enabled` (default `true`). No DB migration needed — purely client preference.
+- Add tiny helper in `src/lib/utils.ts` or new `src/lib/preferences.ts`:
+  - `getConfettiEnabled(): boolean`
+  - `setConfettiEnabled(v: boolean): void`
+
+**b. `src/components/SuccessAnimation.tsx**`
+
+- Before calling `confetti(...)`, check `getConfettiEnabled()`. If `false`, skip the confetti call but still show the green check + title + auto-complete.
+
+**c. `src/pages/Settings.tsx**`
+
+- Add a "Preferences" section (or append to existing) with a `<Switch>`:
+  - Label: "Celebration confetti"
+  - Description: "Show a confetti burst when segments are created successfully."
+  - Default ON. Reads/writes via the helper. Persists immediately.
+
+## 4. Technical notes
+
+- The edge function must use the service-role client for the in-flight job updates to bypass RLS on `segment_creation_jobs`.
+- Realtime is already enabled on `segment_creation_jobs` (verified in `pg_publication_tables`).
+- No DB migration required.
+- Result list ordering in the modal: dedupe by `segmentId` when merging realtime updates so we don't double-render.
+
+## Files touched
+
+- `src/components/SegmentCreationFlow.tsx` — remove top card, remove ETA line
+- `src/hooks/useKlaviyoSegments.ts` — pass jobId, merge realtime updates into `results` + `batchProgress`
+- `supabase/functions/klaviyo-create-segments/index.ts` — per-segment job row updates via service role
+- `src/components/SuccessAnimation.tsx` — gate confetti on preference
+- `src/pages/Settings.tsx` — add confetti toggle
+- `src/lib/preferences.ts` (new, small) — localStorage helpers
