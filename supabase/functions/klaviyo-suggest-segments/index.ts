@@ -190,6 +190,7 @@ Based on this information and the available Klaviyo metrics, suggest segments th
           { role: 'user', content: userPrompt }
         ],
         response_format: { type: "json_object" },
+        max_tokens: 8192,
       }),
     });
 
@@ -215,15 +216,28 @@ Based on this information and the available Klaviyo metrics, suggest segments th
 
     console.log('[klaviyo-suggest-segments] AI response received successfully');
     const aiData = await aiResponse.json();
-    const content = aiData.choices[0].message.content;
-    
+    const content = aiData.choices?.[0]?.message?.content;
+    const finishReason = aiData.choices?.[0]?.finish_reason;
+
+    if (!content) {
+      console.error('[klaviyo-suggest-segments] Empty AI content. finish_reason:', finishReason, 'usage:', JSON.stringify(aiData.usage));
+      return new Response(
+        JSON.stringify({ error: 'AI returned an incomplete response. Please try again with fewer details or contact support.' }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     let suggestedSegments;
     try {
       suggestedSegments = JSON.parse(content);
     } catch (parseError) {
-      console.error('[klaviyo-suggest-segments] Failed to parse AI response:', content);
-      throw new Error('Failed to parse AI response');
+      console.error('[klaviyo-suggest-segments] Failed to parse AI response. finish_reason:', finishReason, 'content:', content);
+      return new Response(
+        JSON.stringify({ error: 'AI returned an unparseable response. Please try again.' }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
     
     console.log('[klaviyo-suggest-segments] Parsed', suggestedSegments.segments?.length || 0, 'suggested segments');
 
