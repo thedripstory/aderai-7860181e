@@ -529,14 +529,14 @@ function getSegmentDefinition(
       }
     } : null,
     
-    // #26 Big Spenders - Historic CLV above threshold (DIFFERENT from VIP!)
+    // #26 Big Spenders - Predictive Historic CLV above threshold (DIFFERENT from VIP!)
     'big-spenders': {
       name: `Big Spenders (${currencySymbol}${vipThreshold}+)${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Historic Customer Lifetime Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'historic_clv',
             filter: {
               type: 'numeric',
               operator: 'greater-than',
@@ -547,14 +547,14 @@ function getSegmentDefinition(
       }
     },
     
-    // #27 Bargain Shoppers - Historic CLV below threshold
+    // #27 Bargain Shoppers - Predictive Historic CLV below threshold
     'bargain-shoppers': {
       name: `Bargain Shoppers (Under ${currencySymbol}${aov})${ADERAI_SUFFIX}`,
       definition: {
         condition_groups: [{
           conditions: [{
-            type: 'profile-property',
-            property: "properties['Historic Customer Lifetime Value']",
+            type: 'profile-predictive-analytics',
+            dimension: 'historic_clv',
             filter: {
               type: 'numeric',
               operator: 'less-than',
