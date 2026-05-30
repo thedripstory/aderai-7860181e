@@ -1810,7 +1810,7 @@ async function createKlaviyoSegment(
       'refunded-customers', 'unengaged-exclusion', 'sunset-segment', 'received-5-opened-0',
       'received-3-in-3-days', 'marked-spam', 'never-engaged-exclusion',
     ]);
-    let cleanName = cleanName.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim();
+    let cleanName = segmentDef.name.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim();
     if (EXCLUSION_SEGMENT_IDS.has(segmentId) && !/^\(Exclude\)/i.test(cleanName)) {
       cleanName = `(Exclude) ${cleanName}`;
     }
