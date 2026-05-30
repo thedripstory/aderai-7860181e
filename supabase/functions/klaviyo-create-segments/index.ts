@@ -1,11 +1,35 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Service-role client for writing live progress to segment_creation_jobs (bypasses RLS).
+function getServiceClient() {
+  const url = Deno.env.get('SUPABASE_URL');
+  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { persistSession: false } });
+}
+
+async function updateJobProgress(
+  jobId: string | null,
+  fields: Record<string, unknown>
+) {
+  if (!jobId) return;
+  try {
+    const client = getServiceClient();
+    if (!client) return;
+    await client.from('segment_creation_jobs').update(fields).eq('id', jobId);
+  } catch (err) {
+    console.error('[klaviyo-create-segments] Failed to update job progress:', err);
+  }
+}
+
 
 // Aderai branding suffix
 const ADERAI_SUFFIX = ' | Aderai';
