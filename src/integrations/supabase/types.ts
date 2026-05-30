@@ -544,6 +544,7 @@ export type Database = {
       }
       notification_preferences: {
         Row: {
+          confetti_enabled: boolean
           created_at: string | null
           email_marketing: boolean | null
           email_on_api_key_added: boolean | null
@@ -560,6 +561,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          confetti_enabled?: boolean
           created_at?: string | null
           email_marketing?: boolean | null
           email_on_api_key_added?: boolean | null
@@ -576,6 +578,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          confetti_enabled?: boolean
           created_at?: string | null
           email_marketing?: boolean | null
           email_on_api_key_added?: boolean | null

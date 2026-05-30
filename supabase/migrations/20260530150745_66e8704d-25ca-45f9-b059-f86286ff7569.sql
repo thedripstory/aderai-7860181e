@@ -1,0 +1,1 @@
+ALTER TABLE public.notification_preferences ADD COLUMN IF NOT EXISTS confetti_enabled boolean NOT NULL DEFAULT true;

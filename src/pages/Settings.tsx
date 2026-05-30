@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackEvent } from '@/lib/analytics';
-import { getConfettiEnabled, setConfettiEnabled } from '@/lib/preferences';
+import { getConfettiEnabled, saveConfettiEnabled, syncConfettiFromServer } from '@/lib/preferences';
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -164,6 +164,14 @@ export default function Settings() {
     if (tabParam === 'billing') {
       setActiveTab('billing');
     }
+  }, []);
+
+  // Sync confetti preference from server (cross-device)
+  useEffect(() => {
+    (async () => {
+      const v = await syncConfettiFromServer();
+      if (typeof v === 'boolean') setConfettiEnabledState(v);
+    })();
   }, []);
 
   const loadSubscriptionDetails = async () => {
@@ -889,7 +897,7 @@ export default function Settings() {
                     checked={confettiEnabled}
                     onCheckedChange={(v) => {
                       setConfettiEnabledState(v);
-                      setConfettiEnabled(v);
+                      void saveConfettiEnabled(v);
                       toast({
                         title: v ? "Confetti enabled" : "Confetti disabled",
                       });

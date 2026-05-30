@@ -558,6 +558,64 @@ export const useKlaviyoSegments = () => {
     }
   };
 
+  /**
+   * Resume tracking an in-progress job (after a page refresh).
+   * Hydrates loading/results/batchProgress/jobStatus from the DB row,
+   * then subscribes to realtime updates via the jobId effect.
+   */
+  const resumeJob = async (existingJobId: string) => {
+    const { data: job, error } = await supabase
+      .from('segment_creation_jobs')
+      .select('*')
+      .eq('id', existingJobId)
+      .maybeSingle();
+    if (error || !job) return false;
+
+    const total = job.total_segments || 0;
+    const processed = job.segments_processed || 0;
+    const completedIds: string[] = Array.isArray(job.completed_segment_ids) ? (job.completed_segment_ids as string[]) : [];
+    const failedIds: string[] = Array.isArray(job.failed_segment_ids) ? (job.failed_segment_ids as string[]) : [];
+    const pendingIds: string[] = Array.isArray(job.pending_segment_ids) ? (job.pending_segment_ids as string[]) : [];
+
+    const hydrated: SegmentResult[] = [
+      ...completedIds.map((id) => ({ segmentId: id, status: 'success' as const, message: 'Created' })),
+      ...failedIds.map((id) => ({ segmentId: id, status: 'error' as const, message: 'Failed' })),
+      ...pendingIds.map((id) => ({ segmentId: id, status: 'queued' as const, message: 'Queued' })),
+    ];
+
+    const BATCH_SIZE = 4;
+    const totalBatches = Math.max(1, Math.ceil(total / BATCH_SIZE));
+    const currentBatch = Math.min(
+      totalBatches,
+      Math.max(1, Math.floor(processed / BATCH_SIZE) + (processed < total ? 1 : 0))
+    );
+
+    setResults(hydrated);
+    setProgress({ current: processed, total });
+    setBatchProgress({
+      currentBatch,
+      totalBatches,
+      segmentsProcessed: processed,
+      totalSegments: total,
+      estimatedTimeRemaining: 0,
+    });
+    setJobStatus({
+      id: job.id,
+      status: job.status as JobStatus['status'],
+      totalSegments: total,
+      segmentsProcessed: processed,
+      successCount: job.success_count || 0,
+      errorCount: job.error_count || 0,
+      rateLimitType: job.rate_limit_type || undefined,
+      rateLimitMessage: job.last_klaviyo_error || undefined,
+    });
+
+    const isActive = job.status === 'in_progress' || job.status === 'pending' || job.status === 'waiting_retry';
+    setLoading(isActive);
+    setJobId(existingJobId);
+    return true;
+  };
+
   return {
     loading,
     results,
@@ -566,6 +624,7 @@ export const useKlaviyoSegments = () => {
     jobId,
     jobStatus,
     createSegments,
+    resumeJob,
     setResults,
   };
 };
