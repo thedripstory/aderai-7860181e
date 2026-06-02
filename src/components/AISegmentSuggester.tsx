@@ -233,7 +233,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
         <textarea
           value={aiPrompt}
           onChange={e => setAiPrompt(e.target.value)}
-          placeholder="Example: Customers who bought Jaadugar from my website over all time"
+          placeholder="Example: Customers who bought [your product] from my website over all time"
           className="w-full px-4 py-3 rounded-lg border border-input bg-background min-h-[120px] mb-4"
         />
 
