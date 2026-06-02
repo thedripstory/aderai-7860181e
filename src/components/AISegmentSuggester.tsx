@@ -216,7 +216,7 @@ export const AISegmentSuggester: React.FC<AISegmentSuggesterProps> = ({ activeKe
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">Get Segment Ideas</h2>
             <p className="text-muted-foreground">
-              Describe what you're trying to achieve and we'll suggest related segment ideas you can build in Klaviyo. For example: "Customers who bought Jaadugar in the last 30 days" — we'll also suggest browsers, repeat buyers, and adjacent variants.
+              Describe what you're trying to achieve and we'll suggest related segment ideas you can build in Klaviyo. For example: "Customers who bought [your product] in the last 30 days" — we'll also suggest browsers, repeat buyers, and adjacent variants.
             </p>
           </div>
           <a
