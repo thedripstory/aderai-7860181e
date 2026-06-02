@@ -159,7 +159,7 @@ RULES:
    - String equals: { "property": "Item Name", "filter": { "type": "string", "operator": "equals", "value": "<NAME>" } }
    - String set: { "property": "Discount Codes", "filter": { "type": "string", "operator": "is-set" } }
    - String not set: { "property": "Discount Codes", "filter": { "type": "string", "operator": "is-not-set" } }
-8. If the segment references a specific product (e.g. "Recent Purchasers of Jaadugar"), you MUST add a metric_filters entry with property "Item Name" and value equal to the exact product name from the segment name/description.
+8. If the segment references a specific product (e.g. "Recent Purchasers of <product name>"), you MUST add a metric_filters entry with property "Item Name" and value equal to the exact product name from the segment name/description.
 9. Return ONLY valid JSON, no markdown or explanations`;
 
     const userPrompt = `Create a segment with:
