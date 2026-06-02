@@ -108,7 +108,7 @@ Respond with EXACTLY this JSON shape:
       "name": "Short clear segment name (no '| Aderai' suffix, no emojis)",
       "description": "2-3 sentences explaining who this targets and why this segment is valuable for marketing.",
       "plain_english_criteria": [
-        "Placed Order with Item Name equal to \\"Jaadugar\\" in the last 7 days",
+        "Placed Order with Item Name equal to \\"<product name>\\" in the last 7 days",
         "At least 1 order"
       ],
       "definition": {
