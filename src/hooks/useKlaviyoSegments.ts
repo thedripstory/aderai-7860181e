@@ -175,15 +175,8 @@ export const useKlaviyoSegments = () => {
       throw new Error('Please select at least one segment to create');
     }
 
-    // Expand any bundle IDs into their component segments
-    let expandedSegmentIds = [...selectedSegments];
-    selectedSegments.forEach(id => {
-      if (SEGMENT_BUNDLES[id]) {
-        expandedSegmentIds = expandedSegmentIds.filter(s => s !== id);
-        expandedSegmentIds.push(...SEGMENT_BUNDLES[id]);
-      }
-    });
-    expandedSegmentIds = [...new Set(expandedSegmentIds)];
+    // Bundles are already expanded into segment IDs by the UI before reaching this hook.
+    const expandedSegmentIds = [...new Set(selectedSegments)];
     
     // Filter out unavailable segments
     const availableSegmentIds = expandedSegmentIds.filter(id => {
