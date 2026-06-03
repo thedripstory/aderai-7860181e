@@ -60,6 +60,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const gate = await requireActiveSubscription(req);
+  if (!gate.ok) return gate.response;
+
+
   try {
     const body = await req.json();
     const validationResult = RequestSchema.safeParse(body);
