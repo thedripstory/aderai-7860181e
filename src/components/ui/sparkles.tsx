@@ -1,5 +1,5 @@
 "use client";
-import React, { useId } from "react";
+import React, { useId, useRef } from "react";
 import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container, SingleOrMultiple } from "@tsparticles/engine";
@@ -19,6 +19,17 @@ type ParticlesProps = {
   particleDensity?: number;
 };
 
+// Initialize particles engine only once globally
+let enginePromise: Promise<void> | null = null;
+const ensureEngine = () => {
+  if (!enginePromise) {
+    enginePromise = initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    });
+  }
+  return enginePromise;
+};
+
 export const SparklesCore = (props: ParticlesProps) => {
   const {
     id,
@@ -31,17 +42,41 @@ export const SparklesCore = (props: ParticlesProps) => {
     particleDensity,
   } = props;
   const [init, setInit] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<Container | null>(null);
   useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    }).then(() => {
-      setInit(true);
+    let cancelled = false;
+    ensureEngine().then(() => {
+      if (!cancelled) setInit(true);
     });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const c = containerRef.current;
+          if (!c) continue;
+          if (entry.isIntersecting) c.play();
+          else c.pause();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [init]);
+
   const controls = useAnimation();
 
   const particlesLoaded = async (container?: Container) => {
     if (container) {
+      containerRef.current = container;
       controls.start({
         opacity: 1,
         transition: {
@@ -53,7 +88,8 @@ export const SparklesCore = (props: ParticlesProps) => {
 
   const generatedId = useId();
   return (
-    <motion.div animate={controls} className={cn("opacity-0", className)}>
+    <motion.div ref={wrapperRef} animate={controls} className={cn("opacity-0", className)}>
+
       {init && (
         <Particles
           id={id || generatedId}

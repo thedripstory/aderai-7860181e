@@ -83,10 +83,10 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative z-10 pt-24 sm:pt-32 md:pt-40 pb-8 sm:pb-12 px-4 sm:px-6 overflow-visible gpu-accelerated">
         {/* Background Elements - optimized with reduced blur */}
-        <div className="absolute inset-0 -z-10 contain-paint">
-          <div className="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/8 rounded-full blur-2xl" style={{ transform: 'translateZ(0)' }} />
-          <div className="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/8 rounded-full blur-2xl" style={{ transform: 'translateZ(0)' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-2xl" style={{ transform: 'translateZ(0)' }} />
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/8 rounded-full blur-2xl" />
+          <div className="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/8 rounded-full blur-2xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-2xl" />
         </div>
 
         <div className="max-w-7xl mx-auto">
@@ -207,7 +207,7 @@ export default function LandingPage() {
 
               {/* After Card */}
               <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl gpu-accelerated">
-                <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-primary/10 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
+                <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-primary/10 rounded-full blur-xl" />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-4 sm:mb-6">
                     <div className="p-2.5 sm:p-3 bg-primary/10 rounded-xl border border-primary/20">
@@ -268,8 +268,8 @@ export default function LandingPage() {
       {/* Automation Section */}
       <section className="pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden contain-layout gpu-accelerated">
         {/* Decorative Elements - static, no animations */}
-        <div className="absolute top-20 right-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
-        <div className="absolute bottom-20 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
+        <div className="absolute top-20 right-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/5 rounded-full blur-xl" />
+        <div className="absolute bottom-20 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl" />
 
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -593,7 +593,7 @@ export default function LandingPage() {
               </div>
               
               {/* Subtle glow underneath - optimized blur */}
-              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-2xl contain-paint" style={{ transform: 'translateZ(0)' }} />
+              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-2xl" />
             </div>
           </div>
         </section>
@@ -672,8 +672,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted contain-layout">
         {/* Decorative Elements - moved inside with proper positioning */}
-        <div className="absolute top-0 left-0 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-xl contain-paint -translate-x-1/4 -translate-y-1/4" style={{ transform: 'translateZ(0) translate(-25%, -25%)' }} />
-        <div className="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl contain-paint translate-x-1/4 translate-y-1/4" style={{ transform: 'translateZ(0) translate(25%, 25%)' }} />
+        <div className="absolute top-0 left-0 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-xl -translate-x-1/4 -translate-y-1/4" />
+        <div className="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl translate-x-1/4 translate-y-1/4" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           {/* Segment Flow Effect Section */}
