@@ -268,8 +268,8 @@ export default function LandingPage() {
       {/* Automation Section */}
       <section className="pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-6 bg-gradient-to-br from-muted via-muted to-primary/5 relative z-0 overflow-hidden contain-layout gpu-accelerated">
         {/* Decorative Elements - static, no animations */}
-        <div className="absolute top-20 right-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
-        <div className="absolute bottom-20 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
+        <div className="absolute top-20 right-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/5 rounded-full blur-xl" />
+        <div className="absolute bottom-20 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl" />
 
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
