@@ -83,10 +83,10 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative z-10 pt-24 sm:pt-32 md:pt-40 pb-8 sm:pb-12 px-4 sm:px-6 overflow-visible gpu-accelerated">
         {/* Background Elements - optimized with reduced blur */}
-        <div className="absolute inset-0 -z-10 contain-paint">
-          <div className="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/8 rounded-full blur-2xl" style={{ transform: 'translateZ(0)' }} />
-          <div className="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/8 rounded-full blur-2xl" style={{ transform: 'translateZ(0)' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-2xl" style={{ transform: 'translateZ(0)' }} />
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/8 rounded-full blur-2xl" />
+          <div className="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 bg-accent/8 rounded-full blur-2xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-2xl" />
         </div>
 
         <div className="max-w-7xl mx-auto">
