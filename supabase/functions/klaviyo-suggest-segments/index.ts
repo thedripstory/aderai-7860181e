@@ -30,6 +30,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const gate = await requireActiveSubscription(req);
+  if (!gate.ok) return gate.response;
+
   console.log('[klaviyo-suggest-segments] Request received');
 
   try {
