@@ -2107,6 +2107,24 @@ serve(async (req) => {
     }
     
     let { apiKey, segmentIds, currencySymbol, settings, customInputs, jobId } = body;
+
+    // Verify the caller owns the job they're writing progress to.
+    if (jobId) {
+      const svc = getServiceClient();
+      if (svc) {
+        const { data: jobRow, error: jobErr } = await svc
+          .from('segment_creation_jobs')
+          .select('user_id')
+          .eq('id', jobId)
+          .maybeSingle();
+        if (jobErr || !jobRow || jobRow.user_id !== gate.userId) {
+          return new Response(
+            JSON.stringify({ error: 'Forbidden: job does not belong to caller' }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
     
     console.log('[klaviyo-create-segments] Request params:', {
       hasApiKey: !!apiKey,
