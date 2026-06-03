@@ -21,44 +21,6 @@ async function trackAnalyticsEvent(eventName: string, metadata?: Record<string, 
   }
 }
 
-// Bundle definitions - each bundle expands to multiple segment IDs
-const SEGMENT_BUNDLES: Record<string, string[]> = {
-  'core-essentials': [
-    'engaged-30-days',
-    'repeat-customers', 
-    'cart-abandoners',
-    'vip-customers',
-    'recent-purchasers-30'
-  ],
-  'engagement-maximizer': [
-    'highly-engaged',
-    'email-openers-30',
-    'email-clickers-30',
-    'recent-clickers-90',
-    'active-site-30'
-  ],
-  'lifecycle-manager': [
-    'new-subscribers',
-    'first-time-buyers',
-    'repeat-customers',
-    'at-risk-customers',
-    'churned-customers',
-    'vip-customers'
-  ],
-  'shopping-behavior': [
-    'cart-abandoners',
-    'browse-abandoners',
-    'product-viewers',
-    'checkout-starters',
-    'frequent-browsers'
-  ],
-  'smart-exclusions': [
-    'recent-purchasers-exclusion',
-    'unengaged-exclusion',
-    'never-engaged-exclusion',
-    'bounced-emails'
-  ]
-};
 
 export interface SegmentResult {
   segmentId: string;
@@ -213,15 +175,8 @@ export const useKlaviyoSegments = () => {
       throw new Error('Please select at least one segment to create');
     }
 
-    // Expand any bundle IDs into their component segments
-    let expandedSegmentIds = [...selectedSegments];
-    selectedSegments.forEach(id => {
-      if (SEGMENT_BUNDLES[id]) {
-        expandedSegmentIds = expandedSegmentIds.filter(s => s !== id);
-        expandedSegmentIds.push(...SEGMENT_BUNDLES[id]);
-      }
-    });
-    expandedSegmentIds = [...new Set(expandedSegmentIds)];
+    // Bundles are already expanded into segment IDs by the UI before reaching this hook.
+    const expandedSegmentIds = [...new Set(selectedSegments)];
     
     // Filter out unavailable segments
     const availableSegmentIds = expandedSegmentIds.filter(id => {
