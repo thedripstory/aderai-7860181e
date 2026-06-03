@@ -207,7 +207,7 @@ export default function LandingPage() {
 
               {/* After Card */}
               <div className="group bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-primary hover:border-primary/80 transition-all hover:scale-[1.02] relative overflow-hidden shadow-xl hover:shadow-2xl gpu-accelerated">
-                <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-primary/10 rounded-full blur-xl contain-paint" style={{ transform: 'translateZ(0)' }} />
+                <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-primary/10 rounded-full blur-xl" />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-4 sm:mb-6">
                     <div className="p-2.5 sm:p-3 bg-primary/10 rounded-xl border border-primary/20">
