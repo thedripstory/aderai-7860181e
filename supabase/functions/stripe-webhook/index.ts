@@ -2,6 +2,19 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
+function getPeriodStart(sub: any): number | null {
+  const v = sub?.items?.data?.[0]?.current_period_start ?? sub?.current_period_start;
+  return typeof v === 'number' ? v : null;
+}
+function getPeriodEnd(sub: any): number | null {
+  const v = sub?.items?.data?.[0]?.current_period_end ?? sub?.current_period_end;
+  return typeof v === 'number' ? v : null;
+}
+function toIso(unixSeconds: number | null | undefined): string | null {
+  if (typeof unixSeconds !== 'number' || !isFinite(unixSeconds)) return null;
+  return new Date(unixSeconds * 1000).toISOString();
+}
+
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2025-08-27.basil",
 });
