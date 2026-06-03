@@ -672,8 +672,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative border-t border-border bg-gradient-to-br from-muted via-background to-muted contain-layout">
         {/* Decorative Elements - moved inside with proper positioning */}
-        <div className="absolute top-0 left-0 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-xl contain-paint -translate-x-1/4 -translate-y-1/4" style={{ transform: 'translateZ(0) translate(-25%, -25%)' }} />
-        <div className="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl contain-paint translate-x-1/4 translate-y-1/4" style={{ transform: 'translateZ(0) translate(25%, 25%)' }} />
+        <div className="absolute top-0 left-0 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-xl -translate-x-1/4 -translate-y-1/4" />
+        <div className="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-accent/5 rounded-full blur-xl translate-x-1/4 translate-y-1/4" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           {/* Segment Flow Effect Section */}
