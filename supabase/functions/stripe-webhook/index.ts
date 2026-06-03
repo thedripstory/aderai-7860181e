@@ -2,6 +2,19 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
+function getPeriodStart(sub: any): number | null {
+  const v = sub?.items?.data?.[0]?.current_period_start ?? sub?.current_period_start;
+  return typeof v === 'number' ? v : null;
+}
+function getPeriodEnd(sub: any): number | null {
+  const v = sub?.items?.data?.[0]?.current_period_end ?? sub?.current_period_end;
+  return typeof v === 'number' ? v : null;
+}
+function toIso(unixSeconds: number | null | undefined): string | null {
+  if (typeof unixSeconds !== 'number' || !isFinite(unixSeconds)) return null;
+  return new Date(unixSeconds * 1000).toISOString();
+}
+
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2025-08-27.basil",
 });
@@ -145,30 +158,36 @@ serve(async (req) => {
             session.subscription as string
           );
 
+          const startIso = toIso(getPeriodStart(subscription));
+          const endIso = toIso(getPeriodEnd(subscription));
+          const userUpdate: Record<string, unknown> = {
+            stripe_subscription_id: subscription.id,
+            subscription_status: "active",
+          };
+          if (startIso) userUpdate.subscription_start_date = startIso;
+          if (endIso) userUpdate.subscription_end_date = endIso;
+
           const { error: updateError } = await supabaseAdmin
             .from("users")
-            .update({
-              stripe_subscription_id: subscription.id,
-              subscription_status: "active",
-              subscription_start_date: new Date(subscription.current_period_start * 1000).toISOString(),
-              subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString(),
-            })
+            .update(userUpdate)
             .eq("id", userId);
 
           if (updateError) {
             logStep("ERROR updating user subscription", { userId, error: updateError.message });
           } else {
             logStep("Updated user subscription status to active", { userId, subscriptionId: subscription.id });
-            
-            // Send subscription confirmation email
+
+            const periodEnd = getPeriodEnd(subscription);
             await sendBillingEmail(userId, "subscription_confirmed", {
               amount: session.amount_total ? session.amount_total / 100 : 9,
               currency: session.currency?.toUpperCase() || "USD",
-              nextBillingDate: new Date(subscription.current_period_end * 1000).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }),
+              nextBillingDate: typeof periodEnd === 'number'
+                ? new Date(periodEnd * 1000).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : undefined,
             });
           }
 
@@ -225,15 +244,18 @@ serve(async (req) => {
               status = "inactive";
           }
 
+          const endIso = toIso(getPeriodEnd(subscription));
+          const subUpdate: Record<string, unknown> = {
+            subscription_status: status,
+            subscription_canceled_at: subscription.canceled_at
+              ? new Date(subscription.canceled_at * 1000).toISOString()
+              : null,
+          };
+          if (endIso) subUpdate.subscription_end_date = endIso;
+
           const { error: updateError } = await supabaseAdmin
             .from("users")
-            .update({
-              subscription_status: status,
-              subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString(),
-              subscription_canceled_at: subscription.canceled_at 
-                ? new Date(subscription.canceled_at * 1000).toISOString() 
-                : null,
-            })
+            .update(subUpdate)
             .eq("id", userId);
 
           if (updateError) {
@@ -325,11 +347,12 @@ serve(async (req) => {
             await sendBillingEmail(userId, "subscription_renewed", {
               amount: invoice.amount_paid ? invoice.amount_paid / 100 : 9,
               currency: invoice.currency?.toUpperCase() || "USD",
-              nextBillingDate: new Date(subscription.current_period_end * 1000).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }),
+              nextBillingDate: (() => {
+                const pe = getPeriodEnd(subscription);
+                return typeof pe === 'number'
+                  ? new Date(pe * 1000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+                  : undefined;
+              })(),
             });
 
             await supabaseAdmin.from("subscription_events").insert({

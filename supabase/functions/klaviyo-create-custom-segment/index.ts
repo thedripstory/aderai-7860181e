@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { decryptApiKey, isEncrypted } from "../_shared/encryption.ts";
+import { requireActiveSubscription } from "../_shared/checkSubscription.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RequestSchema = z.object({
@@ -58,6 +59,10 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const gate = await requireActiveSubscription(req);
+  if (!gate.ok) return gate.response;
+
 
   try {
     const body = await req.json();
