@@ -158,30 +158,36 @@ serve(async (req) => {
             session.subscription as string
           );
 
+          const startIso = toIso(getPeriodStart(subscription));
+          const endIso = toIso(getPeriodEnd(subscription));
+          const userUpdate: Record<string, unknown> = {
+            stripe_subscription_id: subscription.id,
+            subscription_status: "active",
+          };
+          if (startIso) userUpdate.subscription_start_date = startIso;
+          if (endIso) userUpdate.subscription_end_date = endIso;
+
           const { error: updateError } = await supabaseAdmin
             .from("users")
-            .update({
-              stripe_subscription_id: subscription.id,
-              subscription_status: "active",
-              subscription_start_date: new Date(subscription.current_period_start * 1000).toISOString(),
-              subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString(),
-            })
+            .update(userUpdate)
             .eq("id", userId);
 
           if (updateError) {
             logStep("ERROR updating user subscription", { userId, error: updateError.message });
           } else {
             logStep("Updated user subscription status to active", { userId, subscriptionId: subscription.id });
-            
-            // Send subscription confirmation email
+
+            const periodEnd = getPeriodEnd(subscription);
             await sendBillingEmail(userId, "subscription_confirmed", {
               amount: session.amount_total ? session.amount_total / 100 : 9,
               currency: session.currency?.toUpperCase() || "USD",
-              nextBillingDate: new Date(subscription.current_period_end * 1000).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }),
+              nextBillingDate: typeof periodEnd === 'number'
+                ? new Date(periodEnd * 1000).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : undefined,
             });
           }
 
