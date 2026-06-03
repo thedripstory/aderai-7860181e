@@ -112,6 +112,7 @@ export function Globe({
 
   let phi = 0
   let width = 0
+  const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pointerInteracting = useRef(null)
   const pointerInteractionMovement = useRef(0)
@@ -149,22 +150,56 @@ export function Globe({
   }
 
   useEffect(() => {
+    const container = containerRef.current
+    const canvas = canvasRef.current
+    if (!container || !canvas) return
+
+    let globe: ReturnType<typeof createGlobe> | null = null
+
+    const start = () => {
+      if (globe) return
+      onResize()
+      globe = createGlobe(canvas, {
+        ...GLOBE_CONFIG,
+        width: width * 2,
+        height: width * 2,
+        onRender,
+      })
+      setTimeout(() => {
+        if (canvas) canvas.style.opacity = "1"
+      })
+    }
+
+    const stop = () => {
+      if (!globe) return
+      globe.destroy()
+      globe = null
+      if (canvas) canvas.style.opacity = "0"
+    }
+
     window.addEventListener("resize", onResize)
-    onResize()
 
-    const globe = createGlobe(canvasRef.current!, {
-      ...GLOBE_CONFIG,
-      width: width * 2,
-      height: width * 2,
-      onRender,
-    })
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) start()
+          else stop()
+        }
+      },
+      { rootMargin: "300px" },
+    )
+    observer.observe(container)
 
-    setTimeout(() => (canvasRef.current!.style.opacity = "1"))
-    return () => globe.destroy()
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("resize", onResize)
+      stop()
+    }
   }, [markers])
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "absolute inset-0 mx-auto aspect-[1/1] w-full max-w-[600px]",
         className,
