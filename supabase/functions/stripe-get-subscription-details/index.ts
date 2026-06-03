@@ -156,17 +156,20 @@ serve(async (req) => {
     }
 
     // Use safe date conversion for all timestamps
+    const item: any = subscription.items.data[0];
+    const periodStart = item?.current_period_start ?? (subscription as any).current_period_start ?? null;
+    const periodEnd = item?.current_period_end ?? (subscription as any).current_period_end ?? null;
     const responseData = {
       status: subscription.status,
       hasSubscription: true,
-      currentPeriodStart: safeToISOString(subscription.current_period_start),
-      currentPeriodEnd: safeToISOString(subscription.current_period_end),
-      nextBillingDate: safeToISOString(subscription.current_period_end),
+      currentPeriodStart: safeToISOString(periodStart),
+      currentPeriodEnd: safeToISOString(periodEnd),
+      nextBillingDate: safeToISOString(periodEnd),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       canceledAt: safeToISOString(subscription.canceled_at),
       amount: amount,
       currency: subscription.currency?.toUpperCase() || 'USD',
-      interval: subscription.items.data[0]?.price?.recurring?.interval || "month",
+      interval: item?.price?.recurring?.interval || "month",
       paymentMethod,
     };
 
