@@ -2087,6 +2087,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const gate = await requireActiveSubscription(req);
+  if (!gate.ok) return gate.response;
+
+
   try {
     const bodyText = await req.text();
     console.log('[klaviyo-create-segments] Received request body length:', bodyText.length);
