@@ -593,7 +593,7 @@ export default function LandingPage() {
               </div>
               
               {/* Subtle glow underneath - optimized blur */}
-              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-2xl contain-paint" style={{ transform: 'translateZ(0)' }} />
+              <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-gradient-to-t from-primary/15 to-transparent blur-2xl" />
             </div>
           </div>
         </section>
