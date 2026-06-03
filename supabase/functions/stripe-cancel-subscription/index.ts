@@ -82,12 +82,18 @@ serve(async (req) => {
       },
     });
 
+    const getPeriodEnd = (sub: any): number | null => {
+      const v = sub?.items?.data?.[0]?.current_period_end ?? sub?.current_period_end;
+      return typeof v === 'number' ? v : null;
+    };
+    const pe = getPeriodEnd(subscription);
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         status: subscription.status,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+        currentPeriodEnd: typeof pe === 'number' ? new Date(pe * 1000).toISOString() : null,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
