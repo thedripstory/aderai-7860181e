@@ -347,11 +347,12 @@ serve(async (req) => {
             await sendBillingEmail(userId, "subscription_renewed", {
               amount: invoice.amount_paid ? invoice.amount_paid / 100 : 9,
               currency: invoice.currency?.toUpperCase() || "USD",
-              nextBillingDate: new Date(subscription.current_period_end * 1000).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }),
+              nextBillingDate: (() => {
+                const pe = getPeriodEnd(subscription);
+                return typeof pe === 'number'
+                  ? new Date(pe * 1000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+                  : undefined;
+              })(),
             });
 
             await supabaseAdmin.from("subscription_events").insert({
