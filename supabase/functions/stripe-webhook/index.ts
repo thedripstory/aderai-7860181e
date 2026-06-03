@@ -244,15 +244,18 @@ serve(async (req) => {
               status = "inactive";
           }
 
+          const endIso = toIso(getPeriodEnd(subscription));
+          const subUpdate: Record<string, unknown> = {
+            subscription_status: status,
+            subscription_canceled_at: subscription.canceled_at
+              ? new Date(subscription.canceled_at * 1000).toISOString()
+              : null,
+          };
+          if (endIso) subUpdate.subscription_end_date = endIso;
+
           const { error: updateError } = await supabaseAdmin
             .from("users")
-            .update({
-              subscription_status: status,
-              subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString(),
-              subscription_canceled_at: subscription.canceled_at 
-                ? new Date(subscription.canceled_at * 1000).toISOString() 
-                : null,
-            })
+            .update(subUpdate)
             .eq("id", userId);
 
           if (updateError) {
