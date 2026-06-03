@@ -21,44 +21,6 @@ async function trackAnalyticsEvent(eventName: string, metadata?: Record<string, 
   }
 }
 
-// Bundle definitions - each bundle expands to multiple segment IDs
-const SEGMENT_BUNDLES: Record<string, string[]> = {
-  'core-essentials': [
-    'engaged-30-days',
-    'repeat-customers', 
-    'cart-abandoners',
-    'vip-customers',
-    'recent-purchasers-30'
-  ],
-  'engagement-maximizer': [
-    'highly-engaged',
-    'email-openers-30',
-    'email-clickers-30',
-    'recent-clickers-90',
-    'active-site-30'
-  ],
-  'lifecycle-manager': [
-    'new-subscribers',
-    'first-time-buyers',
-    'repeat-customers',
-    'at-risk-customers',
-    'churned-customers',
-    'vip-customers'
-  ],
-  'shopping-behavior': [
-    'cart-abandoners',
-    'browse-abandoners',
-    'product-viewers',
-    'checkout-starters',
-    'frequent-browsers'
-  ],
-  'smart-exclusions': [
-    'recent-purchasers-exclusion',
-    'unengaged-exclusion',
-    'never-engaged-exclusion',
-    'bounced-emails'
-  ]
-};
 
 export interface SegmentResult {
   segmentId: string;
