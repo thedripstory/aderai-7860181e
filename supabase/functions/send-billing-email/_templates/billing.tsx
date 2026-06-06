@@ -95,7 +95,7 @@ export const BillingEmail = ({
             title: '📋 Your Subscription Details',
             items: [
               `Plan: ${planName}`,
-              `Amount: ${amount}/${currency === 'USD' ? 'month' : currency}`,
+              amountStr ? `Amount: ${amountStr}/month` : null,
               nextBillingDate ? `Next billing date: ${nextBillingDate}` : null,
             ].filter(Boolean),
           },
