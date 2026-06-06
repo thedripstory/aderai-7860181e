@@ -1088,7 +1088,7 @@ export default function Settings() {
                                 ) : (
                                   <>
                                     <CreditCard className="w-4 h-4 mr-2" />
-                                    Resubscribe - $9/month
+                                    Resubscribe - {pricing.pricePerMonth}
                                   </>
                                 )}
                               </Button>
@@ -1140,7 +1140,7 @@ export default function Settings() {
                             ) : (
                               <>
                                 <CreditCard className="w-4 h-4 mr-2" />
-                                Subscribe Now - $9/month
+                                Subscribe Now - {pricing.pricePerMonth}
                               </>
                             )}
                           </Button>
