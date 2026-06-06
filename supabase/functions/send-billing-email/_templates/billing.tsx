@@ -30,12 +30,42 @@ interface BillingEmailProps {
   dashboardUrl: string;
   billingPortalUrl?: string;
   planName?: string;
-  amount?: string;
+  amount?: string | number;
   currency?: string;
   nextBillingDate?: string;
   trialEndDate?: string;
   failureReason?: string;
   trackingPixelUrl?: string;
+}
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  GBP: '£',
+  AUD: 'A$',
+  CAD: 'C$',
+  EUR: '€',
+};
+
+/**
+ * Format amount + currency from Stripe into a display string.
+ * - Number 39 + "USD" → "$39"
+ * - Number 59 + "AUD" → "A$59"
+ * - String "$9" pass-through (legacy/grandfathered already-formatted)
+ * - Missing → empty string (caller decides what to render)
+ */
+export function formatAmount(amount?: string | number, currency?: string): string {
+  if (amount === undefined || amount === null || amount === '') return '';
+  const code = (currency || 'USD').toUpperCase();
+  const symbol = CURRENCY_SYMBOLS[code] || '';
+  if (typeof amount === 'number') {
+    // Drop trailing .00 for whole units.
+    const display = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+    return `${symbol}${display}`;
+  }
+  // String input: if it already starts with a symbol, trust it; otherwise prefix.
+  const s = String(amount).trim();
+  if (/^[^\d]/.test(s)) return s;
+  return `${symbol}${s}`;
 }
 
 export const BillingEmail = ({
@@ -44,13 +74,15 @@ export const BillingEmail = ({
   dashboardUrl,
   billingPortalUrl,
   planName = 'Pro',
-  amount = '$39',
-  currency = 'USD',
+  amount,
+  currency,
   nextBillingDate,
   trialEndDate,
   failureReason,
   trackingPixelUrl,
 }: BillingEmailProps) => {
+  // Format Stripe amount + currency (e.g. 39 + "GBP" → "£39"). Empty when missing.
+  const amountStr = formatAmount(amount, currency);
   const getEmailContent = () => {
     switch (emailType) {
       case 'subscription_confirmed':
@@ -63,7 +95,7 @@ export const BillingEmail = ({
             title: '📋 Your Subscription Details',
             items: [
               `Plan: ${planName}`,
-              `Amount: ${amount}/${currency === 'USD' ? 'month' : currency}`,
+              amountStr ? `Amount: ${amountStr}/month` : null,
               nextBillingDate ? `Next billing date: ${nextBillingDate}` : null,
             ].filter(Boolean),
           },
@@ -100,7 +132,7 @@ export const BillingEmail = ({
           highlightBox: {
             title: '📋 Renewal Details',
             items: [
-              `Amount charged: ${amount}`,
+              amountStr ? `Amount charged: ${amountStr}` : null,
               nextBillingDate ? `Next renewal: ${nextBillingDate}` : null,
             ].filter(Boolean),
           },
@@ -134,11 +166,13 @@ export const BillingEmail = ({
           preview: 'Payment received for your Aderai subscription',
           emoji: '💳',
           title: 'Payment Successful',
-          message: `We've successfully received your payment of ${amount} for Aderai ${planName}. Thank you!`,
+          message: amountStr
+            ? `We've successfully received your payment of ${amountStr} for Aderai ${planName}. Thank you!`
+            : `We've successfully received your payment for Aderai ${planName}. Thank you!`,
           highlightBox: {
             title: '✅ Payment Details',
             items: [
-              `Amount: ${amount}`,
+              amountStr ? `Amount: ${amountStr}` : null,
               `Plan: ${planName}`,
               nextBillingDate ? `Next billing date: ${nextBillingDate}` : null,
             ].filter(Boolean),

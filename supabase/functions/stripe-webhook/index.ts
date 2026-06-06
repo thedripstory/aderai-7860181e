@@ -179,8 +179,8 @@ serve(async (req) => {
 
             const periodEnd = getPeriodEnd(subscription);
             await sendBillingEmail(userId, "subscription_confirmed", {
-              amount: session.amount_total ? session.amount_total / 100 : 9,
-              currency: session.currency?.toUpperCase() || "USD",
+              amount: typeof session.amount_total === "number" ? session.amount_total / 100 : undefined,
+              currency: session.currency ? session.currency.toUpperCase() : undefined,
               nextBillingDate: typeof periodEnd === 'number'
                 ? new Date(periodEnd * 1000).toLocaleDateString("en-US", {
                     year: "numeric",
@@ -345,8 +345,8 @@ serve(async (req) => {
           if (userId) {
             // Send renewal confirmation email
             await sendBillingEmail(userId, "subscription_renewed", {
-              amount: invoice.amount_paid ? invoice.amount_paid / 100 : 9,
-              currency: invoice.currency?.toUpperCase() || "USD",
+              amount: typeof invoice.amount_paid === "number" ? invoice.amount_paid / 100 : undefined,
+              currency: invoice.currency ? invoice.currency.toUpperCase() : undefined,
               nextBillingDate: (() => {
                 const pe = getPeriodEnd(subscription);
                 return typeof pe === 'number'
@@ -407,8 +407,8 @@ serve(async (req) => {
 
             // Send payment failed email
             await sendBillingEmail(userId, "payment_failed", {
-              amount: invoice.amount_due ? invoice.amount_due / 100 : 9,
-              currency: invoice.currency?.toUpperCase() || "USD",
+              amount: typeof invoice.amount_due === "number" ? invoice.amount_due / 100 : undefined,
+              currency: invoice.currency ? invoice.currency.toUpperCase() : undefined,
             });
 
             logStep("Marked subscription as past_due", { userId });

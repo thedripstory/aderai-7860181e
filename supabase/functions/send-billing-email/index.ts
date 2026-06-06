@@ -26,7 +26,7 @@ const BillingEmailSchema = z.object({
     'trial_ending'
   ]),
   planName: z.string().optional(),
-  amount: z.string().optional(),
+  amount: z.union([z.string(), z.number()]).optional(),
   currency: z.string().optional(),
   nextBillingDate: z.string().optional(),
   trialEndDate: z.string().optional(),

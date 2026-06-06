@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { CreditCard, AlertTriangle, RefreshCw } from 'lucide-react';
-import { useCurrency, usePricing } from '@/hooks/useCurrency';
+import { useCurrency, usePricing, getCurrencySync } from '@/hooks/useCurrency';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -204,7 +204,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     setIsCheckingSubscription(true);
     try {
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: { origin: window.location.origin, currency },
+        body: { origin: window.location.origin, currency: currency || getCurrencySync() },
       });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;

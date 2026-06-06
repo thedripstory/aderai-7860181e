@@ -98,7 +98,7 @@ serve(async (req) => {
         checks.stripe.mode = stripeKey.startsWith("sk_live") ? "live" : "test";
 
         // Check price exists
-        const priceId = Deno.env.get("STRIPE_PRICE_ID") || "price_1SacRA0lE1soQQfxnQig4ytO";
+        const priceId = Deno.env.get("STRIPE_PRICE_ID") || "price_1TfQ330lE1soQQfxIEL5EHtQ";
         try {
           const price = await stripe.prices.retrieve(priceId);
           checks.stripe.priceValid = true;

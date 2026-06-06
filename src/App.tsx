@@ -33,6 +33,7 @@ const AIFeaturesDashboard = lazy(() => import("./pages/AIFeaturesDashboard"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const JobHistory = lazy(() => import("./pages/JobHistory"));
 const AdminSetup = lazy(() => import("./pages/AdminSetup"));
+const AdminPricingPreview = lazy(() => import("./pages/AdminPricingPreview"));
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ const App = () => {
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
                 <Route path="/admin/setup" element={<AdminProtectedRoute><AdminSetup /></AdminProtectedRoute>} />
+                <Route path="/admin/pricing-preview" element={<AdminProtectedRoute><AdminPricingPreview /></AdminProtectedRoute>} />
                 <Route path="/help" element={<HelpCenter />} />
                 <Route path="*" element={<NotFound />} />
                 </Routes>
