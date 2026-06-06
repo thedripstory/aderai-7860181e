@@ -279,7 +279,7 @@ const DatabaseWithRestApi = ({
           <div className="hidden sm:flex relative z-10 w-full items-center justify-between px-3 md:px-4 gap-1">
             {/* Left badge: aderai */}
             <motion.div
-              className="relative flex items-center gap-2 h-9 rounded-full bg-[#101112] px-4 text-sm border border-primary/30 cursor-pointer shadow-lg shadow-primary/10"
+              className="relative flex items-center gap-1.5 h-9 rounded-full bg-[#101112] px-3 text-xs md:text-sm border border-primary/30 cursor-pointer shadow-lg shadow-primary/10"
               whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.35)", borderColor: "hsl(5, 77%, 66%, 0.6)" }}
               transition={{ duration: 0.2 }}
             >
@@ -352,7 +352,7 @@ const DatabaseWithRestApi = ({
 
             {/* Right badge: 70+ Segments */}
             <motion.div
-              className="relative flex items-center gap-2 h-9 rounded-full bg-[#101112] px-4 text-sm border border-accent/30 cursor-pointer shadow-lg shadow-accent/10"
+              className="relative flex items-center gap-1.5 h-9 rounded-full bg-[#101112] px-3 text-xs md:text-sm border border-accent/30 cursor-pointer shadow-lg shadow-accent/10"
               whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.35)", borderColor: "hsl(5, 100%, 64%, 0.6)" }}
               transition={{ duration: 0.2 }}
             >
