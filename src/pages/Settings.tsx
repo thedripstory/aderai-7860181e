@@ -24,7 +24,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackEvent } from '@/lib/analytics';
 import { getConfettiEnabled, saveConfettiEnabled, syncConfettiFromServer } from '@/lib/preferences';
-import { useCurrency, usePricing } from '@/hooks/useCurrency';
+import { useCurrency, usePricing, getCurrencySync } from '@/hooks/useCurrency';
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
