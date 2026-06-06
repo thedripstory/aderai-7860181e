@@ -179,8 +179,8 @@ serve(async (req) => {
 
             const periodEnd = getPeriodEnd(subscription);
             await sendBillingEmail(userId, "subscription_confirmed", {
-              amount: session.amount_total ? session.amount_total / 100 : 9,
-              currency: session.currency?.toUpperCase() || "USD",
+              amount: typeof session.amount_total === "number" ? session.amount_total / 100 : undefined,
+              currency: session.currency ? session.currency.toUpperCase() : undefined,
               nextBillingDate: typeof periodEnd === 'number'
                 ? new Date(periodEnd * 1000).toLocaleDateString("en-US", {
                     year: "numeric",
