@@ -276,7 +276,7 @@ const DatabaseWithRestApi = ({
           />
 
           {/* ============ DESKTOP / TABLET: horizontal layout (≥640px) ============ */}
-          <div className="hidden sm:flex relative z-10 w-full items-center justify-between px-6 md:px-10">
+          <div className="hidden sm:flex relative z-10 w-full items-center justify-between px-3 md:px-4 gap-1">
             {/* Left badge: aderai */}
             <motion.div
               className="relative flex items-center gap-2 h-9 rounded-full bg-[#101112] px-4 text-sm border border-primary/30 cursor-pointer shadow-lg shadow-primary/10"
