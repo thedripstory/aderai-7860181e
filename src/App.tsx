@@ -100,7 +100,9 @@ const App = () => {
                 <Route path="/admin/setup" element={<AdminProtectedRoute><AdminSetup /></AdminProtectedRoute>} />
                 <Route path="/admin/pricing-preview" element={<AdminProtectedRoute><AdminPricingPreview /></AdminProtectedRoute>} />
                 <Route path="/help" element={<HelpCenter />} />
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
+
                 </Routes>
               </Suspense>
             </BrowserRouter>
