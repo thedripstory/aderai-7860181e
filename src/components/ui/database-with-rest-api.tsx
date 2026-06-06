@@ -33,8 +33,7 @@ const DatabaseWithRestApi = ({
   return (
     <div
       className={cn(
-        "relative mx-auto flex w-full max-w-[700px] flex-col items-center",
-        "h-[420px] sm:h-[440px] lg:h-[470px]",
+        "relative flex h-[450px] w-full max-w-[700px] flex-col items-center",
         className
       )}
     >
@@ -241,196 +240,78 @@ const DatabaseWithRestApi = ({
         </defs>
       </svg>
       {/* Main Box */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex w-full max-w-full flex-col items-center px-2">
+      <div className="absolute bottom-10 flex w-full flex-col items-center">
         {/* bottom shadow */}
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 h-[140px] w-[70%] rounded-xl bg-accent/20 blur-xl" />
+        <div className="absolute -bottom-6 h-[140px] w-[70%] rounded-xl bg-accent/20" />
         {/* box title */}
-        <motion.div
-          className="absolute -top-4 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center rounded-xl border border-primary/30 bg-[#101112] px-3 sm:px-4 py-2 shadow-lg shadow-primary/10"
+        <motion.div 
+          className="absolute -top-4 z-20 flex items-center justify-center rounded-xl border border-primary/30 bg-[#101112] px-4 py-2 shadow-lg shadow-primary/10"
           whileHover={{ scale: 1.05, boxShadow: "0 0 30px hsl(5, 77%, 66%, 0.3)" }}
           transition={{ duration: 0.2 }}
         >
-          <SparklesIcon className="size-4 text-primary shrink-0" />
-          <span className="ml-2 text-xs sm:text-sm font-medium text-white whitespace-nowrap">
+          <SparklesIcon className="size-4 text-primary" />
+          <span className="ml-2 text-sm font-medium text-white">
             {title ? title : "Data exchange using a customized REST API"}
           </span>
         </motion.div>
-
+        {/* box outter circle */}
+        <motion.div 
+          className="absolute -bottom-10 z-30 grid h-[80px] w-[80px] place-items-center rounded-full border-t border-primary/30 bg-gradient-to-b from-[#1a1a1b] to-[#0d0d0e] font-bold text-xl text-primary shadow-lg shadow-primary/20"
+          whileHover={{ scale: 1.1, boxShadow: "0 0 40px hsl(5, 77%, 66%, 0.4)" }}
+          transition={{ duration: 0.2 }}
+        >
+          {circleText ? circleText : "SVG"}
+        </motion.div>
         {/* box content */}
-        <div className="relative z-10 mx-auto flex h-[220px] sm:h-[210px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm shadow-2xl">
-          {/* Pulsing rings behind the hub (slowed down) */}
+        <div className="relative z-10 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm shadow-2xl">
+          {/* Badges */}
+          <motion.div 
+            className="absolute bottom-10 left-16 z-10 h-9 rounded-full bg-[#101112] px-4 text-sm border border-primary/20 flex items-center gap-2 cursor-pointer"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.3)", borderColor: "hsl(5, 77%, 66%, 0.5)" }}
+            transition={{ duration: 0.2 }}
+          >
+            <HeartHandshakeIcon className="size-4 text-primary" />
+            <span className="font-medium text-white">{buttonTexts?.first || "LegionDev"}</span>
+          </motion.div>
+          <motion.div 
+            className="absolute right-16 top-10 z-10 hidden h-9 rounded-full bg-[#101112] px-4 text-sm sm:flex border border-accent/20 items-center gap-2 cursor-pointer"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.3)", borderColor: "hsl(5, 100%, 64%, 0.5)" }}
+            transition={{ duration: 0.2 }}
+          >
+            <Folder className="size-4 text-accent" />
+            <span className="font-medium text-white">{buttonTexts?.second || "v2_updates"}</span>
+          </motion.div>
+          {/* Circles */}
           <motion.div
-            className="absolute h-[110px] w-[110px] rounded-full border border-primary/25 bg-primary/5"
-            animate={{ scale: [0.95, 1.05, 0.95], opacity: [0.6, 0.9, 0.6] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -bottom-16 h-[120px] w-[120px] rounded-full border-t border-primary/20 bg-primary/5"
+            animate={{
+              scale: [0.98, 1.02, 0.98, 1, 1, 1, 1, 1, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
           />
           <motion.div
-            className="absolute h-[170px] w-[170px] rounded-full border border-primary/15"
-            animate={{ scale: [1, 1.04, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            className="absolute -bottom-24 h-[175px] w-[175px] rounded-full border-t border-primary/15 bg-primary/3"
+            animate={{
+              scale: [1, 1, 1, 0.98, 1.02, 0.98, 1, 1, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
           />
           <motion.div
-            className="absolute h-[230px] w-[230px] rounded-full border border-primary/10"
-            animate={{ scale: [1, 1.03, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute -bottom-[120px] h-[230px] w-[230px] rounded-full border-t border-primary/10 bg-primary/2"
+            animate={{
+              scale: [1, 1, 1, 1, 1, 0.98, 1.02, 0.98, 1, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
           />
-
-          {/* ============ DESKTOP / TABLET: horizontal layout (≥640px) ============ */}
-          <div className="hidden sm:flex relative z-10 w-full items-center justify-between px-3 md:px-4 gap-1">
-            {/* Left badge: aderai */}
-            <motion.div
-              className="relative flex items-center gap-1.5 h-9 rounded-full bg-[#101112] px-3 text-xs md:text-sm border border-primary/30 cursor-pointer shadow-lg shadow-primary/10"
-              whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.35)", borderColor: "hsl(5, 77%, 66%, 0.6)" }}
-              transition={{ duration: 0.2 }}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-primary/60 animate-ping" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-              </span>
-              <HeartHandshakeIcon className="size-4 text-primary shrink-0" />
-              <span className="font-medium text-white whitespace-nowrap">{buttonTexts?.first || "LegionDev"}</span>
-            </motion.div>
-
-            {/* Connector + particle stream — fills the gap between badges & hub */}
-            <div className="flex-1 relative h-px mx-1 min-w-[20px]">
-              {/* baseline dashed lines */}
-              <svg className="absolute inset-0 h-full w-full overflow-visible pointer-events-none" preserveAspectRatio="none">
-                <line x1="0" y1="50%" x2="50%" y2="50%" stroke="hsl(5, 77%, 66%)" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="3 3" />
-                <line x1="50%" y1="50%" x2="100%" y2="50%" stroke="hsl(5, 100%, 64%)" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="3 3" />
-              </svg>
-              {/* Left → hub particle */}
-              <motion.div
-                className="absolute top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_2px_hsl(5,77%,66%,0.8)]"
-                initial={{ left: "0%" }}
-                animate={{ left: ["0%", "50%"] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn" }}
-              />
-              <motion.div
-                className="absolute top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary/70 shadow-[0_0_6px_1px_hsl(5,77%,66%,0.6)]"
-                initial={{ left: "0%" }}
-                animate={{ left: ["0%", "50%"] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn", delay: 0.8 }}
-              />
-              {/* Right → hub particle */}
-              <motion.div
-                className="absolute top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_hsl(5,100%,64%,0.8)]"
-                initial={{ left: "100%" }}
-                animate={{ left: ["100%", "50%"] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn", delay: 0.4 }}
-              />
-              <motion.div
-                className="absolute top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-accent/70 shadow-[0_0_6px_1px_hsl(5,100%,64%,0.6)]"
-                initial={{ left: "100%" }}
-                animate={{ left: ["100%", "50%"] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn", delay: 1.2 }}
-              />
-            </div>
-
-            {/* Center hub (with arrival pulse synced to particle cadence) */}
-            <motion.div
-              className="relative z-20 grid h-[68px] w-[68px] md:h-[78px] md:w-[78px] shrink-0 place-items-center rounded-full border border-primary/40 bg-gradient-to-b from-[#1d1d1f] to-[#0d0d0e] font-bold text-lg md:text-xl text-primary shadow-[inset_0_0_20px_hsl(5,77%,66%,0.15),0_0_40px_hsl(5,77%,66%,0.3)]"
-              animate={{ scale: [1, 1.04, 1, 1.04, 1] }}
-              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", times: [0, 0.25, 0.5, 0.75, 1] }}
-              whileHover={{ scale: 1.1, boxShadow: "inset 0 0 20px hsl(5, 77%, 66%, 0.2), 0 0 60px hsl(5, 77%, 66%, 0.55)" }}
-            >
-              <div className="absolute inset-1 rounded-full border border-primary/20" />
-              <span className="relative">{circleText ? circleText : "SVG"}</span>
-            </motion.div>
-
-            {/* Right connector + particle stream */}
-            <div className="flex-1 relative h-px mx-1 min-w-[20px]">
-              <svg className="absolute inset-0 h-full w-full overflow-visible pointer-events-none" preserveAspectRatio="none">
-                <line x1="0" y1="50%" x2="100%" y2="50%" stroke="hsl(5, 100%, 64%)" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="3 3" />
-              </svg>
-              <motion.div
-                className="absolute top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_hsl(5,100%,64%,0.8)]"
-                initial={{ left: "100%" }}
-                animate={{ left: ["100%", "0%"] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn", delay: 0.2 }}
-              />
-            </div>
-
-            {/* Right badge: 70+ Segments */}
-            <motion.div
-              className="relative flex items-center gap-1.5 h-9 rounded-full bg-[#101112] px-3 text-xs md:text-sm border border-accent/30 cursor-pointer shadow-lg shadow-accent/10"
-              whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.35)", borderColor: "hsl(5, 100%, 64%, 0.6)" }}
-              transition={{ duration: 0.2 }}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-accent/60 animate-ping" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-              </span>
-              <Folder className="size-4 text-accent shrink-0" />
-              <span className="font-medium text-white whitespace-nowrap">{buttonTexts?.second || "v2_updates"}</span>
-            </motion.div>
-          </div>
-
-          {/* ============ MOBILE: stacked layout (<640px) ============ */}
-          <div className="flex sm:hidden relative z-10 flex-col items-center justify-between h-full py-4">
-            {/* Top badge */}
-            <motion.div
-              className="relative flex items-center gap-2 h-8 rounded-full bg-[#101112] px-3 text-xs border border-primary/30 shadow-lg shadow-primary/10"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-primary/60 animate-ping" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-              </span>
-              <HeartHandshakeIcon className="size-3.5 text-primary shrink-0" />
-              <span className="font-medium text-white whitespace-nowrap">{buttonTexts?.first || "LegionDev"}</span>
-            </motion.div>
-
-            {/* Vertical connector with particle (top → hub) */}
-            <div className="relative w-px flex-1 my-1">
-              <div className="absolute inset-0 border-l border-dashed border-primary/40" />
-              <motion.div
-                className="absolute left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_2px_hsl(5,77%,66%,0.8)]"
-                initial={{ top: "0%" }}
-                animate={{ top: ["0%", "100%"] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn" }}
-              />
-            </div>
-
-            {/* Hub */}
-            <motion.div
-              className="relative z-20 grid h-[68px] w-[68px] shrink-0 place-items-center rounded-full border border-primary/40 bg-gradient-to-b from-[#1d1d1f] to-[#0d0d0e] font-bold text-lg text-primary shadow-[inset_0_0_15px_hsl(5,77%,66%,0.15),0_0_30px_hsl(5,77%,66%,0.3)]"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <div className="absolute inset-1 rounded-full border border-primary/20" />
-              <span className="relative">{circleText ? circleText : "SVG"}</span>
-            </motion.div>
-
-            {/* Vertical connector with particle (hub → bottom) */}
-            <div className="relative w-px flex-1 my-1">
-              <div className="absolute inset-0 border-l border-dashed border-accent/40" />
-              <motion.div
-                className="absolute left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_hsl(5,100%,64%,0.8)]"
-                initial={{ top: "100%" }}
-                animate={{ top: ["100%", "0%"] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn", delay: 0.4 }}
-              />
-            </div>
-
-            {/* Bottom badge */}
-            <motion.div
-              className="relative flex items-center gap-2 h-8 rounded-full bg-[#101112] px-3 text-xs border border-accent/30 shadow-lg shadow-accent/10"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-accent/60 animate-ping" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
-              </span>
-              <Folder className="size-3.5 text-accent shrink-0" />
-              <span className="font-medium text-white whitespace-nowrap">{buttonTexts?.second || "v2_updates"}</span>
-            </motion.div>
-          </div>
+          <motion.div
+            className="absolute -bottom-[150px] h-[290px] w-[290px] rounded-full border-t border-primary/5 bg-primary/1"
+            animate={{
+              scale: [1, 1, 1, 1, 1, 1, 0.98, 1.02, 0.98, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
         </div>
       </div>
-
-
     </div>
   );
 };
