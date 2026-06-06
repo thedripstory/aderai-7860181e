@@ -553,6 +553,10 @@ const AdminDashboard = () => {
           <TabsContent value="emails">
             <AdminEmailMonitoring />
           </TabsContent>
+          <TabsContent value="email-delivery">
+            <AdminEmailDelivery />
+          </TabsContent>
+
 
           {/* Analytics Tab - removed, split into dedicated tabs */}
 
