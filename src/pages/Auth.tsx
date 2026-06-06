@@ -6,7 +6,7 @@ import { SignInCard } from "@/components/ui/sign-in-card";
 import { ErrorLogger } from "@/lib/errorLogger";
 import { sanitizeEmail, sanitizeString, validatePassword } from "@/lib/inputSanitization";
 import { identifyUser, trackEvent, setGroup } from '@/lib/analytics';
-import { useCurrency } from '@/hooks/useCurrency';
+import { useCurrency, getCurrencySync } from '@/hooks/useCurrency';
 
 interface AuthProps {
   onComplete?: (user: any) => void;
