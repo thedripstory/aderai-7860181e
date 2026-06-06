@@ -132,7 +132,7 @@ export const BillingEmail = ({
           highlightBox: {
             title: '📋 Renewal Details',
             items: [
-              `Amount charged: ${amount}`,
+              amountStr ? `Amount charged: ${amountStr}` : null,
               nextBillingDate ? `Next renewal: ${nextBillingDate}` : null,
             ].filter(Boolean),
           },
