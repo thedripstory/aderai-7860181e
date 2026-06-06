@@ -28,7 +28,7 @@ const testimonials = [
   {
     name: 'David Kim',
     username: '@davidkim',
-    body: 'Finally, enterprise-level segmentation without the enterprise price tag. Best $9 I spend each month!',
+    body: 'Finally, enterprise-level segmentation without the enterprise price tag. Best subscription I have!',
     img: 'https://randomuser.me/api/portraits/men/33.jpg',
     country: '🇰🇷 Korea',
   },
@@ -112,7 +112,7 @@ const testimonials = [
   {
     name: 'Liam O\'Brien',
     username: '@liamob',
-    body: 'For $9/month, you get what agencies charge thousands for. Absolute no-brainer.',
+    body: 'You get what agencies charge thousands for. Absolute no-brainer.',
     img: 'https://randomuser.me/api/portraits/men/92.jpg',
     country: '🇮🇪 Ireland',
   },

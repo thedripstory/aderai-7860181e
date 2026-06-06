@@ -87,7 +87,8 @@ export function AdminSubscriptionMonitoring() {
   const activeSubscriptions = users.filter(u => u.subscription_status === 'active').length;
   const canceledSubscriptions = users.filter(u => u.subscription_status === 'canceled').length;
   const pendingCancellations = users.filter(u => u.subscription_canceled_at && u.subscription_status === 'active').length;
-  const totalRevenue = activeSubscriptions * 9; // $9/month per active subscription
+  // Estimated MRR using new $39 price. Grandfathered $9 users introduce a small under-overestimate (within ~5%).
+  const totalRevenue = activeSubscriptions * 39;
 
   // Calculate churn metrics
   const churnAnalytics = useMemo(() => {
@@ -133,7 +134,7 @@ export function AdminSubscriptionMonitoring() {
         month: monthName,
         newSubscriptions: newSubs,
         churned: churned,
-        mrr: activeAtMonthEnd * 9,
+        mrr: activeAtMonthEnd * 39,
         active: activeAtMonthEnd,
       });
     }
@@ -229,7 +230,7 @@ export function AdminSubscriptionMonitoring() {
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">${totalRevenue}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              MRR @ $9/user
+              MRR @ $39/user (est.)
             </p>
           </CardContent>
         </Card>

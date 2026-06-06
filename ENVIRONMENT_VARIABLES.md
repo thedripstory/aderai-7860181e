@@ -27,7 +27,7 @@ ENCRYPTION_KEY=your_32_character_encryption_key
 ```env
 STRIPE_SECRET_KEY=sk_live_xxx        # Stripe Dashboard → Developers → API Keys
 STRIPE_WEBHOOK_SECRET=whsec_xxx      # Stripe Dashboard → Developers → Webhooks
-STRIPE_PRICE_ID=price_xxx            # Stripe Dashboard → Products → Your $9/month price
+STRIPE_PRICE_ID=price_xxx            # Stripe Dashboard → Products → USD $39/month price (other currencies hardcoded in stripe-create-checkout)
 ```
 
 #### Required for Email
@@ -54,9 +54,9 @@ OPENAI_API_KEY=sk-xxx                # OpenAI Platform → API Keys
 ### 3. Create Product & Price
 - Go to Products → Add Product
 - Name: "Aderai Monthly"
-- Price: $9.00 USD, Recurring monthly
-- Copy the **Price ID** (starts with `price_`)
-- Add as `STRIPE_PRICE_ID` in Cloud secrets
+- Prices: USD $39/mo, GBP £39/mo, AUD A$59/mo, CAD C$59/mo (all recurring monthly)
+- Copy each **Price ID** (starts with `price_`)
+- Add the USD one as `STRIPE_PRICE_ID` in Cloud secrets (the others are hardcoded in `stripe-create-checkout`)
 
 ### 4. Set Up Webhook
 - Go to Developers → Webhooks → Add endpoint

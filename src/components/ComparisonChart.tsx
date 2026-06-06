@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Check, X, Zap, Clock, DollarSign, TrendingUp, ArrowRight, Sparkles, Code, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { usePricing } from "@/hooks/useCurrency";
 
 export const ComparisonChart = () => {
   const [activeView, setActiveView] = useState<'manual' | 'aderai'>('aderai');
   const navigate = useNavigate();
+  const pricing = usePricing();
 
   const handleGetStarted = () => {
     navigate('/signup');
@@ -27,7 +29,7 @@ export const ComparisonChart = () => {
     {
       feature: "Monthly Cost",
       manual: "$1,500+",
-      aderai: "$9",
+      aderai: pricing.price,
       icon: DollarSign,
     },
     {
@@ -216,7 +218,7 @@ export const ComparisonChart = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span>Get Started for $9/month</span>
+            <span>Get Started for {pricing.pricePerMonth}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </motion.button>
           <p className="mt-3 text-xs text-muted-foreground">

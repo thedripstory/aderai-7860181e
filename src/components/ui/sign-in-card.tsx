@@ -6,6 +6,7 @@ import { Mail, Lock, Eye, EyeClosed, ArrowRight, User, Clock, XCircle } from 'lu
 import { cn } from "@/lib/utils"
 import { AuroraBackground } from "@/components/ui/aurora-background"
 import { AderaiLogo } from "@/components/AderaiLogo"
+import { usePricing } from "@/hooks/useCurrency"
 
 function SignInInput({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -32,6 +33,7 @@ interface SignInCardProps {
 
 export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading = false }: SignInCardProps) {
   const [searchParams] = useSearchParams();
+  const pricing = usePricing();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -554,7 +556,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                 {isSignUp && (
                   <div className="text-center space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      $9/month • Cancel anytime
+                      {pricing.pricePerMonth} • Cancel anytime
                     </p>
                     <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1">
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

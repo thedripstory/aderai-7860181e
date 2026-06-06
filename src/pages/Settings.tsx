@@ -24,6 +24,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackEvent } from '@/lib/analytics';
 import { getConfettiEnabled, saveConfettiEnabled, syncConfettiFromServer } from '@/lib/preferences';
+import { useCurrency, usePricing } from '@/hooks/useCurrency';
 
 const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -37,6 +38,8 @@ const CURRENCIES = [
 
 export default function Settings() {
   useInactivityLogout();
+  const detectedCurrency = useCurrency();
+  const pricing = usePricing();
   const [activeTab, setActiveTab] = useState<"account" | "thresholds" | "security" | "notifications" | "billing">("account");
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -554,7 +557,7 @@ export default function Settings() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: { origin: window.location.origin },
+        body: { origin: window.location.origin, currency: detectedCurrency },
       });
       
       if (error) throw error;
@@ -1085,7 +1088,7 @@ export default function Settings() {
                                 ) : (
                                   <>
                                     <CreditCard className="w-4 h-4 mr-2" />
-                                    Resubscribe - $9/month
+                                    Resubscribe - {pricing.pricePerMonth}
                                   </>
                                 )}
                               </Button>
@@ -1137,7 +1140,7 @@ export default function Settings() {
                             ) : (
                               <>
                                 <CreditCard className="w-4 h-4 mr-2" />
-                                Subscribe Now - $9/month
+                                Subscribe Now - {pricing.pricePerMonth}
                               </>
                             )}
                           </Button>

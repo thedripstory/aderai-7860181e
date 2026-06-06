@@ -6,6 +6,7 @@ import { SignInCard } from "@/components/ui/sign-in-card";
 import { ErrorLogger } from "@/lib/errorLogger";
 import { sanitizeEmail, sanitizeString, validatePassword } from "@/lib/inputSanitization";
 import { identifyUser, trackEvent, setGroup } from '@/lib/analytics';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface AuthProps {
   onComplete?: (user: any) => void;
@@ -17,6 +18,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const detectedCurrency = useCurrency();
 
   const handleAuth = async (email: string, password: string, firstName?: string, brandName?: string) => {
     setLoading(true);
@@ -183,7 +185,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
               'stripe-create-checkout',
               {
-                body: { origin: window.location.origin },
+                body: { origin: window.location.origin, currency: detectedCurrency },
               }
             );
 

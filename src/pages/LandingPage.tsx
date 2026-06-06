@@ -16,6 +16,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
 import { SectionPlaceholder } from "@/components/ui/SectionPlaceholder";
+import { usePricing } from "@/hooks/useCurrency";
 
 // Lazy load heavy components
 const ComparisonChart = lazy(() => import('@/components/ComparisonChart').then(m => ({ default: m.ComparisonChart })));
@@ -27,6 +28,7 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const heroVariant = useABTest('hero-headline');
+  const pricing = usePricing();
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -162,7 +164,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>Just $9/month</span>
+                <span>Just {pricing.pricePerMonth}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />

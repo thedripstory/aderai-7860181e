@@ -44,7 +44,7 @@ export const BillingEmail = ({
   dashboardUrl,
   billingPortalUrl,
   planName = 'Pro',
-  amount = '$9',
+  amount = '$39',
   currency = 'USD',
   nextBillingDate,
   trialEndDate,
