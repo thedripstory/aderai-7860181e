@@ -345,8 +345,8 @@ serve(async (req) => {
           if (userId) {
             // Send renewal confirmation email
             await sendBillingEmail(userId, "subscription_renewed", {
-              amount: invoice.amount_paid ? invoice.amount_paid / 100 : 9,
-              currency: invoice.currency?.toUpperCase() || "USD",
+              amount: typeof invoice.amount_paid === "number" ? invoice.amount_paid / 100 : undefined,
+              currency: invoice.currency ? invoice.currency.toUpperCase() : undefined,
               nextBillingDate: (() => {
                 const pe = getPeriodEnd(subscription);
                 return typeof pe === 'number'
