@@ -16,6 +16,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
 import { SectionPlaceholder } from "@/components/ui/SectionPlaceholder";
+import { usePricing } from "@/hooks/useCurrency";
 
 // Lazy load heavy components
 const ComparisonChart = lazy(() => import('@/components/ComparisonChart').then(m => ({ default: m.ComparisonChart })));
@@ -27,6 +28,7 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const heroVariant = useABTest('hero-headline');
+  const pricing = usePricing();
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);

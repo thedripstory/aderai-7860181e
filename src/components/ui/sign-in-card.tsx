@@ -6,6 +6,7 @@ import { Mail, Lock, Eye, EyeClosed, ArrowRight, User, Clock, XCircle } from 'lu
 import { cn } from "@/lib/utils"
 import { AuroraBackground } from "@/components/ui/aurora-background"
 import { AderaiLogo } from "@/components/AderaiLogo"
+import { usePricing } from "@/hooks/useCurrency"
 
 function SignInInput({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -32,6 +33,7 @@ interface SignInCardProps {
 
 export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading = false }: SignInCardProps) {
   const [searchParams] = useSearchParams();
+  const pricing = usePricing();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
