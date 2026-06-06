@@ -185,7 +185,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
               'stripe-create-checkout',
               {
-                body: { origin: window.location.origin, currency: detectedCurrency },
+                body: { origin: window.location.origin, currency: detectedCurrency || getCurrencySync() },
               }
             );
 
