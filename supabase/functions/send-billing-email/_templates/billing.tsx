@@ -76,19 +76,13 @@ export const BillingEmail = ({
   planName = 'Pro',
   amount,
   currency,
-}: BillingEmailProps) => {
-  const formattedAmount = formatAmount(amount, currency);
-  const _unused_destructure_alias = (() => {})();
-  // Re-bind for the legacy template lines below.
-  // We intentionally do NOT default to $39 — missing means "don't show a price".
-  const amountStr = formattedAmount;
-  void currency;
-  void amount;
   nextBillingDate,
   trialEndDate,
   failureReason,
   trackingPixelUrl,
 }: BillingEmailProps) => {
+  // Format Stripe amount + currency (e.g. 39 + "GBP" → "£39"). Empty when missing.
+  const amountStr = formatAmount(amount, currency);
   const getEmailContent = () => {
     switch (emailType) {
       case 'subscription_confirmed':
