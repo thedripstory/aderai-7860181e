@@ -67,10 +67,14 @@ serve(async (req) => {
     const reqData = await req.json().catch(() => ({}));
     const origin = reqData?.origin || Deno.env.get("SITE_URL") || "https://aderai.io";
 
-    // Resolve currency → price id. Default to USD for unknown values.
-    const requestedCurrency = String(reqData?.currency || "usd").toLowerCase();
-    const priceId = PRICE_IDS[requestedCurrency] || PRICE_IDS.usd;
-    const resolvedCurrency = PRICE_IDS[requestedCurrency] ? requestedCurrency : "usd";
+    // Resolve currency → price id. Default to USD for unknown/empty values.
+    const rawCurrency = reqData?.currency;
+    const requestedCurrency = typeof rawCurrency === "string" ? rawCurrency.toLowerCase().trim() : "";
+    const resolvedCurrency = (requestedCurrency && PRICE_IDS[requestedCurrency]) ? requestedCurrency : "usd";
+    if (!requestedCurrency || !PRICE_IDS[requestedCurrency]) {
+      logStep("Unknown/empty currency — defaulting to USD", { rawCurrency });
+    }
+    const priceId = PRICE_IDS[resolvedCurrency];
     logStep("Resolved price for currency", { requestedCurrency, resolvedCurrency, priceId });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
