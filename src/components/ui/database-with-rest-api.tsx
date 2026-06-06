@@ -33,7 +33,8 @@ const DatabaseWithRestApi = ({
   return (
     <div
       className={cn(
-        "relative flex h-[450px] w-full max-w-[700px] flex-col items-center",
+        "relative flex w-full max-w-[700px] flex-col items-center",
+        "h-[380px] sm:h-[420px] lg:h-[460px]",
         className
       )}
     >
