@@ -137,7 +137,7 @@ Recover lost sales:
     order_index: 4,
     content: `# Pricing & Subscription
 
-Aderai offers professional Klaviyo segmentation for just $9/month.
+Aderai offers professional Klaviyo segmentation starting at $39/month (regional pricing applies — £39 in the UK, A$59 in Australia, C$59 in Canada).
 
 ## What's included:
 - Full access to all 70+ segments
@@ -148,13 +148,13 @@ Aderai offers professional Klaviyo segmentation for just $9/month.
 
 ## Billing
 
-- Monthly subscription: $9/month
+- Monthly subscription, automatically priced in your local currency
 - Billed through Stripe (secure payment)
 - Cancel anytime from your account settings
 
 ## Value Comparison
 
-Agencies typically charge $1,500-$5,000 for similar segmentation work. With Aderai, you get the same professional results for just $9/month.
+Agencies typically charge $1,500-$5,000 for similar segmentation work. With Aderai, you get the same professional results for a fraction of the cost.
 
 ## Current Status
 

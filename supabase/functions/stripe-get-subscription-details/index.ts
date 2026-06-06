@@ -146,8 +146,9 @@ serve(async (req) => {
       );
     }
 
-    // Calculate amount
-    let amount = 9; // Default $9
+    // Calculate amount — always read the real value from Stripe so
+    // grandfathered $9 subscribers see $9 and new subscribers see their actual price.
+    let amount = 39; // Default fallback only if Stripe returns no price
     if (subscription.items.data.length > 0) {
       const item = subscription.items.data[0];
       if (item.price.unit_amount) {

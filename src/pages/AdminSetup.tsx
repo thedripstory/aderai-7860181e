@@ -196,7 +196,7 @@ export default function AdminSetup() {
                       <li>
                         Go to <a href="https://dashboard.stripe.com/products" target="_blank" rel="noopener noreferrer" className="underline">Stripe Dashboard → Products</a>
                       </li>
-                      <li>Create a product with a <strong>$9/month recurring price</strong></li>
+                      <li>Create products with a <strong>$39/month (USD), £39 (GBP), A$59 (AUD), and C$59 (CAD)</strong> recurring price each</li>
                       <li>Copy the Price ID (starts with price_)</li>
                       <li>Add it as <code className="bg-blue-100 px-1 rounded">STRIPE_PRICE_ID</code> in Supabase</li>
                     </ol>
