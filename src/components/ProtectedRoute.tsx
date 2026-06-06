@@ -204,7 +204,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     setIsCheckingSubscription(true);
     try {
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: { origin: window.location.origin, currency },
+        body: { origin: window.location.origin, currency: currency || getCurrencySync() },
       });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
