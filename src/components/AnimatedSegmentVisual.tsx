@@ -35,7 +35,7 @@ export const AnimatedSegmentVisual = () => {
         </motion.div>
 
         {/* Main content grid */}
-        <div className="grid lg:grid-cols-3 gap-8 items-center mb-20">
+        <div className="grid lg:grid-cols-[1fr_1.35fr_1fr] gap-6 lg:gap-8 items-center mb-20">
           {/* Left stats */}
           <motion.div 
             className="space-y-6"
@@ -93,7 +93,7 @@ export const AnimatedSegmentVisual = () => {
             viewport={{ once: true }}
           >
             <DatabaseWithRestApi
-              className="w-full max-w-[560px] lg:scale-110 origin-center"
+              className="w-full max-w-[460px] xl:max-w-[520px] mx-auto"
               badgeTexts={{
                 first: "Connect",
                 second: "Select",
