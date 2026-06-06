@@ -74,8 +74,16 @@ export const BillingEmail = ({
   dashboardUrl,
   billingPortalUrl,
   planName = 'Pro',
-  amount = '$39',
-  currency = 'USD',
+  amount,
+  currency,
+}: BillingEmailProps) => {
+  const formattedAmount = formatAmount(amount, currency);
+  const _unused_destructure_alias = (() => {})();
+  // Re-bind for the legacy template lines below.
+  // We intentionally do NOT default to $39 — missing means "don't show a price".
+  const amountStr = formattedAmount;
+  void currency;
+  void amount;
   nextBillingDate,
   trialEndDate,
   failureReason,
