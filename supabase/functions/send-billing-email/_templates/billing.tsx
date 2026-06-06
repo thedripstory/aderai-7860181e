@@ -166,11 +166,13 @@ export const BillingEmail = ({
           preview: 'Payment received for your Aderai subscription',
           emoji: '💳',
           title: 'Payment Successful',
-          message: `We've successfully received your payment of ${amount} for Aderai ${planName}. Thank you!`,
+          message: amountStr
+            ? `We've successfully received your payment of ${amountStr} for Aderai ${planName}. Thank you!`
+            : `We've successfully received your payment for Aderai ${planName}. Thank you!`,
           highlightBox: {
             title: '✅ Payment Details',
             items: [
-              `Amount: ${amount}`,
+              amountStr ? `Amount: ${amountStr}` : null,
               `Plan: ${planName}`,
               nextBillingDate ? `Next billing date: ${nextBillingDate}` : null,
             ].filter(Boolean),
