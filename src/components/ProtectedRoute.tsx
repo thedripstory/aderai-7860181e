@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { CreditCard, AlertTriangle, RefreshCw } from 'lucide-react';
+import { useCurrency, usePricing } from '@/hooks/useCurrency';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -18,6 +19,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const currency = useCurrency();
+  const pricing = usePricing();
 
   // Check if email has free access (bypass subscription)
   const hasFreeAccess = userEmail?.toLowerCase().endsWith('@thedripstory.com') ?? false;
@@ -201,7 +204,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     setIsCheckingSubscription(true);
     try {
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: { origin: window.location.origin },
+        body: { origin: window.location.origin, currency },
       });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
@@ -392,7 +395,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
                 disabled={isCheckingSubscription}
                 className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold mb-3 disabled:opacity-50"
               >
-                {isCheckingSubscription ? 'Setting up...' : subscriptionStatus === 'canceled' ? 'Resubscribe - $9/month' : isComingFromCheckout ? 'Try Again - $9/month' : 'Complete Subscription - $9/month'}
+                {isCheckingSubscription ? 'Setting up...' : subscriptionStatus === 'canceled' ? `Resubscribe - ${pricing.pricePerMonth}` : isComingFromCheckout ? `Try Again - ${pricing.pricePerMonth}` : `Complete Subscription - ${pricing.pricePerMonth}`}
               </button>
               <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1 mb-3">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
