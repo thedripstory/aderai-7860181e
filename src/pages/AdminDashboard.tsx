@@ -28,6 +28,8 @@ import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
 import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
 import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
+import { AdminEmailDelivery } from "@/components/AdminEmailDelivery";
+
 import { AdminCohortAnalysis } from "@/components/AdminCohortAnalysis";
 import { AdminSegmentAnalytics } from "@/components/AdminSegmentAnalytics";
 import { AdminUserHealth } from "@/components/AdminUserHealth";
@@ -399,6 +401,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="errors">Errors</TabsTrigger>
             <TabsTrigger value="email-tracking">Email Tracking</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
+            <TabsTrigger value="email-delivery">Email Delivery</TabsTrigger>
+
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
             <TabsTrigger value="mismatch">Mismatch Reports</TabsTrigger>
@@ -549,6 +553,10 @@ const AdminDashboard = () => {
           <TabsContent value="emails">
             <AdminEmailMonitoring />
           </TabsContent>
+          <TabsContent value="email-delivery">
+            <AdminEmailDelivery />
+          </TabsContent>
+
 
           {/* Analytics Tab - removed, split into dedicated tabs */}
 

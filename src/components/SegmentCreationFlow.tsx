@@ -88,7 +88,27 @@ export const SegmentCreationFlow: React.FC<SegmentCreationFlowProps> = ({
     if (!loading && results.length > 0 && resultState === 'all_success') {
       setShowSuccess(true);
     }
-  }, [loading, results, resultState]);
+    // Trigger first-segment email if any segment was successfully created.
+    // trigger-app-email is idempotent (atomic flag flip), so this is safe to call
+    // multiple times across sessions; only the first call ever sends an email.
+    if (!loading && stats.created > 0) {
+      (async () => {
+        try {
+          const { supabase } = await import('@/integrations/supabase/client');
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+          const firstSuccess = results.find(r => r.status === 'success');
+          const segmentName = firstSuccess ? SEGMENTS.find(s => s.id === firstSuccess.segmentId)?.name : undefined;
+          await supabase.functions.invoke('trigger-app-email', {
+            body: { type: 'first-segment', userId: user.id, templateData: segmentName ? { segmentName } : {} },
+          });
+        } catch (e) {
+          console.warn('[first-segment email] trigger failed', e);
+        }
+      })();
+    }
+  }, [loading, results, resultState, stats.created]);
+
 
   // State configuration for different result states
   const stateConfig = {
