@@ -292,7 +292,7 @@ const DatabaseWithRestApi = ({
             </motion.div>
 
             {/* Connector + particle stream — fills the gap between badges & hub */}
-            <div className="flex-1 relative h-px mx-3">
+            <div className="flex-1 relative h-px mx-1 min-w-[20px]">
               {/* baseline dashed lines */}
               <svg className="absolute inset-0 h-full w-full overflow-visible pointer-events-none" preserveAspectRatio="none">
                 <line x1="0" y1="50%" x2="50%" y2="50%" stroke="hsl(5, 77%, 66%)" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="3 3" />
@@ -338,7 +338,7 @@ const DatabaseWithRestApi = ({
             </motion.div>
 
             {/* Right connector + particle stream */}
-            <div className="flex-1 relative h-px mx-3">
+            <div className="flex-1 relative h-px mx-1 min-w-[20px]">
               <svg className="absolute inset-0 h-full w-full overflow-visible pointer-events-none" preserveAspectRatio="none">
                 <line x1="0" y1="50%" x2="100%" y2="50%" stroke="hsl(5, 100%, 64%)" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="3 3" />
               </svg>
