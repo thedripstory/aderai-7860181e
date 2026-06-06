@@ -241,78 +241,94 @@ const DatabaseWithRestApi = ({
         </defs>
       </svg>
       {/* Main Box */}
-      <div className="absolute bottom-10 flex w-full flex-col items-center">
+      <div className="absolute bottom-6 sm:bottom-8 flex w-full flex-col items-center px-2">
         {/* bottom shadow */}
-        <div className="absolute -bottom-6 h-[140px] w-[70%] rounded-xl bg-accent/20" />
+        <div className="absolute -bottom-6 h-[140px] w-[70%] rounded-xl bg-accent/20 blur-xl" />
         {/* box title */}
-        <motion.div 
-          className="absolute -top-4 z-20 flex items-center justify-center rounded-xl border border-primary/30 bg-[#101112] px-4 py-2 shadow-lg shadow-primary/10"
+        <motion.div
+          className="absolute -top-4 z-20 flex items-center justify-center rounded-xl border border-primary/30 bg-[#101112] px-3 sm:px-4 py-2 shadow-lg shadow-primary/10"
           whileHover={{ scale: 1.05, boxShadow: "0 0 30px hsl(5, 77%, 66%, 0.3)" }}
           transition={{ duration: 0.2 }}
         >
           <SparklesIcon className="size-4 text-primary" />
-          <span className="ml-2 text-sm font-medium text-white">
+          <span className="ml-2 text-xs sm:text-sm font-medium text-white whitespace-nowrap">
             {title ? title : "Data exchange using a customized REST API"}
           </span>
         </motion.div>
-        {/* box outter circle */}
-        <motion.div 
-          className="absolute -bottom-10 z-30 grid h-[80px] w-[80px] place-items-center rounded-full border-t border-primary/30 bg-gradient-to-b from-[#1a1a1b] to-[#0d0d0e] font-bold text-xl text-primary shadow-lg shadow-primary/20"
-          whileHover={{ scale: 1.1, boxShadow: "0 0 40px hsl(5, 77%, 66%, 0.4)" }}
-          transition={{ duration: 0.2 }}
-        >
-          {circleText ? circleText : "SVG"}
-        </motion.div>
+
         {/* box content */}
-        <div className="relative z-10 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm shadow-2xl">
-          {/* Badges */}
-          <motion.div 
-            className="absolute bottom-10 left-16 z-10 h-9 rounded-full bg-[#101112] px-4 text-sm border border-primary/20 flex items-center gap-2 cursor-pointer"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.3)", borderColor: "hsl(5, 77%, 66%, 0.5)" }}
-            transition={{ duration: 0.2 }}
+        <div className="relative z-10 flex h-[180px] sm:h-[200px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm shadow-2xl">
+          {/* Pulsing rings behind the hub */}
+          <motion.div
+            className="absolute h-[120px] w-[120px] rounded-full border border-primary/20 bg-primary/5"
+            animate={{ scale: [0.95, 1.05, 0.95] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute h-[175px] w-[175px] rounded-full border border-primary/15"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+          />
+          <motion.div
+            className="absolute h-[230px] w-[230px] rounded-full border border-primary/10"
+            animate={{ scale: [1, 1.04, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+          />
+
+          {/* Connector lines from hub to side badges */}
+          <svg
+            className="absolute inset-0 h-full w-full pointer-events-none"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
           >
-            <HeartHandshakeIcon className="size-4 text-primary" />
-            <span className="font-medium text-white">{buttonTexts?.first || "LegionDev"}</span>
-          </motion.div>
-          <motion.div 
-            className="absolute right-16 top-10 z-10 hidden h-9 rounded-full bg-[#101112] px-4 text-sm sm:flex border border-accent/20 items-center gap-2 cursor-pointer"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.3)", borderColor: "hsl(5, 100%, 64%, 0.5)" }}
-            transition={{ duration: 0.2 }}
-          >
-            <Folder className="size-4 text-accent" />
-            <span className="font-medium text-white">{buttonTexts?.second || "v2_updates"}</span>
-          </motion.div>
-          {/* Circles */}
-          <motion.div
-            className="absolute -bottom-16 h-[120px] w-[120px] rounded-full border-t border-primary/20 bg-primary/5"
-            animate={{
-              scale: [0.98, 1.02, 0.98, 1, 1, 1, 1, 1, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute -bottom-24 h-[175px] w-[175px] rounded-full border-t border-primary/15 bg-primary/3"
-            animate={{
-              scale: [1, 1, 1, 0.98, 1.02, 0.98, 1, 1, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute -bottom-[120px] h-[230px] w-[230px] rounded-full border-t border-primary/10 bg-primary/2"
-            animate={{
-              scale: [1, 1, 1, 1, 1, 0.98, 1.02, 0.98, 1, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute -bottom-[150px] h-[290px] w-[290px] rounded-full border-t border-primary/5 bg-primary/1"
-            animate={{
-              scale: [1, 1, 1, 1, 1, 1, 0.98, 1.02, 0.98, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
+            <defs>
+              <linearGradient id="db-connector-left" x1="0%" y1="50%" x2="100%" y2="50%">
+                <stop offset="0%" stopColor="hsl(5, 77%, 66%)" stopOpacity="0" />
+                <stop offset="100%" stopColor="hsl(5, 77%, 66%)" stopOpacity="0.7" />
+              </linearGradient>
+              <linearGradient id="db-connector-right" x1="0%" y1="50%" x2="100%" y2="50%">
+                <stop offset="0%" stopColor="hsl(5, 100%, 64%)" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="hsl(5, 100%, 64%)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <line x1="18" y1="50" x2="42" y2="50" stroke="url(#db-connector-left)" strokeWidth="0.4" strokeDasharray="2 2" />
+            <line x1="58" y1="50" x2="82" y2="50" stroke="url(#db-connector-right)" strokeWidth="0.4" strokeDasharray="2 2" />
+          </svg>
+
+          {/* Row: left badge — hub — right badge */}
+          <div className="relative z-10 flex w-full items-center justify-between px-4 sm:px-8">
+            {/* Left badge: aderai */}
+            <motion.div
+              className="flex items-center gap-2 h-9 rounded-full bg-[#101112] px-3 sm:px-4 text-xs sm:text-sm border border-primary/30 cursor-pointer shadow-lg shadow-primary/10"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 77%, 66%, 0.3)", borderColor: "hsl(5, 77%, 66%, 0.6)" }}
+              transition={{ duration: 0.2 }}
+            >
+              <HeartHandshakeIcon className="size-4 text-primary shrink-0" />
+              <span className="font-medium text-white whitespace-nowrap">{buttonTexts?.first || "LegionDev"}</span>
+            </motion.div>
+
+            {/* Center hub */}
+            <motion.div
+              className="relative z-20 grid h-[68px] w-[68px] sm:h-[80px] sm:w-[80px] shrink-0 place-items-center rounded-full border border-primary/40 bg-gradient-to-b from-[#1a1a1b] to-[#0d0d0e] font-bold text-lg sm:text-xl text-primary shadow-[0_0_40px_hsl(5,77%,66%,0.25)]"
+              whileHover={{ scale: 1.08, boxShadow: "0 0 50px hsl(5, 77%, 66%, 0.5)" }}
+              transition={{ duration: 0.2 }}
+            >
+              {circleText ? circleText : "SVG"}
+            </motion.div>
+
+            {/* Right badge: 70+ Segments */}
+            <motion.div
+              className="flex items-center gap-2 h-9 rounded-full bg-[#101112] px-3 sm:px-4 text-xs sm:text-sm border border-accent/30 cursor-pointer shadow-lg shadow-accent/10"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(5, 100%, 64%, 0.3)", borderColor: "hsl(5, 100%, 64%, 0.6)" }}
+              transition={{ duration: 0.2 }}
+            >
+              <Folder className="size-4 text-accent shrink-0" />
+              <span className="font-medium text-white whitespace-nowrap">{buttonTexts?.second || "v2_updates"}</span>
+            </motion.div>
+          </div>
         </div>
       </div>
+
     </div>
   );
 };
