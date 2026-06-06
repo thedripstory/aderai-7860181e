@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/errorLogger';
 import { CreditCard, AlertTriangle, RefreshCw } from 'lucide-react';
-import { useCurrency, usePricing } from '@/hooks/useCurrency';
+import { useCurrency, usePricing, getCurrencySync } from '@/hooks/useCurrency';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
