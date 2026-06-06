@@ -407,8 +407,8 @@ serve(async (req) => {
 
             // Send payment failed email
             await sendBillingEmail(userId, "payment_failed", {
-              amount: invoice.amount_due ? invoice.amount_due / 100 : 9,
-              currency: invoice.currency?.toUpperCase() || "USD",
+              amount: typeof invoice.amount_due === "number" ? invoice.amount_due / 100 : undefined,
+              currency: invoice.currency ? invoice.currency.toUpperCase() : undefined,
             });
 
             logStep("Marked subscription as past_due", { userId });
