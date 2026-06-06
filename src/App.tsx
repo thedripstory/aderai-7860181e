@@ -34,6 +34,8 @@ const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const JobHistory = lazy(() => import("./pages/JobHistory"));
 const AdminSetup = lazy(() => import("./pages/AdminSetup"));
 const AdminPricingPreview = lazy(() => import("./pages/AdminPricingPreview"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+
 
 const queryClient = new QueryClient();
 
