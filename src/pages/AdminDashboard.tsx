@@ -401,6 +401,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="errors">Errors</TabsTrigger>
             <TabsTrigger value="email-tracking">Email Tracking</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
+            <TabsTrigger value="email-delivery">Email Delivery</TabsTrigger>
+
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
             <TabsTrigger value="mismatch">Mismatch Reports</TabsTrigger>
