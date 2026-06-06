@@ -328,7 +328,7 @@ const DatabaseWithRestApi = ({
 
             {/* Center hub (with arrival pulse synced to particle cadence) */}
             <motion.div
-              className="relative z-20 grid h-[78px] w-[78px] md:h-[88px] md:w-[88px] shrink-0 place-items-center rounded-full border border-primary/40 bg-gradient-to-b from-[#1d1d1f] to-[#0d0d0e] font-bold text-xl md:text-2xl text-primary shadow-[inset_0_0_20px_hsl(5,77%,66%,0.15),0_0_40px_hsl(5,77%,66%,0.3)]"
+              className="relative z-20 grid h-[68px] w-[68px] md:h-[78px] md:w-[78px] shrink-0 place-items-center rounded-full border border-primary/40 bg-gradient-to-b from-[#1d1d1f] to-[#0d0d0e] font-bold text-lg md:text-xl text-primary shadow-[inset_0_0_20px_hsl(5,77%,66%,0.15),0_0_40px_hsl(5,77%,66%,0.3)]"
               animate={{ scale: [1, 1.04, 1, 1.04, 1] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", times: [0, 0.25, 0.5, 0.75, 1] }}
               whileHover={{ scale: 1.1, boxShadow: "inset 0 0 20px hsl(5, 77%, 66%, 0.2), 0 0 60px hsl(5, 77%, 66%, 0.55)" }}
