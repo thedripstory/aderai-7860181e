@@ -1364,8 +1364,10 @@ export type Database = {
           email: string
           email_verified: boolean | null
           first_name: string | null
+          first_segment_email_sent: boolean
           id: string
           industry: string | null
+          klaviyo_reminder_sent: boolean
           klaviyo_setup_completed: boolean | null
           marketing_goals: string | null
           onboarding_completed: boolean | null
@@ -1383,6 +1385,7 @@ export type Database = {
           two_factor_prompt_shown_at: string | null
           two_factor_secret: string | null
           updated_at: string | null
+          welcome_email_sent: boolean
         }
         Insert: {
           account_name: string
@@ -1391,8 +1394,10 @@ export type Database = {
           email: string
           email_verified?: boolean | null
           first_name?: string | null
+          first_segment_email_sent?: boolean
           id?: string
           industry?: string | null
+          klaviyo_reminder_sent?: boolean
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
           onboarding_completed?: boolean | null
@@ -1410,6 +1415,7 @@ export type Database = {
           two_factor_prompt_shown_at?: string | null
           two_factor_secret?: string | null
           updated_at?: string | null
+          welcome_email_sent?: boolean
         }
         Update: {
           account_name?: string
@@ -1418,8 +1424,10 @@ export type Database = {
           email?: string
           email_verified?: boolean | null
           first_name?: string | null
+          first_segment_email_sent?: boolean
           id?: string
           industry?: string | null
+          klaviyo_reminder_sent?: boolean
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
           onboarding_completed?: boolean | null
@@ -1437,6 +1445,7 @@ export type Database = {
           two_factor_prompt_shown_at?: string | null
           two_factor_secret?: string | null
           updated_at?: string | null
+          welcome_email_sent?: boolean
         }
         Relationships: []
       }
