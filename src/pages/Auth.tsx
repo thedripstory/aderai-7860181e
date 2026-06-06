@@ -135,15 +135,10 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             }
           }
 
-          // Send welcome email
+          // Send welcome email (idempotent: trigger-app-email flips a flag)
           try {
-            await supabase.functions.invoke('send-welcome-email', {
-              body: {
-                email: sanitizedEmail,
-                userName: sanitizedFirstName || sanitizedEmail.split('@')[0],
-                accountType: 'brand',
-                userId: authData.user.id,
-              },
+            await supabase.functions.invoke('trigger-app-email', {
+              body: { type: 'welcome', userId: authData.user.id },
             });
           } catch (emailError) {
             await ErrorLogger.logError(emailError as Error, {
@@ -151,6 +146,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
               userId: authData.user.id,
             });
           }
+
 
 
           toast({
