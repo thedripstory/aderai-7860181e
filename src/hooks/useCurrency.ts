@@ -110,9 +110,13 @@ export function useCurrency(): CurrencyCode {
 
     detectCountryFromIP().then((country) => {
       if (cancelled) return;
+      // On failure (timeout/blocked), persist USD so we don't retry every page.
       const detected = countryToCurrency(country);
       try { sessionStorage.setItem(SESSION_KEY, detected); } catch { /* noop */ }
       setCurrency((prev) => (prev === detected ? prev : detected));
+    }).catch(() => {
+      // Belt & braces — already handled inside detectCountryFromIP.
+      try { sessionStorage.setItem(SESSION_KEY, DEFAULT_CURRENCY); } catch { /* noop */ }
     });
 
     return () => { cancelled = true; };
