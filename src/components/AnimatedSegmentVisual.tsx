@@ -93,7 +93,7 @@ export const AnimatedSegmentVisual = () => {
             viewport={{ once: true }}
           >
             <DatabaseWithRestApi
-              className="w-full max-w-[640px] mx-auto"
+              className="w-full max-w-[460px] xl:max-w-[520px] mx-auto"
               badgeTexts={{
                 first: "Connect",
                 second: "Select",
