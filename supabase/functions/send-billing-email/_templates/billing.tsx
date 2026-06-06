@@ -30,12 +30,42 @@ interface BillingEmailProps {
   dashboardUrl: string;
   billingPortalUrl?: string;
   planName?: string;
-  amount?: string;
+  amount?: string | number;
   currency?: string;
   nextBillingDate?: string;
   trialEndDate?: string;
   failureReason?: string;
   trackingPixelUrl?: string;
+}
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  GBP: '£',
+  AUD: 'A$',
+  CAD: 'C$',
+  EUR: '€',
+};
+
+/**
+ * Format amount + currency from Stripe into a display string.
+ * - Number 39 + "USD" → "$39"
+ * - Number 59 + "AUD" → "A$59"
+ * - String "$9" pass-through (legacy/grandfathered already-formatted)
+ * - Missing → empty string (caller decides what to render)
+ */
+export function formatAmount(amount?: string | number, currency?: string): string {
+  if (amount === undefined || amount === null || amount === '') return '';
+  const code = (currency || 'USD').toUpperCase();
+  const symbol = CURRENCY_SYMBOLS[code] || '';
+  if (typeof amount === 'number') {
+    // Drop trailing .00 for whole units.
+    const display = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+    return `${symbol}${display}`;
+  }
+  // String input: if it already starts with a symbol, trust it; otherwise prefix.
+  const s = String(amount).trim();
+  if (/^[^\d]/.test(s)) return s;
+  return `${symbol}${s}`;
 }
 
 export const BillingEmail = ({
