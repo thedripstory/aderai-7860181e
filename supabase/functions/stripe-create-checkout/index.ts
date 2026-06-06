@@ -7,8 +7,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Use environment variable with fallback to hardcoded price
-const STRIPE_PRICE_ID = Deno.env.get("STRIPE_PRICE_ID") || "price_1SacRA0lE1soQQfxnQig4ytO";
+// Multi-currency Stripe Price IDs. USD is the default; the others are selected
+// based on the user's detected country (sent from the client as `currency`).
+const PRICE_IDS: Record<string, string> = {
+  usd: "price_1TfQ330lE1soQQfxIEL5EHtQ", // $39/month
+  gbp: "price_1TfQ350lE1soQQfxt9JfdVjD", // £39/month
+  aud: "price_1TfQ360lE1soQQfxqPr4jXt9", // A$59/month
+  cad: "price_1TfQ360lE1soQQfxWwoSZL6n", // C$59/month
+};
+
+// Env override still wins for USD (legacy compatibility / emergencies).
+const USD_PRICE_OVERRIDE = Deno.env.get("STRIPE_PRICE_ID");
+if (USD_PRICE_OVERRIDE) {
+  PRICE_IDS.usd = USD_PRICE_OVERRIDE;
+}
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -23,35 +35,16 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    // Validate Stripe configuration
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       logStep("ERROR: STRIPE_SECRET_KEY not configured");
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: "Payment system not configured. Please contact support.",
           code: "STRIPE_NOT_CONFIGURED",
-          setupRequired: true
+          setupRequired: true,
         }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 503,
-        }
-      );
-    }
-
-    if (!STRIPE_PRICE_ID) {
-      logStep("ERROR: STRIPE_PRICE_ID not configured");
-      return new Response(
-        JSON.stringify({ 
-          error: "Subscription pricing not configured. Please contact support.",
-          code: "PRICE_NOT_CONFIGURED",
-          setupRequired: true
-        }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 503,
-        }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 503 }
       );
     }
 
@@ -71,26 +64,30 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(stripeKey, {
-      apiVersion: "2025-08-27.basil",
-    });
+    const reqData = await req.json().catch(() => ({}));
+    const origin = reqData?.origin || Deno.env.get("SITE_URL") || "https://aderai.io";
+
+    // Resolve currency → price id. Default to USD for unknown values.
+    const requestedCurrency = String(reqData?.currency || "usd").toLowerCase();
+    const priceId = PRICE_IDS[requestedCurrency] || PRICE_IDS.usd;
+    const resolvedCurrency = PRICE_IDS[requestedCurrency] ? requestedCurrency : "usd";
+    logStep("Resolved price for currency", { requestedCurrency, resolvedCurrency, priceId });
+
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
     // Verify price exists in Stripe
     try {
-      await stripe.prices.retrieve(STRIPE_PRICE_ID);
-      logStep("Price verified", { priceId: STRIPE_PRICE_ID });
+      await stripe.prices.retrieve(priceId);
+      logStep("Price verified", { priceId });
     } catch (priceError) {
-      logStep("ERROR: Price not found in Stripe", { priceId: STRIPE_PRICE_ID, error: priceError });
+      logStep("ERROR: Price not found in Stripe", { priceId, error: priceError });
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: "Subscription plan not found. Please contact support.",
           code: "PRICE_NOT_FOUND",
-          setupRequired: true
+          setupRequired: true,
         }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 503,
-        }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 503 }
       );
     }
 
@@ -101,22 +98,18 @@ serve(async (req) => {
     });
 
     let customerId: string;
-
     if (existingCustomers.data.length > 0) {
       customerId = existingCustomers.data[0].id;
       logStep("Found existing Stripe customer", { customerId });
     } else {
       const customer = await stripe.customers.create({
         email: user.email,
-        metadata: {
-          supabase_user_id: user.id,
-        },
+        metadata: { supabase_user_id: user.id },
       });
       customerId = customer.id;
       logStep("Created new Stripe customer", { customerId });
     }
 
-    // Update user with stripe_customer_id
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -129,26 +122,20 @@ serve(async (req) => {
 
     logStep("Updated user with Stripe customer ID");
 
-    const reqData = await req.json().catch(() => ({}));
-    const origin = reqData?.origin || Deno.env.get("SITE_URL") || "https://aderai.io";
-
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      line_items: [
-        {
-          price: STRIPE_PRICE_ID,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       success_url: `${origin}/onboarding?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/auth?payment=canceled`,
       metadata: {
         supabase_user_id: user.id,
+        currency: resolvedCurrency,
       },
       subscription_data: {
         metadata: {
           supabase_user_id: user.id,
+          currency: resolvedCurrency,
         },
       },
       allow_promotion_codes: true,
@@ -158,21 +145,15 @@ serve(async (req) => {
     logStep("Created checkout session", { sessionId: session.id, url: session.url });
 
     return new Response(
-      JSON.stringify({ url: session.url, sessionId: session.id }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
+      JSON.stringify({ url: session.url, sessionId: session.id, currency: resolvedCurrency }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error creating checkout session:", errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
 });

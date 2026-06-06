@@ -1,5 +1,6 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { usePricing } from '@/hooks/useCurrency';
 
 /**
  * Final call-to-action section
@@ -7,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
  */
 export function CTA() {
   const navigate = useNavigate();
+  const pricing = usePricing();
 
   return (
     <section className="relative py-32 px-6 overflow-hidden">
@@ -28,7 +30,7 @@ export function CTA() {
         </h2>
 
         <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
-          Join the brands using Aderai to unlock their full Klaviyo potential. Just $9/month for agency-level segmentation.
+          Join the brands using Aderai to unlock their full Klaviyo potential. Just {pricing.pricePerMonth} for agency-level segmentation.
         </p>
 
         <button

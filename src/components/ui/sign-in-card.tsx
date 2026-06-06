@@ -554,7 +554,7 @@ export function SignInCard({ isSignUp = false, onToggleMode, onSubmit, isLoading
                 {isSignUp && (
                   <div className="text-center space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      $9/month • Cancel anytime
+                      {pricing.pricePerMonth} • Cancel anytime
                     </p>
                     <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1">
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
