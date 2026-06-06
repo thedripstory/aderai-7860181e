@@ -557,7 +557,7 @@ export default function Settings() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: { origin: window.location.origin, currency: detectedCurrency },
+        body: { origin: window.location.origin, currency: detectedCurrency || getCurrencySync() },
       });
       
       if (error) throw error;
