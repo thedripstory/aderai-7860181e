@@ -28,6 +28,8 @@ import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
 import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
 import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
+import { AdminEmailDelivery } from "@/components/AdminEmailDelivery";
+
 import { AdminCohortAnalysis } from "@/components/AdminCohortAnalysis";
 import { AdminSegmentAnalytics } from "@/components/AdminSegmentAnalytics";
 import { AdminUserHealth } from "@/components/AdminUserHealth";
