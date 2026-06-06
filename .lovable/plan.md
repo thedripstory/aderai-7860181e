@@ -1,92 +1,86 @@
-## Pricing change: $9 → $39 (multi-currency, IP-detected)
+## Goal
+Harden the new $39 multi-currency pricing across frontend, Stripe, and email — plus add an admin currency previewer.
 
-### Decisions locked in
-- **Existing subscribers**: grandfathered at $9 forever. We do NOT touch any existing Stripe subscription. Only the checkout for new signups uses the new prices.
-- **Geo detection**: native, instant. Use `Intl.DateTimeFormat().resolvedOptions().timeZone` + `navigator.language` for first paint (synchronous, zero latency, zero deps), then refine in the background with a free no-key endpoint (`https://ipapi.co/json/` or Cloudflare's `https://www.cloudflare.com/cdn-cgi/trace`) and swap silently if the country differs. No spinner, no flash — default currency renders immediately based on locale, then corrects within ~100ms if needed.
+---
 
-### Currency map (single source of truth)
-```
-US + RoW → USD $39
-GB       → GBP £39
-AU       → AUD $59  (display as "A$59")
-CA       → CAD $59  (display as "C$59")
-```
+### 1. Robust currency fallback → instant USD checkout
 
-### Backend — Stripe
+**`src/hooks/useCurrency.ts`**
+- Wrap the Cloudflare `/cdn-cgi/trace` call in `Promise.race` with a 1500 ms timeout so a slow/blocked CDN never delays anything.
+- On any failure (timeout, network, parse, empty `loc`), persist `usd` in `sessionStorage` so we don't re-attempt every navigation, and keep the locale guess on screen.
+- Export a new synchronous helper `getCurrencySync()` that returns the cached / locale-guessed currency without React. Used by checkout call sites so we never send `undefined`.
 
-1. **Create 3 new Stripe Prices** alongside the existing USD $39 price (which we'll also create — current live price is $9). Using `stripe--create_stripe_product_and_price`:
-   - Product "Aderai Monthly" — USD 3900, recurring monthly → `price_id_usd`
-   - Same product, GBP 3900 monthly → `price_id_gbp`
-   - Same product, AUD 5900 monthly → `price_id_aud`
-   - Same product, CAD 5900 monthly → `price_id_cad`
+**`src/pages/Auth.tsx`, `src/pages/Settings.tsx`, `src/components/ProtectedRoute.tsx`, `src/components/ui/sign-in-card.tsx`**
+- Replace the current `useCurrency()` read at click-time with `currency ?? getCurrencySync() ?? 'usd'` before invoking `stripe-create-checkout`. Guarantees a valid 3-letter code is always sent.
 
-2. **`stripe-create-checkout`** — accept an optional `currency` field in the request body (`usd|gbp|aud|cad`, default `usd`), map it to the right price id, and pass that into `stripe.checkout.sessions.create`. The hardcoded `STRIPE_PRICE_ID` fallback becomes a lookup table. Existing `STRIPE_PRICE_ID` env var stays as the USD default for safety.
+**`supabase/functions/stripe-create-checkout/index.ts`**
+- Already defaults unknown currency to `usd`. Add explicit guard: if `requestedCurrency` is empty/null/not in `PRICE_IDS`, log a warning and use `usd`. No behaviour change for valid inputs.
 
-3. **`stripe-webhook`** — no logic change needed. It already records whatever price the customer checked out with.
+### 2. Admin pricing preview page
 
-4. **`stripe-get-subscription-details`** — the `let amount = 9` default becomes a dynamic read from `subscription.items.data[0].price.unit_amount` / `.currency` (already partially done) so grandfathered users correctly see "$9" and new users see "$39" / "£39" / etc.
+**New route `src/pages/AdminPricingPreview.tsx`** (added to admin nav; admin-only via existing `is_admin()` check)
+- Country/currency selector (USD / GBP / AUD / CAD + free-form ISO-2 input that maps via `countryToCurrency`).
+- Live preview panel that renders the actual `LandingPage` hero/CTA copy using the selected currency (re-uses `PRICING` + `formatPrice`).
+- "Test checkout" button that calls `stripe-create-checkout` with the chosen currency and opens the resulting Stripe Checkout URL in a new tab so you can verify the price/currency shown by Stripe before publishing.
+- Shows the resolved Stripe Price ID for each currency (read-only) so a mismatch is obvious at a glance.
 
-5. **Webhook + check-subscription** — unchanged. They already use the actual Stripe subscription, so grandfathered $9 customers continue working untouched.
+**`src/components/AdminDashboard.tsx`** — add a nav entry "Pricing Preview" linking to the new page.
 
-### Frontend
+### 3. Billing-email tests using real Stripe amount/currency
 
-1. **New file `src/lib/pricing.ts`** — single source of truth:
-   ```ts
-   export const PRICING = {
-     usd: { symbol: '$',  amount: 39, code: 'USD', display: '$39'  },
-     gbp: { symbol: '£',  amount: 39, code: 'GBP', display: '£39'  },
-     aud: { symbol: 'A$', amount: 59, code: 'AUD', display: 'A$59' },
-     cad: { symbol: 'C$', amount: 59, code: 'CAD', display: 'C$59' },
-   } as const;
-   export type CurrencyCode = keyof typeof PRICING;
-   ```
+**`supabase/functions/stripe-webhook/index.ts`**
+- Replace the hard-coded fallback `9` in the three `sendBillingEmail` calls with `(session.amount_total ?? 0) / 100` etc. Never invent a price; if Stripe didn't send one, omit the field so the template falls back to its own default rather than a misleading "$9".
 
-2. **New hook `src/hooks/useCurrency.ts`**:
-   - Synchronous initial value from `navigator.language` + timezone (`en-GB`/`Europe/London` → gbp, `en-AU`/`Australia/*` → aud, `en-CA`/`America/Toronto|Vancouver|...` → cad, else usd). Returns instantly, no flash.
-   - On mount, `fetch('https://www.cloudflare.com/cdn-cgi/trace')` (tiny, ~50ms, no key, returns `loc=GB` line). Map country code → currency. If different from locale guess, update state silently. Cache result in `sessionStorage` so subsequent renders are instant.
+**`supabase/functions/send-billing-email/_templates/billing.tsx`**
+- Format `amount` + `currency` together via a small helper (`formatAmount(amount, currency)`) so `A$59`, `£39`, `C$59`, `$9` (grandfathered) all render correctly. Currency symbol map mirrors `src/lib/pricing.ts`.
 
-3. **Replace all hardcoded `$9` strings** with `usePricing()` output in:
-   - `src/pages/LandingPage.tsx` (hero "Just $9/month")
-   - `src/components/ComparisonChart.tsx` (table cell + CTA button)
-   - `src/components/landing/CTA.tsx` ("$9/month for agency-level…")
-   - `src/components/landing/SocialProof.tsx` (testimonial copy — keep as static testimonial but update to "$39" since it's marketing claim, not a real quote per memory rules; we'll rewrite to drop the price reference rather than fabricate)
-   - `src/components/landing/Testimonials3D.tsx` (same — drop price references from testimonial bodies; price doesn't belong in fake testimonials)
-   - `src/components/ui/sign-in-card.tsx` ("$9/month • Cancel anytime")
-   - `src/pages/Settings.tsx` (Resubscribe + Subscribe Now buttons — show user's current price if grandfathered, else new price)
-   - `src/components/ProtectedRoute.tsx` (paywall CTA — always new price since by definition not yet subscribed)
+**New `supabase/functions/send-billing-email/index.test.ts`** (Deno test)
+- Test cases:
+  1. New $39 USD subscriber → email body contains `$39` and `/month`.
+  2. Grandfathered $9 USD subscriber → email body contains `$9` (not `$39`).
+  3. £39 GBP subscriber → email body contains `£39`.
+  4. A$59 AUD subscriber → email body contains `A$59`.
+  5. Missing amount/currency → template renders without crashing and does NOT contain a fabricated price.
+- Uses `renderAsync` directly on `<BillingEmail …/>` — no network, no Resend call — and `assertStringIncludes`.
 
-4. **`ProtectedRoute.tsx` checkout call** — pass detected `currency` into `supabase.functions.invoke('stripe-create-checkout', { body: { currency } })`. Same for `Settings.tsx`.
+Run with `supabase--test_edge_functions { functions: ["send-billing-email"] }`.
 
-5. **Grandfather display logic in `Settings.tsx`**: the existing-subscriber CTA reads `subscription_status` + `subscription_price_amount` from `useAuth`/profile and shows their actual current price, not the new price.
+### 4. End-to-end Stripe + codebase verification
 
-### Admin / docs (cosmetic, non-functional)
+**Stripe side** (read-only verification via `stripe--fetch_stripe_resources` / `stripe_api_execute`):
+- Confirm the four live Price IDs in `stripe-create-checkout/index.ts` exist, are `active: true`, `recurring.interval = month`, and have unit_amounts 3900 USD, 3900 GBP, 5900 AUD, 5900 CAD.
+- Confirm the old `$9` USD price still exists and is active (needed for grandfathered renewals).
+- Confirm the `STRIPE_PRICE_ID` env override either matches the new USD price or is unset (currently overrides USD — could silently break the new price). Document the resolved value.
 
-- `src/components/AdminSubscriptionMonitoring.tsx` — MRR calc currently `activeSubscriptions * 9`. Change to sum actual `subscription_amount_cents` from the `users` table (we already store it via webhook). Falls back to $9 if null (grandfathered legacy rows).
-- `src/lib/helpArticlesData.ts` — update copy to "starts at $39/month (regional pricing applies)".
-- `src/pages/AdminSetup.tsx` — update doc string.
-- `ENVIRONMENT_VARIABLES.md` — update mentions.
-- `supabase/functions/send-billing-email/_templates/billing.tsx` — `amount = '$9'` default → read from actual invoice amount passed in (already passed via webhook); only the default fallback changes to `'$39'`.
+**Codebase sweep**
+- `rg -n "\\$9|price_1[A-Za-z0-9]+"` across `src/` and `supabase/` to catch any leftover `$9` strings or stale Price IDs. Fix any straggler in copy, docs, help articles, or admin MRR estimates.
+- Confirm `AdminSubscriptionMonitoring.tsx` MRR uses real `subscription_amount_cents` where available and only falls back to $39 estimate when null.
 
-### Memory updates
-Update `mem://strategy/business-model-paid-subscription` and the Core index line from "$9/mo" to "$39/mo USD (regional: £39 / A$59 / C$59). Existing $9 subscribers grandfathered."
+**Runtime smoke test**
+- From browser preview: open `/` from US locale → expect `$39`. Override `navigator.language` to `en-GB` via devtools → expect `£39` after refresh. Click "Get Started" → confirm Stripe Checkout page shows £39/month.
+- Repeat for AUD and CAD via the new admin preview page.
+- Replay a test `checkout.session.completed` webhook with each currency in Stripe dashboard → confirm `send-billing-email` log shows the matching amount/currency and the test inbox renders correctly.
 
-### What we explicitly DO NOT touch
-- The `stripe-webhook`, `stripe-check-subscription`, `stripe-cancel-subscription`, `stripe-resume-subscription`, `stripe-create-portal-session` functions — pricing is read from Stripe, not hardcoded.
-- The subscription gate (`_shared/checkSubscription.ts`).
-- Any existing customer's Stripe subscription object.
-- Cron jobs, RLS, segment code.
+---
 
-### Verification checklist (post-build)
-1. Visit `/` from a US IP → see `$39/month` everywhere.
-2. Override locale to `en-GB` → see `£39` instantly.
-3. Click "Get Started" → Stripe Checkout shows GBP £39.
-4. Existing test user with $9 subscription opens `/settings` → sees "$9/month" (their actual price), can manage portal normally.
-5. New user signs up + pays → webhook stores `subscription_amount = 3900`, `currency = 'usd'`; gate works.
-6. `stripe-get-subscription-details` returns correct price per user.
+## Files
 
-### Files to edit (summary)
-- New: `src/lib/pricing.ts`, `src/hooks/useCurrency.ts`
-- Edit: `src/pages/LandingPage.tsx`, `src/pages/Settings.tsx`, `src/pages/AdminSetup.tsx`, `src/components/ComparisonChart.tsx`, `src/components/landing/CTA.tsx`, `src/components/landing/SocialProof.tsx`, `src/components/landing/Testimonials3D.tsx`, `src/components/ui/sign-in-card.tsx`, `src/components/ProtectedRoute.tsx`, `src/components/AdminSubscriptionMonitoring.tsx`, `src/lib/helpArticlesData.ts`, `ENVIRONMENT_VARIABLES.md`
-- Edit edge functions: `supabase/functions/stripe-create-checkout/index.ts`, `supabase/functions/stripe-get-subscription-details/index.ts`, `supabase/functions/send-billing-email/_templates/billing.tsx`, `supabase/functions/check-setup-status/index.ts`
-- Stripe: create 4 new Prices via `stripe--create_stripe_product_and_price`
-- Memory: update business-model memory + Core index
+**New**
+- `src/pages/AdminPricingPreview.tsx`
+- `supabase/functions/send-billing-email/index.test.ts`
+
+**Edited**
+- `src/hooks/useCurrency.ts` (timeout + `getCurrencySync` export)
+- `src/lib/pricing.ts` (export `countryToCurrency` for the admin page)
+- `src/pages/Auth.tsx`, `src/pages/Settings.tsx`, `src/components/ProtectedRoute.tsx`, `src/components/ui/sign-in-card.tsx` (use `getCurrencySync` safety net)
+- `src/components/AdminDashboard.tsx` (nav entry)
+- `src/components/AdminSubscriptionMonitoring.tsx` (only if sweep finds stale $9)
+- `supabase/functions/stripe-create-checkout/index.ts` (explicit unknown-currency guard + log)
+- `supabase/functions/stripe-webhook/index.ts` (drop hard-coded `9` fallbacks)
+- `supabase/functions/send-billing-email/_templates/billing.tsx` (currency-aware formatter)
+
+**Untouched (per prior batches)**
+- Subscription gate, cron secret wiring, all other Stripe edge functions (`stripe-webhook` event handling, `stripe-check-subscription`, cancel/resume/portal), RLS, segment code.
+
+## Confirmation flow
+I'll execute the four tasks in order and confirm each one before moving to the next: (1) fallback, (2) admin preview page, (3) email tests pass, (4) Stripe + codebase audit results.
