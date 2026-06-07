@@ -204,6 +204,60 @@ serve(async (req) => {
             customerEmail: session.customer_email 
           });
         }
+
+        // Meta Conversions API — server-side Purchase (deduped with browser Pixel via event_id)
+        try {
+          const metaPixelId = Deno.env.get("META_PIXEL_ID");
+          const metaAccessToken = Deno.env.get("META_CAPI_ACCESS_TOKEN");
+
+          if (!metaPixelId || !metaAccessToken) {
+            logStep("Meta CAPI skipped — missing META_PIXEL_ID or META_CAPI_ACCESS_TOKEN");
+          } else {
+            const userData: Record<string, unknown> = {};
+            if (session.customer_email) {
+              const normalized = session.customer_email.trim().toLowerCase();
+              const digestBuf = await crypto.subtle.digest(
+                "SHA-256",
+                new TextEncoder().encode(normalized),
+              );
+              const hashedEmail = Array.from(new Uint8Array(digestBuf))
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("");
+              userData.em = [hashedEmail];
+            }
+
+            const capiBody = {
+              data: [{
+                event_name: "Purchase",
+                event_time: Math.floor(Date.now() / 1000),
+                event_id: `purchase_${session.id}`,
+                action_source: "website",
+                event_source_url: "https://aderai.io/onboarding",
+                user_data: userData,
+                custom_data: {
+                  currency: session.currency ? session.currency.toUpperCase() : "USD",
+                  value: typeof session.amount_total === "number" ? session.amount_total / 100 : 39,
+                },
+              }],
+            };
+
+            logStep("Sending Meta CAPI Purchase", { eventId: capiBody.data[0].event_id, value: capiBody.data[0].custom_data.value, currency: capiBody.data[0].custom_data.currency });
+
+            const capiRes = await fetch(
+              `https://graph.facebook.com/v19.0/${metaPixelId}/events?access_token=${metaAccessToken}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(capiBody),
+              },
+            );
+            const capiText = await capiRes.text();
+            logStep("Meta CAPI response", { status: capiRes.status, body: capiText.slice(0, 500) });
+          }
+        } catch (capiErr) {
+          logStep("Meta CAPI error", { error: (capiErr as Error).message });
+        }
+
         break;
       }
 
