@@ -177,6 +177,10 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             accountName: sanitizedBrandName,
           });
 
+          trackMetaEvent('Lead');
+
+          trackMetaEvent('CompleteRegistration', { content_name: 'Aderai Signup' });
+
           // Create Stripe checkout session and redirect
           try {
             const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(

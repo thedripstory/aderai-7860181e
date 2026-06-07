@@ -269,6 +269,12 @@ const KlaviyoSetup = () => {
         currency,
       });
 
+      trackMetaEvent('Subscribe', {
+        value: 39,
+        currency: 'USD',
+        predicted_ltv: 234,
+      });
+
       setUserProperties({
         klaviyoConnected: true,
         klaviyoConnectedAt: new Date().toISOString(),

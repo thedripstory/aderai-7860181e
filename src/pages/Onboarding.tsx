@@ -32,6 +32,13 @@ export default function Onboarding() {
           currency: 'USD',
         });
 
+        trackMetaEvent('Purchase', {
+          value: 39,
+          currency: 'USD',
+          content_name: 'Aderai Subscription',
+          content_type: 'product',
+        }, `purchase_${sessionId}`);
+
         setUserProperties({
           subscriptionStatus: 'active',
           subscribedAt: new Date().toISOString(),
