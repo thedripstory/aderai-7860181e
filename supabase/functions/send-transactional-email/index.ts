@@ -15,6 +15,7 @@ const SENDER_DOMAIN = "notify.aderai.io"
 // When display_from_root is enabled, this can be the root domain for cleaner branding,
 // even though actual sending uses the subdomain above.
 const FROM_DOMAIN = "notify.aderai.io"
+const FROM_ADDRESS = `${SITE_NAME} <noreply@${FROM_DOMAIN}>`
 
 // Generate a cryptographically random 32-byte hex token
 function generateToken(): string {
@@ -308,7 +309,7 @@ Deno.serve(async (req) => {
     payload: {
       message_id: messageId,
       to: effectiveRecipient,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      from: FROM_ADDRESS,
       sender_domain: SENDER_DOMAIN,
       subject: resolvedSubject,
       html,
