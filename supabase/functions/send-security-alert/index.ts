@@ -3,6 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const PUBLIC_SITE_URL = "https://aderai.io";
+const FROM_EMAIL = "Aderai <hello@updates.aderai.io>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -50,7 +52,7 @@ serve(async (req) => {
       .maybeSingle();
 
     const firstName = user?.first_name || "there";
-    const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
+    const siteUrl = PUBLIC_SITE_URL;
     const timestamp = metadata?.timestamp || new Date().toLocaleString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -100,7 +102,7 @@ serve(async (req) => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "Aderai Security <hello@updates.aderai.io>",
+      from: FROM_EMAIL,
       to: [email],
       subject,
       html: `
