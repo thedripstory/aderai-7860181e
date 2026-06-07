@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { z } from "https://esm.sh/zod@3.22.4";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const FROM_EMAIL = "Aderai <hello@updates.aderai.io>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -68,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: "Aderai <hello@updates.aderai.io>",
+        from: FROM_EMAIL,
         to: ["hello@aderai.io"],
         subject: `New ${typeDisplay} from ${userName}`,
         html: `

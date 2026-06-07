@@ -4,6 +4,8 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 import { TestUserInvitationEmail } from "./_templates/test-user-invitation.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const PUBLIC_SITE_URL = "https://aderai.io";
+const FROM_EMAIL = "Aderai <hello@updates.aderai.io>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -83,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Parse request body
     const { action = "create", email, firstName, brandName, notes, sendEmail = true, testUserId }: CreateTestUserRequest = await req.json();
-    const siteUrl = Deno.env.get("SITE_URL") || "https://aderai.io";
+    const siteUrl = PUBLIC_SITE_URL;
 
     // Handle resend invitation action
     if (action === "resend") {
@@ -131,7 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
       console.log(`create-test-user: Sending resend email to ${testUser.email}`);
 
       const { error: emailError } = await resend.emails.send({
-        from: "Aderai <hello@updates.aderai.io>",
+        from: FROM_EMAIL,
         to: [testUser.email],
         subject: `Reminder: Your Aderai Beta Account is Ready!`,
         html
@@ -305,7 +307,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`create-test-user: Sending invitation email to ${email}`);
 
         const { error: emailError } = await resend.emails.send({
-          from: "Aderai <hello@updates.aderai.io>",
+          from: FROM_EMAIL,
           to: [email.toLowerCase()],
           subject: `Welcome to Aderai Beta - Your Test Account is Ready!`,
           html

@@ -19,6 +19,8 @@ const TEMPLATE_NAME: Record<EmailType, string> = {
   'connect-klaviyo-reminder': 'connect-klaviyo-reminder',
 }
 
+const PUBLIC_SITE_URL = 'https://aderai.io'
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
 
@@ -65,7 +67,7 @@ Deno.serve(async (req) => {
 
     const templateData = {
       firstName: (claimed as any).first_name ?? null,
-      dashboardUrl: `${Deno.env.get('SITE_URL') ?? 'https://aderai.io'}/dashboard`,
+      dashboardUrl: `${PUBLIC_SITE_URL}/dashboard`,
       ...extra,
     }
 

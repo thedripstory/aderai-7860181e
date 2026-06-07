@@ -7,6 +7,7 @@ import { WeeklyDigest } from "./_templates/weekly-digest.tsx";
 import { MilestoneEmail } from "./_templates/milestone.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const FROM_EMAIL = "Aderai <hello@updates.aderai.io>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -85,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email
     const emailResponse = await resend.emails.send({
-      from: "Aderai <hello@updates.aderai.io>",
+      from: FROM_EMAIL,
       to: [to],
       subject,
       html,

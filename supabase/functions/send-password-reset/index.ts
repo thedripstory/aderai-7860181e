@@ -6,6 +6,7 @@ import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22";
 import { PasswordResetEmail } from "./_templates/password-reset.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const FROM_EMAIL = "Aderai <hello@updates.aderai.io>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -73,7 +74,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const emailResponse = await resend.emails.send({
-      from: "Aderai <hello@updates.aderai.io>",
+      from: FROM_EMAIL,
       to: [email],
       subject: "Reset Your Aderai Password",
       html,

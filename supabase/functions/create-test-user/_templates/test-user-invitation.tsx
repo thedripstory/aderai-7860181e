@@ -48,7 +48,7 @@ export const TestUserInvitationEmail = ({
         </p>
 
         <p style="color: #374151; font-size: 16px; line-height: 26px; margin: 16px 0;">
-          Great news! You've been selected to be one of our exclusive beta testers for <strong>Aderai</strong> - 
+          Great news! You've been selected to be one of our exclusive beta testers for <strong>Aderai</strong>.
           the AI-powered Klaviyo segmentation tool that creates 70+ expert-grade segments in seconds.
         </p>
 
@@ -151,7 +151,7 @@ export const TestUserInvitationEmail = ({
             Thank you for being part of the Aderai beta program!
           </p>
           <p style="color: #6b7280; font-size: 14px; margin: 8px 0;">
-            — The Aderai Team
+            The Aderai Team
           </p>
           <p style="color: #9ca3af; font-size: 12px; margin: 16px 0 0; font-style: italic;">
             This is an exclusive beta invitation. Please do not share your credentials with others.
