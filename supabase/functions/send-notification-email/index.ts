@@ -195,12 +195,12 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="klaviyo-note">
                 <strong>Why does this take time?</strong><br>
                 This is being paced to stay within Klaviyo's API limits (15 segments/minute). 
-                We're handling everything automatically — no action needed from you.
+                We're handling everything automatically. No action needed from you.
               </div>
               
               <p style="margin-top: 20px;">We'll email you again when everything is complete!</p>
               
-              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">The Aderai Team</p>
             </div>
             <div class="footer">
               <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
@@ -255,7 +255,7 @@ const handler = async (req: Request): Promise<Response> => {
                 and 100/day. Aderai automatically paced your request to work within these limits.
               </div>
               
-              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">The Aderai Team</p>
             </div>
             <div class="footer">
               <p>© ${new Date().getFullYear()} Aderai. All rights reserved.</p>
@@ -303,7 +303,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div class="content">
               <p>Hi there,</p>
-              <p>We've reached Klaviyo's daily segment creation limit. <strong>Don't worry — your remaining segments will be created automatically tomorrow.</strong></p>
+              <p>We've reached Klaviyo's daily segment creation limit. <strong>Don't worry. Your remaining segments will be created automatically tomorrow.</strong></p>
               
               <div class="status-box">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -328,7 +328,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <li style="margin: 6px 0;">Prevent accidental mass-creation of segments</li>
                   <li style="margin: 6px 0;">Ensure segment processing completes reliably</li>
                 </ul>
-                <p style="margin-top: 12px; font-size: 13px; color: #6b7280;">This is standard practice — Mailchimp, HubSpot, and other platforms have similar limits.</p>
+                <p style="margin-top: 12px; font-size: 13px; color: #6b7280;">This is standard practice. Mailchimp, HubSpot, and other platforms have similar limits.</p>
               </div>
 
               <div class="timeline">
@@ -356,7 +356,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <a href="\${dashboardUrl}/jobs" class="button">View Job Progress →</a>
               </div>
               
-              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">The Aderai Team</p>
             </div>
             <div class="footer">
               <p>You can manage your email notification preferences in your account settings.</p>
@@ -433,14 +433,14 @@ const handler = async (req: Request): Promise<Response> => {
 
               <div class="checkmark-item">
                 <span class="checkmark">✓</span>
-                <span><strong>No action needed.</strong> You can close Aderai — we'll continue processing in the background and email you when complete.</span>
+                <span><strong>No action needed.</strong> You can close Aderai. We'll continue processing in the background and email you when complete.</span>
               </div>
               
               <div style="text-align: center; margin-top: 24px;">
                 <a href="\${dashboardUrl}/jobs" class="button">View Job Progress →</a>
               </div>
               
-              <p style="color: #666; font-size: 14px; margin-top: 30px;">— The Aderai Team</p>
+              <p style="color: #666; font-size: 14px; margin-top: 30px;">The Aderai Team</p>
             </div>
             <div class="footer">
               <p>You can manage your email notification preferences in your account settings.</p>
