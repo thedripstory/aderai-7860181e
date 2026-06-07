@@ -3,6 +3,8 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 import { z } from "https://esm.sh/zod@3.22.4";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const PUBLIC_SITE_URL = "https://aderai.io";
+const FROM_EMAIL = "Aderai <hello@updates.aderai.io>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,7 +40,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { email } = validationResult.data;
 
     const verificationToken = crypto.randomUUID();
-    const siteUrl = Deno.env.get('SITE_URL') || 'https://aderai.io';
+    const siteUrl = PUBLIC_SITE_URL;
     const verificationUrl = `${siteUrl}/verify-email?token=${verificationToken}`;
 
     const html = `
@@ -128,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Aderai <hello@updates.aderai.io>",
+      from: FROM_EMAIL,
       to: [email],
       subject: "Verify Your Aderai Email Address",
       html,
