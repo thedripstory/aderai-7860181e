@@ -1,92 +1,18 @@
 /// <reference types="npm:@types/react@18.3.1" />
-
 import * as React from 'npm:react@18.3.1'
+import { BrandShell, Button, Text, styles } from './_brand.tsx'
 
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Text,
-} from 'npm:@react-email/components@0.0.22'
+interface Props { siteName: string; siteUrl: string; recipient: string; confirmationUrl: string; email?: string; newEmail?: string }
 
-interface EmailChangeEmailProps {
-  siteName: string
-  // oldEmail is the user's current address (HookData.OldEmail). For the
-  // NEW-recipient half of a secure email_change fanout, `email` equals the
-  // recipient (NEW), so the "from" line must render oldEmail to read
-  // "from OLD to NEW" instead of "from NEW to NEW".
-  oldEmail: string
-  email: string
-  newEmail: string
-  confirmationUrl: string
-}
-
-export const EmailChangeEmail = ({
-  siteName,
-  oldEmail,
-  newEmail,
-  confirmationUrl,
-}: EmailChangeEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Confirm your email change for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm your email change</Heading>
-        <Text style={text}>
-          You requested to change your email address for {siteName} from{' '}
-          <Link href={`mailto:${oldEmail}`} style={link}>
-            {oldEmail}
-          </Link>{' '}
-          to{' '}
-          <Link href={`mailto:${newEmail}`} style={link}>
-            {newEmail}
-          </Link>
-          .
-        </Text>
-        <Text style={text}>
-          Click the button below to confirm this change:
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Confirm Email Change
-        </Button>
-        <Text style={footer}>
-          If you didn't request this change, please secure your account
-          immediately.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
+export const EmailChangeEmail = ({ confirmationUrl, email, newEmail, recipient }: Props) => (
+  <BrandShell preview="Confirm your new Aderai email address" heading="Confirm your new email">
+    <Text style={styles.text}>You requested to change the email on your Aderai account{email ? <> from <strong>{email}</strong></> : null}{newEmail ? <> to <strong>{newEmail}</strong></> : <> to <strong>{recipient}</strong></>}. Confirm below to complete the change.</Text>
+    <div style={styles.buttonWrap}>
+      <Button style={styles.button} href={confirmationUrl}>Confirm new email</Button>
+    </div>
+    <Text style={styles.small}>Or copy this link:<br /><a href={confirmationUrl} style={styles.link}>{confirmationUrl}</a></Text>
+    <Text style={styles.small}>If you did not request this change, please contact hello@aderai.io right away.</Text>
+  </BrandShell>
 )
 
 export default EmailChangeEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
