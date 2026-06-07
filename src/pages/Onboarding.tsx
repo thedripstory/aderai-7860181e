@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ErrorLogger } from "@/lib/errorLogger";
 import { AderaiLogo } from "@/components/AderaiLogo";
 import { trackEvent, setUserProperties } from '@/lib/analytics';
+import { trackMetaEvent } from '@/lib/metaPixel';
 
 export default function Onboarding() {
   const navigate = useNavigate();
