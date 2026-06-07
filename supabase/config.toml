@@ -1,145 +1,101 @@
 project_id = "kfsvgcijligxschxyuyb"
 
-[functions.check-ai-limit]
-verify_jwt = true
-
-[functions.increment-ai-usage]
-verify_jwt = true
-
-[functions.reset-daily-limits]
-verify_jwt = false
-
-[functions.send-email]
-verify_jwt = false
-
-[functions.send-weekly-digest]
-verify_jwt = false
-
-[functions.send-milestone-email]
-verify_jwt = false
-
-[functions.klaviyo-validate-key]
-verify_jwt = true
-
-[functions.klaviyo-create-segments]
-verify_jwt = true
-
-[functions.klaviyo-proxy]
-verify_jwt = true
-
-[functions.klaviyo-suggest-segments]
-verify_jwt = true
-
-[functions.klaviyo-create-custom-segment]
-verify_jwt = true
-
-[functions.send-feedback-notification]
-verify_jwt = false
-
-[functions.calculate-segment-performance]
-verify_jwt = true
-
-[functions.performance-metrics-secure]
-verify_jwt = true
-
-[functions.performance-flows-secure]
-verify_jwt = true
-
-[functions.performance-campaigns-secure]
-verify_jwt = true
-
-[functions.predict-churn-risk]
-verify_jwt = true
-
-[functions.predict-segment-performance]
-verify_jwt = true
-
-[functions.send-welcome-email]
-verify_jwt = false
-
-[functions.send-verification-email]
-verify_jwt = false
-
-[functions.send-password-reset]
-verify_jwt = false
-
-[functions.send-notification-email]
-verify_jwt = false
-
-[functions.klaviyo-webhook-handler]
-verify_jwt = false
-
-[functions.check-orphan-users]
-verify_jwt = false
-
-[functions.record-segment-snapshots]
-verify_jwt = false
-
-[functions.stripe-create-checkout]
-verify_jwt = true
-
-[functions.stripe-webhook]
-verify_jwt = false
-
-[functions.stripe-check-subscription]
-verify_jwt = true
-
-[functions.stripe-create-portal-session]
-verify_jwt = true
-
-[functions.stripe-get-subscription-details]
-verify_jwt = true
-
-[functions.stripe-cancel-subscription]
-verify_jwt = true
-
-[functions.stripe-resume-subscription]
-verify_jwt = true
-
-[functions.process-segment-queue]
-verify_jwt = false
-
-[functions.track-email-event]
-verify_jwt = false
-
-[functions.klaviyo-get-aderai-segments]
-verify_jwt = true
-
-[functions.klaviyo-delete-aderai-segments]
-verify_jwt = true
-
-[functions.check-setup-status]
-verify_jwt = true
-
-[functions.send-billing-email]
-verify_jwt = false
-
-[functions.send-inactivity-reminder]
-verify_jwt = false
-
-[functions.send-security-alert]
-verify_jwt = false
-
-[functions.create-test-user]
-verify_jwt = true
-
-[functions.process-email-queue]
-verify_jwt = true
-
-[functions.send-transactional-email]
-verify_jwt = true
-
-[functions.preview-transactional-email]
-verify_jwt = false
-
-[functions.handle-email-unsubscribe]
-verify_jwt = false
-
-[functions.handle-email-suppression]
-verify_jwt = false
-
-[functions.trigger-app-email]
-verify_jwt = true
-
-[functions.cron-klaviyo-reminder]
-verify_jwt = false
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.calculate-segment-performance]
+    verify_jwt = true
+  [functions.check-ai-limit]
+    verify_jwt = true
+  [functions.check-orphan-users]
+    verify_jwt = false
+  [functions.check-setup-status]
+    verify_jwt = true
+  [functions.create-test-user]
+    verify_jwt = true
+  [functions.cron-klaviyo-reminder]
+    verify_jwt = false
+  [functions.handle-email-suppression]
+    verify_jwt = false
+  [functions.handle-email-unsubscribe]
+    verify_jwt = false
+  [functions.increment-ai-usage]
+    verify_jwt = true
+  [functions.klaviyo-create-custom-segment]
+    verify_jwt = true
+  [functions.klaviyo-create-segments]
+    verify_jwt = true
+  [functions.klaviyo-delete-aderai-segments]
+    verify_jwt = true
+  [functions.klaviyo-get-aderai-segments]
+    verify_jwt = true
+  [functions.klaviyo-proxy]
+    verify_jwt = true
+  [functions.klaviyo-suggest-segments]
+    verify_jwt = true
+  [functions.klaviyo-validate-key]
+    verify_jwt = true
+  [functions.klaviyo-webhook-handler]
+    verify_jwt = false
+  [functions.performance-campaigns-secure]
+    verify_jwt = true
+  [functions.performance-flows-secure]
+    verify_jwt = true
+  [functions.performance-metrics-secure]
+    verify_jwt = true
+  [functions.predict-churn-risk]
+    verify_jwt = true
+  [functions.predict-segment-performance]
+    verify_jwt = true
+  [functions.preview-transactional-email]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.process-segment-queue]
+    verify_jwt = false
+  [functions.record-segment-snapshots]
+    verify_jwt = false
+  [functions.reset-daily-limits]
+    verify_jwt = false
+  [functions.send-billing-email]
+    verify_jwt = false
+  [functions.send-email]
+    verify_jwt = false
+  [functions.send-feedback-notification]
+    verify_jwt = false
+  [functions.send-inactivity-reminder]
+    verify_jwt = false
+  [functions.send-milestone-email]
+    verify_jwt = false
+  [functions.send-notification-email]
+    verify_jwt = false
+  [functions.send-password-reset]
+    verify_jwt = false
+  [functions.send-security-alert]
+    verify_jwt = false
+  [functions.send-transactional-email]
+    verify_jwt = true
+  [functions.send-verification-email]
+    verify_jwt = false
+  [functions.send-weekly-digest]
+    verify_jwt = false
+  [functions.send-welcome-email]
+    verify_jwt = false
+  [functions.stripe-cancel-subscription]
+    verify_jwt = true
+  [functions.stripe-check-subscription]
+    verify_jwt = true
+  [functions.stripe-create-checkout]
+    verify_jwt = true
+  [functions.stripe-create-portal-session]
+    verify_jwt = true
+  [functions.stripe-get-subscription-details]
+    verify_jwt = true
+  [functions.stripe-resume-subscription]
+    verify_jwt = true
+  [functions.stripe-webhook]
+    verify_jwt = false
+  [functions.track-email-event]
+    verify_jwt = false
+  [functions.trigger-app-email]
+    verify_jwt = true
