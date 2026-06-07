@@ -7,6 +7,8 @@ import { WelcomeEmail } from "./_templates/welcome.tsx";
 import { z } from "https://esm.sh/zod@3.22.4";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const PUBLIC_SITE_URL = "https://aderai.io";
+const FROM_EMAIL = "Aderai <hello@updates.aderai.io>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -77,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
     const trackingPixelUrl = `${supabaseUrl}/functions/v1/track-email-event?e=${emailLogId}&u=${userId}`;
     
     // Dashboard URL from environment variable
-    const dashboardUrl = Deno.env.get('SITE_URL') || 'https://aderai.io';
+    const dashboardUrl = PUBLIC_SITE_URL;
 
     // Render React Email template
     const html = await renderAsync(
@@ -89,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const emailResponse = await resend.emails.send({
-      from: "Aderai <hello@updates.aderai.io>",
+      from: FROM_EMAIL,
       to: [email],
       subject: "Welcome to Aderai - Start Creating Segments!",
       html,
