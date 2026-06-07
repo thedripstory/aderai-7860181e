@@ -25,6 +25,7 @@ import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 import { cn } from "@/lib/utils";
 import { AderaiLogo } from "@/components/AderaiLogo";
 import { trackEvent, setUserProperties } from '@/lib/analytics';
+import { trackMetaEvent } from '@/lib/metaPixel';
 
 const klaviyoLogo = "https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/logos/Klaviyo_idRlQDy2Ux_1.png";
 
@@ -266,6 +267,12 @@ const KlaviyoSetup = () => {
         success: true,
         clientName: clientName || 'My Business',
         currency,
+      });
+
+      trackMetaEvent('Subscribe', {
+        value: 39,
+        currency: 'USD',
+        predicted_ltv: 234,
       });
 
       setUserProperties({

@@ -6,6 +6,7 @@ import { SignInCard } from "@/components/ui/sign-in-card";
 import { ErrorLogger } from "@/lib/errorLogger";
 import { sanitizeEmail, sanitizeString, validatePassword } from "@/lib/inputSanitization";
 import { identifyUser, trackEvent, setGroup } from '@/lib/analytics';
+import { trackMetaEvent } from '@/lib/metaPixel';
 import { useCurrency, getCurrencySync } from '@/hooks/useCurrency';
 
 interface AuthProps {
@@ -175,6 +176,10 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             method: 'email',
             accountName: sanitizedBrandName,
           });
+
+          trackMetaEvent('Lead');
+
+          trackMetaEvent('CompleteRegistration', { content_name: 'Aderai Signup' });
 
           // Create Stripe checkout session and redirect
           try {
