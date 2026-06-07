@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "aderai"
+const SITE_NAME = "Aderai"
 const SENDER_DOMAIN = "notify.aderai.io"
 const ROOT_DOMAIN = "aderai.io"
 const FROM_DOMAIN = "notify.aderai.io" // Domain shown in From address (may be root or sender subdomain)
