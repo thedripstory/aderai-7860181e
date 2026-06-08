@@ -76,7 +76,7 @@ export class PageErrorBoundary extends Component<Props, State> {
               </Button>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.MODE === 'development' && this.state.error && (
               <details className="mt-4 p-4 bg-muted rounded-md">
                 <summary className="cursor-pointer font-semibold">
                   Error Details (Dev Only)

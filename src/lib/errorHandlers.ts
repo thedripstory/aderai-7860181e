@@ -37,7 +37,7 @@ export class ErrorHandler {
 
     // Show user-friendly message
     toast.error(userMessage, {
-      description: process.env.NODE_ENV === 'development' 
+      description: import.meta.env.MODE === 'development' 
         ? error.message 
         : undefined,
       duration: 5000,
