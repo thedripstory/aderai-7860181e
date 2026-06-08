@@ -60,81 +60,12 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
         if (signUpError) throw signUpError;
 
         if (authData.user) {
-          // Verify profile was created by trigger, create manually if not
-          let profileExists = false;
-          let retries = 0;
-          const maxRetries = 3;
-
-          while (!profileExists && retries < maxRetries) {
-            const { data: profile, error: profileError } = await supabase
-              .from('users')
-              .select('id')
-              .eq('id', authData.user.id)
-              .maybeSingle();
-
-            if (profile) {
-              profileExists = true;
-            } else {
-              // Wait 500ms and retry
-              await new Promise(resolve => setTimeout(resolve, 500));
-              retries++;
-            }
-          }
-
-          // If profile still doesn't exist after retries, create it manually
-          if (!profileExists) {
-            await ErrorLogger.logWarning('Profile not created by trigger, creating manually', {
-              userId: authData.user.id,
-              email: sanitizedEmail,
-            });
-            
-            const { error: createError } = await supabase
-              .from('users')
-              .insert({
-                id: authData.user.id,
-                email: sanitizedEmail,
-                first_name: sanitizedFirstName || '',
-                account_name: sanitizedBrandName || sanitizedEmail.split('@')[0],
-                password_hash: '', // Managed by auth.users
-                email_verified: false,
-              });
-
-            if (createError) {
-              await ErrorLogger.logError(createError, {
-                context: 'Manual profile creation',
-                userId: authData.user.id,
-              });
-              
-              // Log to analytics
-              await supabase.from('analytics_events').insert({
-                user_id: authData.user.id,
-                event_name: 'profile_creation_failed',
-                event_metadata: {
-                  email: sanitizedEmail,
-                  error: createError.message,
-                }
-              });
-
-              toast({
-                title: "Profile Creation Error",
-                description: "Please contact support at hello@aderai.io",
-                variant: "destructive",
-              });
-              return;
-            }
-            
-            // Profile created manually, also create notification preferences
-            try {
-              await supabase.from('notification_preferences').insert({
-                user_id: authData.user.id,
-              });
-            } catch (notifErr) {
-              await ErrorLogger.logError(notifErr as Error, {
-                context: 'Failed to create notification preferences',
-                userId: authData.user.id,
-              });
-            }
-          }
+          // Profile and notification preferences are created automatically by
+          // the on_auth_user_created triggers on auth.users. We deliberately do
+          // NOT try to read/insert them from the client here: until the user
+          // confirms their email, there is no authenticated session, so RLS
+          // would block those calls and surface a misleading "Profile Creation
+          // Error" even though the signup itself succeeded.
 
           // Send welcome email (idempotent: trigger-app-email flips a flag)
           try {
