@@ -58,7 +58,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
           email: sanitizedEmail,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `https://aderai.io/auth/confirm?next=/dashboard`,
             data: {
               first_name: sanitizedFirstName || '',
               account_name: sanitizedBrandName || sanitizedEmail.split('@')[0],
