@@ -99,3 +99,6 @@ project_id = "kfsvgcijligxschxyuyb"
     verify_jwt = false
   [functions.trigger-app-email]
     verify_jwt = true
+
+[auth.email]
+enable_confirmations = false

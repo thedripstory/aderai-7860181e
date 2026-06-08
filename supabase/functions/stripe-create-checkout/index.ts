@@ -53,13 +53,30 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      logStep("ERROR: No Authorization header");
+      return new Response(
+        JSON.stringify({
+          error: "Your session didn't start. Please sign in and try again.",
+          code: "NOT_AUTHENTICATED",
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData } = await supabaseClient.auth.getUser(token);
-    const user = userData.user;
+    const { data: userData, error: userErr } = await supabaseClient.auth.getUser(token);
+    const user = userData?.user;
 
-    if (!user?.email) {
-      throw new Error("User not authenticated or email not available");
+    if (userErr || !user?.email) {
+      logStep("ERROR: User not authenticated", { userErr: userErr?.message });
+      return new Response(
+        JSON.stringify({
+          error: "Your session didn't start. Please sign in and try again.",
+          code: "NOT_AUTHENTICATED",
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
     }
 
     logStep("User authenticated", { userId: user.id, email: user.email });
