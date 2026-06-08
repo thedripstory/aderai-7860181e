@@ -16,11 +16,9 @@ const PRICE_IDS: Record<string, string> = {
   cad: "price_1TfQ360lE1soQQfxWwoSZL6n", // C$59/month
 };
 
-// Env override still wins for USD (legacy compatibility / emergencies).
-const USD_PRICE_OVERRIDE = Deno.env.get("STRIPE_PRICE_ID");
-if (USD_PRICE_OVERRIDE) {
-  PRICE_IDS.usd = USD_PRICE_OVERRIDE;
-}
+// Note: We intentionally do NOT honor a STRIPE_PRICE_ID env override anymore.
+// A stale override was previously sending users to a legacy $9/mo price.
+// The price IDs above are the single source of truth.
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
