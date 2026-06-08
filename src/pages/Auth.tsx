@@ -21,6 +21,15 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
   const navigate = useNavigate();
   const detectedCurrency = useCurrency();
 
+  const getFreshSession = async () => {
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token && session.user?.email) return session;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    return null;
+  };
+
   const handleAuth = async (email: string, password: string, firstName?: string, brandName?: string) => {
     setLoading(true);
 
@@ -66,20 +75,6 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
           // confirms their email, there is no authenticated session, so RLS
           // would block those calls and surface a misleading "Profile Creation
           // Error" even though the signup itself succeeded.
-
-          // Send welcome email (idempotent: trigger-app-email flips a flag)
-          try {
-            await supabase.functions.invoke('trigger-app-email', {
-              body: { type: 'welcome', userId: authData.user.id },
-            });
-          } catch (emailError) {
-            await ErrorLogger.logError(emailError as Error, {
-              context: 'Error sending welcome email',
-              userId: authData.user.id,
-            });
-          }
-
-
 
           toast({
             title: "Account created!",
@@ -128,12 +123,32 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             }
           }
 
+          const session = authData.session || await getFreshSession();
+          if (!session?.access_token) {
+            throw new Error('Your account was created, but the login session did not start. Please sign in to continue to payment.');
+          }
+
+          // Send welcome email only after a real user session exists; otherwise
+          // protected functions receive the anon key and fail with "missing sub".
+          try {
+            await supabase.functions.invoke('trigger-app-email', {
+              headers: { Authorization: `Bearer ${session.access_token}` },
+              body: { type: 'welcome', userId: authData.user.id },
+            });
+          } catch (emailError) {
+            await ErrorLogger.logError(emailError as Error, {
+              context: 'Error sending welcome email',
+              userId: authData.user.id,
+            });
+          }
+
           // Create Stripe checkout session and redirect
           try {
             const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
               'stripe-create-checkout',
               {
-                body: { origin: window.location.origin, currency: detectedCurrency || getCurrencySync() },
+                headers: { Authorization: `Bearer ${session.access_token}` },
+                body: { origin: 'https://aderai.io', currency: detectedCurrency || getCurrencySync() },
               }
             );
 
@@ -145,12 +160,17 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
               throw new Error('No checkout URL returned');
             }
           } catch (stripeError: any) {
+            const responseBody = stripeError?.context instanceof Response
+              ? await stripeError.context.clone().json().catch(() => null)
+              : null;
+
             await ErrorLogger.logError(stripeError, {
               context: 'Error creating Stripe checkout',
               userId: authData.user.id,
+              checkoutErrorCode: responseBody?.code || stripeError?.code,
             });
 
-            const code = stripeError?.context?.code || stripeError?.code;
+            const code = responseBody?.code || stripeError?.code;
             if (code === 'NOT_AUTHENTICATED') {
               toast({
                 title: "Almost there",
