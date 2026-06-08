@@ -366,10 +366,8 @@ export default function UnifiedDashboard() {
             <TabsList className="w-auto">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="segments" data-tour="segments-tab">Segments</TabsTrigger>
-              <TabsTrigger value="analytics" data-tour="analytics-tab">Analytics</TabsTrigger>
-              <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
-              <TabsTrigger value="performance" className="relative">
-                Performance
+              <TabsTrigger value="analytics" data-tour="analytics-tab" className="relative">
+                Analytics & Performance
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -378,11 +376,12 @@ export default function UnifiedDashboard() {
                       </span>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="text-xs">
-                      <p>Under maintenance - Some features may be incomplete</p>
+                      <p>Invite-only — currently under testing</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </TabsTrigger>
+              <TabsTrigger value="ai" data-tour="ai-tab">AI</TabsTrigger>
               <TabsTrigger value="more">More</TabsTrigger>
             </TabsList>
           </div>
