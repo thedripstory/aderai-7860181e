@@ -219,12 +219,39 @@ async function handleWebhook(req: Request): Promise<Response> {
     )
   }
 
+  // Rewrite the raw backend verification URL into a first-party Aderai link.
+  // Recipients should only ever see https://aderai.io/... in the email body.
+  // The actual token + type are preserved and verified by /auth/confirm on the app.
+  const buildAderaiConfirmUrl = (rawUrl: string | undefined, type: string): string => {
+    const next = type === 'recovery' ? '/reset-password' : '/dashboard'
+    if (!rawUrl) return `${PUBLIC_SITE_URL}${next}`
+    try {
+      const parsed = new URL(rawUrl)
+      // Supabase verify URLs include `token` (and sometimes `token_hash`) + `type`
+      const tokenHash =
+        parsed.searchParams.get('token_hash') ||
+        parsed.searchParams.get('token') ||
+        ''
+      const linkType = parsed.searchParams.get('type') || type
+      if (!tokenHash) return `${PUBLIC_SITE_URL}${next}`
+      const out = new URL(`${PUBLIC_SITE_URL}/auth/confirm`)
+      out.searchParams.set('token_hash', tokenHash)
+      out.searchParams.set('type', linkType)
+      out.searchParams.set('next', next)
+      return out.toString()
+    } catch (_err) {
+      return `${PUBLIC_SITE_URL}${next}`
+    }
+  }
+
+  const aderaiConfirmUrl = buildAderaiConfirmUrl(payload.data.url, emailType)
+
   // Build template props from payload.data (HookData structure)
   const templateProps = {
     siteName: SITE_NAME,
     siteUrl: PUBLIC_SITE_URL,
     recipient: payload.data.email,
-    confirmationUrl: payload.data.url,
+    confirmationUrl: aderaiConfirmUrl,
     token: payload.data.token,
     email: payload.data.email,
     oldEmail: payload.data.old_email,
