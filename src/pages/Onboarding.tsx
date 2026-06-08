@@ -16,42 +16,64 @@ export default function Onboarding() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Check for payment success
+      // Check for payment return — Stripe redirects with ?session_id=cs_...
+      // (sometimes also ?payment=success). Trigger on session_id presence.
       const urlParams = new URLSearchParams(window.location.search);
-      const paymentStatus = urlParams.get('payment');
       const sessionId = urlParams.get('session_id');
 
-      if (paymentStatus === 'success' && sessionId) {
-        // Clear URL params
+      if (sessionId) {
+        // Clear URL params immediately (capture sessionId in closure first)
         window.history.replaceState({}, '', '/onboarding');
-        
-        // Track subscription with PostHog
-        trackEvent('Subscription Started', {
-          plan: 'monthly',
-          amount: 39,
-          currency: 'USD',
-        });
 
+        // Fetch the real Stripe session to get the actual paid amount + currency.
+        // This makes Meta Purchase value accurate for any coupon (100% OFF -> $0,
+        // 5% OFF -> discounted amount, no coupon -> full price).
+        let value = 39;
+        let currency = 'USD';
+        let paid = true;
         try {
-          trackMetaEvent('Purchase', {
-            value: 39,
-            currency: 'USD',
-            content_name: 'Aderai Subscription',
-            content_type: 'product',
-          }, `purchase_${sessionId}`);
+          const { data: sessionData, error: sessionErr } = await supabase.functions.invoke(
+            'stripe-get-session',
+            { body: { session_id: sessionId } }
+          );
+          if (!sessionErr && sessionData && typeof sessionData.value === 'number') {
+            value = sessionData.value;
+            currency = sessionData.currency || 'USD';
+            paid = sessionData.paid !== false;
+          }
         } catch {
-          // Silently ignore Meta Pixel errors so onboarding never breaks
+          // Fall back to defaults if the lookup fails; never block onboarding.
         }
 
-        setUserProperties({
-          subscriptionStatus: 'active',
-          subscribedAt: new Date().toISOString(),
-          plan: 'monthly',
-        });
-        
-        toast.success('Payment successful! Welcome to Aderai.', {
-          duration: 5000,
-        });
+        if (paid) {
+          // Track subscription with PostHog using REAL amount
+          trackEvent('Subscription Started', {
+            plan: 'monthly',
+            amount: value,
+            currency,
+          });
+
+          try {
+            trackMetaEvent('Purchase', {
+              value,
+              currency,
+              content_name: 'Aderai Subscription',
+              content_type: 'product',
+            }, `purchase_${sessionId}`);
+          } catch {
+            // Silently ignore Meta Pixel errors so onboarding never breaks
+          }
+
+          setUserProperties({
+            subscriptionStatus: 'active',
+            subscribedAt: new Date().toISOString(),
+            plan: 'monthly',
+          });
+
+          toast.success('Payment successful! Welcome to Aderai.', {
+            duration: 5000,
+          });
+        }
       }
 
       const { data: { session } } = await supabase.auth.getSession();
