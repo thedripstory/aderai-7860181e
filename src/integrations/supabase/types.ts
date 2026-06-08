@@ -1371,7 +1371,6 @@ export type Database = {
           klaviyo_setup_completed: boolean | null
           marketing_goals: string | null
           onboarding_completed: boolean | null
-          password_hash: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_canceled_at: string | null
@@ -1397,7 +1396,6 @@ export type Database = {
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
           onboarding_completed?: boolean | null
-          password_hash: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_canceled_at?: string | null
@@ -1423,7 +1421,6 @@ export type Database = {
           klaviyo_setup_completed?: boolean | null
           marketing_goals?: string | null
           onboarding_completed?: boolean | null
-          password_hash?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_canceled_at?: string | null
