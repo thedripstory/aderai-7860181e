@@ -90,7 +90,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               }
             });
 
-            toast.error('Profile not found. Please contact support at akshat@aderai.io', {
+            toast.error('Profile not found. Please contact support at hello@aderai.io', {
               duration: 10000,
             });
           } else {
@@ -276,7 +276,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
             Your user profile could not be found. This is a rare issue that our team has been notified about.
           </p>
           <p className="text-sm text-muted-foreground mb-6">
-            Please contact support at <strong>akshat@aderai.io</strong> to resolve this issue.
+            Please contact support at <strong>hello@aderai.io</strong> to resolve this issue.
           </p>
           <button
             onClick={() => supabase.auth.signOut()}

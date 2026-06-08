@@ -1,0 +1,1 @@
+DROP TRIGGER IF EXISTS on_auth_user_created_notification_prefs ON auth.users;
