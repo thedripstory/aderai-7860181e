@@ -1062,7 +1062,7 @@ export default function Settings() {
                         </div>
                       )}
 
-                      {/* Canceled Subscription Notice */}
+                      {/* Canceled / No Subscription Notice */}
                       {(subscriptionDetails.status === 'canceled' || !subscriptionDetails.hasSubscription) && (
                         <div className="bg-muted/50 border border-border rounded-lg p-4">
                           <div className="flex items-start gap-3">
@@ -1072,31 +1072,9 @@ export default function Settings() {
                                 {subscriptionDetails.status === 'canceled' ? 'Your subscription has been canceled' : 'No active subscription'}
                               </p>
                               <p className="text-sm text-muted-foreground mt-1">
-                                Resubscribe to regain access to all Aderai features including 70+ expert segments and AI-powered suggestions.
-                              </p>
-                              <Button
-                                size="sm"
-                                className="mt-3"
-                                onClick={handleResubscribe}
-                                disabled={loading}
-                              >
-                                {loading ? (
-                                  <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Loading...
-                                  </>
-                                ) : (
-                                  <>
-                                    <CreditCard className="w-4 h-4 mr-2" />
-                                    Resubscribe - {pricing.pricePerMonth}
-                                  </>
-                                )}
-                              </Button>
-                              <p className="text-xs text-muted-foreground/60 flex items-center gap-1 mt-2">
-                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                Payments securely processed by Stripe
+                                {subscriptionDetails.status === 'canceled'
+                                  ? 'Resubscribe to regain access to all Aderai features including 70+ expert segments and AI-powered suggestions.'
+                                  : 'Subscribe to unlock all Aderai features including 70+ expert segments and AI-powered suggestions.'}
                               </p>
                             </div>
                           </div>
@@ -1106,44 +1084,49 @@ export default function Settings() {
                       {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
                         {subscriptionDetails.hasSubscription && subscriptionDetails.status !== 'canceled' ? (
-                          <>
-                            <Button
-                              onClick={handleOpenPortal}
-                              disabled={portalLoading}
-                              className="flex-1"
-                            >
-                              {portalLoading ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Opening...
-                                </>
-                              ) : (
-                                <>
-                                  <ExternalLink className="w-4 h-4 mr-2" />
-                                  Manage in Stripe
-                                </>
-                              )}
-                            </Button>
-
-                          </>
-                        ) : (
                           <Button
-                            onClick={handleResubscribe}
-                            disabled={loading}
+                            onClick={handleOpenPortal}
+                            disabled={portalLoading}
                             className="flex-1"
                           >
-                            {loading ? (
+                            {portalLoading ? (
                               <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Loading...
+                                Opening...
                               </>
                             ) : (
                               <>
-                                <CreditCard className="w-4 h-4 mr-2" />
-                                Subscribe Now - {pricing.pricePerMonth}
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                Manage in Stripe
                               </>
                             )}
                           </Button>
+                        ) : (
+                          <div className="flex-1 flex flex-col gap-2">
+                            <Button
+                              onClick={handleResubscribe}
+                              disabled={loading}
+                              className="w-full"
+                            >
+                              {loading ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Loading...
+                                </>
+                              ) : (
+                                <>
+                                  <CreditCard className="w-4 h-4 mr-2" />
+                                  {subscriptionDetails.status === 'canceled' ? 'Resubscribe' : 'Subscribe Now'} - {pricing.pricePerMonth}
+                                </>
+                              )}
+                            </Button>
+                            <p className="text-xs text-muted-foreground/70 flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                              Payments securely processed by Stripe
+                            </p>
+                          </div>
                         )}
                       </div>
                     </div>
