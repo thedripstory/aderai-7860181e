@@ -28,16 +28,20 @@ export default function Onboarding() {
         // Track subscription with PostHog
         trackEvent('Subscription Started', {
           plan: 'monthly',
-          amount: 9,
+          amount: 39,
           currency: 'USD',
         });
 
-        trackMetaEvent('Purchase', {
-          value: 39,
-          currency: 'USD',
-          content_name: 'Aderai Subscription',
-          content_type: 'product',
-        }, `purchase_${sessionId}`);
+        try {
+          trackMetaEvent('Purchase', {
+            value: 39,
+            currency: 'USD',
+            content_name: 'Aderai Subscription',
+            content_type: 'product',
+          }, `purchase_${sessionId}`);
+        } catch {
+          // Silently ignore Meta Pixel errors so onboarding never breaks
+        }
 
         setUserProperties({
           subscriptionStatus: 'active',
