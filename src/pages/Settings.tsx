@@ -914,23 +914,45 @@ export default function Settings() {
           {/* Billing Tab */}
           <TabsContent value="billing">
             <div className="space-y-6">
-              {/* Subscription Status Card */}
+              {(() => {
+                const isFreeAccess = email?.toLowerCase().endsWith('@thedripstory.com');
+                return (
               <Card className="border-border/50 shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CreditCard className="w-5 h-5" />
-                    Subscription
+                    Subscription & Billing
                   </CardTitle>
-                  <CardDescription>Manage your Aderai subscription</CardDescription>
+                  <CardDescription>
+                    {isFreeAccess
+                      ? 'Your account has complimentary access to Aderai.'
+                      : 'Manage your plan, payment method, and invoices in one place.'}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {subscriptionLoading ? (
+                  {isFreeAccess ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Status</span>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          <span className="font-medium text-emerald-600 dark:text-emerald-400">Free Access</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Plan</span>
+                        <span className="font-medium">Complimentary — $0/month</span>
+                      </div>
+                      <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 text-sm text-emerald-800 dark:text-emerald-200">
+                        Your <strong>@thedripstory.com</strong> account is on the house — no billing, no invoices, full access.
+                      </div>
+                    </div>
+                  ) : subscriptionLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                     </div>
-                  ) : subscriptionDetails ? (
+                  ) : subscriptionDetails?.hasSubscription ? (
                     <div className="space-y-6">
-                      {/* Status Badge */}
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Status</span>
                         <div className="flex items-center gap-2">
@@ -946,72 +968,56 @@ export default function Settings() {
                               <span className="font-medium text-amber-600 dark:text-amber-400">Canceling</span>
                             </>
                           )}
+                          {subscriptionDetails.status === 'trialing' && (
+                            <>
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                              <span className="font-medium text-emerald-600 dark:text-emerald-400">Trialing</span>
+                            </>
+                          )}
                           {subscriptionDetails.status === 'past_due' && (
                             <>
                               <AlertCircle className="w-4 h-4 text-red-500" />
                               <span className="font-medium text-red-600 dark:text-red-400">Past Due</span>
                             </>
                           )}
-                          {subscriptionDetails.status === 'canceled' && (
-                            <>
-                              <XCircle className="w-4 h-4 text-muted-foreground" />
-                              <span className="font-medium text-muted-foreground">Canceled</span>
-                            </>
-                          )}
-                          {!subscriptionDetails.hasSubscription && (
-                            <>
-                              <XCircle className="w-4 h-4 text-muted-foreground" />
-                              <span className="font-medium text-muted-foreground">No Subscription</span>
-                            </>
-                          )}
                         </div>
                       </div>
 
-                      {/* Plan Details */}
-                      {subscriptionDetails.hasSubscription && (
-                        <>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Plan</span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Plan</span>
+                        <span className="font-medium">
+                          Aderai Monthly{subscriptionDetails.amount ? ` — ${(subscriptionDetails.currency === 'USD' || !subscriptionDetails.currency) ? '$' : ''}${subscriptionDetails.amount}${subscriptionDetails.currency && subscriptionDetails.currency !== 'USD' ? ' ' + subscriptionDetails.currency : ''}/${subscriptionDetails.interval || 'month'}` : ''}
+                        </span>
+                      </div>
+
+                      {subscriptionDetails.nextBillingDate && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">
+                            {subscriptionDetails.cancelAtPeriodEnd ? 'Access Until' : 'Next Billing Date'}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
                             <span className="font-medium">
-                              Aderai Monthly{subscriptionDetails.amount ? ` — ${(subscriptionDetails.currency === 'USD' || !subscriptionDetails.currency) ? '$' : ''}${subscriptionDetails.amount}${subscriptionDetails.currency && subscriptionDetails.currency !== 'USD' ? ' ' + subscriptionDetails.currency : ''}/${subscriptionDetails.interval || 'month'}` : ''}
+                              {new Date(subscriptionDetails.nextBillingDate).toLocaleDateString('en-US', {
+                                month: 'long', day: 'numeric', year: 'numeric',
+                              })}
                             </span>
                           </div>
-
-                          {/* Next Billing Date */}
-                          {subscriptionDetails.status === 'active' && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-muted-foreground">
-                                {subscriptionDetails.cancelAtPeriodEnd ? 'Access Until' : 'Next Billing Date'}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-muted-foreground" />
-                                <span className="font-medium">
-                                  {new Date(subscriptionDetails.nextBillingDate).toLocaleDateString('en-US', {
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                  })}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Payment Method */}
-                          {subscriptionDetails.paymentMethod && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-muted-foreground">Payment Method</span>
-                              <div className="flex items-center gap-2">
-                                <CreditCard className="w-4 h-4 text-muted-foreground" />
-                                <span className="font-medium capitalize">
-                                  {subscriptionDetails.paymentMethod.brand} •••• {subscriptionDetails.paymentMethod.last4}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        </>
+                        </div>
                       )}
 
-                      {/* Cancellation Notice */}
+                      {subscriptionDetails.paymentMethod && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Payment Method</span>
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-medium capitalize">
+                              {subscriptionDetails.paymentMethod.brand} •••• {subscriptionDetails.paymentMethod.last4}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
                       {subscriptionDetails.cancelAtPeriodEnd && (
                         <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
                           <div className="flex items-start gap-3">
@@ -1021,8 +1027,7 @@ export default function Settings() {
                                 Your subscription is set to cancel
                               </p>
                               <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                                You'll have access until {new Date(subscriptionDetails.nextBillingDate).toLocaleDateString()}. 
-                                After that, you won't be able to access Aderai features.
+                                You'll have access until {new Date(subscriptionDetails.nextBillingDate).toLocaleDateString()}.
                               </p>
                               <Button
                                 variant="outline"
@@ -1031,146 +1036,51 @@ export default function Settings() {
                                 onClick={handleResumeSubscription}
                                 disabled={loading}
                               >
-                                {loading ? (
-                                  <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Resuming...
-                                  </>
-                                ) : (
-                                  'Resume Subscription'
-                                )}
+                                {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Resuming...</>) : 'Resume Subscription'}
                               </Button>
                             </div>
                           </div>
                         </div>
                       )}
 
-                      {/* Past Due Notice */}
                       {subscriptionDetails.status === 'past_due' && (
-                        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                          <div className="flex items-start gap-3">
-                            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <p className="font-medium text-red-800 dark:text-red-200">
-                                Payment failed
-                              </p>
-                              <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                                Please update your payment method to continue using Aderai.
-                              </p>
-                            </div>
-                          </div>
+                        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-4 text-sm">
+                          <p className="font-medium text-red-800 dark:text-red-200">Payment failed</p>
+                          <p className="text-red-700 dark:text-red-300 mt-1">
+                            Update your payment method in the Stripe portal to continue using Aderai.
+                          </p>
                         </div>
                       )}
 
-                      {/* Canceled / No Subscription Notice */}
-                      {(subscriptionDetails.status === 'canceled' || !subscriptionDetails.hasSubscription) && (
-                        <div className="bg-muted/50 border border-border rounded-lg p-4">
-                          <div className="flex items-start gap-3">
-                            <XCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                            <div>
-                              <p className="font-medium">
-                                {subscriptionDetails.status === 'canceled' ? 'Your subscription has been canceled' : 'No active subscription'}
-                              </p>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {subscriptionDetails.status === 'canceled'
-                                  ? 'Resubscribe to regain access to all Aderai features including 70+ expert segments and AI-powered suggestions.'
-                                  : 'Subscribe to unlock all Aderai features including 70+ expert segments and AI-powered suggestions.'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
-                        {subscriptionDetails.hasSubscription && subscriptionDetails.status !== 'canceled' ? (
-                          <Button
-                            onClick={handleOpenPortal}
-                            disabled={portalLoading}
-                            className="flex-1"
-                          >
-                            {portalLoading ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Opening...
-                              </>
-                            ) : (
-                              <>
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                Manage in Stripe
-                              </>
-                            )}
-                          </Button>
-                        ) : (
-                          <div className="flex-1 flex flex-col gap-2">
-                            <Button
-                              onClick={handleResubscribe}
-                              disabled={loading}
-                              className="w-full"
-                            >
-                              {loading ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Loading...
-                                </>
-                              ) : (
-                                <>
-                                  <CreditCard className="w-4 h-4 mr-2" />
-                                  {subscriptionDetails.status === 'canceled' ? 'Resubscribe' : 'Subscribe Now'} - {pricing.pricePerMonth}
-                                </>
-                              )}
-                            </Button>
-                            <p className="text-xs text-muted-foreground/70 flex items-center gap-1">
-                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                              </svg>
-                              Payments securely processed by Stripe
-                            </p>
-                          </div>
-                        )}
+                      <div className="pt-4 border-t border-border space-y-3">
+                        <Button onClick={handleOpenPortal} disabled={portalLoading} className="w-full">
+                          {portalLoading ? (
+                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Opening Stripe…</>
+                          ) : (
+                            <><ExternalLink className="w-4 h-4 mr-2" />Manage Subscription & Invoices</>
+                          )}
+                        </Button>
+                        <p className="text-xs text-muted-foreground text-center">
+                          View invoices, update payment method, or cancel anytime — all securely handled by Stripe.
+                        </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground mb-4">No subscription information available</p>
-                      <Button onClick={loadSubscriptionDetails}>
-                        Retry
-                      </Button>
+                    <div className="text-center py-8 space-y-4">
+                      <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">We couldn't load your subscription</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          This is unusual — please retry, or contact <a href="mailto:hello@aderai.io" className="text-primary underline">hello@aderai.io</a>.
+                        </p>
+                      </div>
+                      <Button onClick={loadSubscriptionDetails} variant="outline">Retry</Button>
                     </div>
                   )}
                 </CardContent>
               </Card>
-
-              {/* Billing History Card */}
-              <Card className="border-border/50 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg">Billing History & Invoices</CardTitle>
-                  <CardDescription>View and download your past invoices</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Access your complete billing history, download invoices, and manage your payment methods through the Stripe portal.
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={handleOpenPortal}
-                    disabled={portalLoading || !subscriptionDetails?.hasSubscription}
-                  >
-                    {portalLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Opening...
-                      </>
-                    ) : (
-                      <>
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View Billing History
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
+                );
+              })()}
 
               {/* Support Card */}
               <Card className="border-border/50 shadow-lg">
