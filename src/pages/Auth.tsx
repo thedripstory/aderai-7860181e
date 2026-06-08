@@ -117,7 +117,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
 
               toast({
                 title: "Profile Creation Error",
-                description: "Please contact support at akshat@aderai.io",
+                description: "Please contact support at hello@aderai.io",
                 variant: "destructive",
               });
               return;
@@ -205,7 +205,7 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             
             toast({
               title: "Payment Setup Error",
-              description: "Please try again or contact support at akshat@aderai.io",
+              description: "Please try again or contact support at hello@aderai.io",
               variant: "destructive",
             });
             

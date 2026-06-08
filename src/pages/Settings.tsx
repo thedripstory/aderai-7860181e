@@ -1198,8 +1198,8 @@ export default function Settings() {
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
                     For billing questions or issues, please contact us at{' '}
-                    <a href="mailto:akshat@aderai.io" className="text-primary hover:underline font-medium">
-                      akshat@aderai.io
+                    <a href="mailto:hello@aderai.io" className="text-primary hover:underline font-medium">
+                      hello@aderai.io
                     </a>
                   </p>
                 </CardContent>

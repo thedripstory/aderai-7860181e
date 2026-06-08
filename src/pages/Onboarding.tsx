@@ -78,7 +78,7 @@ export default function Onboarding() {
           context: 'Onboarding',
           userId: session.user.id,
         });
-        toast.error('Profile not found. Please contact support at akshat@aderai.io');
+        toast.error('Profile not found. Please contact support at hello@aderai.io');
         navigate('/login');
         return;
       }
