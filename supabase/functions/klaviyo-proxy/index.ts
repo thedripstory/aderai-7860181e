@@ -47,6 +47,30 @@ Deno.serve(async (req) => {
       );
     }
 
+    // SSRF protection: only allow requests to Klaviyo's official API host.
+    // Reject any other URL so the user's API key cannot be exfiltrated and
+    // internal cloud/metadata services cannot be probed.
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(endpoint);
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Invalid endpoint URL' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (
+      parsedUrl.protocol !== 'https:' ||
+      parsedUrl.hostname !== 'a.klaviyo.com' ||
+      !parsedUrl.pathname.startsWith('/api/')
+    ) {
+      console.warn(`Rejected non-Klaviyo endpoint from user ${user.id}: ${endpoint}`);
+      return new Response(
+        JSON.stringify({ error: 'Endpoint must be https://a.klaviyo.com/api/...' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Fetch the actual API key from database (only for authenticated user)
     const { data: keyData, error: keyError } = await supabaseClient
       .from('klaviyo_keys')

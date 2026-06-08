@@ -71,45 +71,58 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Handle click tracking (POST request)
+    // Handle click tracking (POST request) — requires authentication and
+    // userId must match the caller. This prevents unauthenticated injection
+    // of fabricated tracking events.
     if (req.method === "POST") {
-      const { emailLogId, userId, eventType, eventData }: TrackingRequest = await req.json();
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-      if (!emailLogId || !userId || !eventType) {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
         return new Response(
-          JSON.stringify({ error: 'Missing required fields' }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
+          JSON.stringify({ error: "Authentication required" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const token = authHeader.replace("Bearer ", "");
+      const authClient = createClient(supabaseUrl, serviceKey);
+      const { data: { user }, error: authError } = await authClient.auth.getUser(token);
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: "Invalid authentication" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { emailLogId, eventType, eventData }: TrackingRequest = await req.json();
+      if (!emailLogId || !eventType) {
+        return new Response(
+          JSON.stringify({ error: "Missing required fields" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
-      // Record email click
+      const supabase = createClient(supabaseUrl, serviceKey);
+
+      // Record email click — user_id is taken from the verified JWT, never the body.
       await supabase.from("email_tracking").insert({
         email_log_id: emailLogId,
-        user_id: userId,
+        user_id: user.id,
         event_type: eventType,
         event_data: {
           ...eventData,
-          user_agent: req.headers.get('user-agent'),
-          ip_address: req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for'),
+          user_agent: req.headers.get("user-agent"),
+          ip_address: req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for"),
           timestamp: new Date().toISOString(),
         },
       });
 
-      console.log(`Email ${eventType}: ${emailLogId} by user: ${userId}`);
+      console.log(`Email ${eventType}: ${emailLogId} by user: ${user.id}`);
 
       return new Response(
         JSON.stringify({ success: true }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

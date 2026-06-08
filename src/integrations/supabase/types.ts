@@ -1372,18 +1372,14 @@ export type Database = {
           marketing_goals: string | null
           onboarding_completed: boolean | null
           password_hash: string
-          password_reset_expires: string | null
-          password_reset_token: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_canceled_at: string | null
           subscription_end_date: string | null
           subscription_start_date: string | null
           subscription_status: string | null
-          two_factor_backup_codes: Json | null
           two_factor_enabled: boolean | null
           two_factor_prompt_shown_at: string | null
-          two_factor_secret: string | null
           updated_at: string | null
           welcome_email_sent: boolean
         }
@@ -1402,18 +1398,14 @@ export type Database = {
           marketing_goals?: string | null
           onboarding_completed?: boolean | null
           password_hash: string
-          password_reset_expires?: string | null
-          password_reset_token?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_canceled_at?: string | null
           subscription_end_date?: string | null
           subscription_start_date?: string | null
           subscription_status?: string | null
-          two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
           two_factor_prompt_shown_at?: string | null
-          two_factor_secret?: string | null
           updated_at?: string | null
           welcome_email_sent?: boolean
         }
@@ -1432,18 +1424,14 @@ export type Database = {
           marketing_goals?: string | null
           onboarding_completed?: boolean | null
           password_hash?: string
-          password_reset_expires?: string | null
-          password_reset_token?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_canceled_at?: string | null
           subscription_end_date?: string | null
           subscription_start_date?: string | null
           subscription_status?: string | null
-          two_factor_backup_codes?: Json | null
           two_factor_enabled?: boolean | null
           two_factor_prompt_shown_at?: string | null
-          two_factor_secret?: string | null
           updated_at?: string | null
           welcome_email_sent?: boolean
         }
