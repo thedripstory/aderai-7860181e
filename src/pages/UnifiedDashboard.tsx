@@ -421,7 +421,7 @@ export default function UnifiedDashboard() {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <PremiumInviteGate featureName="Advanced Analytics" />
+            <PremiumInviteGate featureName="Advanced Analytics & Performance" />
           </TabsContent>
 
           <TabsContent value="ai">
@@ -442,9 +442,6 @@ export default function UnifiedDashboard() {
             )}
           </TabsContent>
 
-          <TabsContent value="performance">
-            <PremiumInviteGate featureName="Performance Insights" variant="performance" />
-          </TabsContent>
 
           <TabsContent value="more">
             <div className="grid gap-6">
