@@ -973,7 +973,7 @@ export default function Settings() {
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">Plan</span>
                             <span className="font-medium">
-                              Aderai Monthly - ${subscriptionDetails.amount || 9}/{subscriptionDetails.interval || 'month'}
+                              Aderai Monthly{subscriptionDetails.amount ? ` — ${(subscriptionDetails.currency === 'USD' || !subscriptionDetails.currency) ? '$' : ''}${subscriptionDetails.amount}${subscriptionDetails.currency && subscriptionDetails.currency !== 'USD' ? ' ' + subscriptionDetails.currency : ''}/${subscriptionDetails.interval || 'month'}` : ''}
                             </span>
                           </div>
 
