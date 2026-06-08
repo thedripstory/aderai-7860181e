@@ -112,6 +112,22 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
 
           trackMetaEvent('CompleteRegistration', { content_name: 'Aderai Signup' });
 
+          // Ensure we actually have a session before invoking authenticated edge functions.
+          // With email confirmations disabled, signUp returns a session immediately.
+          // If for any reason it doesn't, sign the user in with the password they just set.
+          if (!authData.session) {
+            const { error: signInErr } = await supabase.auth.signInWithPassword({
+              email: sanitizedEmail,
+              password,
+            });
+            if (signInErr) {
+              await ErrorLogger.logError(signInErr, {
+                context: 'Post-signup auto sign-in failed',
+                userId: authData.user.id,
+              });
+            }
+          }
+
           // Create Stripe checkout session and redirect
           try {
             const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
@@ -133,15 +149,23 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
               context: 'Error creating Stripe checkout',
               userId: authData.user.id,
             });
-            
-            toast({
-              title: "Payment Setup Error",
-              description: "Please try again or contact support at hello@aderai.io",
-              variant: "destructive",
-            });
-            
-            // Still allow them to proceed to try again
-            navigate('/signup?payment=error');
+
+            const code = stripeError?.context?.code || stripeError?.code;
+            if (code === 'NOT_AUTHENTICATED') {
+              toast({
+                title: "Almost there",
+                description: "Please sign in and we'll take you to payment.",
+                variant: "destructive",
+              });
+              navigate('/auth');
+            } else {
+              toast({
+                title: "Payment Setup Error",
+                description: "Please try again or contact support at hello@aderai.io",
+                variant: "destructive",
+              });
+              navigate('/signup?payment=error');
+            }
           }
         }
       } else {
