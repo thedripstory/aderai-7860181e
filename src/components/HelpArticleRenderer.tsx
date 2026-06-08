@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import { 
   CheckCircle2, AlertTriangle, Info, Lightbulb, 
   ArrowRight, Zap, Shield, Settings, Key, 
@@ -10,6 +11,14 @@ interface HelpArticleRendererProps {
   content: string;
   title: string;
 }
+
+// Sanitize HTML produced by formatInlineText to prevent stored XSS.
+// Only the small set of tags/attrs we actually emit are allowed.
+const sanitize = (html: string) =>
+  DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['strong', 'code', 'span', 'em', 'b', 'i', 'br'],
+    ALLOWED_ATTR: ['class'],
+  });
 
 export const HelpArticleRenderer: React.FC<HelpArticleRendererProps> = ({ content, title }) => {
   // Parse and render content with custom styling
@@ -47,7 +56,7 @@ export const HelpArticleRenderer: React.FC<HelpArticleRendererProps> = ({ conten
                     <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2" />
                   )}
                   <span className="text-muted-foreground leading-relaxed" 
-                    dangerouslySetInnerHTML={{ __html: formatInlineText(cleanItem) }} 
+                    dangerouslySetInnerHTML={{ __html: sanitize(formatInlineText(cleanItem)) }} 
                   />
                 </div>
               );
@@ -59,8 +68,17 @@ export const HelpArticleRenderer: React.FC<HelpArticleRendererProps> = ({ conten
       }
     };
 
+    const escapeHtml = (text: string): string =>
+      text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
     const formatInlineText = (text: string): string => {
-      return text
+      // Escape first, then apply formatting markers so user content can't inject HTML.
+      return escapeHtml(text)
         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
         .replace(/`(.*?)`/g, '<code class="px-1.5 py-0.5 rounded bg-muted text-primary text-sm font-mono">$1</code>')
         .replace(/→/g, '<span class="text-primary mx-1">→</span>');
@@ -98,7 +116,6 @@ export const HelpArticleRenderer: React.FC<HelpArticleRendererProps> = ({ conten
         const headerText = trimmedLine.replace('### ', '');
         const isStep = headerText.match(/^(\d+)\./);
         const isIssue = headerText.toLowerCase().includes('issue') || headerText.toLowerCase().includes('error');
-        const isSolution = headerText.toLowerCase().includes('solution');
         
         if (isStep) {
           stepCounter++;
@@ -160,7 +177,7 @@ export const HelpArticleRenderer: React.FC<HelpArticleRendererProps> = ({ conten
         if (trimmedLine.includes('**Symptoms:**') || trimmedLine.includes('**Cause:**')) {
           elements.push(
             <div key={`callout-${index}`} className="mt-4 p-3 rounded-lg bg-muted/50 border border-border">
-              <span dangerouslySetInnerHTML={{ __html: formatInlineText(trimmedLine) }} />
+              <span dangerouslySetInnerHTML={{ __html: sanitize(formatInlineText(trimmedLine)) }} />
             </div>
           );
           return;
@@ -178,7 +195,7 @@ export const HelpArticleRenderer: React.FC<HelpArticleRendererProps> = ({ conten
 
         elements.push(
           <p key={`p-${index}`} className="text-muted-foreground leading-relaxed my-3" 
-            dangerouslySetInnerHTML={{ __html: formatInlineText(trimmedLine) }} 
+            dangerouslySetInnerHTML={{ __html: sanitize(formatInlineText(trimmedLine)) }} 
           />
         );
       }
