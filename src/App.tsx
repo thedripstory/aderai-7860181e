@@ -35,6 +35,7 @@ const JobHistory = lazy(() => import("./pages/JobHistory"));
 const AdminSetup = lazy(() => import("./pages/AdminSetup"));
 const AdminPricingPreview = lazy(() => import("./pages/AdminPricingPreview"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const AuthConfirm = lazy(() => import("./pages/AuthConfirm"));
 
 
 const queryClient = new QueryClient();
@@ -103,6 +104,7 @@ const App = () => {
                 <Route path="/admin/pricing-preview" element={<AdminProtectedRoute><AdminPricingPreview /></AdminProtectedRoute>} />
                 <Route path="/help" element={<HelpCenter />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
+                <Route path="/auth/confirm" element={<AuthConfirm />} />
                 <Route path="*" element={<NotFound />} />
 
                 </Routes>
