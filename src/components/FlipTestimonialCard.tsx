@@ -31,8 +31,8 @@ export const FlipTestimonialCard = ({
     const cardElement = cardRef.current;
     if (!cardElement) return;
     
-    let autoFlipInterval: NodeJS.Timeout | null = null;
-    let flipBackTimeout: NodeJS.Timeout | null = null;
+    let autoFlipInterval: ReturnType<typeof setTimeout> | null = null;
+    let flipBackTimeout: ReturnType<typeof setTimeout> | null = null;
     
     const observer = new IntersectionObserver(
       ([entry]) => {

@@ -8,8 +8,8 @@ const LOGOUT_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 export function useInactivityLogout() {
   const navigate = useNavigate();
-  const reminderTimer = useRef<NodeJS.Timeout | null>(null);
-  const logoutTimer = useRef<NodeJS.Timeout | null>(null);
+  const reminderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const logoutTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasShownReminder = useRef(false);
 
   const handleLogout = useCallback(async () => {
