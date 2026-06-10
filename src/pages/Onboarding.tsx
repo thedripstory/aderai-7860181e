@@ -64,6 +64,11 @@ export default function Onboarding() {
             // Silently ignore Meta Pixel errors so onboarding never breaks
           }
 
+          try {
+            const { trackTraffic } = await import('@/lib/trafficTracker');
+            trackTraffic('purchase', { value_usd: currency === 'USD' ? value : null, metadata: { stripe_session_id: sessionId, currency, raw_value: value } });
+          } catch {}
+
           setUserProperties({
             subscriptionStatus: 'active',
             subscribedAt: new Date().toISOString(),

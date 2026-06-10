@@ -155,6 +155,11 @@ export default function Auth({ onComplete, initialView = "signup" }: AuthProps) 
             if (checkoutError) throw checkoutError;
 
             if (checkoutData?.url) {
+              try {
+                const { trackTraffic } = await import('@/lib/trafficTracker');
+                trackTraffic('signup', { user_id: authData.user.id });
+                trackTraffic('checkout_started', { user_id: authData.user.id, metadata: { stripe_session_id: checkoutData.sessionId } });
+              } catch {}
               window.location.href = checkoutData.url;
             } else {
               throw new Error('No checkout URL returned');

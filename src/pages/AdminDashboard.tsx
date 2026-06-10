@@ -1,311 +1,333 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
+  SidebarHeader, SidebarFooter, useSidebar,
+} from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
-import { 
-  Users, Shield, Key, Building2, Mail, AlertCircle, 
-  TrendingUp, LogOut, Search, RefreshCw, UserCog, FileText, Download, CreditCard
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
+
+import {
+  Shield, LogOut, LayoutDashboard, Activity, Users, UserCog, HeartPulse, Route,
+  GitBranch, FlaskConical, CreditCard, KeyRound, Layers, MessageSquareWarning,
+  Mail, MailCheck, MailWarning, ServerCog, Cpu, AlertOctagon, ScrollText, Bell,
+  Sparkles, Gauge, FlaskRound, Eye, Key,
 } from "lucide-react";
-import { AdminBulkActions } from "@/components/AdminBulkActions";
-import { AdminAnalyticsCharts } from "@/components/AdminAnalyticsCharts";
-import { AdminTableFilters } from "@/components/AdminTableFilters";
-import { AdminAuditTab } from "./AdminDashboard_AuditTab";
-import { AdminSystemHealth } from "@/components/AdminSystemHealth";
+
+import { AdminUserManagement } from "@/components/AdminUserManagement";
 import { AdminUserSessions } from "@/components/AdminUserSessions";
+import { AdminUserHealth } from "@/components/AdminUserHealth";
+import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
+import { AdminCohortAnalysis } from "@/components/AdminCohortAnalysis";
+import { AdminTestUserManagement } from "@/components/AdminTestUserManagement";
+import { AdminSubscriptionMonitoring } from "@/components/AdminSubscriptionMonitoring";
+import { AdminSegmentAnalytics } from "@/components/AdminSegmentAnalytics";
+import { AdminSegmentMismatchReports } from "@/components/AdminSegmentMismatchReports";
+import { AdminEmailDelivery } from "@/components/AdminEmailDelivery";
+import { AdminEmailTracking } from "@/components/AdminEmailTracking";
+import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
+import { AdminSystemHealth } from "@/components/AdminSystemHealth";
+import { AdminSystemHealthMetrics } from "@/components/AdminSystemHealthMetrics";
 import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
 import { AdminErrorTracking } from "@/components/AdminErrorTracking";
-import { AdminEmailTracking } from "@/components/AdminEmailTracking";
-import { AdminUsageTracking } from "@/components/AdminUsageTracking";
-import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
+import { AdminAuditTab } from "./AdminDashboard_AuditTab";
 import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
-import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
-import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
-import { AdminEmailDelivery } from "@/components/AdminEmailDelivery";
-
-import { AdminCohortAnalysis } from "@/components/AdminCohortAnalysis";
-import { AdminSegmentAnalytics } from "@/components/AdminSegmentAnalytics";
-import { AdminUserHealth } from "@/components/AdminUserHealth";
+import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
 import { AdminAdvancedFeatureUsage } from "@/components/AdminAdvancedFeatureUsage";
-import { AdminSystemHealthMetrics } from "@/components/AdminSystemHealthMetrics";
+import { AdminUsageTracking } from "@/components/AdminUsageTracking";
 import { ABTestResults } from "@/components/ABTestResults";
-import { exportUsersToCSV, exportFeedbackToCSV } from "@/lib/csvExport";
+import { AdminAnalyticsCharts } from "@/components/AdminAnalyticsCharts";
 import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
-import { AdminUserManagement } from "@/components/AdminUserManagement";
-import { AdminSubscriptionMonitoring } from "@/components/AdminSubscriptionMonitoring";
-import { AdminSegmentMismatchReports } from "@/components/AdminSegmentMismatchReports";
-import { AdminTestUserManagement } from "@/components/AdminTestUserManagement";
-import { PageErrorBoundary } from "@/components/PageErrorBoundary";
+import { AdminTrafficPage } from "@/components/admin/AdminTrafficPage";
+
+type SectionId =
+  | "overview" | "traffic"
+  | "users" | "sessions" | "user-health" | "journey" | "cohorts" | "test-users"
+  | "subscriptions"
+  | "klaviyo" | "segments" | "mismatch"
+  | "email-delivery" | "email-tracking" | "email-monitoring"
+  | "system-health" | "api" | "errors" | "audit" | "notifications"
+  | "features" | "usage" | "abtests";
+
+const NAV: { group: string; items: { id: SectionId; label: string; icon: any }[] }[] = [
+  { group: "Overview", items: [
+    { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+    { id: "traffic", label: "Traffic", icon: Activity },
+  ]},
+  { group: "Users", items: [
+    { id: "users", label: "All Users", icon: Users },
+    { id: "sessions", label: "Sessions", icon: Eye },
+    { id: "user-health", label: "User Health", icon: HeartPulse },
+    { id: "journey", label: "Journey", icon: Route },
+    { id: "cohorts", label: "Cohorts", icon: GitBranch },
+    { id: "test-users", label: "Test Users", icon: FlaskConical },
+  ]},
+  { group: "Revenue", items: [
+    { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
+  ]},
+  { group: "Klaviyo & Segments", items: [
+    { id: "klaviyo", label: "Klaviyo Keys", icon: KeyRound },
+    { id: "segments", label: "Segment Analytics", icon: Layers },
+    { id: "mismatch", label: "Mismatch Reports", icon: MessageSquareWarning },
+  ]},
+  { group: "Email", items: [
+    { id: "email-delivery", label: "Delivery", icon: Mail },
+    { id: "email-tracking", label: "Tracking", icon: MailCheck },
+    { id: "email-monitoring", label: "Monitoring", icon: MailWarning },
+  ]},
+  { group: "System", items: [
+    { id: "system-health", label: "Health", icon: ServerCog },
+    { id: "api", label: "API Monitoring", icon: Cpu },
+    { id: "errors", label: "Errors", icon: AlertOctagon },
+    { id: "audit", label: "Audit Log", icon: ScrollText },
+    { id: "notifications", label: "Notifications", icon: Bell },
+  ]},
+  { group: "Product", items: [
+    { id: "features", label: "Feature Usage", icon: Sparkles },
+    { id: "usage", label: "Usage / Limits", icon: Gauge },
+    { id: "abtests", label: "A/B Tests", icon: FlaskRound },
+  ]},
+];
+
+const validIds = new Set<string>(NAV.flatMap(g => g.items.map(i => i.id)));
+
+function AdminSidebarNav({ active, onSelect }: { active: SectionId; onSelect: (id: SectionId) => void }) {
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="p-4 border-b">
+        <div className="flex items-center gap-2">
+          <Shield className="h-6 w-6 text-primary shrink-0" />
+          {!collapsed && (
+            <div>
+              <p className="font-semibold text-sm leading-tight">Admin</p>
+              <p className="text-xs text-muted-foreground">Aderai Control</p>
+            </div>
+          )}
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        {NAV.map(group => (
+          <SidebarGroup key={group.group}>
+            <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map(item => (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      isActive={active === item.id}
+                      onClick={() => onSelect(item.id)}
+                      tooltip={item.label}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+      <SidebarFooter className="p-2 border-t">
+        {!collapsed && (
+          <a href="/admin/pricing-preview" className="text-xs text-muted-foreground hover:text-foreground px-2 py-1">
+            Pricing Preview →
+          </a>
+        )}
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+const OverviewSection = () => {
+  const [stats, setStats] = useState({ users: 0, verified: 0, klaviyoKeys: 0, activeKeys: 0, emails: 0, errors: 0 });
+  const [dateRange, setDateRange] = useState<DateRange>("30d");
+
+  useEffect(() => {
+    (async () => {
+      const [u, k, e, se] = await Promise.all([
+        supabase.from("users").select("id,email_verified", { count: "exact" }),
+        supabase.from("klaviyo_keys").select("id,is_active", { count: "exact" }),
+        supabase.from("email_audit_log").select("id", { count: "exact", head: true }),
+        supabase.from("segment_creation_errors").select("id,resolved_at", { count: "exact" }),
+      ]);
+      setStats({
+        users: u.count || 0,
+        verified: (u.data || []).filter((x: any) => x.email_verified).length,
+        klaviyoKeys: k.count || 0,
+        activeKeys: (k.data || []).filter((x: any) => x.is_active).length,
+        emails: e.count || 0,
+        errors: (se.data || []).filter((x: any) => !x.resolved_at).length,
+      });
+    })();
+  }, []);
+
+  const card = (title: string, value: number | string, sub: string) => (
+    <Card>
+      <CardHeader className="pb-2"><CardTitle className="text-sm">{title}</CardTitle></CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        <p className="text-xs text-muted-foreground mt-1">{sub}</p>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Overview</h2>
+          <p className="text-sm text-muted-foreground">Live system snapshot.</p>
+        </div>
+        <AdminDateRangeFilter value={dateRange} onChange={setDateRange} />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {card("Total Users", stats.users, `${stats.verified} verified`)}
+        {card("Klaviyo Keys", stats.klaviyoKeys, `${stats.activeKeys} active`)}
+        {card("Emails Sent", stats.emails, "lifetime")}
+        {card("Open Errors", stats.errors, "unresolved segment errors")}
+      </div>
+      <AdminAnalyticsCharts />
+    </div>
+  );
+};
+
+const KlaviyoKeysSection = () => {
+  const [keys, setKeys] = useState<any[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("klaviyo_keys")
+        .select("*, users(email, account_name)")
+        .order("created_at", { ascending: false });
+      setKeys(data || []);
+    })();
+  }, []);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Klaviyo API Keys</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {keys.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-8 text-center">No Klaviyo keys connected yet.</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Client</TableHead><TableHead>User</TableHead>
+                <TableHead>Status</TableHead><TableHead>Currency</TableHead>
+                <TableHead>AOV</TableHead><TableHead>Created</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {keys.map((k: any) => (
+                <TableRow key={k.id}>
+                  <TableCell className="font-medium">{k.client_name || "N/A"}</TableCell>
+                  <TableCell>{k.users?.email}</TableCell>
+                  <TableCell><Badge variant={k.is_active ? "default" : "destructive"}>{k.is_active ? "Active" : "Inactive"}</Badge></TableCell>
+                  <TableCell>{k.currency}</TableCell>
+                  <TableCell>{k.currency_symbol}{k.aov}</TableCell>
+                  <TableCell>{new Date(k.created_at).toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+const AuditSection = () => {
+  const [logs, setLogs] = useState<any[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("admin_audit_log").select("*").order("created_at", { ascending: false }).limit(100);
+      setLogs(data || []);
+    })();
+  }, []);
+  return <AdminAuditTab auditLogs={logs} />;
+};
+
+const renderSection = (id: SectionId) => {
+  switch (id) {
+    case "overview": return <OverviewSection />;
+    case "traffic": return <AdminTrafficPage />;
+    case "users": return <AdminUserManagement />;
+    case "sessions": return <AdminUserSessions />;
+    case "user-health": return <AdminUserHealth />;
+    case "journey": return <AdminUserJourneyAnalytics />;
+    case "cohorts": return <AdminCohortAnalysis />;
+    case "test-users": return <AdminTestUserManagement />;
+    case "subscriptions": return <AdminSubscriptionMonitoring />;
+    case "klaviyo": return <KlaviyoKeysSection />;
+    case "segments": return <AdminSegmentAnalytics />;
+    case "mismatch": return <AdminSegmentMismatchReports />;
+    case "email-delivery": return <AdminEmailDelivery />;
+    case "email-tracking": return <AdminEmailTracking />;
+    case "email-monitoring": return <AdminEmailMonitoring />;
+    case "system-health": return <div className="space-y-6"><AdminSystemHealthMetrics /><AdminSystemHealth /></div>;
+    case "api": return <AdminAPIMonitoring />;
+    case "errors": return <AdminErrorTracking />;
+    case "audit": return <AuditSection />;
+    case "notifications": return <AdminNotificationCenter />;
+    case "features": return <div className="space-y-6"><AdminFeatureUsage /><AdminAdvancedFeatureUsage /></div>;
+    case "usage": return <AdminUsageTracking />;
+    case "abtests": return <ABTestResults testName="hero-headline" />;
+  }
+};
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
-  const [auditLogs, setAuditLogs] = useState<any[]>([]);
-  const [filters, setFilters] = useState<any>({});
-  const [dateRange, setDateRange] = useState<DateRange>("30d");
+  const initialHash = typeof window !== "undefined" ? window.location.hash.replace("#", "") : "";
+  const [section, setSection] = useState<SectionId>(
+    validIds.has(initialHash) ? (initialHash as SectionId) : "overview"
+  );
 
-  // Data states
-  const [users, setUsers] = useState<any[]>([]);
-  const [klaviyoKeys, setKlaviyoKeys] = useState<any[]>([]);
-  const [emailLogs, setEmailLogs] = useState<any[]>([]);
-  const [segmentErrors, setSegmentErrors] = useState<any[]>([]);
-  const [userRoles, setUserRoles] = useState<any[]>([]);
-
-  // Enable system health monitoring
   useSystemHealthMonitor();
 
   useEffect(() => {
-    checkAdminAccess();
-  }, []);
-
-  const checkAdminAccess = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/");
-        return;
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { navigate("/admin-login"); return; }
+        const { data: isAdminUser, error } = await supabase.rpc("is_admin");
+        if (error || !isAdminUser) {
+          toast.error("Access denied. Admin privileges required.");
+          await supabase.auth.signOut();
+          navigate("/admin-login");
+          return;
+        }
+        setIsAdmin(true);
+      } catch (e) {
+        console.error(e);
+        navigate("/admin-login");
+      } finally {
+        setLoading(false);
       }
+    })();
+  }, [navigate]);
 
-      // Use RPC function to check admin role (security definer)
-      const { data: isAdminUser, error: roleError } = await supabase.rpc("is_admin");
-
-      if (roleError || !isAdminUser) {
-        toast.error("Access denied. Admin privileges required.");
-        await supabase.auth.signOut();
-        navigate("/");
-        return;
-      }
-
-      setIsAdmin(true);
-      loadAllData();
-    } catch (error) {
-      console.error("Error checking admin access:", error);
-      await supabase.auth.signOut();
-      navigate("/");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadAllData = async () => {
-    await Promise.all([
-      loadUsers(),
-      loadKlaviyoKeys(),
-      loadEmailLogs(),
-      loadSegmentErrors(),
-      loadUserRoles(),
-      loadAuditLogs()
-    ]);
-  };
-
-  const loadUsers = async () => {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
-    if (!error && data) setUsers(data);
-  };
-
-  const loadKlaviyoKeys = async () => {
-    const { data, error } = await supabase
-      .from("klaviyo_keys")
-      .select("*, users(email, account_name)")
-      .order("created_at", { ascending: false });
-    
-    if (!error && data) setKlaviyoKeys(data);
-  };
-
-
-  const loadEmailLogs = async () => {
-    const { data, error } = await supabase
-      .from("email_audit_log")
-      .select("*")
-      .order("sent_at", { ascending: false })
-      .limit(100);
-    
-    if (!error && data) setEmailLogs(data);
-  };
-
-  const loadSegmentErrors = async () => {
-    const { data, error } = await supabase
-      .from("segment_creation_errors")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100);
-    
-    if (!error && data) setSegmentErrors(data);
-  };
-
-  const loadUserRoles = async () => {
-    // Query roles and users separately due to foreign key issues
-    const { data: rolesData, error: rolesError } = await supabase
-      .from("user_roles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
-    if (rolesError || !rolesData) {
-      console.error("Error loading user roles:", rolesError);
-      return;
-    }
-
-    // Get all unique user IDs from roles
-    const userIds = [...new Set(rolesData.map(r => r.user_id))];
-    
-    // Fetch user details for these IDs
-    const { data: usersData, error: usersError } = await supabase
-      .from("users")
-      .select("id, email, account_name")
-      .in("id", userIds);
-    
-    if (usersError) {
-      console.error("Error loading users for roles:", usersError);
-      setUserRoles(rolesData);
-      return;
-    }
-
-    // Merge user data with roles
-    const mergedData = rolesData.map(role => ({
-      ...role,
-      users: usersData?.find(u => u.id === role.user_id) || null
-    }));
-    
-    setUserRoles(mergedData);
-  };
-
-  const loadAuditLogs = async () => {
-    const { data, error } = await supabase
-      .from("admin_audit_log")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100);
-    
-    if (!error && data) setAuditLogs(data);
-  };
-
-  const logAuditAction = async (actionType: string, targetTable?: string, targetId?: string, oldValues?: any, newValues?: any) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from("admin_audit_log").insert([{
-        admin_user_id: user?.id,
-        action_type: actionType,
-        target_table: targetTable,
-        target_id: targetId,
-        old_values: oldValues,
-        new_values: newValues
-      }]);
-    } catch (error) {
-      console.error("Failed to log audit action:", error);
-    }
-  };
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.history.replaceState({}, "", `/admin#${section}`);
+  }, [section]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/admin-login");
-  };
-
-  const updateUserRole = async (userId: string, role: "admin" | "user") => {
-    try {
-      // First, check if role exists
-      const { data: existingRole } = await supabase
-        .from("user_roles")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
-
-      const oldRole = existingRole?.role;
-      
-      if (existingRole) {
-        // Update existing role
-        const { error } = await supabase
-          .from("user_roles")
-          .update({ role })
-          .eq("user_id", userId);
-
-        if (error) throw error;
-      } else {
-        // Insert new role
-        const { data: { user } } = await supabase.auth.getUser();
-        const { error } = await supabase
-          .from("user_roles")
-          .insert([{ user_id: userId, role, created_by: user?.id }]);
-
-        if (error) throw error;
-      }
-
-      // Log audit action
-      await logAuditAction("role_update", "user_roles", userId, { role: oldRole }, { role });
-
-      toast.success(`Role updated to ${role} successfully`);
-      loadUserRoles();
-      loadAuditLogs();
-    } catch (error: any) {
-      toast.error("Failed to update role: " + error.message);
-    }
-  };
-
-  const revokeUserRole = async (userId: string) => {
-    try {
-      const { data: existingRole } = await supabase
-        .from("user_roles")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
-
-      if (!existingRole) {
-        toast.error("No role to revoke");
-        return;
-      }
-
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", userId);
-
-      if (error) throw error;
-
-      // Log audit action
-      await logAuditAction("role_revoke", "user_roles", userId, { role: existingRole.role }, null);
-
-      toast.success("Role revoked successfully");
-      loadUserRoles();
-      loadAuditLogs();
-    } catch (error: any) {
-      toast.error("Failed to revoke role: " + error.message);
-    }
-  };
-
-  const toggleUserEmailVerification = async (userId: string, currentVerified: boolean) => {
-    const newVerified = !currentVerified;
-    const { error } = await supabase
-      .from("users")
-      .update({ email_verified: newVerified })
-      .eq("id", userId);
-
-    if (!error) {
-      await logAuditAction("user_email_verification_update", "users", userId, { email_verified: currentVerified }, { email_verified: newVerified });
-    }
-
-    if (error) {
-      toast.error("Failed to update user verification status");
-    } else {
-      toast.success("User verification status updated");
-      loadUsers();
-      loadAuditLogs();
-    }
   };
 
   if (loading) {
@@ -318,516 +340,37 @@ const AdminDashboard = () => {
       </div>
     );
   }
-
   if (!isAdmin) return null;
-
-  const applyFilters = (data: any[], filterConfig: any) => {
-    let filtered = [...data];
-
-    if (filterConfig.search) {
-      const term = filterConfig.search.toLowerCase();
-      filtered = filtered.filter((item: any) => 
-        JSON.stringify(item).toLowerCase().includes(term)
-      );
-    }
-
-    if (filterConfig.dateFrom) {
-      filtered = filtered.filter((item: any) => 
-        new Date(item.created_at || item.sent_at) >= filterConfig.dateFrom
-      );
-    }
-
-    if (filterConfig.dateTo) {
-      filtered = filtered.filter((item: any) => 
-        new Date(item.created_at || item.sent_at) <= filterConfig.dateTo
-      );
-    }
-
-    if (filterConfig.status && filterConfig.status.length > 0) {
-      filtered = filtered.filter((item: any) => 
-        filterConfig.status.includes(item.status)
-      );
-    }
-
-    return filtered;
-  };
-
-  const filteredUsers = applyFilters(users, filters).filter(user => 
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.account_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <PageErrorBoundary pageName="Admin Dashboard">
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Shield className="h-8 w-8 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                <p className="text-sm text-muted-foreground">System Management & Analytics</p>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AdminSidebarNav active={section} onSelect={setSection} />
+          <div className="flex-1 flex flex-col min-w-0">
+            <header className="h-14 border-b bg-card flex items-center justify-between px-4 sticky top-0 z-30">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger />
+                <div>
+                  <h1 className="text-lg font-semibold leading-tight">Admin Dashboard</h1>
+                  <p className="text-xs text-muted-foreground leading-tight">System Management & Analytics</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" asChild>
-                <a href="/admin/pricing-preview">Pricing Preview</a>
-              </Button>
-              <Button variant="outline" size="icon" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4" />
-              </Button>
-              <AdminNotificationCenter />
-            </div>
+              <div className="flex items-center gap-2">
+                <AdminNotificationCenter />
+                <Button variant="outline" size="icon" onClick={handleSignOut} title="Sign out">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            </header>
+            <main className="flex-1 p-4 md:p-6 overflow-x-auto">
+              <PageErrorBoundary pageName={`Admin: ${section}`}>
+                {renderSection(section)}
+              </PageErrorBoundary>
+            </main>
           </div>
         </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-8 xl:grid-cols-19 w-full mb-8 gap-2">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="testusers">Test Users</TabsTrigger>
-            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-            <TabsTrigger value="cohorts">Cohorts</TabsTrigger>
-            <TabsTrigger value="segments">Segments</TabsTrigger>
-            <TabsTrigger value="userhealth">User Health</TabsTrigger>
-            <TabsTrigger value="features">Features</TabsTrigger>
-            <TabsTrigger value="systemhealth">System</TabsTrigger>
-            <TabsTrigger value="journey">Journey</TabsTrigger>
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="api">API</TabsTrigger>
-            <TabsTrigger value="errors">Errors</TabsTrigger>
-            <TabsTrigger value="email-tracking">Email Tracking</TabsTrigger>
-            <TabsTrigger value="emails">Emails</TabsTrigger>
-            <TabsTrigger value="email-delivery">Email Delivery</TabsTrigger>
-
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="klaviyo">Klaviyo</TabsTrigger>
-            <TabsTrigger value="mismatch">Mismatch Reports</TabsTrigger>
-            <TabsTrigger value="abtests">A/B Tests</TabsTrigger>
-            <TabsTrigger value="audit">Audit</TabsTrigger>
-          </TabsList>
-
-          {/* Test Users Tab */}
-          <TabsContent value="testusers">
-            <AdminTestUserManagement />
-          </TabsContent>
-          <TabsContent value="overview" className="space-y-6">
-            <div className="flex justify-end">
-              <AdminDateRangeFilter value={dateRange} onChange={setDateRange} />
-            </div>
-            
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{users.length}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {users.filter(u => u.email_verified).length} verified
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Klaviyo Keys</CardTitle>
-                  <Key className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{klaviyoKeys.length}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {klaviyoKeys.filter(k => k.is_active).length} active
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Email Logs</CardTitle>
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{emailLogs.length}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {emailLogs.filter(e => e.status === 'sent').length} sent successfully
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Segment Errors</CardTitle>
-                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{segmentErrors.length}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {segmentErrors.filter(e => !e.resolved_at).length} unresolved
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Audit Events</CardTitle>
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{auditLogs.length}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Last 100 actions
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Subscriptions Tab */}
-          <TabsContent value="subscriptions">
-            <AdminSubscriptionMonitoring />
-          </TabsContent>
-
-          {/* Cohort Analysis Tab */}
-          <TabsContent value="cohorts">
-            <AdminCohortAnalysis />
-          </TabsContent>
-
-          {/* Segment Analytics Tab */}
-          <TabsContent value="segments">
-            <AdminSegmentAnalytics />
-          </TabsContent>
-
-          {/* User Health Tab */}
-          <TabsContent value="userhealth">
-            <AdminUserHealth />
-          </TabsContent>
-
-          {/* Feature Usage Tab */}
-          <TabsContent value="features">
-            <AdminAdvancedFeatureUsage />
-          </TabsContent>
-
-          {/* System Health Metrics Tab */}
-          <TabsContent value="systemhealth">
-            <AdminSystemHealthMetrics />
-          </TabsContent>
-
-          {/* User Journey Tab */}
-          <TabsContent value="journey">
-            <AdminUserJourneyAnalytics />
-          </TabsContent>
-
-          {/* System Health Tab */}
-          <TabsContent value="health">
-            <AdminSystemHealth />
-          </TabsContent>
-
-          {/* User Sessions Tab */}
-          <TabsContent value="sessions">
-            <AdminUserSessions />
-          </TabsContent>
-
-          {/* API Monitoring Tab */}
-          <TabsContent value="api">
-            <AdminAPIMonitoring />
-          </TabsContent>
-
-          {/* Error Tracking Tab */}
-          <TabsContent value="errors">
-            <AdminErrorTracking />
-          </TabsContent>
-
-          {/* Email Tracking Tab */}
-          <TabsContent value="email-tracking">
-            <AdminEmailTracking />
-          </TabsContent>
-
-          {/* Usage Tracking Tab - removed, merged into Features tab */}
-
-          {/* Email Monitoring Tab */}
-          <TabsContent value="emails">
-            <AdminEmailMonitoring />
-          </TabsContent>
-          <TabsContent value="email-delivery">
-            <AdminEmailDelivery />
-          </TabsContent>
-
-
-          {/* Analytics Tab - removed, split into dedicated tabs */}
-
-          {/* Users Tab */}
-          <TabsContent value="users">
-            <AdminUserManagement />
-          </TabsContent>
-
-          {/* Roles Tab */}
-          <TabsContent value="roles">
-            <Card>
-              <CardHeader>
-                <CardTitle>User Roles Management</CardTitle>
-                <CardDescription>Assign and manage admin privileges with full audit trail</CardDescription>
-                <div className="mt-4">
-                  <AdminBulkActions
-                    selectedIds={selectedRoleIds}
-                    onSelectionChange={setSelectedRoleIds}
-                    items={users}
-                    type="roles"
-                    onActionComplete={() => {
-                      loadUserRoles();
-                      loadAuditLogs();
-                    }}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4 p-4 bg-muted/50 rounded-lg border">
-                  <div className="flex items-start gap-2">
-                    <Shield className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Role Management</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Use the dropdown to assign roles or click "Revoke" to remove all privileges. All actions are logged in the Audit tab.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">
-                        <Checkbox
-                          checked={selectedRoleIds.length === users.length && users.length > 0}
-                          onCheckedChange={() => {
-                            if (selectedRoleIds.length === users.length) {
-                              setSelectedRoleIds([]);
-                            } else {
-                              setSelectedRoleIds(users.map(u => u.id));
-                            }
-                          }}
-                        />
-                      </TableHead>
-                      <TableHead>User Email</TableHead>
-                      <TableHead>Account Name</TableHead>
-                      <TableHead>Account Type</TableHead>
-                      <TableHead>Current Role</TableHead>
-                      <TableHead>Assigned Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                    <TableBody>
-                      {users.map((user) => {
-                        const userRole = userRoles.find(r => r.user_id === user.id);
-                        return (
-                          <TableRow key={user.id}>
-                            <TableCell>
-                              <Checkbox
-                                checked={selectedRoleIds.includes(user.id)}
-                                onCheckedChange={() => {
-                                  if (selectedRoleIds.includes(user.id)) {
-                                    setSelectedRoleIds(selectedRoleIds.filter(id => id !== user.id));
-                                  } else {
-                                    setSelectedRoleIds([...selectedRoleIds, user.id]);
-                                  }
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell className="font-medium">{user.email}</TableCell>
-                            <TableCell>{user.account_name}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{user.account_type}</Badge>
-                            </TableCell>
-                          <TableCell>
-                            {userRole ? (
-                              <Badge variant={userRole.role === 'admin' ? 'default' : 'secondary'}>
-                                {userRole.role}
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline">No role</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {userRole ? new Date(userRole.created_at).toLocaleDateString() : '-'}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Select
-                                value={userRole?.role || 'user'}
-                                onValueChange={(value) => updateUserRole(user.id, value as "admin" | "user")}
-                              >
-                                <SelectTrigger className="w-32">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="user">User</SelectItem>
-                                  <SelectItem value="admin">Admin</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              {userRole && (
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => {
-                                    if (confirm(`Revoke role for ${user.email}?`)) {
-                                      revokeUserRole(user.id);
-                                    }
-                                  }}
-                                >
-                                  Revoke
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Klaviyo Keys Tab */}
-          <TabsContent value="klaviyo">
-            <Card>
-              <CardHeader>
-                <CardTitle>Klaviyo API Keys</CardTitle>
-                <CardDescription>Monitor all connected Klaviyo accounts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Client Name</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Currency</TableHead>
-                      <TableHead>AOV</TableHead>
-                      <TableHead>Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {klaviyoKeys.map((key: any) => (
-                      <TableRow key={key.id}>
-                        <TableCell className="font-medium">{key.client_name || 'N/A'}</TableCell>
-                        <TableCell>{key.users?.email}</TableCell>
-                        <TableCell>
-                          <Badge variant={key.is_active ? 'default' : 'destructive'}>
-                            {key.is_active ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{key.currency}</TableCell>
-                        <TableCell>{key.currency_symbol}{key.aov}</TableCell>
-                        <TableCell>{new Date(key.created_at).toLocaleDateString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Email Logs Tab */}
-          <TabsContent value="emails">
-            <Card>
-              <CardHeader>
-                <CardTitle>Email Audit Log</CardTitle>
-                <CardDescription>Recent email activity (last 100)</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Recipient</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Subject</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Sent At</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {emailLogs.map((log) => (
-                      <TableRow key={log.id}>
-                        <TableCell className="font-medium">{log.recipient_email}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{log.email_type}</Badge>
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate">{log.subject}</TableCell>
-                        <TableCell>
-                          <Badge variant={log.status === 'sent' ? 'default' : 'destructive'}>
-                            {log.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{new Date(log.sent_at).toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Errors Tab */}
-          <TabsContent value="errors">
-            <Card>
-              <CardHeader>
-                <CardTitle>Segment Creation Errors</CardTitle>
-                <CardDescription>Track and monitor segment creation failures</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Segment Name</TableHead>
-                      <TableHead>Error Message</TableHead>
-                      <TableHead>Retry Count</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {segmentErrors.map((error) => (
-                      <TableRow key={error.id}>
-                        <TableCell className="font-medium">{error.segment_name}</TableCell>
-                        <TableCell className="max-w-md truncate">{error.error_message}</TableCell>
-                        <TableCell>{error.retry_count}</TableCell>
-                        <TableCell>
-                          {error.resolved_at ? (
-                            <Badge variant="default">Resolved</Badge>
-                          ) : (
-                            <Badge variant="destructive">Pending</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>{new Date(error.created_at).toLocaleDateString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Segment Mismatch Reports Tab */}
-          <TabsContent value="mismatch">
-            <AdminSegmentMismatchReports />
-          </TabsContent>
-
-          {/* A/B Tests Tab */}
-          <TabsContent value="abtests" className="space-y-6">
-            <ABTestResults testName="hero-headline" />
-          </TabsContent>
-
-          {/* Audit Trail Tab */}
-          <TabsContent value="audit">
-            <AdminAuditTab auditLogs={auditLogs} />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+      </SidebarProvider>
     </PageErrorBoundary>
   );
 };
