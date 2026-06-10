@@ -110,11 +110,14 @@ export const AdminTrafficPage = () => {
 
   const countries = useMemo(() => {
     const map = new Map<string, number>();
+    let known = 0;
     pageViews.forEach(e => {
-      const c = (e.country || "??").toUpperCase();
+      const c = (e.country || "").toUpperCase();
+      if (!c || c === "??" || c.length !== 2) return;
+      known++;
       map.set(c, (map.get(c) || 0) + 1);
     });
-    const total = pageViews.length || 1;
+    const total = known || 1;
     return Array.from(map.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
