@@ -17,6 +17,7 @@ import { Globe } from "@/components/ui/globe";
 import { useNavigate } from "react-router-dom";
 import { SectionPlaceholder } from "@/components/ui/SectionPlaceholder";
 import { usePricing } from "@/hooks/useCurrency";
+import { trackTraffic, captureUtmFromUrl } from "@/lib/trafficTracker";
 
 // Lazy load heavy components
 const ComparisonChart = lazy(() => import('@/components/ComparisonChart').then(m => ({ default: m.ComparisonChart })));
@@ -33,11 +34,14 @@ export default function LandingPage() {
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
+    captureUtmFromUrl();
+    trackTraffic("page_view");
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
   const handleGetStarted = () => {
     trackABTestConversion('hero-headline');
+    trackTraffic("cta_click", { metadata: { source: "hero" } });
     navigate("/signup");
   };
 
