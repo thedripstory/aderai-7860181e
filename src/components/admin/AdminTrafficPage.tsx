@@ -27,7 +27,7 @@ type TrafficEvent = {
 };
 
 const rangeToDays: Record<DateRange, number> = {
-  "24h": 1, "7d": 7, "30d": 30, "90d": 90, all: 3650,
+  "7d": 7, "30d": 30, "90d": 90, all: 3650,
 };
 
 export const AdminTrafficPage = () => {
