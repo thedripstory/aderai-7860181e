@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -14,38 +14,40 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 
 import {
-  Shield, LogOut, LayoutDashboard, Activity, Users, UserCog, HeartPulse, Route,
+  LogOut, LayoutDashboard, Activity, Users, UserCog, HeartPulse, Route,
   GitBranch, FlaskConical, CreditCard, KeyRound, Layers, MessageSquareWarning,
   Mail, MailCheck, MailWarning, ServerCog, Cpu, AlertOctagon, ScrollText, Bell,
-  Sparkles, Gauge, FlaskRound, Eye, Key,
+  Sparkles, Gauge, FlaskRound, Eye, RefreshCw,
 } from "lucide-react";
 
-import { AdminUserManagement } from "@/components/AdminUserManagement";
-import { AdminUserSessions } from "@/components/AdminUserSessions";
-import { AdminUserHealth } from "@/components/AdminUserHealth";
-import { AdminUserJourneyAnalytics } from "@/components/AdminUserJourneyAnalytics";
-import { AdminCohortAnalysis } from "@/components/AdminCohortAnalysis";
-import { AdminTestUserManagement } from "@/components/AdminTestUserManagement";
-import { AdminSubscriptionMonitoring } from "@/components/AdminSubscriptionMonitoring";
-import { AdminSegmentAnalytics } from "@/components/AdminSegmentAnalytics";
-import { AdminSegmentMismatchReports } from "@/components/AdminSegmentMismatchReports";
-import { AdminEmailDelivery } from "@/components/AdminEmailDelivery";
-import { AdminEmailTracking } from "@/components/AdminEmailTracking";
-import { AdminEmailMonitoring } from "@/components/AdminEmailMonitoring";
-import { AdminSystemHealth } from "@/components/AdminSystemHealth";
-import { AdminSystemHealthMetrics } from "@/components/AdminSystemHealthMetrics";
-import { AdminAPIMonitoring } from "@/components/AdminAPIMonitoring";
-import { AdminErrorTracking } from "@/components/AdminErrorTracking";
-import { AdminAuditTab } from "./AdminDashboard_AuditTab";
-import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
-import { AdminFeatureUsage } from "@/components/AdminFeatureUsage";
-import { AdminAdvancedFeatureUsage } from "@/components/AdminAdvancedFeatureUsage";
-import { AdminUsageTracking } from "@/components/AdminUsageTracking";
-import { ABTestResults } from "@/components/ABTestResults";
-import { AdminAnalyticsCharts } from "@/components/AdminAnalyticsCharts";
 import { AdminDateRangeFilter, DateRange } from "@/components/AdminDateRangeFilter";
 import { useSystemHealthMonitor } from "@/hooks/useSystemHealthMonitor";
-import { AdminTrafficPage } from "@/components/admin/AdminTrafficPage";
+
+// ---- Lazy-load heavy admin sections to keep initial /admin load fast ----
+const AdminUserManagement       = lazy(() => import("@/components/AdminUserManagement").then(m => ({ default: m.AdminUserManagement })));
+const AdminUserSessions         = lazy(() => import("@/components/AdminUserSessions").then(m => ({ default: m.AdminUserSessions })));
+const AdminUserHealth           = lazy(() => import("@/components/AdminUserHealth").then(m => ({ default: m.AdminUserHealth })));
+const AdminUserJourneyAnalytics = lazy(() => import("@/components/AdminUserJourneyAnalytics").then(m => ({ default: m.AdminUserJourneyAnalytics })));
+const AdminCohortAnalysis       = lazy(() => import("@/components/AdminCohortAnalysis").then(m => ({ default: m.AdminCohortAnalysis })));
+const AdminTestUserManagement   = lazy(() => import("@/components/AdminTestUserManagement").then(m => ({ default: m.AdminTestUserManagement })));
+const AdminSubscriptionMonitoring = lazy(() => import("@/components/AdminSubscriptionMonitoring").then(m => ({ default: m.AdminSubscriptionMonitoring })));
+const AdminSegmentAnalytics     = lazy(() => import("@/components/AdminSegmentAnalytics").then(m => ({ default: m.AdminSegmentAnalytics })));
+const AdminSegmentMismatchReports = lazy(() => import("@/components/AdminSegmentMismatchReports").then(m => ({ default: m.AdminSegmentMismatchReports })));
+const AdminEmailDelivery        = lazy(() => import("@/components/AdminEmailDelivery").then(m => ({ default: m.AdminEmailDelivery })));
+const AdminEmailTracking        = lazy(() => import("@/components/AdminEmailTracking").then(m => ({ default: m.AdminEmailTracking })));
+const AdminEmailMonitoring      = lazy(() => import("@/components/AdminEmailMonitoring").then(m => ({ default: m.AdminEmailMonitoring })));
+const AdminSystemHealth         = lazy(() => import("@/components/AdminSystemHealth").then(m => ({ default: m.AdminSystemHealth })));
+const AdminSystemHealthMetrics  = lazy(() => import("@/components/AdminSystemHealthMetrics").then(m => ({ default: m.AdminSystemHealthMetrics })));
+const AdminAPIMonitoring        = lazy(() => import("@/components/AdminAPIMonitoring").then(m => ({ default: m.AdminAPIMonitoring })));
+const AdminErrorTracking        = lazy(() => import("@/components/AdminErrorTracking").then(m => ({ default: m.AdminErrorTracking })));
+const AdminAuditTab             = lazy(() => import("./AdminDashboard_AuditTab").then(m => ({ default: m.AdminAuditTab })));
+const AdminNotificationCenter   = lazy(() => import("@/components/AdminNotificationCenter").then(m => ({ default: m.AdminNotificationCenter })));
+const AdminFeatureUsage         = lazy(() => import("@/components/AdminFeatureUsage").then(m => ({ default: m.AdminFeatureUsage })));
+const AdminAdvancedFeatureUsage = lazy(() => import("@/components/AdminAdvancedFeatureUsage").then(m => ({ default: m.AdminAdvancedFeatureUsage })));
+const AdminUsageTracking        = lazy(() => import("@/components/AdminUsageTracking").then(m => ({ default: m.AdminUsageTracking })));
+const ABTestResults             = lazy(() => import("@/components/ABTestResults").then(m => ({ default: m.ABTestResults })));
+const AdminAnalyticsCharts      = lazy(() => import("@/components/AdminAnalyticsCharts").then(m => ({ default: m.AdminAnalyticsCharts })));
+const AdminTrafficPage          = lazy(() => import("@/components/admin/AdminTrafficPage").then(m => ({ default: m.AdminTrafficPage })));
 
 type SectionId =
   | "overview" | "traffic"
@@ -298,6 +300,15 @@ const renderSection = (id: SectionId) => {
   }
 };
 
+const SectionFallback = () => (
+  <div className="flex items-center justify-center py-24">
+    <div className="relative w-8 h-8">
+      <div className="absolute inset-0 border-2 border-transparent border-t-primary border-r-primary rounded-full animate-spin" />
+      <div className="absolute inset-1 border-2 border-transparent border-b-accent border-l-accent rounded-full animate-[spin_0.8s_linear_infinite_reverse]" />
+    </div>
+  </div>
+);
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -306,6 +317,9 @@ const AdminDashboard = () => {
   const [section, setSection] = useState<SectionId>(
     validIds.has(initialHash) ? (initialHash as SectionId) : "overview"
   );
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
   useSystemHealthMonitor();
 
@@ -336,6 +350,20 @@ const AdminDashboard = () => {
     window.history.replaceState({}, "", `/admin#${section}`);
   }, [section]);
 
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    setRefreshKey(k => k + 1);
+    setLastRefreshed(new Date());
+    setTimeout(() => setRefreshing(false), 600);
+  }, []);
+
+  // Auto-refresh every 2 minutes
+  useEffect(() => {
+    if (!isAdmin) return;
+    const id = setInterval(handleRefresh, 120_000);
+    return () => clearInterval(id);
+  }, [isAdmin, handleRefresh]);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/admin-login");
@@ -353,6 +381,12 @@ const AdminDashboard = () => {
   }
   if (!isAdmin) return null;
 
+  const lastAgo = (() => {
+    const s = Math.floor((Date.now() - lastRefreshed.getTime()) / 1000);
+    if (s < 60) return `${s}s ago`;
+    return `${Math.floor(s / 60)}m ago`;
+  })();
+
   return (
     <PageErrorBoundary pageName="Admin Dashboard">
       <SidebarProvider>
@@ -368,7 +402,22 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <AdminNotificationCenter />
+                <span className="hidden md:inline text-xs text-muted-foreground tabular-nums">
+                  Updated {lastAgo}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  title="Refresh stats (auto every 2 min)"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
+                <Suspense fallback={null}>
+                  <AdminNotificationCenter />
+                </Suspense>
                 <Button variant="outline" size="icon" onClick={handleSignOut} title="Sign out">
                   <LogOut className="h-4 w-4" />
                 </Button>
@@ -376,7 +425,9 @@ const AdminDashboard = () => {
             </header>
             <main className="flex-1 p-4 md:p-6 overflow-x-auto">
               <PageErrorBoundary pageName={`Admin: ${section}`}>
-                {renderSection(section)}
+                <Suspense fallback={<SectionFallback />}>
+                  <div key={refreshKey}>{renderSection(section)}</div>
+                </Suspense>
               </PageErrorBoundary>
             </main>
           </div>
