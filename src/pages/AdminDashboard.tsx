@@ -105,11 +105,22 @@ function AdminSidebarNav({ active, onSelect }: { active: SectionId; onSelect: (i
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4 border-b">
         <div className="flex items-center gap-2">
-          <Shield className="h-6 w-6 text-primary shrink-0" />
-          {!collapsed && (
-            <div>
-              <p className="font-semibold text-sm leading-tight">Admin</p>
-              <p className="text-xs text-muted-foreground">Aderai Control</p>
+          {collapsed ? (
+            <img
+              src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png"
+              alt="Aderai"
+              className="h-6 w-6 object-contain dark:invert shrink-0"
+            />
+          ) : (
+            <div className="flex items-center gap-2 min-w-0">
+              <img
+                src="https://pub-3bbb34ba2afb44e8af7fdecd43e23b74.r2.dev/aderai-logos/zoomed-inblack-logo-png%20copy.png"
+                alt="Aderai"
+                className="h-7 w-auto object-contain dark:invert shrink-0"
+              />
+              <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                Admin
+              </span>
             </div>
           )}
         </div>
