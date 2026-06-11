@@ -236,7 +236,16 @@ serve(async (req) => {
                 user_data: userData,
                 custom_data: {
                   currency: session.currency ? session.currency.toUpperCase() : "USD",
-                  value: typeof session.amount_total === "number" ? session.amount_total / 100 : 39,
+                  // Meta requires `value` as a positive Number. Round to 2dp and guard against 0/NaN/null.
+                  value: (() => {
+                    const raw = typeof session.amount_total === "number" ? session.amount_total / 100 : 39;
+                    const n = Number(raw);
+                    const safe = Number.isFinite(n) && n > 0 ? n : 39;
+                    return Math.round(safe * 100) / 100;
+                  })(),
+                  content_name: "Aderai Subscription",
+                  content_type: "product",
+                  num_items: 1,
                 },
               }],
             };
