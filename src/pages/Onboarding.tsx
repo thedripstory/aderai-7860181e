@@ -54,11 +54,14 @@ export default function Onboarding() {
           });
 
           try {
+            const n = Number(value);
+            const safeValue = Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 39;
             trackMetaEvent('Purchase', {
-              value,
-              currency,
+              value: safeValue,
+              currency: (currency || 'USD').toUpperCase(),
               content_name: 'Aderai Subscription',
               content_type: 'product',
+              num_items: 1,
             }, `purchase_${sessionId}`);
           } catch {
             // Silently ignore Meta Pixel errors so onboarding never breaks
